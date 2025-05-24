@@ -6,7 +6,7 @@ pageEncoding="UTF-8"%>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MasterTicket Dashboard</title>
-    <!-- CSS remains unchanged -->
+
     <style>
       * {
         margin: 0;
@@ -30,7 +30,7 @@ pageEncoding="UTF-8"%>
         z-index: 1;
       }
 
-      /* Sidebar */
+   
       .sidebar {
         width: 280px;
         background: rgba(15, 23, 42, 0.9);
@@ -103,7 +103,7 @@ pageEncoding="UTF-8"%>
       }
 
       .nav-link.active {
-        background: rgba(159, 153, 153, 0.18);
+        background: rgba(255, 255, 255, 0.05);
         color: white;
       }
 
@@ -130,12 +130,11 @@ pageEncoding="UTF-8"%>
         color: white;
       }
 
-      /* Main Content */
+      
       .main-content {
         flex: 1;
         padding: 2rem;
-        /* background: rgba(15, 23, 42, 0.5);
-        backdrop-filter: blur(10px); */
+      
       }
 
       .header {
@@ -160,7 +159,7 @@ pageEncoding="UTF-8"%>
         backdrop-filter: blur(20px);
       }
 
-      /* Stats Cards */
+
       .stats-grid {
         display: flex;
         flex-direction: row;
@@ -177,9 +176,9 @@ pageEncoding="UTF-8"%>
       }
 
       .stat-card {
-        width: fit-content; /* Changed from fixed 20% to adapt to content */
-        min-width: 230px; /* Optional: set a minimum width to avoid overly narrow cards */
-        max-width: 100%; /* Ensure card doesn't exceed parent container */
+        width: fit-content; 
+        min-width: 230px;
+        max-width: 100%; 
         background: rgba(255, 255, 255, 0.18);
         border-radius: 12px;
         padding: 2rem;
@@ -196,7 +195,7 @@ pageEncoding="UTF-8"%>
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        width: 100%; /* Ensure wrapper takes full card width */
+        width: 100%; 
       }
 
       .stat-header {
@@ -204,7 +203,7 @@ pageEncoding="UTF-8"%>
         align-items: flex-start;
         gap: 0.75rem;
         margin-bottom: 1rem;
-        width: 100%; /* Ensure header doesn't cause overflow */
+        width: 100%; 
       }
 
       .stat-icon {
@@ -212,24 +211,24 @@ pageEncoding="UTF-8"%>
         height: 52px;
         max-width: 100%;
         height: auto;
-        flex-shrink: 0; /* Prevent icon from shrinking */
+        flex-shrink: 0;
       }
 
       .stat-content {
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: flex-start; /* Changed from center to avoid overflow */
+        justify-content: flex-start;
         gap: 5px;
-        width: 100%; /* Ensure content takes full width */
-        flex-wrap: wrap; /* Allow content to wrap if too wide */
+        width: 100%; 
+        flex-wrap: wrap; 
       }
 
       .stat-title {
         color: #ffffff;
         font-size: 1rem;
         font-weight: 500;
-        word-wrap: break-word; /* Ensure text wraps */
+        word-wrap: break-word; 
       }
 
       .stat-value {
@@ -237,9 +236,9 @@ pageEncoding="UTF-8"%>
         font-size: 24px;
         font-weight: 700;
         word-wrap: break-word;
-        max-width: 100%; /* Ensure value doesn't overflow */
+        max-width: 100%;
       }
-      /* Content Grid */
+
       .content-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -261,7 +260,6 @@ pageEncoding="UTF-8"%>
         margin-bottom: 0.5rem;
       }
 
-      /* Hot Events List */
       .event-list {
         list-style: none;
       }
@@ -312,7 +310,7 @@ pageEncoding="UTF-8"%>
         font-weight: 600;
       }
 
-      /* Request List */
+
       .request-item {
         display: flex;
         align-items: center;
@@ -439,7 +437,7 @@ pageEncoding="UTF-8"%>
     </style>
   </head>
   <body>
-    <!-- Updated image paths -->
+
     <img
       class="bg_elips firstElement"
       src="${pageContext.request.contextPath}/asset/full.svg"
@@ -450,7 +448,7 @@ pageEncoding="UTF-8"%>
     />
 
     <div class="container">
-      <!-- Sidebar -->
+
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
 
@@ -475,7 +473,7 @@ pageEncoding="UTF-8"%>
               <a href="#" class="nav-link">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">Danh sách tài khoản</a>
+             <a href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount" class="nav-link">Danh sách tài khoản</a>
             </li>
             <li class="nav-item">
               <a href="#" class="nav-link">Hỗ trợ khách hàng</a>
@@ -494,13 +492,13 @@ pageEncoding="UTF-8"%>
         </a>
       </aside>
 
-      <!-- Main Content -->
+  
       <main class="main-content">
         <header class="header">
           <div class="control-panel">Bảng điều khiển</div>
         </header>
 
-        <!-- Stats Grid -->
+    
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-wrapper">
@@ -680,9 +678,8 @@ pageEncoding="UTF-8"%>
       </main>
     </div>
 
-    <!-- JavaScript remains unchanged -->
     <script>
-      // Add smooth hover effects and interactions
+      
       document.querySelectorAll(".stat-card").forEach((card) => {
         card.addEventListener("mouseenter", () => {
           card.style.transform = "translateY(-4px)";
@@ -695,16 +692,6 @@ pageEncoding="UTF-8"%>
         });
       });
 
-      // Add click interactions for buttons
-      document.querySelectorAll(".btn-detail").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          btn.style.transform = "scale(0.95)";
-          setTimeout(() => {
-            btn.style.transform = "scale(1)";
-          }, 150);
-        });
-      });
-
       // Animate ellipses
       function animateEllipses() {
         const ellipses = document.querySelectorAll(".bg_elips");
@@ -713,20 +700,6 @@ pageEncoding="UTF-8"%>
           ellipse.style.animation = `float ${duration}ms ease-in-out infinite`;
         });
       }
-
-      // Add floating animation keyframes
-      const style = document.createElement("style");
-      style.textContent = `
-            @keyframes float {
-                0%, 100% { transform: translateY(0px) rotate(0deg); }
-                33% { transform: translateY(-20px) rotate(1deg); }
-                66% { transform: translateY(10px) rotate(-1deg); }
-            }
-        `;
-      document.head.appendChild(style);
-
-      // Initialize animations
-      animateEllipses();
     </script>
   </body>
 </html>
