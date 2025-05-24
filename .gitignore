@@ -1,0 +1,23 @@
+# Maven
+target/
+
+# IntelliJ
+*.iml
+.idea/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# OS / tạm thời
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Maven Wrapper (nếu không dùng)
+.mvn/
+mvnw
+mvnw.cmd
+.target/
