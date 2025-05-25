@@ -7,6 +7,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.RequestDispatcher;
+import Model.User;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "AdminServlet", urlPatterns = { "/AdminServlet" })
 public class AdminServlet extends HttpServlet {
@@ -22,12 +25,25 @@ public class AdminServlet extends HttpServlet {
             String targetJsp;
 
             // Handle null, empty, or "?action=" cases
-            if (action == null || action.trim().isEmpty()) {
+            if (action == null || action.trim().isEmpty() || action.equalsIgnoreCase("adminDashboard")) {
                 System.out.println("[AdminServlet] Action is null or empty, forwarding to AdminDashboard.jsp");
                 targetJsp = "managerPage/AdminDashboard.jsp";
             } else if ("manageUserAccount".equalsIgnoreCase(action)) {
-                System.out.println("[AdminServlet] Action is manageUserAccount, forwarding to AdminUserManagement.jsp");
-                targetJsp = "managerPage/AdminUserManagement.jsp";
+                System.out.println("[AdminServlet] Action is manageUserAccount, preparing user data");
+
+                // Create sample user data
+                List<User> userList = new ArrayList<>();
+                userList.add(new User("Nguyen Van A", "aimablet@gmail.com", "password123", "22/02/2025"));
+                userList.add(new User("Nguyen Van B", "user2@gmail.com", "pass456", "22/02/2025"));
+                userList.add(new User("Nguyen Van C", "user3@gmail.com", "secure789", "22/02/2025"));
+                userList.add(new User("Nguyen Van D", "user4@gmail.com", "mypassword", "22/02/2025"));
+                userList.add(new User("Nguyen Van E", "user5@gmail.com", "testpass", "22/02/2025"));
+
+                // Set userList as a request attribute
+                request.setAttribute("userList", userList);
+
+                System.out.println("[AdminServlet] User list size: " + userList.size());
+                targetJsp = "managerPage/AdminUserManagement.jsp"; // Point to your JSP
             } else {
                 System.out.println("[AdminServlet] Unknown action: '" + action + "', defaulting to AdminDashboard.jsp");
                 targetJsp = "managerPage/AdminDashboard.jsp";

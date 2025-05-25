@@ -30,9 +30,8 @@ pageEncoding="UTF-8"%>
         z-index: 1;
       }
 
-   
       .sidebar {
-        width: 280px;
+        width: 16%;
         background: rgba(15, 23, 42, 0.9);
         backdrop-filter: blur(20px);
         border-right: 1px solid #4d4d4d;
@@ -130,11 +129,12 @@ pageEncoding="UTF-8"%>
         color: white;
       }
 
-      
+     
       .main-content {
         flex: 1;
-        padding: 2rem;
-      
+        padding: 0 80px;
+        padding-top: 40px;
+        overflow-y: auto;
       }
 
       .header {
@@ -159,7 +159,6 @@ pageEncoding="UTF-8"%>
         backdrop-filter: blur(20px);
       }
 
-
       .stats-grid {
         display: flex;
         flex-direction: row;
@@ -176,9 +175,9 @@ pageEncoding="UTF-8"%>
       }
 
       .stat-card {
-        width: fit-content; 
+        width: fit-content;
         min-width: 230px;
-        max-width: 100%; 
+        max-width: 100%;
         background: rgba(255, 255, 255, 0.18);
         border-radius: 12px;
         padding: 2rem;
@@ -195,7 +194,7 @@ pageEncoding="UTF-8"%>
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        width: 100%; 
+        width: 100%;
       }
 
       .stat-header {
@@ -203,7 +202,7 @@ pageEncoding="UTF-8"%>
         align-items: flex-start;
         gap: 0.75rem;
         margin-bottom: 1rem;
-        width: 100%; 
+        width: 100%;
       }
 
       .stat-icon {
@@ -220,15 +219,15 @@ pageEncoding="UTF-8"%>
         align-items: center;
         justify-content: flex-start;
         gap: 5px;
-        width: 100%; 
-        flex-wrap: wrap; 
+        width: 100%;
+        flex-wrap: wrap;
       }
 
       .stat-title {
         color: #ffffff;
         font-size: 1rem;
         font-weight: 500;
-        word-wrap: break-word; 
+        word-wrap: break-word;
       }
 
       .stat-value {
@@ -309,7 +308,6 @@ pageEncoding="UTF-8"%>
         font-size: 0.75rem;
         font-weight: 600;
       }
-
 
       .request-item {
         display: flex;
@@ -437,7 +435,6 @@ pageEncoding="UTF-8"%>
     </style>
   </head>
   <body>
-
     <img
       class="bg_elips firstElement"
       src="${pageContext.request.contextPath}/asset/full.svg"
@@ -448,7 +445,6 @@ pageEncoding="UTF-8"%>
     />
 
     <div class="container">
-
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
 
@@ -473,7 +469,11 @@ pageEncoding="UTF-8"%>
               <a href="#" class="nav-link">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
-             <a href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount" class="nav-link">Danh sách tài khoản</a>
+              <a
+                href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
+                class="nav-link"
+                >Danh sách tài khoản</a
+              >
             </li>
             <li class="nav-item">
               <a href="#" class="nav-link">Hỗ trợ khách hàng</a>
@@ -492,13 +492,11 @@ pageEncoding="UTF-8"%>
         </a>
       </aside>
 
-  
       <main class="main-content">
         <header class="header">
           <div class="control-panel">Bảng điều khiển</div>
         </header>
 
-    
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-wrapper">
@@ -679,7 +677,6 @@ pageEncoding="UTF-8"%>
     </div>
 
     <script>
-      
       document.querySelectorAll(".stat-card").forEach((card) => {
         card.addEventListener("mouseenter", () => {
           card.style.transform = "translateY(-4px)";
