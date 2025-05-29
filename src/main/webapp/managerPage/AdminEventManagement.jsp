@@ -645,7 +645,7 @@
               <div class="event-status success">Đang hoạt động</div>
             </div>
             <div class="actions">
-              <button class="action-btn edit-btn">
+              <button class="action-btn edit-btn onclick="handleEditEvent(${event.eventId})"">
                 <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" />
               </button>
               <button class="action-btn delete-btn">
@@ -661,7 +661,7 @@
               <div class="event-status error">Đã Dừng</div>
             </div>
             <div class="actions">
-              <button class="action-btn edit-btn">
+              <button class="action-btn edit-btn" onclick="handleEditEvent(${event.eventId})">
                 <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" />
               </button>
               <button class="action-btn delete-btn">
@@ -693,7 +693,7 @@
               <div class="event-status warning">Đang chờ duyệt</div>
             </div>
             <div class="actions">
-              <button class="action-btn edit-btn">
+              <button class="action-btn edit-btn" onclick="handleEditEvent(${event.eventId})">
                 <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" />
               </button>
               <button class="action-btn delete-btn">
@@ -726,6 +726,14 @@
             }
           });
         });
+        
+         function handleEditEvent(eventId) {
+        // Kiểm tra ID (debug)
+        console.log("Redirecting to edit event:", eventId);
+
+        // Redirect đến Servlet
+        window.location.href = 'AdminServlet?action=viewEventDetail&eventId=' + eventId;
+    }
     </script>
   </body>
 </html>

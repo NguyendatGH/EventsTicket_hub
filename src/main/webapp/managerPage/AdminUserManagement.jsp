@@ -314,7 +314,6 @@ prefix="c" %>
         background: rgba(220, 53, 69, 0.3);
       }
 
-      /* Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -325,12 +324,12 @@ prefix="c" %>
       }
 
       ::-webkit-scrollbar-thumb {
-        background: rgba(100, 150, 255, 0.5);
+        background: rgba(38, 62, 114, 0.5);
         border-radius: 10px;
       }
 
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(100, 150, 255, 0.7);
+        background: rgba(45, 70, 126, 0.7);
       }
 
       /* Responsive */
@@ -398,12 +397,12 @@ prefix="c" %>
               <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link active">Danh sách sự kiện</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
-                class="nav-link"
+                class="nav-link active"
                 >Danh sách tài khoản</a
               >
             </li>
@@ -582,3 +581,4 @@ prefix="c" %>
     </script>
   </body>
 </html>
+
