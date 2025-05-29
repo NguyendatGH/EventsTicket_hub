@@ -12,12 +12,17 @@
     <title>Change Password</title>
     <style>
         body {
-            font-family: "Segoe UI", sans-serif;
-            background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
-            height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1123, #1f1d40, #5e1763);
+            background-size: cover;
+            background-repeat: no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            color: white;
         }
 
         .form-box {
@@ -30,7 +35,11 @@
         }
 
         .form-box h2 {
-            margin-bottom: 20px;
+            font-size: 36px;
+                font-weight: 400;
+                margin-bottom: 30px;
+                margin-top: 0;
+                text-align: left;
         }
 
         .form-box input {
