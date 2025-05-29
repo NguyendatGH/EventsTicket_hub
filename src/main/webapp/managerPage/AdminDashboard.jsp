@@ -589,7 +589,7 @@ pageEncoding="UTF-8"%>
             </ul>
           </div>
 
-          <!-- Requests -->
+   
           <div class="content-card">
             <div class="request-header">
               <h2 class="card-title">Yêu cầu phê duyệt</h2>
@@ -606,7 +606,7 @@ pageEncoding="UTF-8"%>
                 <span class="request-text">Sự kiện về tranh hoài linh</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -620,7 +620,7 @@ pageEncoding="UTF-8"%>
                 <span class="request-text">Sự kiện về tranh hoài linh</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -634,7 +634,7 @@ pageEncoding="UTF-8"%>
                 <span class="request-text">Sự kiện về tranh hoài linh</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -648,7 +648,7 @@ pageEncoding="UTF-8"%>
                 <span class="request-text">Sự kiện về tranh hoài linh</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -662,7 +662,7 @@ pageEncoding="UTF-8"%>
                 <span class="request-text">Sự kiện về tranh hoài linh</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -697,6 +697,13 @@ pageEncoding="UTF-8"%>
           ellipse.style.animation = `float ${duration}ms ease-in-out infinite`;
         });
       }
+      function handleEditEvent(eventId) {
+        // Kiểm tra ID (debug)
+        console.log("Redirecting to edit event:", eventId);
+
+        // Redirect đến Servlet
+        window.location.href = 'AdminServlet?action=viewEventDetail&eventId=' + eventId;
+    }
     </script>
   </body>
 </html>
