@@ -20,17 +20,11 @@ public class AdminServlet extends HttpServlet {
         try {
             String action = request.getParameter("action");
             System.out.println("[AdminServlet] Action parameter: '" + action + "'");
-
             RequestDispatcher dispatcher;
             String targetJsp;
-
-            // Handle null, empty, or "?action=" cases
-            if (action == null || action.trim().isEmpty() || action.equalsIgnoreCase("adminDashboard")) {
-                System.out.println("[AdminServlet] Action is null or empty, forwarding to AdminDashboard.jsp");
+            if (action == null || action.trim().isEmpty() || action.equalsIgnoreCase("AdminDashboard")) {
                 targetJsp = "managerPage/AdminDashboard.jsp";
             } else if ("manageUserAccount".equalsIgnoreCase(action)) {
-                System.out.println("[AdminServlet] Action is manageUserAccount, preparing user data");
-
                 // Create sample user data
                 List<User> userList = new ArrayList<>();
                 userList.add(new User("Nguyen Van A", "aimablet@gmail.com", "password123", "22/02/2025"));
@@ -39,33 +33,30 @@ public class AdminServlet extends HttpServlet {
                 userList.add(new User("Nguyen Van D", "user4@gmail.com", "mypassword", "22/02/2025"));
                 userList.add(new User("Nguyen Van E", "user5@gmail.com", "testpass", "22/02/2025"));
 
-                // Set userList as a request attribute
                 request.setAttribute("userList", userList);
 
-                System.out.println("[AdminServlet] User list size: " + userList.size());
-                targetJsp = "managerPage/AdminUserManagement.jsp"; // Point to your JSP
+                targetJsp = "managerPage/AdminUserManagement.jsp";
+            } else if ("manageEvents".equalsIgnoreCase(action)) {
+
+                targetJsp = "managerPage/AdminEventManagement.jsp";
             } else {
-                System.out.println("[AdminServlet] Unknown action: '" + action + "', defaulting to AdminDashboard.jsp");
                 targetJsp = "managerPage/AdminDashboard.jsp";
             }
 
-            System.out.println("[AdminServlet] Attempting to get RequestDispatcher for: " + targetJsp);
             dispatcher = request.getRequestDispatcher(targetJsp);
             if (dispatcher == null) {
-                System.err.println("[AdminServlet] RequestDispatcher is null for: " + targetJsp);
+
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "JSP file not found: " + targetJsp);
                 return;
             }
 
-            System.out.println("[AdminServlet] Forwarding to: " + targetJsp);
             dispatcher.forward(request, response);
-            System.out.println("[AdminServlet] Successfully forwarded to: " + targetJsp);
 
         } catch (Exception e) {
             System.err.println("[AdminServlet] Error in doGet: " + e.getMessage());
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                "Unable to process request: " + (e.getMessage() != null ? e.getMessage() : "Unknown error"));
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Unable to process request: " + (e.getMessage() != null ? e.getMessage() : "Unknown error"));
         }
     }
 
