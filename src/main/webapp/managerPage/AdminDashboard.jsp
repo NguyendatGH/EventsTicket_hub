@@ -463,10 +463,10 @@ pageEncoding="UTF-8"%>
         <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="#" class="nav-link active">Bảng điều khiển</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">Danh sách sự kiện</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link active">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
               <a

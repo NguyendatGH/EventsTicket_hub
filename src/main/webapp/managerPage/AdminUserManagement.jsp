@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -127,7 +128,7 @@
       .logout:hover {
         color: white;
       }
-    
+
       .main-content {
         flex: 1;
         padding: 0 80px;
@@ -193,7 +194,7 @@
 
       /* Table */
       .data-table {
-        background: #1B1C21;
+        background: #1b1c21;
         border-radius: 15px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -230,7 +231,7 @@
         grid-template-columns: 50px 1fr 1fr 1fr 1fr 120px;
         gap: 20px;
         padding: 20px;
-        border-bottom: 1px solid #3E3E3E;
+        border-bottom: 1px solid #3e3e3e;
         transition: all 0.3s ease;
         align-items: center;
         color: white;
@@ -366,8 +367,14 @@
     </style>
   </head>
   <body>
-    <img class="bg_elips firstElement" src="${pageContext.request.contextPath}/asset/full.svg" />
-    <img class="bg_elips secondElement" src="${pageContext.request.contextPath}/asset/full2.svg" />
+  <img
+      class="bg_elips firstElement"
+      src="${pageContext.request.contextPath}/asset/full.svg"
+    />
+    <img
+      class="bg_elips secondElement"
+      src="${pageContext.request.contextPath}/asset/full2.svg"
+    />
     <div class="container">
       <!-- Sidebar -->
       <aside class="sidebar">
@@ -388,15 +395,15 @@
         <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="#" class="nav-link" href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard">Bảng điều khiển</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">Danh sách sự kiện</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link active">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
-                class="nav-link active"
+                class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
@@ -448,7 +455,9 @@
               <div>${status.count}</div>
               <div><c:out value="${user.username}" /></div>
               <div>
-                <a href="mailto:${user.email}" class="email-link"><c:out value="${user.email}" /></a>
+                <a href="mailto:${user.email}" class="email-link"
+                  ><c:out value="${user.email}"
+                /></a>
               </div>
               <div class="password-field">
                 <span class="password-dots">•••••••••••••</span>
@@ -481,13 +490,22 @@
               <div><c:out value="${user.createdDate}" /></div>
               <div class="actions">
                 <button class="action-btn lock-btn">
-                  <img src="${pageContext.request.contextPath}/asset/Lock_duotone_line.svg" alt="Lock" />
+                  <img
+                    src="${pageContext.request.contextPath}/asset/Lock_duotone_line.svg"
+                    alt="Lock"
+                  />
                 </button>
                 <button class="action-btn edit-btn">
-                  <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" alt="Edit" />
+                  <img
+                    src="${pageContext.request.contextPath}/asset/Edit_fill.svg"
+                    alt="Edit"
+                  />
                 </button>
                 <button class="action-btn delete-btn">
-                  <img src="${pageContext.request.contextPath}/asset/Trash.svg" alt="Delete" />
+                  <img
+                    src="${pageContext.request.contextPath}/asset/Trash.svg"
+                    alt="Delete"
+                  />
                 </button>
               </div>
             </div>
