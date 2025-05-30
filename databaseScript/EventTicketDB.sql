@@ -1,4 +1,4 @@
-﻿create database EventTicketDB
+﻿create database EventTicketDB2
 
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -14,10 +14,12 @@ CREATE TABLE Users (
     Avatar NVARCHAR(255),
     IsDeleted BIT DEFAULT 0,
     LastLoginAt DATETIME,
+	GoogleId NVARCHAR(255) ,
     CONSTRAINT CK_Users_Email CHECK (Email LIKE '%@%.%' AND LEN(Email) >= 5),
     CONSTRAINT CK_Users_PhoneNumber CHECK (PhoneNumber IS NULL OR PhoneNumber LIKE '[0-9]%'),
     CONSTRAINT CK_Users_Birthday CHECK (Birthday IS NULL OR Birthday <= GETDATE())
 );
+
 
 -- Bảng Genre
 CREATE TABLE Genres (
@@ -112,12 +114,12 @@ CREATE TABLE Ticket (
 CREATE TABLE PaymentMethod (
     PaymentMethodID INT IDENTITY(1,1) PRIMARY KEY,
     MethodName NVARCHAR(100) NOT NULL UNIQUE,
-    PromotionCode NVARCHAR(50) NOT NULL UNIQUE,
+    PromotionCode NVARCHAR(50), 
     Description NVARCHAR(255),
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE()
-	CONSTRAINT FK_PaymentMethod_Promotions FOREIGN KEY (PromotionCode) REFERENCES Promotions(PromotionCode),
+   
 );
 
 -- Bảng Orders (Gộp thông tin từ Orders cũ và một số thông tin từ OrderTickets)
@@ -366,36 +368,6 @@ CREATE INDEX IX_Notifications_IsRead ON Notifications(IsRead);
 CREATE INDEX IX_Notifications_CreatedAt ON Notifications(CreatedAt);
 CREATE INDEX IX_Notifications_Type ON Notifications(NotificationType);
 
--- Indexes cho bảng Communities
-CREATE INDEX IX_Communities_CreatorID ON Communities(CreatorID);
-CREATE INDEX IX_Communities_EventID ON Communities(EventID);
-CREATE INDEX IX_Communities_IsActive ON Communities(IsActive);
-CREATE INDEX IX_Communities_IsDeleted ON Communities(IsDeleted);
-
--- Indexes cho bảng CommunityMembers
-CREATE INDEX IX_CommunityMembers_CommunityID ON CommunityMembers(CommunityID);
-CREATE INDEX IX_CommunityMembers_UserID ON CommunityMembers(UserID);
-CREATE INDEX IX_CommunityMembers_IsActive ON CommunityMembers(IsActive);
-
--- Indexes cho bảng Posts
-CREATE INDEX IX_Posts_UserID ON Posts(UserID);
-CREATE INDEX IX_Posts_CommunityID ON Posts(CommunityID);
-CREATE INDEX IX_Posts_EventID ON Posts(EventID);
-CREATE INDEX IX_Posts_IsApproved ON Posts(IsApproved);
-CREATE INDEX IX_Posts_IsDeleted ON Posts(IsDeleted);
-CREATE INDEX IX_Posts_CreatedAt ON Posts(CreatedAt);
-
--- Indexes cho bảng PostComments
-CREATE INDEX IX_PostComments_PostID ON PostComments(PostID);
-CREATE INDEX IX_PostComments_UserID ON PostComments(UserID);
-CREATE INDEX IX_PostComments_ParentCommentID ON PostComments(ParentCommentID);
-CREATE INDEX IX_PostComments_IsDeleted ON PostComments(IsDeleted);
-
--- Indexes cho bảng PostLikes
-CREATE INDEX IX_PostLikes_PostID ON PostLikes(PostID);
-CREATE INDEX IX_PostLikes_UserID ON PostLikes(UserID);
-
-
 -- Indexes cho bảng Refunds
 CREATE INDEX IX_Refunds_OrderID ON Refunds(OrderID);
 CREATE INDEX IX_Refunds_OrderItemID ON Refunds(OrderItemID);
@@ -527,84 +499,6 @@ BEGIN
     );
 END;
 
--- Trigger để cập nhật UpdatedAt cho Communities
-GO
-CREATE TRIGGER TR_Communities_UpdatedAt ON Communities
-AFTER UPDATE AS
-BEGIN
-    UPDATE Communities SET UpdatedAt = GETDATE()
-    WHERE CommunityID IN (SELECT DISTINCT CommunityID FROM Inserted)
-END;
-
--- Trigger để cập nhật UpdatedAt cho Posts
-GO
-CREATE TRIGGER TR_Posts_UpdatedAt ON Posts
-AFTER UPDATE AS
-BEGIN
-    UPDATE Posts SET UpdatedAt = GETDATE()
-    WHERE PostID IN (SELECT DISTINCT PostID FROM Inserted)
-END;
-
--- Trigger để cập nhật UpdatedAt cho PostComments
-GO
-CREATE TRIGGER TR_PostComments_UpdatedAt ON PostComments
-AFTER UPDATE AS
-BEGIN
-    UPDATE PostComments SET UpdatedAt = GETDATE()
-    WHERE CommentID IN (SELECT DISTINCT CommentID FROM Inserted)
-END;
-
--- Trigger để kiểm tra quyền xóa bài đăng (chỉ admin)
-GO
-CREATE TRIGGER TR_Posts_RestrictDelete ON Posts
-AFTER UPDATE AS
-BEGIN
-    IF EXISTS (
-        SELECT 1 FROM Inserted i
-        JOIN Deleted d ON i.PostID = d.PostID
-        WHERE i.IsDeleted = 1 AND d.IsDeleted = 0
-        AND NOT EXISTS (
-            SELECT 1 FROM Users u
-            WHERE u.Id = i.UserID
-            AND u.Role = 'admin'
-        )
-    )
-    BEGIN
-        ROLLBACK TRANSACTION;
-        THROW 50002, 'Only admin can delete posts.', 1;
-    END
-END;
-
--- Trigger để kiểm tra quyền xóa bình luận (chỉ admin)
-GO
-CREATE TRIGGER TR_PostComments_RestrictDelete ON PostComments
-AFTER UPDATE AS
-BEGIN
-    IF EXISTS (
-        SELECT 1 FROM Inserted i
-        JOIN Deleted d ON i.CommentID = d.CommentID
-        WHERE i.IsDeleted = 1 AND d.IsDeleted = 0
-        AND NOT EXISTS (
-            SELECT 1 FROM Users u
-            WHERE u.Id = i.UserID
-            AND u.Role = 'admin'
-        )
-    )
-    BEGIN
-        ROLLBACK TRANSACTION;
-        THROW 50003, 'Only admin can delete comments.', 1;
-    END
-END;
-
--- Trigger để tự động thêm creator vào CommunityMembers khi tạo cộng đồng
-GO
-CREATE TRIGGER TR_Communities_AutoAddCreator ON Communities
-AFTER INSERT AS
-BEGIN
-    INSERT INTO CommunityMembers (CommunityID, UserID, Role, JoinedAt, IsActive)
-    SELECT CommunityID, CreatorID, 'admin', GETDATE(), 1
-    FROM Inserted
-END;
 
 -- Trigger để cập nhật UpdatedAt cho Refunds
 GO
@@ -755,7 +649,17 @@ VALUES
 ('Meet & Greet - Isaac', 'Includes meet and greet', 'Meet & Greet', 300000, '2025-05-01 00:00:00', '2025-06-13 09:30:00', 7, 5, 1),
 ('Premium Ticket - Hương Tràm', 'Premium concert ticket', 'Premium', 280000, '2025-05-01 00:00:00', '2025-06-14 10:00:00', 8, 10, 1),
 ('Food Festival Pass', 'Entry to food festival', 'General Admission', 80000, '2025-05-01 00:00:00', '2025-06-14 10:30:00', 9, 10, 1),
-('VIP Concert - Anh Trai', 'VIP concert experience', 'VIP', 350000, '2025-05-01 00:00:00', '2025-06-14 10:30:00', 10, 10, 1);
+('VIP Concert - Anh Trai', 'VIP concert experience', 'VIP', 350000, '2025-05-01 00:00:00', '2025-06-14 10:30:00', 10, 10, 1),
+('Standard Ticket - Saxophone Festival', 'General admission', 'Standard', 160000, '2025-05-01 00:00:00', '2025-06-14 11:30:00', 11, 10, 1),
+('Ringside Ticket - Lion Championship', 'Premium ringside seats', 'Premium', 400000, '2025-05-01 00:00:00', '2025-06-14 11:30:00', 12, 8, 1),
+('Courtside Ticket - VBA Match', 'Courtside basketball seats', 'VIP', 300000, '2025-05-01 00:00:00', '2025-06-14 12:00:00', 13, 6, 1),
+('Standard Ticket - Cải Lương Câu Thơ', 'Traditional opera seating', 'Standard', 130000, '2025-05-01 00:00:00', '2025-06-14 12:30:00', 14, 10, 1),
+('Concert Ticket - Luiza', 'Classical music concert', 'Premium', 220000, '2025-05-01 00:00:00', '2025-06-14 12:30:00', 15, 10, 1),
+('Premium Ticket - Lê Hiếu Show', 'Premium romantic show', 'Premium', 260000, '2025-05-01 00:00:00', '2025-06-14 12:30:00', 16, 10, 1),
+('Standard Ticket - Sấm Vang', 'Traditional opera', 'Standard', 140000, '2025-05-01 00:00:00', '2025-06-14 12:30:00', 17, 10, 1),
+('VIP Ticket - Pop Rock Fashion', 'VIP experience', 'VIP', 320000, '2025-05-01 00:00:00', '2025-06-17 12:30:00', 18, 8, 1),
+('Party Pass - autoFEST', 'Music party admission', 'General Admission', 180000, '2025-05-01 00:00:00', '2025-06-19 01:30:00', 19, 10, 1),
+('Conference Pass - Automotive', 'Industry conference access', 'Professional', 250000, '2025-05-01 00:00:00', '2025-06-19 02:30:00', 20, 5, 1);
 
 -- Insert into TicketInventory
 INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity)
@@ -769,7 +673,17 @@ VALUES
 (7, 200, 2, 0), -- ISAAC FANMEETING
 (8, 200, 2, 0), -- LULULOLA SHOW HƯƠNG TRÀM
 (9, 200, 2, 0), -- LỄ HỘI ẨM THỰC ẤN ĐỘ
-(10, 200, 1, 0); -- ANH TRAI VƯỢT NGÀN CHÔNG GAI
+(10, 200, 1, 0), -- ANH TRAI VƯỢT NGÀN CHÔNG GAI
+(11, 200, 0, 0), -- Saxophone Festival
+(12, 200, 0, 0), -- Lion Championship
+(13, 200, 0, 0), -- VBA Match
+(14, 200, 0, 0), -- Cải Lương Câu Thơ
+(15, 200, 0, 0), -- Concert Luiza
+(16, 200, 0, 0), -- Lê Hiếu Show
+(17, 200, 0, 0), -- Sấm Vang
+(18, 200, 0, 0), -- Pop Rock Fashion
+(19, 200, 0, 0), -- autoFEST
+(20, 200, 0, 0); -- Automotive Conference
 
 -- Insert into Ticket
 INSERT INTO Ticket (TicketInfoID, TicketCode, Status, SeatID)
@@ -778,6 +692,8 @@ VALUES
 (1, 'TKT000000022025', 'sold', 2), -- Nhà Hát Kịch IDECAF: 12 Bà Mụ
 (2, 'TKT000000032025', 'sold', NULL), -- The Island And The Bay
 (3, 'TKT000000042025', 'sold', NULL), -- Địa Đạo Củ Chi : Trăng Chiến Khu
+ (4, 'TKT000000142025', 'available', NULL), --SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI
+(4, 'TKT000000152025', 'available', NULL),--SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI
 (5, 'TKT000000052025', 'sold', NULL), -- NGÀY AN LÀNH
 (6, 'TKT000000062025', 'sold', 3), -- Hãy Để Anh Đi Concert
 (7, 'TKT000000072025', 'sold', NULL), -- ISAAC FANMEETING
@@ -789,13 +705,12 @@ VALUES
 (10, 'TKT000000132025', 'sold', NULL); -- ANH TRAI VƯỢT NGÀN CHÔNG GAI
 
 -- Insert into PaymentMethod
-INSERT INTO PaymentMethod (MethodName, Promotion, Description, IsActive)
+INSERT INTO PaymentMethod (MethodName, PromotionCode, Description, IsActive)
 VALUES
-('Credit Card', '5% off for first-time users', 'Pay with Visa, MasterCard, or Amex', 1),
+('Credit Card', 'CREDIT5', '5% off for first-time users - Pay with Visa, MasterCard, or Amex', 1),
 ('Bank Transfer', NULL, 'Direct bank transfer', 1),
-('VNPay', 'Free transaction fee', 'Pay with mobile apps like VNPay', 1),
-('E-Wallet', 'Free transaction fee', 'Pay with mobile apps like Momo', 1);
-
+('VNPay', 'VNPAY0', 'Free transaction fee - Pay with VNPay mobile app', 1),
+('E-Wallet', 'EWALLET0', 'Free transaction fee - Pay with mobile apps like Momo', 1);
 
 -- Insert into Orders
 INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes)
@@ -874,48 +789,6 @@ VALUES
 ('Users', 5, 'INSERT', NULL, 'Email: customer1@ticketbox.vn, Role: customer', 'Email, Role', 1, 'Mozilla/5.0'),
 ('Orders', 1, 'INSERT', NULL, 'OrderNumber: ORD00000001, TotalAmount: 300000', 'OrderNumber, TotalAmount', 1, 'Mozilla/5.0'),
 ('Ticket', 1, 'UPDATE', 'Status: available', 'Status: sold', 'Status', 1, 'Mozilla/5.0');
-
--- Insert into Communities
-INSERT INTO Communities (Name, Description, CreatorID, EventID, IsPrivate, IsActive)
-VALUES
-('IDECAF Theater Fans', 'A community for fans of IDECAF theater productions', 5, 1, 0, 1),
-('Hương Tràm Concert Goers', 'Discuss the upcoming Hương Tràm concert', 5, 8, 0, 1),
-('Saigon Sports Enthusiasts', 'For fans of sports events in Saigon', 4, NULL, 0, 1);
-
--- Insert into CommunityMembers
-INSERT INTO CommunityMembers (CommunityID, UserID, Role)
-VALUES
-(1, 5, 'admin'),
-(2, 5, 'admin'),
-(3, 4, 'admin'),
-(1, 2, 'member'),
-(2, 3, 'member'),
-(3, 5, 'member');
-
--- Insert into Posts
-INSERT INTO Posts (UserID, CommunityID, EventID, Title, Content, PostType)
-VALUES
-(5, 1, 1, 'Review: 12 Bà Mụ', 'Just saw the play, it was amazing!', 'text'),
-(5, 2, 8, 'Looking forward to Hương Tràm!', 'Who else is excited for the concert?', 'text'),
-(4, 3, 12, 'Lion Championship Discussion', 'Predictions for the upcoming fights?', 'text');
-
--- Insert into PostComments
-INSERT INTO PostComments (PostID, UserID, Content)
-VALUES
-(1, 2, 'I agree! The lead actress was fantastic.'),
-(2, 3, 'Me too! Can’t wait to hear her new songs live.'),
-(3, 5, 'I think the main event will be a knockout!');
-
--- Insert into PostLikes
-INSERT INTO PostLikes (PostID, UserID)
-VALUES
-(1, 2),
-(2, 5),
-(3, 4),
-(1, 5);
-
-
-
 
 -- Insert into Refunds
 INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, RefundStatus, PaymentMethodID)
