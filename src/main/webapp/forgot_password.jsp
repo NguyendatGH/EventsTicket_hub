@@ -12,21 +12,34 @@
     <title>Forgot Password</title>
     <style>
         body {
-            font-family: "Segoe UI", sans-serif;
-            background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1123, #1f1d40, #5e1763);
+            background-size: cover;
+            background-repeat: no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            color: white;
         }
+
         .box {
             background: rgba(255, 255, 255, 0.1);
-            color: white;
             padding: 30px;
             border-radius: 15px;
             width: 300px;
             backdrop-filter: blur(10px);
         }
+
+        .box h2 {
+            margin: 0 0 20px 0;
+            font-size: 28px;
+            font-weight: normal;
+            color: white;
+        }
+
         input[type=email], button {
             width: 100%;
             padding: 10px;
@@ -34,11 +47,27 @@
             border-radius: 8px;
             border: none;
         }
+
         button {
-            background: #4facfe;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #4facfe, #9b59b6);
+            border: none;
+            border-radius: 10px;
             color: white;
-            cursor: pointer;
             font-weight: bold;
+            cursor: pointer;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 15px;
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -50,9 +79,9 @@
             <input type="email" name="email" required placeholder="you@example.com">
             <button type="submit">Reset Password</button>
         </form>
-        <br>
-        <a href="login.jsp" style="color: #ccc;">Back to login</a>
+        <a href="login.jsp">Back to login</a>
     </div>
 </body>
 </html>
+
 

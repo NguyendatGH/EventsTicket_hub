@@ -22,36 +22,37 @@
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: linear-gradient(135deg, #000428, #2c003e, #360033);
         }
 
         .otp-container {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
             border-radius: 20px;
-            padding: 40px;
+            padding: 50px 40px;
             width: 500px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
         }
 
         .otp-container h2 {
             color: white;
-            margin-bottom: 20px;
-            font-size: 32px;
+            font-size: 36px;
+            font-weight: 400;
+            margin-bottom: 25px;
         }
 
         .otp-container p {
             color: #ccc;
+            font-size: 15px;
             margin-bottom: 30px;
-            font-size: 16px;
         }
 
         .otp-inputs {
             display: flex;
             justify-content: center;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .otp-inputs input {
@@ -61,41 +62,44 @@
             text-align: center;
             border: none;
             border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.08);
             color: white;
             transition: 0.2s ease;
         }
 
         .otp-inputs input:focus {
             outline: none;
-            background-color: rgba(255, 255, 255, 0.25);
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         button {
-            background: linear-gradient(to right, #6dd5fa, #2980b9);
+            background: linear-gradient(to right, #64f3ff, #e74cfa);
             border: none;
             color: white;
             font-size: 18px;
             padding: 10px 40px;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: 0.3s ease;
         }
 
         button:hover {
-            background: linear-gradient(to right, #4ca1af, #2c3e50);
-        }
-
-        .otp-container a {
-            color: #ff00cc;
-            text-decoration: none;
-            margin-left: 5px;
+            opacity: 0.9;
         }
 
         .bottom-text {
-            margin-top: 20px;
+            margin-top: 25px;
             color: #ccc;
             font-size: 14px;
+        }
+
+        .bottom-text a {
+            color: #ff00cc;
+            text-decoration: none;
+        }
+
+        .bottom-text a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -119,5 +123,6 @@
 </div>
 </body>
 </html>
+
 
 
