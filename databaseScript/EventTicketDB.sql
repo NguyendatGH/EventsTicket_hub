@@ -112,11 +112,12 @@ CREATE TABLE Ticket (
 CREATE TABLE PaymentMethod (
     PaymentMethodID INT IDENTITY(1,1) PRIMARY KEY,
     MethodName NVARCHAR(100) NOT NULL UNIQUE,
-    Promotion NVARCHAR(100),
+    PromotionCode NVARCHAR(50) NOT NULL UNIQUE,
     Description NVARCHAR(255),
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE()
+	CONSTRAINT FK_PaymentMethod_Promotions FOREIGN KEY (PromotionCode) REFERENCES Promotions(PromotionCode),
 );
 
 -- Bảng Orders (Gộp thông tin từ Orders cũ và một số thông tin từ OrderTickets)
@@ -292,85 +293,6 @@ CREATE TABLE AuditLog (
     CONSTRAINT FK_AuditLog_User FOREIGN KEY (UserID) REFERENCES Users(Id)
 );
 
-
-CREATE TABLE Communities (
-    CommunityID INT IDENTITY(1,1) PRIMARY KEY,
-    Name NVARCHAR(255) NOT NULL UNIQUE,
-    Description NVARCHAR(MAX),
-    CreatorID INT NOT NULL, -- Người tạo cộng đồng (customer, event_owner, hoặc admin)
-    EventID INT, -- Liên kết với sự kiện nếu cộng đồng liên quan đến sự kiện
-    IsPrivate BIT DEFAULT 0, -- Cộng đồng công khai hay riêng tư
-    IsActive BIT DEFAULT 1,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    UpdatedAt DATETIME DEFAULT GETDATE(),
-    IsDeleted BIT DEFAULT 0,
-    CONSTRAINT FK_Communities_Creator FOREIGN KEY (CreatorID) REFERENCES Users(Id),
-    CONSTRAINT FK_Communities_Event FOREIGN KEY (EventID) REFERENCES Events(EventID),
-  
-);
-
--- Bảng CommunityMembers (Quản lý thành viên trong cộng đồng)
-CREATE TABLE CommunityMembers (
-    CommunityMemberID INT IDENTITY(1,1) PRIMARY KEY,
-    CommunityID INT NOT NULL,
-    UserID INT NOT NULL,
-    Role NVARCHAR(50) DEFAULT 'member' CHECK (Role IN ('member', 'moderator', 'admin')),
-    JoinedAt DATETIME DEFAULT GETDATE(),
-    IsActive BIT DEFAULT 1,
-    CONSTRAINT FK_CommunityMembers_Community FOREIGN KEY (CommunityID) REFERENCES Communities(CommunityID),
-    CONSTRAINT FK_CommunityMembers_User FOREIGN KEY (UserID) REFERENCES Users(Id),
-    CONSTRAINT UK_CommunityMembers UNIQUE (CommunityID, UserID)
-);
-
--- Bảng Posts (Quản lý bài đăng)
-CREATE TABLE Posts (
-    PostID INT IDENTITY(1,1) PRIMARY KEY,
-    UserID INT NOT NULL, -- Người tạo bài đăng
-    CommunityID INT, -- Cộng đồng mà bài đăng thuộc về (NULL nếu là bài đăng độc lập)
-    EventID INT, -- Liên kết với sự kiện nếu bài đăng liên quan
-    Title NVARCHAR(255) NOT NULL,
-    Content NVARCHAR(MAX) NOT NULL,
-    PostType NVARCHAR(50) DEFAULT 'text' CHECK (PostType IN ('text', 'image', 'video', 'event')),
-    AttachmentURL NVARCHAR(255), -- URL của hình ảnh/video nếu có
-    IsApproved BIT DEFAULT 1, -- Bài đăng có cần phê duyệt hay không
-    IsDeleted BIT DEFAULT 0, -- Chỉ admin có thể set IsDeleted = 1
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    UpdatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT FK_Posts_User FOREIGN KEY (UserID) REFERENCES Users(Id),
-    CONSTRAINT FK_Posts_Community FOREIGN KEY (CommunityID) REFERENCES Communities(CommunityID),
-    CONSTRAINT FK_Posts_Event FOREIGN KEY (EventID) REFERENCES Events(EventID),
-    
-);
-
--- Bảng PostComments (Quản lý bình luận trên bài đăng)
-CREATE TABLE PostComments (
-    CommentID INT IDENTITY(1,1) PRIMARY KEY,
-    PostID INT NOT NULL,
-    UserID INT NOT NULL,
-    Content NVARCHAR(MAX) NOT NULL,
-    ParentCommentID INT, -- Hỗ trợ bình luận trả lời (nested comments)
-    IsDeleted BIT DEFAULT 0, -- Chỉ admin có thể xóa
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    UpdatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT FK_PostComments_Post FOREIGN KEY (PostID) REFERENCES Posts(PostID),
-    CONSTRAINT FK_PostComments_User FOREIGN KEY (UserID) REFERENCES Users(Id),
-    CONSTRAINT FK_PostComments_ParentComment FOREIGN KEY (ParentCommentID) REFERENCES PostComments(CommentID), --use for nested comment
-    
-);
-
-
-
--- Bảng PostLikes (Quản lý lượt thích bài đăng)
-CREATE TABLE PostLikes (
-    LikeID INT IDENTITY(1,1) PRIMARY KEY,
-    PostID INT NOT NULL,
-    UserID INT NOT NULL,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT FK_PostLikes_Post FOREIGN KEY (PostID) REFERENCES Posts(PostID),
-    CONSTRAINT FK_PostLikes_User FOREIGN KEY (UserID) REFERENCES Users(Id),
-    CONSTRAINT UK_PostLikes UNIQUE (PostID, UserID), -- Mỗi user chỉ được thích 1 lần
- 
-);
 
 
 -- Bảng Refunds (Quản lý yêu cầu hoàn tiền)
@@ -991,6 +913,9 @@ VALUES
 (2, 5),
 (3, 4),
 (1, 5);
+
+
+
 
 -- Insert into Refunds
 INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, RefundStatus, PaymentMethodID)
