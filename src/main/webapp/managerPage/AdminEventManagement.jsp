@@ -41,7 +41,7 @@
         color: white;
         font-size: 1.5rem;
         font-weight: 700;
-        margin-bottom: 3rem;
+        margin-bottom: 5rem;
         padding: 0 2rem;
       }
 
@@ -51,25 +51,25 @@
       }
 
       .admin-avatar {
-        width: 80px;
-        height: 80px;
+        width: 120px;
+        height: 120px;
         background: rgba(71, 85, 105, 0.8);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1rem;
+        margin: 0 auto 2rem;
       }
 
       .admin-avatar svg {
-        width: 40px;
-        height: 40px;
+        width: 80px;
+        height: 80px;
         color: #94a3b8;
       }
 
       .admin-name {
         color: white;
-        font-size: 1.25rem;
+        font-size: 24px;
         font-weight: 600;
         text-align: center;
         margin-bottom: 0.5rem;
@@ -130,11 +130,13 @@
 
       .main-content {
         flex: 1;
-        padding: 0 80px;
-        padding-top: 40px;
+        padding: 0 94px;
+        padding-top: 2rem;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
       }
-
       .header {
         display: flex;
         justify-content: space-between;
@@ -530,27 +532,26 @@
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-        <nav>
+       <nav>
           <ul class="nav-menu">
             <li class="nav-item">
               <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link active">Danh sách sự kiện</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
-                class="nav-link"
+                class="nav-link active"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">Hỗ trợ khách hàng</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
             </li>
           </ul>
         </nav>
-
         <a href="#" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
