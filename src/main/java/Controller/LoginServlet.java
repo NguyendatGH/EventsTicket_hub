@@ -4,12 +4,13 @@
  */
 package Controller;
 
-import userDAO.IUserDAO;
-import userDAO.UserDAO;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+
+import Dao.UserDAO;
+import Interfaces.IUserDAO;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {

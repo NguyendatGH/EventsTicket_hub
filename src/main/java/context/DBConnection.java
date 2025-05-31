@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
-package dao;
+package context;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,9 +12,9 @@ import java.util.logging.Logger;
 
 public class DBConnection {
     private static final String DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=Sm25-DemoSWP;";
-    private static final String USER_DB = "sa";
-    private static final String PASS_DB = "123"; // 
+    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=XXXXXXX"; //your database name
+    private static final String USER_DB = "XX"; //your username 
+    private static final String PASS_DB = "123"; //your password
     
     private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
@@ -32,9 +32,9 @@ public class DBConnection {
     public static void main(String[] args) {
         try (Connection con = getConnection()) {
             if (con != null) {
-                System.out.println("Connected to Sm25-DemoSWP successfully!");
+                System.out.println("Connected to xxxxx successfully!");
             } else {
-                System.out.println("Failed to connect to Sm25-DemoSWP.");
+                System.out.println("Failed to connect to xxxxx.");
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "Connection attempt failed", ex);

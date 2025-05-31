@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.RequestDispatcher;
-import Model.User;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import Models.User;
 
 @WebServlet(name = "AdminServlet", urlPatterns = { "/AdminServlet" })
 public class AdminServlet extends HttpServlet {
