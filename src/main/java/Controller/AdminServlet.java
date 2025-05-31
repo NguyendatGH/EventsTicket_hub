@@ -43,8 +43,10 @@ public class AdminServlet extends HttpServlet {
                 targetJsp = "managerPage/AdminEventManagement.jsp";
             } else if("viewEventDetail".equals(action)){
                  targetJsp = "managerPage/EventOptions.jsp";
-            }else {
-                targetJsp = "managerPage/AdminDashboard.jsp";
+            }else if ("supportCenter".equalsIgnoreCase(action)){
+                targetJsp = "managerPage/supportCenter_admin.jsp";
+            }else{
+                  targetJsp = "managerPage/AdminDashboard.jsp";
             }
 
             dispatcher = request.getRequestDispatcher(targetJsp);

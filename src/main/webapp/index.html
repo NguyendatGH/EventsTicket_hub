@@ -39,7 +39,7 @@
         color: white;
         font-size: 1.5rem;
         font-weight: 700;
-        margin-bottom: 3rem;
+        margin-bottom: 5rem;
         padding: 0 2rem;
       }
 
@@ -49,25 +49,25 @@
       }
 
       .admin-avatar {
-        width: 80px;
-        height: 80px;
+        width: 120px;
+        height: 120px;
         background: rgba(71, 85, 105, 0.8);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1rem;
+        margin: 0 auto 2rem;
       }
 
       .admin-avatar svg {
-        width: 40px;
-        height: 40px;
+        width: 80px;
+        height: 80px;
         color: #94a3b8;
       }
 
       .admin-name {
         color: white;
-        font-size: 1.25rem;
+        font-size: 24px;
         font-weight: 600;
         text-align: center;
         margin-bottom: 0.5rem;
@@ -125,12 +125,15 @@
       .logout:hover {
         color: white;
       }
-    
+
       .main-content {
         flex: 1;
-        padding: 0 80px;
-        padding-top: 40px;
+        padding: 0 94px;
+        padding-top: 2rem;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
       }
 
       .header {
@@ -154,44 +157,8 @@
         font-weight: 600;
         backdrop-filter: blur(20px);
       }
-
-      .search-container {
-        position: relative;
-        width: 30%;
-      }
-
-      .search-box {
-        width: 100%;
-        padding: 15px 50px 15px 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        color: white;
-        font-size: 16px;
-        outline: none;
-        transition: all 0.3s ease;
-      }
-
-      .search-box:focus {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(100, 150, 255, 0.5);
-      }
-
-      .search-box::placeholder {
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      .search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: rgba(255, 255, 255, 0.6);
-      }
-
       /* Table */
       .data-table {
-        background: #1B1C21;
         border-radius: 15px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -202,7 +169,7 @@
         align-items: center;
         padding: 20px;
         gap: 10%;
-        background: rgba(21, 0, 97, 0.78);
+         background: rgba(21, 0, 97, 0.78);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
 
@@ -215,27 +182,33 @@
 
       .table-columns {
         display: grid;
-        grid-template-columns: 50px 1fr 1fr 1fr 1fr 120px;
+        grid-template-columns: 60px 2fr 2fr 1.5fr 1fr;
         gap: 20px;
-        padding: 10px;
-        background: rgba(87, 87, 87, 0.34);
+        padding: 15px 20px;
+        background: rgba(35, 35, 35, 0.46);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         color: white;
+        font-weight: 500;
       }
 
       .table-row {
         display: grid;
-        grid-template-columns: 50px 1fr 1fr 1fr 1fr 120px;
+        grid-template-columns: 60px 2fr 2fr 1.5fr 1fr;
         gap: 20px;
         padding: 20px;
-        border-bottom: 1px solid #3E3E3E;
+        background-color: rgba(63, 62, 62, 0.46);
+        border-bottom: 1px solid #3e3e3e;
         transition: all 0.3s ease;
         align-items: center;
         color: white;
       }
 
       .table-row:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background-color: rgba(87, 85, 85, 0.46);
+      }
+
+      .table-row.isActive {
+        background-color: rgba(87, 85, 85, 0.46);
       }
 
       .table-row:last-child {
@@ -247,35 +220,16 @@
         text-decoration: underline;
       }
 
-      .password-field {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .password-dots {
-        color: rgba(255, 255, 255, 0.7);
-      }
-
-      .toggle-password {
-        cursor: pointer;
-        color: rgba(255, 255, 255, 0.6);
-        transition: color 0.3s ease;
-      }
-
-      .toggle-password:hover {
-        color: #64b5f6;
-      }
-
       .actions {
         display: flex;
-        gap: 10px;
+        gap: 14px;
+        justify-content: flex-start;
       }
 
       .action-btn {
-        width: 35px;
-        height: 35px;
-        border-radius: 8px;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
         border: none;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -284,22 +238,23 @@
         justify-content: center;
       }
 
-      .lock-btn {
-        background: rgba(255, 193, 7, 0.2);
-        color: #ffc107;
+      .Respond {
+        background-color: transparent;
+        color: white;
+        border-radius: 8px;
+        border: 1px solid white;
+        padding: 6px 10px;
+        width: 90px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .Respond:hover {
+        background-color: #cbf9ff29;
       }
 
-      .lock-btn:hover {
-        background: rgba(255, 193, 7, 0.3);
-      }
-
-      .edit-btn {
-        background: rgba(40, 167, 69, 0.2);
-        color: #28a745;
-      }
-
-      .edit-btn:hover {
-        background: rgba(40, 167, 69, 0.3);
+      .action-btn img {
+        width: 18px;
+        height: 18px;
       }
 
       .delete-btn {
@@ -394,12 +349,12 @@
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
-                class="nav-link active"
+                class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">Hỗ trợ khách hàng</a>
+              <a href="#" class="nav-link active">Hỗ trợ khách hàng</a>
             </li>
           </ul>
         </nav>
@@ -417,74 +372,33 @@
       <!-- Main Content -->
       <div class="main-content">
         <header class="header">
-          <div class="control-panel">Quản lí người dùng</div>
+          <div class="control-panel">Hỗ trợ khách hàng</div>
         </header>
 
         <div class="data-table">
           <div class="table-header">
-            <div class="page-title">Danh sách người dùng</div>
-            <div class="search-container">
-              <input
-                type="text"
-                class="search-box"
-                placeholder="Bạn muốn tìm gì?"
-              />
-              <div class="search-icon">🔍</div>
-            </div>
+            <div class="page-title">Danh sách hỗ trợ</div>
           </div>
           <div class="table-columns">
             <div></div>
-            <div>Tên người dùng</div>
-            <div>Email</div>
-            <div>Mật khẩu</div>
-            <div>Ngày tạo</div>
-            <div></div>
+            <div>Đến từ</div>
+            <div>Tiêu đề</div>
+            <div>Ngày gửi</div>
+            <div>Tùy chọn</div>
           </div>
 
-          <div class="table-row">
+          <div class="table-row isActive">
             <div>1</div>
-            <div>Nguyen van a</div>
             <div>
               <a href="mailto:aimablet@gmail.com" class="email-link"
                 >aimablet@gmail.com</a
               >
             </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
+            <div>Nguyen van a</div>
             <div>22/2/2025</div>
             <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
+              <button class="action-btn Respond">Phản hồi</button>
+
               <button class="action-btn delete-btn">
                 <img src="../webapp/asset/Trash.svg" />
               </button>
@@ -492,49 +406,17 @@
           </div>
 
           <div class="table-row">
-            <div>2</div>
-            <div>Nguyen van b</div>
+            <div>1</div>
             <div>
-              <a href="mailto:user2@gmail.com" class="email-link"
-                >user2@gmail.com</a
+              <a href="mailto:aimablet@gmail.com" class="email-link"
+                >aimablet@gmail.com</a
               >
             </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
+            <div>Nguyen van a</div>
             <div>22/2/2025</div>
             <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
+              <button class="action-btn Respond">Phản hồi</button>
+
               <button class="action-btn delete-btn">
                 <img src="../webapp/asset/Trash.svg" />
               </button>
@@ -542,49 +424,17 @@
           </div>
 
           <div class="table-row">
-            <div>3</div>
-            <div>Nguyen van c</div>
+            <div>1</div>
             <div>
-              <a href="mailto:user3@gmail.com" class="email-link"
-                >user3@gmail.com</a
+              <a href="mailto:aimablet@gmail.com" class="email-link"
+                >aimablet@gmail.com</a
               >
             </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
+            <div>Nguyen van a</div>
             <div>22/2/2025</div>
             <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
+              <button class="action-btn Respond">Phản hồi</button>
+
               <button class="action-btn delete-btn">
                 <img src="../webapp/asset/Trash.svg" />
               </button>
@@ -592,49 +442,17 @@
           </div>
 
           <div class="table-row">
-            <div>4</div>
-            <div>Nguyen van d</div>
+            <div>1</div>
             <div>
-              <a href="mailto:user4@gmail.com" class="email-link"
-                >user4@gmail.com</a
+              <a href="mailto:aimablet@gmail.com" class="email-link"
+                >aimablet@gmail.com</a
               >
             </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
+            <div>Nguyen van a</div>
             <div>22/2/2025</div>
             <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
+              <button class="action-btn Respond">Phản hồi</button>
+
               <button class="action-btn delete-btn">
                 <img src="../webapp/asset/Trash.svg" />
               </button>
@@ -642,49 +460,17 @@
           </div>
 
           <div class="table-row">
-            <div>5</div>
-            <div>Nguyen van e</div>
+            <div>1</div>
             <div>
-              <a href="mailto:user5@gmail.com" class="email-link"
-                >user5@gmail.com</a
+              <a href="mailto:aimablet@gmail.com" class="email-link"
+                >aimablet@gmail.com</a
               >
             </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
+            <div>Nguyen van a</div>
             <div>22/2/2025</div>
             <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
+              <button class="action-btn Respond">Phản hồi</button>
+
               <button class="action-btn delete-btn">
                 <img src="../webapp/asset/Trash.svg" />
               </button>
@@ -692,349 +478,17 @@
           </div>
 
           <div class="table-row">
-            <div>5</div>
-            <div>Nguyen van e</div>
+            <div>1</div>
             <div>
-              <a href="mailto:user5@gmail.com" class="email-link"
-                >user5@gmail.com</a
+              <a href="mailto:aimablet@gmail.com" class="email-link"
+                >aimablet@gmail.com</a
               >
             </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
+            <div>Nguyen van a</div>
             <div>22/2/2025</div>
             <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="../webapp/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
+              <button class="action-btn Respond">Phản hồi</button>
 
-          <div class="table-row">
-            <div>5</div>
-            <div>Nguyen van e</div>
-            <div>
-              <a href="mailto:user5@gmail.com" class="email-link"
-                >user5@gmail.com</a
-              >
-            </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
-            <div>22/2/2025</div>
-            <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="../webapp/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-
-          <div class="table-row">
-            <div>5</div>
-            <div>Nguyen van e</div>
-            <div>
-              <a href="mailto:user5@gmail.com" class="email-link"
-                >user5@gmail.com</a
-              >
-            </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
-            <div>22/2/2025</div>
-            <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="../webapp/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-
-          <div class="table-row">
-            <div>5</div>
-            <div>Nguyen van e</div>
-            <div>
-              <a href="mailto:user5@gmail.com" class="email-link"
-                >user5@gmail.com</a
-              >
-            </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
-            <div>22/2/2025</div>
-            <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="../webapp/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-
-          <div class="table-row">
-            <div>5</div>
-            <div>Nguyen van e</div>
-            <div>
-              <a href="mailto:user5@gmail.com" class="email-link"
-                >user5@gmail.com</a
-              >
-            </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
-            <div>22/2/2025</div>
-            <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="../webapp/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-
-          <div class="table-row">
-            <div>5</div>
-            <div>Nguyen van e</div>
-            <div>
-              <a href="mailto:user5@gmail.com" class="email-link"
-                >user5@gmail.com</a
-              >
-            </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
-            <div>22/2/2025</div>
-            <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="../webapp/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-
-          <div class="table-row">
-            <div>5</div>
-            <div>Nguyen van e</div>
-            <div>
-              <a href="mailto:user5@gmail.com" class="email-link"
-                >user5@gmail.com</a
-              >
-            </div>
-            <div class="password-field">
-              <span class="password-dots">•••••••••••••</span>
-              <span class="toggle-password">
-                <svg
-                  class="eye-open"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                  />
-                </svg>
-                <svg
-                  class="eye-closed"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="display: none"
-                >
-                  <path
-                    d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                  />
-                </svg>
-              </span>
-            </div>
-            <div>22/2/2025</div>
-            <div class="actions">
-              <button class="action-btn lock-btn">
-                <img src="../webapp/asset//Lock_duotone_line.svg" alt="" />
-              </button>
-              <button class="action-btn edit-btn">
-                <img src="../webapp/asset/Edit_fill.svg" />
-              </button>
               <button class="action-btn delete-btn">
                 <img src="../webapp/asset/Trash.svg" />
               </button>
@@ -1045,23 +499,6 @@
     </div>
 
     <script>
-      document.querySelectorAll(".toggle-password").forEach((toggle) => {
-        toggle.addEventListener("click", function () {
-          const passwordDots = this.previousElementSibling;
-          const eyeOpen = this.querySelector(".eye-open");
-          const eyeClosed = this.querySelector(".eye-closed");
-
-          if (passwordDots.textContent === "•••••••••••••") {
-            passwordDots.textContent = "password123";
-            eyeOpen.style.display = "none";
-            eyeClosed.style.display = "block";
-          } else {
-            passwordDots.textContent = "•••••••••••••";
-            eyeOpen.style.display = "block";
-            eyeClosed.style.display = "none";
-          }
-        });
-      });
       // Navigation active state
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.addEventListener("click", function () {
@@ -1088,25 +525,6 @@
           }
         });
       });
-
-      // Search functionality
-      document
-        .querySelector(".search-box")
-        .addEventListener("input", function () {
-          const searchTerm = this.value.toLowerCase();
-          const rows = document.querySelectorAll(".table-row");
-
-          rows.forEach((row) => {
-            const username = row.children[1].textContent.toLowerCase();
-            const email = row.children[2].textContent.toLowerCase();
-
-            if (username.includes(searchTerm) || email.includes(searchTerm)) {
-              row.style.display = "grid";
-            } else {
-              row.style.display = "none";
-            }
-          });
-        });
     </script>
   </body>
 </html>

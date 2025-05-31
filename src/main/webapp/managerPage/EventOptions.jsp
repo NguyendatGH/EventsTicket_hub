@@ -30,7 +30,7 @@
         z-index: 1;
       }
 
-      .sidebar {
+       .sidebar {
         width: 16%;
         background: rgba(15, 23, 42, 0.9);
         backdrop-filter: blur(20px);
@@ -42,7 +42,7 @@
         color: white;
         font-size: 1.5rem;
         font-weight: 700;
-        margin-bottom: 3rem;
+        margin-bottom: 5rem;
         padding: 0 2rem;
       }
 
@@ -52,25 +52,25 @@
       }
 
       .admin-avatar {
-        width: 80px;
-        height: 80px;
+        width: 120px;
+        height: 120px;
         background: rgba(71, 85, 105, 0.8);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1rem;
+        margin: 0 auto 2rem;
       }
 
       .admin-avatar svg {
-        width: 40px;
-        height: 40px;
+        width: 80px;
+        height: 80px;
         color: #94a3b8;
       }
 
       .admin-name {
         color: white;
-        font-size: 1.25rem;
+        font-size: 24px;
         font-weight: 600;
         text-align: center;
         margin-bottom: 0.5rem;
@@ -131,9 +131,12 @@
 
       .main-content {
         flex: 1;
-        padding: 0 80px;
-        padding-top: 40px;
+        padding: 0 94px;
+        padding-top: 2rem;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
       }
 
       .header {

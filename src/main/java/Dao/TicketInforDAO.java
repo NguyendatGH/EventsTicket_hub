@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import Models.TicketInfor;
-import context.DBContext;
+import context.DBConnection;
 
 public class TicketInforDAO {
 
@@ -15,7 +15,7 @@ public class TicketInforDAO {
         String sql = "SELECT * FROM TicketInfo";
 
         try {
-            Connection conn = new DBContext().getConnection(); // Lấy kết nối từ DBContext
+            Connection conn = new DBConnection().getConnection(); // Lấy kết nối từ DBContext
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
