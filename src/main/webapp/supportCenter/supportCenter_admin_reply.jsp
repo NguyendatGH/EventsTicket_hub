@@ -243,52 +243,80 @@
         background-color: white;
       }
 
-      .email-subject {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e5e7eb;
-      }
-      .email-date {
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin-bottom: 1.5rem;
-        text-align: right;
+      .greeting {
+        font-weight: 600;
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: #2d3748;
       }
 
       .email-body {
-        color: #374151;
-        margin-bottom: 1.5rem;
+        margin-bottom: 25px;
+        color: #4a5568;
       }
-      .email-body p {
-        margin-bottom: 1rem;
+
+      .step-list {
+        margin: 20px 0;
+        padding-left: 25px;
+      }
+
+      .step-list li {
+        margin-bottom: 12px;
+        padding-left: 8px;
+        font-weight: 500;
+      }
+
+      .email-footer {
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 2px solid #e2e8f0;
+      }
+
+      .signature {
+        font-style: italic;
+        color: #718096;
+        margin-bottom: 15px;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .admin-info {
+        color: #a0aec0;
+        font-size: 14px;
+        margin-bottom: 5px;
       }
 
       .reply-button {
-        background: #3b82f6;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         color: white;
         border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
+        padding: 16px 32px;
+        border-radius: 12px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 600;
+        margin-top: 18px;
         transition: all 0.3s ease;
-        float: right;
-        margin-top: 1rem;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        letter-spacing: 0.5px;
       }
 
       .reply-button:hover {
-        background: #2563eb;
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, #3568f4 0%, #1641d0 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(65, 125, 221, 0.6);
       }
 
-      .clearfix::after {
-        content: "";
-        display: table;
-        clear: both;
+      .button-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 18px;
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
       }
       ::-webkit-scrollbar {
         width: 8px;
@@ -369,14 +397,14 @@
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
-                class="nav-link active"
+                class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=supportCenter"
-                class="nav-link"
+                class="nav-link active"
                 >Hỗ trợ khách hàng</a
               >
             </li>
@@ -394,10 +422,10 @@
       </aside>
       <!-- Main Content -->
       <div class="main-content">
-        <header class="header">
+        <header>
           <div class="header-wrapper">
             <h3 class="control-panel">Hỗ Trợ khách hàng</h3>
-            <div class="breadcrumb">Hỗ trợ / Chi tiết</div>
+            <div class="breadcrumb">Hỗ trợ/ Chi tiết/ Phản hồi</div>
           </div>
           <button class="back-button">
             <img src="${pageContext.request.contextPath}/asset/back.svg" />
@@ -408,42 +436,43 @@
         <div class="card-content">
           <div class="wrapper">
             <div class="email-header">
-              <span>From: almatbiet@gmail.com</span>
-              <span>To: admin@customerService.com</span>
+              <span>From: admin@customerService.com</span>
+              <span>Reply: almatbiet@gmail.com</span>
             </div>
 
             <div class="email-content">
-              <div class="email-subject">
-                Header : Cần hỗ trợ cách sử dụng chức năng đặt vé trên nền tảng
-                masterTicket
-              </div>
-
-              <div class="email-date">Đã gửi lúc: 19:00 GMT, 20/4/2025</div>
+              <div class="greeting">Chào Anh/Chị,</div>
 
               <div class="email-body">
-                <p>
-                  Hiện tại mình đang gặp khó khăn trong việc sử dụng chức năng
-                  đặt vé trên nền tảng MasterTicket. Mình đã thử thực hiện các
-                  bước như chọn sự kiện và chỗ ngồi, nhưng không rõ sau đó cần
-                  thao tác gì để hoàn tất việc đặt vé.
-                </p>
+                Cảm ơn Anh/Chị đã quan tâm đến sự kiện của chúng tôi. Sau đây là
+                các bước để đặt vé:
 
-                <p>
-                  Ngoài ra, mình cũng không thấy thông báo xác nhận sau khi nhấn
-                  "Đặt vé".
-                </p>
+                <ol class="step-list">
+                  <li>Truy cập website tại địa chỉ [website].</li>
+                  <li>
+                    Chọn mục "Sự kiện" và tìm sự kiện Anh/Chị muốn tham gia.
+                  </li>
+                  <li>Nhấn vào "Đặt vé" ở trang thông tin sự kiện.</li>
+                  <li>
+                    Chọn loại vé, số lượng và điền thông tin cá nhân (tên, etc).
+                  </li>
+                  <li>Điền đầy đủ thông tin cá nhân theo yêu cầu.</li>
+                  <li>Chọn phương thức thanh toán và hoàn tất giao dịch.</li>
+                </ol>
 
-                <p>
-                  Mong admin có thể hướng dẫn chi tiết giúp mình quy trình đặt
-                  vé đúng cách, cũng như kiểm tra giúp mình xem vé đã được đặt
-                  thành công chưa.
-                </p>
-
-                <p>Mong quản trị viên sớm phản hồi !</p>
+                Sau khi đặt vé thành công, Anh/Chị sẽ nhận được email xác nhận
+                kèm mã vé.<br />
+                Nếu cần hỗ trợ thêm, Anh/Chị vui lòng liên hệ qua [hotline/email
+                hỗ trợ].
               </div>
 
-              <div class="clearfix">
-                <button class="reply-button">Phản hồi</button>
+              <div class="email-footer">
+                <div class="signature">Trân trọng,</div>
+                <div class="admin-info">[Tên admin hoặc bộ phận hỗ trợ]</div>
+                <div class="admin-info">Ban Tổ Chức Sự Kiện</div>
+              </div>
+              <div class="button-container">
+                <button class="reply-button">Gửi</button>
               </div>
             </div>
           </div>
