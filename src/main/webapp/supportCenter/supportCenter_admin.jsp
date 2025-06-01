@@ -348,13 +348,21 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-     <nav>
+        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
+              <a
+                href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard"
+                class="nav-link"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents"
+                class="nav-link"
+                >Danh sách sự kiện</a
+              >
             </li>
             <li class="nav-item">
               <a
@@ -364,7 +372,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/AdminServlet?action=supportCenter"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>

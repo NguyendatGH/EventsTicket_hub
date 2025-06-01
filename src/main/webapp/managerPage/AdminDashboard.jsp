@@ -465,7 +465,7 @@ pageEncoding="UTF-8"%>
        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link active">Bảng điều khiển</a>
             </li>
             <li class="nav-item">
               <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
@@ -473,7 +473,7 @@ pageEncoding="UTF-8"%>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
-                class="nav-link active"
+                class="nav-link "
                 >Danh sách tài khoản</a
               >
             </li>
