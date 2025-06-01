@@ -2,10 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package Controller;
+package controller;
 
-import Dao.EventDAO;
-import Models.Event;
+import dao.EventDAO;
+import models.Event;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -27,6 +27,6 @@ public class HomePageServlet extends HttpServlet {
         List<Event> events = eventDAO.getAllEvents();
           request.setAttribute("events", events);
         // Forward tới homePage.jsp
-        request.getRequestDispatcher("/homePage.jsp").forward(request, response);
+        request.getRequestDispatcher("/pages/Home.jsp").forward(request, response);
     }
 }

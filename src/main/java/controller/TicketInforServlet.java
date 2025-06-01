@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package Controller;
+package controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,8 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author admin
  */
-@WebServlet(name="EventServlet", urlPatterns={"/EventServlet"})
-public class EventServlet extends HttpServlet {
+@WebServlet(name="TicketInforServlet", urlPatterns={"/TicketInforServlet"})
+public class TicketInforServlet extends HttpServlet {
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -35,10 +35,10 @@ public class EventServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet EventServlet</title>");  
+            out.println("<title>Servlet TicketInforServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet EventServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet TicketInforServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }

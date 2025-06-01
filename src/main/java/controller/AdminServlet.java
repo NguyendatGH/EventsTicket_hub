@@ -1,4 +1,4 @@
-package Controller;
+package controller;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -11,7 +11,7 @@ import jakarta.servlet.RequestDispatcher;
 import java.util.ArrayList;
 import java.util.List;
 
-import Models.User;
+import models.User;
 
 @WebServlet(name = "AdminServlet", urlPatterns = { "/AdminServlet" })
 public class AdminServlet extends HttpServlet {

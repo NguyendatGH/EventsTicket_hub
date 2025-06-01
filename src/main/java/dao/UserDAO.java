@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Dao;
+package dao;
 
 import java.sql.*;
 import java.security.MessageDigest;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Interfaces.IUserDAO;
-import Models.User;
+import models.User;
 import context.DBConnection;
 
 public class UserDAO implements IUserDAO {
@@ -67,7 +67,7 @@ public class UserDAO implements IUserDAO {
         return false;
     }
     public String resetPassword(String email) {
-    String newPassword = generateRandomPassword(); // VD: "Abc12345"
+    String newPassword = generateRandomPassword(); 
     String hashedPassword = hashPassword(newPassword);
 
     String sql = "UPDATE Users SET passwordHash = ? WHERE email = ?";
@@ -79,7 +79,7 @@ public class UserDAO implements IUserDAO {
 
         int updated = ps.executeUpdate();
         if (updated > 0) {
-            return newPassword; // Trả lại mật khẩu mới để hiển thị hoặc gửi email
+            return newPassword; 
         }
 
     } catch (Exception e) {
@@ -90,7 +90,7 @@ public class UserDAO implements IUserDAO {
 }
 
 private String generateRandomPassword() {
-    // Tạo mật khẩu ngẫu nhiên (8 ký tự)
+    
     String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < 8; i++) {
