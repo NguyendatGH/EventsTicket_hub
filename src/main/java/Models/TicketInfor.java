@@ -1,6 +1,7 @@
-
+// File: src/main/java/Models/TicketInfor.java
 package Models;
 
+import java.math.BigDecimal; // Import BigDecimal
 import java.time.LocalDateTime;
 
 public class TicketInfor {
@@ -8,18 +9,21 @@ public class TicketInfor {
     private String ticketName;
     private String ticketDescription;
     private String category;
-    private double price;
+    private BigDecimal price; // Changed from double to BigDecimal
     private LocalDateTime salesStartTime;
     private LocalDateTime salesEndTime;
     private int eventID;
     private int maxQuantityPerOrder;
     private boolean isActive;
+    // Thêm trường CreatedAt và UpdatedAt nếu bạn muốn đọc từ DB
+    // private LocalDateTime createdAt;
+    // private LocalDateTime updatedAt;
 
     public TicketInfor() {
     }
 
-    public TicketInfor(int ticketInfoID, String ticketName, String ticketDescription, String category, double price,
-                      LocalDateTime salesStartTime, LocalDateTime salesEndTime, int eventID, int maxQuantityPerOrder, boolean isActive) {
+    public TicketInfor(int ticketInfoID, String ticketName, String ticketDescription, String category, BigDecimal price, // Changed to BigDecimal
+                       LocalDateTime salesStartTime, LocalDateTime salesEndTime, int eventID, int maxQuantityPerOrder, boolean isActive) {
         this.ticketInfoID = ticketInfoID;
         this.ticketName = ticketName;
         this.ticketDescription = ticketDescription;
@@ -30,9 +34,9 @@ public class TicketInfor {
         this.eventID = eventID;
         this.maxQuantityPerOrder = maxQuantityPerOrder;
         this.isActive = isActive;
+        // this.createdAt = createdAt; // Nếu thêm vào constructor
+        // this.updatedAt = updatedAt; // Nếu thêm vào constructor
     }
-
-    // Getters and Setters
 
     public int getTicketInfoID() {
         return ticketInfoID;
@@ -66,11 +70,11 @@ public class TicketInfor {
         this.category = category;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() { // Changed to BigDecimal
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) { // Changed to BigDecimal
         this.price = price;
     }
 
@@ -114,9 +118,27 @@ public class TicketInfor {
         isActive = active;
     }
 
+    /* Nếu bạn muốn đọc CreatedAt và UpdatedAt từ DB, uncomment các phần này
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    */
+
     @Override
     public String toString() {
-        return "TicketInfo{" +
+        return "TicketInfor{" +
                 "ticketInfoID=" + ticketInfoID +
                 ", ticketName='" + ticketName + '\'' +
                 ", ticketDescription='" + ticketDescription + '\'' +
@@ -129,9 +151,4 @@ public class TicketInfor {
                 ", isActive=" + isActive +
                 '}';
     }
-
-    public void setIsActive(boolean aBoolean) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }
-

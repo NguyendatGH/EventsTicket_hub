@@ -11,11 +11,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DBConnection {
+
     private static final String DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=XXXXXXX"; //your database name
-    private static final String USER_DB = "XX"; //your username 
+    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=EventTicketDB;encrypt=true;trustServerCertificate=true";
+    private static final String USER_DB = "sa"; //your username 
     private static final String PASS_DB = "123"; //your password
-    
+
     private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
     public static Connection getConnection() {

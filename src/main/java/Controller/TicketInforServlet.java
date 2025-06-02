@@ -1,83 +1,73 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
+// File: src/main/java/Controller/TicketInforServlet.java
 package Controller;
 
+import Dao.TicketInforDAO; // Đảm bảo đúng tên package của DAO
+import Models.TicketInfor; // Đảm bảo đúng tên package của Model
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author admin
- */
-@WebServlet(name="TicketInforServlet", urlPatterns={"/TicketInforServlet"})
+@WebServlet(name = "TicketInforServlet", urlPatterns = {"/TicketInforServlet"})
 public class TicketInforServlet extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet TicketInforServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet TicketInforServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
+    private TicketInforDAO ticketInfoDAO; // Khai báo instance của DAO
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+    public void init() throws ServletException {
+        // Khởi tạo DAO khi Servlet được khởi tạo
+        ticketInfoDAO = new TicketInforDAO();
     }
 
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
     @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
+        // Lấy eventID từ request
+        String idParam = request.getParameter("id");
+        int eventID; // Khởi tạo eventID để sử dụng sau này
+
+        if (idParam == null || idParam.isEmpty()) {
+            // Nếu không có EventID, lấy tất cả các loại vé đang hoạt động
+            // Đây là một cách để hiển thị mặc định nếu không có tham số ID
+            // Hoặc bạn có thể chọn gửi lỗi hoặc chuyển hướng
+            System.out.println("No event ID provided, fetching all active tickets.");
+            List<TicketInfor> listTicket = ticketInfoDAO.getAllTicketInfo(); // Lấy tất cả vé
+            request.setAttribute("listTicket", listTicket);
+        } else {
+            try {
+                eventID = Integer.parseInt(idParam);
+                List<TicketInfor> listTicket = ticketInfoDAO.getTicketInfosByEventID(eventID);
+                request.setAttribute("listTicket", listTicket); // Đặt danh sách vé vào request
+            } catch (NumberFormatException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid event ID format.");
+                return;
+            } catch (Exception e) {
+                // Xử lý các lỗi khác từ DAO hoặc DB
+                e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error retrieving ticket information.");
+                return;
+            }
+        }
+
+        // Đặt thông tin sự kiện tĩnh (bạn có thể lấy từ DB nếu có bảng Events)
+        request.setAttribute("eventName", "THE WHISPER #2 | \"TÌNH ĐƠN PHƯƠNG\" - LAM TRƯỜNG");
+        request.setAttribute("eventTime", "20:00, 19 tháng 7, 2025");
+        request.setAttribute("eventLocation", "Sofi"); // Địa điểm thực tế
+
+        // Chuyển tiếp đến JSP (TicketDetail.jsp như bạn đã chỉ định)
+        request.getRequestDispatcher("TicketDetail.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Hiện tại, doPost chỉ gọi doGet, bạn có thể mở rộng logic này
+        // để xử lý việc người dùng gửi số lượng vé đã chọn.
+        // Ví dụ: Lưu vào session hoặc gửi đến trang thanh toán.
+        doGet(request, response);
+    }
 }

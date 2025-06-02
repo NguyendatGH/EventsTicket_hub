@@ -196,7 +196,7 @@
                 </div>
 
                 <div class="signup">
-                    Not have account yet ? Please <a href="${pageContext.request.contextPath}/register.jsp">sign up</a>
+                    Don't have an account yet? Please <a href="${pageContext.request.contextPath}/register.jsp">sign up</a>
                 </div>
             </form>
         </div>

@@ -516,7 +516,7 @@
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lí website masterTicket</div>
+          <div class="admin-role">MasterTicket Website Manager</div>
         </div>
 
         <nav>
@@ -525,25 +525,25 @@
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard"
                 class="nav-link active"
-                >Bảng điều khiển</a
+                >Control Panel</a
               >
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents"
                 class="nav-link"
-                >Danh sách sự kiện</a
+                >Event List</a
               >
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
                 class="nav-link"
-                >Danh sách tài khoản</a
+                >Account List</a
               >
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">Hỗ trợ khách hàng</a>
+              <a href="#" class="nav-link">Customer Support</a>
             </li>
           </ul>
         </nav>
@@ -555,25 +555,25 @@
               d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
             />
           </svg>
-          Đăng xuất
+          Logout
         </a>
       </aside>
 
       <main class="main-content">
         <div class="top-bar">
           <div class="breadcrumb">
-            <span class="breadcrumb-item">Bảng điều khiển</span>
+            <span class="breadcrumb-item">Control Panel</span>
             <span style="color: white">/</span>
-            <span class="breadcrumb-current">Chi tiết sự kiện</span>
+            <span class="breadcrumb-current">Event Details</span>
           </div>
          
         </div>
 
         <div class="section">
-          <h2 class="section-title">Tổng quan</h2>
+          <h2 class="section-title">Overview</h2>
           <div class="overview-section">
             <div class="link-container">
-              <span class="link-label">Link sự kiện</span>
+              <span class="link-label">Event Link</span>
               <input
                 type="text"
                 class="link-input"
@@ -586,71 +586,60 @@
 
         <div class="event-name-section">
           <div class="event-input-group">
-            <span class="event-label">Tên sự kiện:</span>
+            <span class="event-label">Event Name:</span>
             <input
               type="text"
               class="event-input"
-              value="Sự kiện vẽ tranh hoạt hình"
+              value="Cartoon Drawing Event"
               readonly
             />
           </div>
         </div>
 
         <div class="description-section">
-          <h3 class="description-title">Đơn vị tổ chức</h3>
+          <h3 class="description-title">Organizer</h3>
           <p class="description-text">
-            Trung tâm Văn hóa Thanh thiếu niên Thành phố phối hợp cùng Câu lạc
-            bộ Mỹ thuật Sáng tạo Trẻ.
+            Youth Cultural Center in collaboration with Young Creative Art Club.
           </p>
         </div>
 
         <div class="details-grid">
           <div class="details-section">
             <div class="detail-item">
-              <span class="detail-label">Thời gian:</span>
-              <span class="detail-value"
-                >08:00 – 17:00, ngày 15 tháng 6 năm 2025.</span
-              >
+              <span class="detail-label">Time:</span>
+              <span class="detail-value">08:00 - 17:00, June 15, 2025.</span>
             </div>
             <div class="detail-item">
-              <span class="detail-label">Địa điểm:</span>
-              <span class="detail-value"
-                >Nhà Văn hóa Thanh niên, số 4 Phạm Ngọc Thạch, Quận 1,
-                TP.HCM.</span
-              >
+              <span class="detail-label">Location:</span>
+              <span class="detail-value">Youth Cultural House, 4 Pham Ngoc Thach, District 1, HCMC.</span>
             </div>
           </div>
 
           <div class="details-section">
             <div class="detail-item">
-              <span class="detail-label">Số lượng:</span>
-              <span class="detail-value">120 vé</span>
+              <span class="detail-label">Quantity:</span>
+              <span class="detail-value">120 tickets</span>
             </div>
             <div class="detail-item">
-              <span class="detail-label">Giới hạn tuổi:</span>
+              <span class="detail-label">Age limit:</span>
               <span class="detail-value">0</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Dress code:</span>
-              <span class="detail-value">không có</span>
+              <span class="detail-value">None</span>
             </div>
           </div>
         </div>
 
         <div class="info-section">
-          <h3 class="info-title">Thông tin sự kiện</h3>
+          <h3 class="info-title">Event Information</h3>
           <p class="info-text">
-            Sự kiện Vẽ Tranh Hoạt Hình là một hoạt động sáng tạo dành cho các
-            bạn yêu thích hội họa và đam mê thế giới hoạt hình. Trong gia sự
-            kiện, người chơi sẽ được thỏa sức thể hiện tài năng qua việc sáng
-            tác nhân vật, tạo bối cảnh và kể câu chuyện bằng nét vẽ sinh động.
-            Đây không chỉ là sân chơi nghệ thuật mà còn là cơ hội giao lưu, học
-            hỏi và truyền cảm hứng giữa những người có cùng sở thích.
+            The Cartoon Drawing Event is a creative activity for those who love art and are passionate about the world of animation. During the event, participants will have the opportunity to express their talents through character creation, setting design, and storytelling through dynamic drawings. This is not just an artistic playground but also an opportunity for networking, learning, and inspiration among people with similar interests.
           </p>
         </div>
 
         <div class="events-material">
-          <h3 class="material-header">Hình ảnh</h3>
+          <h3 class="material-header">Images</h3>
           <div class="material-wrapper">
             <div class="Banner">
               <h3 class="banner-header">Banner</h3>
@@ -683,11 +672,11 @@
         </div>
         <div class="event-option">
           <button class="btn approve">
-            Phê Duyệt
+            Approve
             <img src="${pageContext.request.contextPath}/asset/accept.svg" class="btn-img" alt=""/>
           </button>
           <button class="btn reject">
-            Phê Duyệt
+            Approve
             <img src="${pageContext.request.contextPath}/asset/Trash.svg" class="btn-img" alt=""/>
           </button>
         </div>

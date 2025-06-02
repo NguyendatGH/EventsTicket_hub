@@ -459,26 +459,26 @@ pageEncoding="UTF-8"%>
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lí website masterTicket</div>
+          <div class="admin-role">MasterTicket Website Manager</div>
         </div>
 
        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link">Control Panel</a>
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link">Event List</a>
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
                 class="nav-link active"
-                >Danh sách tài khoản</a
+                >Account List</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a href="${pageContext.request.contextPath}/AdminServlet?action=supportCenter" class="nav-link">Customer Support</a>
             </li>
           </ul>
         </nav>
@@ -490,20 +490,20 @@ pageEncoding="UTF-8"%>
               d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
             />
           </svg>
-          Đăng xuất
+          Logout
         </a>
       </aside>
 
       <main class="main-content">
         <header class="header">
-          <div class="control-panel">Bảng điều khiển</div>
+          <div class="control-panel">Control Panel</div>
         </header>
 
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-wrapper">
               <div class="stat-header">
-                <span class="stat-title">Tổng người dùng</span>
+                <span class="stat-title">Total Users</span>
               </div>
               <span class="stat-content">
                 <img
@@ -511,14 +511,14 @@ pageEncoding="UTF-8"%>
                   alt=""
                   class="stat-icon"
                 />
-                <div class="stat-value">100.000</div>
+                <div class="stat-value">100,000</div>
               </span>
             </div>
           </div>
           <div class="stat-card">
             <div class="stat-wrapper">
               <div class="stat-header">
-                <span class="stat-title">Sự kiện tháng này</span>
+                <span class="stat-title">Events This Month</span>
               </div>
               <span class="stat-content">
                 <img
@@ -533,7 +533,7 @@ pageEncoding="UTF-8"%>
           <div class="stat-card">
             <div class="stat-wrapper">
               <div class="stat-header">
-                <span class="stat-title">Lượt truy cập</span>
+                <span class="stat-title">Total Visits</span>
               </div>
               <span class="stat-content">
                 <img
@@ -541,7 +541,7 @@ pageEncoding="UTF-8"%>
                   alt=""
                   class="stat-icon"
                 />
-                <div class="stat-value">100.000</div>
+                <div class="stat-value">100,000</div>
               </span>
             </div>
           </div>
@@ -551,7 +551,7 @@ pageEncoding="UTF-8"%>
         <div class="content-grid">
           <!-- Hot Events -->
           <div class="content-card">
-            <h2 class="card-title">Top sự kiện hot</h2>
+            <h2 class="card-title">Top Hot Events</h2>
             <ul class="event-list">
               <li class="event-item">
                 <div class="event-info">
@@ -562,28 +562,28 @@ pageEncoding="UTF-8"%>
               </li>
               <li class="event-item">
                 <div class="event-info">
-                  <div class="event-number">01</div>
+                  <div class="event-number">02</div>
                   <span class="event-name">Home Decore Range</span>
                 </div>
                 <div class="event-date">15/5/2025</div>
               </li>
               <li class="event-item">
                 <div class="event-info">
-                  <div class="event-number">01</div>
+                  <div class="event-number">03</div>
                   <span class="event-name">Home Decore Range</span>
                 </div>
                 <div class="event-date">15/5/2025</div>
               </li>
               <li class="event-item">
                 <div class="event-info">
-                  <div class="event-number">01</div>
+                  <div class="event-number">04</div>
                   <span class="event-name">Home Decore Range</span>
                 </div>
                 <div class="event-date">15/5/2025</div>
               </li>
               <li class="event-item">
                 <div class="event-info">
-                  <div class="event-number">01</div>
+                  <div class="event-number">05</div>
                   <span class="event-name">Home Decore Range</span>
                 </div>
                 <div class="event-date">15/5/2025</div>
@@ -594,7 +594,7 @@ pageEncoding="UTF-8"%>
    
           <div class="content-card">
             <div class="request-header">
-              <h2 class="card-title">Yêu cầu phê duyệt</h2>
+              <h2 class="card-title">Approval Requests</h2>
               <img
                 class="bell_img"
                 src="${pageContext.request.contextPath}/asset/Property 1=Bell_pin_light.svg"
@@ -605,10 +605,10 @@ pageEncoding="UTF-8"%>
             <div class="request-item">
               <div class="request-info">
                 <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
+                <span class="request-text">Hoai Linh Painting Event</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent('${event.eventId}')">Details</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -618,11 +618,11 @@ pageEncoding="UTF-8"%>
 
             <div class="request-item">
               <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
+                <div class="request-number">02</div>
+                <span class="request-text">Hoai Linh Painting Event</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent('${event.eventId}')">Details</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -632,11 +632,11 @@ pageEncoding="UTF-8"%>
 
             <div class="request-item">
               <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
+                <div class="request-number">03</div>
+                <span class="request-text">Hoai Linh Painting Event</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent('${event.eventId}')">Details</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -646,11 +646,11 @@ pageEncoding="UTF-8"%>
 
             <div class="request-item">
               <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
+                <div class="request-number">04</div>
+                <span class="request-text">Hoai Linh Painting Event</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent('${event.eventId}')">Details</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -660,11 +660,11 @@ pageEncoding="UTF-8"%>
 
             <div class="request-item">
               <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
+                <div class="request-number">05</div>
+                <span class="request-text">Hoai Linh Painting Event</span>
               </div>
               <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
+                <button class="btn-detail" onclick="handleEditEvent('${event.eventId}')">Details</button>
                 <img
                   src="${pageContext.request.contextPath}/asset/Variant52.svg"
                   alt=""
@@ -672,7 +672,7 @@ pageEncoding="UTF-8"%>
               </div>
             </div>
 
-            <a href="#" class="view-more">Xem thêm ></a>
+            <a href="#" class="view-more">View more ></a>
           </div>
         </div>
       </main>
