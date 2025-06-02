@@ -1,9 +1,3 @@
-<%-- 
-    Document   : registerUser
-    Created on : May 27, 2025, 10:02:16 PM
-    Author     : phanh
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -41,7 +35,6 @@
                 color: white;
             }
 
-
             form {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -61,8 +54,6 @@
             input::placeholder {
                 color: rgba(255, 255, 255, 0.25);
             }
-
-
 
             .full-width {
                 grid-column: span 2;
@@ -99,31 +90,44 @@
             .login-link a:hover {
                 text-decoration: underline;
             }
+
+            .error-message {
+                color: #ff4d4d;
+                font-size: 14px;
+                grid-column: span 2;
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <h2>Đăng Ký</h2>
-            <form action="registerUser" method="post">
+
+            <!-- Hiển thị lỗi nếu có -->
+            <c:if test="${not empty error}">
+                <div class="error-message">${error}</div>
+            </c:if>
+
+            <form action="register" method="post">
                 <input type="email" name="email" placeholder="Vui lòng nhập email" required>
-                <input type="text" name="gender" placeholder="Giới tính" required>
+                <select name="gender" required>
+                    <option value="" disabled selected>Chọn giới tính</option>
+                    <option value="male">Nam</option>
+                    <option value="female">Nữ</option>
+                </select>
                 <input type="password" name="password" placeholder="Mật khẩu" required>
                 <input type="text" name="phone" placeholder="Số điện thoại" required>
                 <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu" required>
-                <input type="text" name="dob" placeholder="dd/MM/yyyy" required>
-                <input type="text" name="country" placeholder="Quốc gia" required>
-                <input type="text" name="language" placeholder="Ngôn ngữ" required>
+                <input type="text" name="dob" placeholder="Ngày sinh (dd/MM/yyyy)" required>
+                <input type="text" name="address" placeholder="Địa chỉ" required>
 
                 <div class="full-width">
                     <button class="submit-button" type="submit">Đăng Ký ➤</button>
                 </div>
 
                 <div class="login-link">
-                    Đã có tài khoản trước đó ? <a href="login.jsp">Đăng nhập</a>
+                    Đã có tài khoản? <a href="login.jsp">Đăng nhập</a>
                 </div>
             </form>
         </div>
     </body>
 </html>
-
-

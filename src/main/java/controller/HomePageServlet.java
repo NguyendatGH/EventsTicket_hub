@@ -27,6 +27,6 @@ public class HomePageServlet extends HttpServlet {
         List<Event> events = eventDAO.getAllEvents();
           request.setAttribute("events", events);
         // Forward tới homePage.jsp
-        request.getRequestDispatcher("/pages/Home.jsp").forward(request, response);
+        request.getRequestDispatcher("/pages/homePage.jsp").forward(request, response);
     }
 }

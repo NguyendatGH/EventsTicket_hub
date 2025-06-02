@@ -20,6 +20,28 @@ public class User {
     private LocalDateTime lastLoginAt;
     private String googleId;
 
+    public User() {
+    }
+
+    public User(int id, String email, String passwordHash, String role, LocalDateTime createdAt, LocalDateTime updatedAt, String gender, Date birthday, String phoneNumber, String address, String avatar, boolean isDeleted, LocalDateTime lastLoginAt, String googleId) {
+        this.id = id;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.gender = gender;
+        this.birthday = birthday;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.avatar = avatar;
+        this.isDeleted = isDeleted;
+        this.lastLoginAt = lastLoginAt;
+        this.googleId = googleId;
+    }
+    
+    
+
     // Getters and Setters
     public int getId() {
         return id;
