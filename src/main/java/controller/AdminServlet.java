@@ -38,11 +38,11 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
             case "manageuseraccount":
                 // Create sample user data
                 List<User> userList = new ArrayList<>();
-                userList.add(new User("Nguyen Van A", "aimablet@gmail.com", "password123", "22/02/2025"));
-                userList.add(new User("Nguyen Van B", "user2@gmail.com", "pass456", "22/02/2025"));
-                userList.add(new User("Nguyen Van C", "user3@gmail.com", "secure789", "22/02/2025"));
-                userList.add(new User("Nguyen Van D", "user4@gmail.com", "mypassword", "22/02/2025"));
-                userList.add(new User("Nguyen Van E", "user5@gmail.com", "testpass", "22/02/2025"));
+//                userList.add(new User("Nguyen Van A", "aimablet@gmail.com", "password123", "22/02/2025"));
+//                userList.add(new User("Nguyen Van B", "user2@gmail.com", "pass456", "22/02/2025"));
+//                userList.add(new User("Nguyen Van C", "user3@gmail.com", "secure789", "22/02/2025"));
+//                userList.add(new User("Nguyen Van D", "user4@gmail.com", "mypassword", "22/02/2025"));
+//                userList.add(new User("Nguyen Van E", "user5@gmail.com", "testpass", "22/02/2025"));
                 
                 request.setAttribute("userList", userList);
                 targetJsp = "managerPage/AdminUserManagement.jsp";
