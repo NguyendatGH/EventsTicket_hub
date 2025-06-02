@@ -167,40 +167,48 @@
         </style>
     </head>
     <body>
-        <div class="login-box">
-            <h2>Login</h2>
-            <form action="/LoginServlet" method="post">
-                <label>Email</label>
-                <input type="text" name="user" placeholder="Enter your email" required />
-                <label>Passwords</label>
-                <input type="password" name="pass" placeholder="Enter your password" required />
+    <div class="login-box">
+        <h2>Login</h2>
 
-                <div class="checkbox">
-                    <input type="checkbox" name="remember" />
-                    <label>Remember me</label>
-                </div>
+        <%-- Hiển thị lỗi nếu có --%>
+        <c:if test="${not empty error}">
+            <p style="color: red; margin-bottom: 10px;">${error}</p>
+        </c:if>
 
-                <div class="actions">
-                    <a href="change_password.jsp">Change password</a>
-                    <a href="forgot_password.jsp">Forgot password?</a>
-                </div>
+        <form action="${pageContext.request.contextPath}/login" method="post">
+            <label>Email</label>
+            <input type="text" name="email" placeholder="Enter your email" required />
 
-                <button type="submit">Sign in</button>
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter your password" required />
 
-                <div class="divider">or</div>
+            <div class="checkbox">
+                <input type="checkbox" name="remember" />
+                <label>Remember me</label>
+            </div>
 
-                <div class="social-icons">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook">
-                </div>
+            <div class="actions">
+                <a href="change_password.jsp">Change password</a>
+                <a href="forgot_password.jsp">Forgot password?</a>
+            </div>
 
-                <div class="signup">
-                    Not have account yet ? Please <a href="${pageContext.request.contextPath}/register.jsp">sign up</a>
-                </div>
-            </form>
-        </div>
-    </body>
+            <button type="submit">Sign in</button>
+
+            <div class="divider">or</div>
+
+            <div class="social-icons">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook">
+            </div>
+
+            <div class="signup">
+                Don't have an account yet? Please 
+                <a href="${pageContext.request.contextPath}/register.jsp">sign up</a>
+            </div>
+        </form>
+    </div>
+</body>
 </html>
 
 

@@ -4,7 +4,12 @@
  */
 package Interfaces;
 
+import models.User;
+
 public interface IUserDAO {
-    boolean checkLogin(String email, String password);
+    User login(String email, String password);
+    
+    boolean insertUser(User user);
+    boolean isEmailTaken(String email);
 }
 
