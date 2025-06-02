@@ -646,7 +646,7 @@
               <div class="event-status success">Đang hoạt động</div>
             </div>
             <div class="actions">
-              <button class="action-btn edit-btn onclick="handleEditEvent(${event.eventId})"">
+              <button class="action-btn edit-btn" onclick="handleEditEvent(${event.eventId})"">
                 <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" />
               </button>
               <button class="action-btn delete-btn">
