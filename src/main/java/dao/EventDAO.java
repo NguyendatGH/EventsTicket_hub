@@ -19,7 +19,7 @@ import java.util.List;
 public class EventDAO {
     
     
-     public List<Event> getAllEvents() {
+     public List<Event> getAllApprovedEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1";
 

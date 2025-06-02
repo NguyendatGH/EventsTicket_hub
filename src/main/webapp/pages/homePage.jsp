@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
-<%@page import="Models.Event"%>
+<%@ page import="models.Event" %>
+
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
 <!DOCTYPE html>
@@ -478,10 +479,12 @@
                 <input type="text" class="search-box" placeholder="Tìm sự kiện theo tên..." id="searchInput">
             </div>
             <ul class="nav-links">
-                <li><a href="#events">Sự kiện</a></li>
-                <li><a href="#venues">Địa điểm</a></li>
-                <li><a href="#about">Giới thiệu</a></li>
-                <li><a href="#contact">Liên hệ</a></li>
+                <li><a href="#events">Trang chủ</a></li>
+                <li><a href="#venues">Các sự kiện hot</a></li>
+                <li><a href="#about">Săn voucher giảm giá</a></li>
+                <li><a href="#contact">Tạo sự kiện</a></li>
+                <li><a href="#contact">Hỗ trợ</a></li>
+                
             </ul>
             <div class="auth-buttons">
                 <a href="#" class="btn btn-outline">Đăng nhập</a>

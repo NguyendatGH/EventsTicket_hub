@@ -7,7 +7,6 @@ package controller;
 import dao.EventDAO;
 import models.Event;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,9 +23,9 @@ public class HomePageServlet extends HttpServlet {
             throws ServletException, IOException {
         
          EventDAO eventDAO = new EventDAO();
-        List<Event> events = eventDAO.getAllEvents();
+        List<Event> events = eventDAO.getAllApprovedEvents();
           request.setAttribute("events", events);
         // Forward tới homePage.jsp
-        request.getRequestDispatcher("/pages/Home.jsp").forward(request, response);
+        request.getRequestDispatcher("/pages/homePage.jsp").forward(request, response);
     }
 }
