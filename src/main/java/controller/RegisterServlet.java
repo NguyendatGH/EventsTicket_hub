@@ -47,22 +47,19 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        String dob = request.getParameter("dob");
         Date birthday = null;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            sdf.setLenient(false); 
-            birthday = sdf.parse(dob);
+            sdf.setLenient(false);
+            birthday = sdf.parse(dobStr);
         } catch (ParseException e) {
             request.setAttribute("error", "Ngày sinh không hợp lệ. Định dạng đúng là dd/MM/yyyy.");
             request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
             return;
         }
 
-        
         String passwordHash = HashUtil.sha256(password);
 
-        
         User user = new User();
         user.setEmail(email);
         user.setPasswordHash(passwordHash);
@@ -78,13 +75,22 @@ public class RegisterServlet extends HttpServlet {
         user.setGoogleId(null);
         user.setLastLoginAt(null);
 
-        boolean inserted = userDAO.insertUser(user);
+       
+        String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
 
-        if (inserted) {
-            response.sendRedirect("authentication/login.jsp");
-        } else {
-            request.setAttribute("error", "Đăng ký thất bại. Email có thể đã tồn tại.");
+        try {
+            utils.EmailUtil.sendEmail(email, "Mã xác minh đăng ký", "Mã xác minh của bạn là: " + otp);
+        } catch (Exception e) {
+            request.setAttribute("error", "Không gửi được email xác minh. Kiểm tra lại địa chỉ email.");
             request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
+            return;
         }
+
+       
+        HttpSession session = request.getSession();
+        session.setAttribute("otp", otp);
+        session.setAttribute("pendingUser", user);
+
+        response.sendRedirect("authentication/verify.jsp");
     }
 }
