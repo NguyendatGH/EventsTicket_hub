@@ -53,7 +53,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         session.removeAttribute("pendingUser");
 
         if (inserted) {
-            response.sendRedirect("authentication/login.jsp");
+            request.getRequestDispatcher("authentication/success.jsp").forward(request, response);
         } else {
             request.setAttribute("error", "Đăng ký thất bại");
             request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
