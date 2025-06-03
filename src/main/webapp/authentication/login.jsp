@@ -176,7 +176,7 @@
 
             <div class="signup">
                 Don't have an account yet? Please 
-                <a href="${pageContext.request.contextPath}/register.jsp">sign up</a>
+                <a href="${pageContext.request.contextPath}/authentication/register.jsp">sign up</a>
             </div>
         </div>
 

@@ -465,20 +465,20 @@ pageEncoding="UTF-8"%>
        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard" class="nav-link active">Bảng điều khiển</a>
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link active">Bảng điều khiển</a>
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
+                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
                 class="nav-link "
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdminServlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
             </li>
           </ul>
         </nav>
@@ -537,7 +537,7 @@ pageEncoding="UTF-8"%>
               </div>
               <span class="stat-content">
                 <img
-                  src="${pageContext.request.contextPath}/asset/Property 1=Send_fill.svg"
+                  src="${pageContext.request.contextPath}/asset/Property1=Send_fill.svg"
                   alt=""
                   class="stat-icon"
                 />
@@ -597,7 +597,7 @@ pageEncoding="UTF-8"%>
               <h2 class="card-title">Yêu cầu phê duyệt</h2>
               <img
                 class="bell_img"
-                src="${pageContext.request.contextPath}/asset/Property 1=Bell_pin_light.svg"
+                src="${pageContext.request.contextPath}/asset/Property1=Bell_pin_light.svg"
                 alt=""
               />
             </div>
@@ -700,11 +700,10 @@ pageEncoding="UTF-8"%>
         });
       }
       function handleEditEvent(eventId) {
-        // Kiểm tra ID (debug)
+    
         console.log("Redirecting to edit event:", eventId);
 
-        // Redirect đến Servlet
-        window.location.href = 'AdminServlet?action=viewEventDetail&eventId=' + eventId;
+        window.location.href = 'admin-servlet?action=viewEventDetail&eventId=' + eventId;
     }
     </script>
   </body>
