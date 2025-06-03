@@ -581,11 +581,11 @@ END;
 -- Insert into Users (Administrator with Id=1)
 INSERT INTO Users (Email, PasswordHash, Role, Gender, Birthday, PhoneNumber, Address, Avatar, IsDeleted, LastLoginAt)
 VALUES
-('adminEventWeb@support.com', '$2a$10$Mwmm41x7egsU9TvUSA9Yv.36SdFVdmSP6t2/jqrESFRKz.A3wfqnG', 'admin', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', NULL, 0, GETDATE()),
-('organizer@ticketbox.vn', '$2a$10$nt3PC4s3AUW35G2EYnDXKezhIh3AXE5zd2JARaFnJFowgoAf4Crce', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', NULL, 0, GETDATE()),
-('music_events@hcmc.com', '$2a$10$4.gPx4T.4gnmONlxLdnrZuGOyRVh7blG9MvUA7/3rVoDH7XZu4GDy', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', NULL, 0, GETDATE()),
-('sports_events@hcmc.com', '$2a$10$tWaH8zP/62EymWew3IG.R.Kd9EuVwUYIwf94g7ErJi872babiZsPi', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', NULL, 0, GETDATE()),
-('customer1@ticketbox.vn', '$2a$10$Z5PCViLlQP4MNCH9EbbYyeJci6EKWKPXvO3Vyr1pQ5NBh5mYjimd.', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', NULL, 0, GETDATE());
+('adminEventWeb@support.com', 'ddfa08f04ffbedd937ce079026ead9826c0f4572feee5e45ff2a66d058c0c9d5', 'admin', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', NULL, 0, GETDATE()),
+('organizer@ticketbox.vn', '058caa5e5eec0aa2911b924607646627dbf0815d513576ada793072e78810691', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', NULL, 0, GETDATE()),
+('music_events@hcmc.com', 'e51a4dbbf6c5021893e89253da30c135286bb8cdfb8019d87d666e5483e21c21', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', NULL, 0, GETDATE()),
+('sports_events@hcmc.com', '42148a0e9fdc241f7d762b460c4ee97442621455745864c23adb3e4abbcdf17c', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', NULL, 0, GETDATE()),
+('customer1@ticketbox.vn', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', NULL, 0, GETDATE());
 
 
 select * from users;
