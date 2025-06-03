@@ -9,8 +9,6 @@ import java.sql.*;
 import Interfaces.IUserDAO;
 import models.User;
 import context.DBConnection;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import utils.HashUtil;
 
 public class UserDAO implements IUserDAO {
@@ -105,7 +103,6 @@ public class UserDAO implements IUserDAO {
         }
     }
 
-    
     //Update profile của "Customer"
     @Override
     public boolean updateProfile(User user) {
@@ -126,6 +123,103 @@ public class UserDAO implements IUserDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public boolean updatePasswordByEmail(String email, String newPassword) {
+        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = ? WHERE Email = ? AND IsDeleted = 0";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newPassword);
+            stmt.setTimestamp(2, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            stmt.setString(3, email);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean changePassword(int userId, String oldPassword, String newPassword) {
+        String checkSql = "SELECT PasswordHash FROM Users WHERE Id = ? AND IsDeleted = 0";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+
+            checkStmt.setInt(1, userId);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next()) {
+                String currentHashedPassword = rs.getString("PasswordHash");
+                String oldPasswordHash = HashUtil.sha256(oldPassword);
+
+                if (!currentHashedPassword.equals(oldPasswordHash)) {
+                    return false; // Sai mật khẩu cũ
+                }
+
+                // Đúng mật khẩu cũ, cập nhật mật khẩu mới
+                String updateSql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = ? WHERE Id = ?";
+                try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                    String newPasswordHash = HashUtil.sha256(newPassword);
+                    updateStmt.setString(1, newPasswordHash);
+                    updateStmt.setTimestamp(2, Timestamp.valueOf(java.time.LocalDateTime.now()));
+                    updateStmt.setInt(3, userId);
+
+                    return updateStmt.executeUpdate() > 0;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPasswordHash(rs.getString("passwordHash"));
+                    user.setRole(rs.getString("role"));
+
+                    Timestamp createdAt = rs.getTimestamp("createdAt");
+                    user.setCreatedAt(createdAt != null ? createdAt.toLocalDateTime() : null);
+
+                    Timestamp updatedAt = rs.getTimestamp("updatedAt");
+                    user.setUpdatedAt(updatedAt != null ? updatedAt.toLocalDateTime() : null);
+
+                    user.setGender(rs.getString("gender"));
+
+                    Date birthday = rs.getDate("birthday");
+                    user.setBirthday(birthday);
+
+                    user.setPhoneNumber(rs.getString("phoneNumber"));
+                    user.setAddress(rs.getString("address"));
+                    user.setAvatar(rs.getString("avatar"));
+                    user.setIsDeleted(rs.getBoolean("isDeleted"));
+
+                    Timestamp lastLoginAt = rs.getTimestamp("lastLoginAt");
+                    user.setLastLoginAt(lastLoginAt != null ? lastLoginAt.toLocalDateTime() : null);
+
+                    user.setGoogleId(rs.getString("googleId"));
+
+                    return user;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
