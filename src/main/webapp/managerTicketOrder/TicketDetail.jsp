@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%-- Import các lớp Java bạn cần, lưu ý đúng package --%>
 <%@ page import="java.util.List" %>
-<%@ page import="Models.TicketInfor" %>
+<%@ page import="models.TicketInfor" %>
 <%@ page import="java.math.BigDecimal" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
