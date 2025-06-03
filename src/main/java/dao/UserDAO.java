@@ -241,4 +241,20 @@ public class UserDAO implements IUserDAO {
         }
     }
 
+    @Override
+    public boolean insertUserFromGoogle(User user) {
+        String sql = "INSERT INTO Users (Email, Role, CreatedAt, IsDeleted, GoogleId) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getRole());
+            ps.setTimestamp(3, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setBoolean(4, user.getIsDeleted());
+            ps.setString(5, user.getGoogleId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

@@ -761,7 +761,6 @@
             dropdown.classList.toggle("show");
         }
 
-        // Đóng dropdown nếu click ra ngoài
         window.addEventListener("click", function (e) {
             const userInfo = document.querySelector(".user-info");
             const dropdown = document.getElementById("userDropdown");
@@ -771,7 +770,6 @@
             }
         });
 
-        // JavaScript để xem trước ảnh avatar
         document.getElementById('avatar').addEventListener('change', function (event) {
             const file = event.target.files[0];
             const avatarPreview = document.getElementById('avatarPreview');
@@ -779,9 +777,7 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    // Xóa nội dung chữ cái đầu nếu có
                     avatarPreview.innerHTML = '';
-                    // Tạo thẻ img và thêm vào preview
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.alt = 'New Avatar';
@@ -793,8 +789,7 @@
                 };
                 reader.readAsDataURL(file);
             } else {
-                // Nếu không có file được chọn, hiển thị lại avatar cũ hoặc chữ cái đầu
-                // Lấy đường dẫn avatar hiện tại từ thuộc tính data-current-avatar
+
                 const currentAvatarPath = avatarPreview.dataset.currentAvatar;
                 if (currentAvatarPath) {
                     avatarPreview.innerHTML = ''; // Xóa chữ cái đầu nếu có
@@ -812,7 +807,6 @@
             }
         });
 
-        // Cập nhật thuộc tính data-current-avatar khi trang tải
         document.addEventListener('DOMContentLoaded', function () {
             const avatarPreview = document.getElementById('avatarPreview');
         <% if (user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>

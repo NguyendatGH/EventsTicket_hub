@@ -23,6 +23,8 @@ public interface IUserDAO {
     User getUserByEmail(String email);
     
     boolean updatePassword(int userId, String newPasswordHash);
+    
+    boolean insertUserFromGoogle(User user);
 
 }
     
