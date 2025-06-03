@@ -175,8 +175,8 @@
             </div>
 
             <div class="signup">
-                Chưa có tài khoản ? 
-                <a href="${pageContext.request.contextPath}/register">Đăng ký tại đây</a>
+                Don't have an account yet? Please 
+                <a href="${pageContext.request.contextPath}/authentication/register.jsp">sign up</a>
             </div>
         </div>
 
