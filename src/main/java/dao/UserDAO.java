@@ -67,7 +67,7 @@ public class UserDAO implements IUserDAO {
         return user;
     }
 
-    //Thêm người dùng là khách
+    //Thêm người dùng là "Customer"
     @Override
     public boolean insertUser(User user) {
         String sql = "INSERT INTO Users (Email, PasswordHash, Role, CreatedAt, UpdatedAt, Gender, Birthday, PhoneNumber, Address, IsDeleted) "
@@ -92,7 +92,6 @@ public class UserDAO implements IUserDAO {
         }
     }
 
-
     @Override
     public boolean isEmailTaken(String email) {
         String sql = "SELECT 1 FROM Users WHERE Email = ?";
@@ -103,6 +102,29 @@ public class UserDAO implements IUserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             return true;
+        }
+    }
+
+    
+    //Update profile của "Customer"
+    @Override
+    public boolean updateProfile(User user) {
+        String sql = "UPDATE Users SET Gender = ?, Birthday = ?, PhoneNumber = ?, Address = ?, UpdatedAt = ? WHERE Id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, user.getGender());
+            stmt.setDate(2, new java.sql.Date(user.getBirthday().getTime()));
+            stmt.setString(3, user.getPhoneNumber());
+            stmt.setString(4, user.getAddress());
+            stmt.setTimestamp(5, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            stmt.setInt(6, user.getId());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

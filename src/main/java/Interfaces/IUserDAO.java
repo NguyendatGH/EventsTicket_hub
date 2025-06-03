@@ -10,6 +10,9 @@ public interface IUserDAO {
     User login(String email, String password);
     
     boolean insertUser(User user);
+    
     boolean isEmailTaken(String email);
+    
+    boolean updateProfile(User user );
 }
 

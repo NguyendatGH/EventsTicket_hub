@@ -133,11 +133,6 @@
                 font-size: 0.9rem;
             }
 
-            .user-name {
-                font-weight: 500;
-                color: white;
-            }
-
             .user-dropdown {
                 position: absolute;
                 top: 100%;
@@ -621,7 +616,7 @@
                         👤 Xin chào, <%= user.getEmail() %> <span style="margin-left: 0.5rem;">▼</span>
                     </div>
                     <div class="user-dropdown" id="userDropdown">
-                        <a href="#profile" class="dropdown-item">👤 Thông tin cá nhân</a>
+                        <a href="updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
                         <a href="#tickets" class="dropdown-item">🎫 Vé đã mua</a>
                         <a href="#favorites" class="dropdown-item">❤️ Sự kiện yêu thích</a>
                         <a href="#settings" class="dropdown-item">⚙️ Cài đặt</a>
