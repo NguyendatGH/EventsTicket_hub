@@ -11,6 +11,9 @@ import java.io.IOException;
 
 import dao.UserDAO;
 import Interfaces.IUserDAO;
+import dao.EventDAO;
+import java.util.List;
+import models.Event;
 import models.User;
 
 @WebServlet("/login")
@@ -36,7 +39,13 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-            response.sendRedirect("pages/homePage.jsp");
+
+            EventDAO eventDAO = new EventDAO();
+            List<Event> events = eventDAO.getAllApprovedEvents();
+            request.setAttribute("events", events); 
+
+            request.getRequestDispatcher("userPage/userHomePage.jsp").forward(request, response);
+
         } else {
             request.setAttribute("error", "Email hoặc mật khẩu không đúng!");
             request.getRequestDispatcher("authentication/login.jsp").forward(request, response);

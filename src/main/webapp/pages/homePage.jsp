@@ -487,8 +487,8 @@
                 
             </ul>
             <div class="auth-buttons">
-                <a href="#" class="btn btn-outline">Đăng nhập</a>
-                <a href="#" class="btn btn-primary">Đăng ký</a>
+                <a href="login" class="btn btn-outline">Đăng nhập</a>
+                <a href="register" class="btn btn-primary">Đăng ký</a>
             </div>
         </nav>
     </header>

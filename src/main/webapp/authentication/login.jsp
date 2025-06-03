@@ -1,10 +1,5 @@
-<%-- 
-    Document   : login
-    Created on : May 27, 2025, 10:03:39 PM
-    Author     : phanh
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -27,7 +22,6 @@
                 background-repeat: no-repeat;
             }
 
-
             .login-box {
                 background: rgba(255, 255, 255, 0.05);
                 border-radius: 20px;
@@ -46,7 +40,6 @@
                 margin-top: 0;
                 text-align: left;
             }
-
 
             .login-box label {
                 display: block;
@@ -129,26 +122,6 @@
                 right: 0;
             }
 
-            .social-icons {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 10px;
-            }
-
-            .social-icons img {
-                width: 40px;
-                height: 40px;
-                background: white;
-                border-radius: 6px;
-                padding: 5px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                transition: transform 0.2s ease;
-            }
-
-            .social-icons img:hover {
-                transform: scale(1.1);
-            }
-
             .signup {
                 margin-top: 20px;
                 text-align: center;
@@ -167,48 +140,46 @@
         </style>
     </head>
     <body>
-    <div class="login-box">
-        <h2>Login</h2>
+        <div class="login-box">
+            <h2>Login</h2>
 
-        <%-- Hiển thị lỗi nếu có --%>
-        <c:if test="${not empty error}">
-            <p style="color: red; margin-bottom: 10px;">${error}</p>
-        </c:if>
+            <c:if test="${not empty error}">
+                <p style="color: red; margin-bottom: 10px;">${error}</p>
+            </c:if>
 
-        <form action="${pageContext.request.contextPath}/login" method="post">
-            <label>Email</label>
-            <input type="text" name="email" placeholder="Enter your email" required />
+            <form action="${pageContext.request.contextPath}/login" method="post">
+                <label>Email</label>
+                <input type="text" name="email" placeholder="Enter your email" required />
 
-            <label>Password</label>
-            <input type="password" name="password" placeholder="Enter your password" required />
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter your password" required />
 
-            <div class="checkbox">
-                <input type="checkbox" name="remember" />
-                <label>Remember me</label>
-            </div>
+                <div class="checkbox">
+                    <input type="checkbox" name="remember" />
+                    <label>Remember me</label>
+                </div>
 
-            <div class="actions">
-                <a href="change_password.jsp">Change password</a>
-                <a href="forgot_password.jsp">Forgot password?</a>
-            </div>
+                <div class="actions">
+                    <a href="${pageContext.request.contextPath}/authentication/forgotPassword.jsp">Quên mật khẩu?</a>
 
-            <button type="submit">Sign in</button>
+                </div>
+
+                <button type="submit">Sign in</button>
+            </form>
 
             <div class="divider">or</div>
-
-            <div class="social-icons">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook">
+            <div style="margin-top: 10px;"> 
+                <a href="${pageContext.request.contextPath}/login-google">
+                    <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" />
+                </a>
             </div>
 
             <div class="signup">
                 Don't have an account yet? Please 
                 <a href="${pageContext.request.contextPath}/register.jsp">sign up</a>
             </div>
-        </form>
-    </div>
-</body>
+        </div>
+
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+    </body>
 </html>
-
-
