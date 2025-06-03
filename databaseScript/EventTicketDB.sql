@@ -588,7 +588,7 @@ VALUES
 ('customer1@ticketbox.vn', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', NULL, 0, GETDATE());
 
 
-select * from users;
+--select * from users;
 --adminEventWeb@support.com: admin123@
 --organizer@ticketbox.vn: eventowner123
 --music_events@hcmc.com: eventowner321
@@ -602,6 +602,8 @@ VALUES
 ('Music', 'Music concerts and performances'),
 ('Sport', 'Sporting events'),
 ('Others', 'Miscellaneous events');
+
+--select * from Genres;
 
 -- Insert into Events
 INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted)
@@ -627,6 +629,7 @@ VALUES
 ('autoFEST@HCMC [Music Party & Merchandise]', 'Music and automotive merchandise event', 'Ho Chi Minh City', '2025-06-19 02:00:00', '2025-06-19 04:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/87/43/e3/7e239ba463207db6e0e12cee4e433536.jpg', 0, 0),
 ('Automotive Mobility Solutions Conference', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-06-19 03:00:00', '2025-06-19 05:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/4d/8c/8a/4b0586d8a8733d9ed6cc9f5115960529.png', 0, 0);
 
+--select * from Events;
 -- Insert into Seat (for events with seating charts, assuming some events have seats)
 INSERT INTO Seat (EventID, SeatNumber, SeatRow, SeatSection, SeatStatus)
 VALUES
@@ -637,6 +640,7 @@ VALUES
 (8, 'C1', 'C', 'Premium', 'available'),
 (8, 'C2', 'C', 'Premium', 'available');
 
+--select * from Seat
 -- Insert into TicketInfo
 INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive)
 VALUES
@@ -661,6 +665,7 @@ VALUES
 ('Party Pass - autoFEST', 'Music party admission', 'General Admission', 180000, '2025-05-01 00:00:00', '2025-06-19 01:30:00', 19, 10, 1),
 ('Conference Pass - Automotive', 'Industry conference access', 'Professional', 250000, '2025-05-01 00:00:00', '2025-06-19 02:30:00', 20, 5, 1);
 
+--select * from TicketInfo
 -- Insert into TicketInventory
 INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity)
 VALUES
@@ -685,6 +690,7 @@ VALUES
 (19, 200, 0, 0), -- autoFEST
 (20, 200, 0, 0); -- Automotive Conference
 
+--select * from TicketInventory
 -- Insert into Ticket
 INSERT INTO Ticket (TicketInfoID, TicketCode, Status, SeatID)
 VALUES
@@ -704,6 +710,7 @@ VALUES
 (9, 'TKT000000122025', 'sold', NULL), -- LỄ HỘI ẨM THỰC ẤN ĐỘ
 (10, 'TKT000000132025', 'sold', NULL); -- ANH TRAI VƯỢT NGÀN CHÔNG GAI
 
+--select * from Ticket
 -- Insert into PaymentMethod
 INSERT INTO PaymentMethod (MethodName, PromotionCode, Description, IsActive)
 VALUES
@@ -712,6 +719,7 @@ VALUES
 ('VNPay', 'VNPAY0', 'Free transaction fee - Pay with VNPay mobile app', 1),
 ('E-Wallet', 'EWALLET0', 'Free transaction fee - Pay with mobile apps like Momo', 1);
 
+--select * from PaymentMethod
 -- Insert into Orders
 INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes)
 VALUES
@@ -723,7 +731,7 @@ VALUES
 ('ORD00000006', 5, 1, 280000, 0, 280000, 'paid', 'delivered', 3, '0945678901', 'customer1@ticketbox.vn', NULL),
 ('ORD00000007', 5, 1, 350000, 0, 350000, 'pending', 'created', 1, '0945678901', 'customer1@ticketbox.vn', NULL);
 
-
+--select * from Orders
 -- Insert into OrderItems
 INSERT INTO OrderItems (OrderID, TicketInfoID, EventID, TicketID, UnitPrice, Quantity, TotalPrice)
 VALUES
@@ -739,6 +747,7 @@ VALUES
 (6, 8, 8, 10, 280000, 1, 280000),
 (7, 10, 10, 13, 350000, 1, 350000);
 
+--select * from OrderItems
 -- Insert into Feedback
 INSERT INTO Feedback (UserID, EventID, OrderID, Rating, Content, IsApproved)
 VALUES
@@ -795,3 +804,7 @@ INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, R
 VALUES
 (1, 1, 5, 150000, 'Change of plans', 'pending', 2),
 (2, NULL, 5, 530000, 'Double booking', 'pending', 1);
+
+
+--delete from Ticket
+--DBCC CHECKIDENT ('Ticket', RESEED, 0);
