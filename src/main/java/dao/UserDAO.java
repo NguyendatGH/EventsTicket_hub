@@ -222,4 +222,22 @@ public class UserDAO implements IUserDAO {
         return null;
     }
 
+    @Override
+    public boolean updatePassword(int userId, String newPasswordHash) {
+        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = CURRENT_TIMESTAMP WHERE Id = ? AND IsDeleted = 0";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, newPasswordHash);
+            stmt.setInt(2, userId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

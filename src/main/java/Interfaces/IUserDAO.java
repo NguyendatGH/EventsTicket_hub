@@ -21,6 +21,8 @@ public interface IUserDAO {
     boolean changePassword(int userId, String oldPassword, String newPassword);
 
     User getUserByEmail(String email);
+    
+    boolean updatePassword(int userId, String newPasswordHash);
 
 }
     
