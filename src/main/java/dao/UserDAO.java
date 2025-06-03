@@ -106,7 +106,7 @@ public class UserDAO implements IUserDAO {
     //Update profile của "Customer"
     @Override
     public boolean updateProfile(User user) {
-        String sql = "UPDATE Users SET Gender = ?, Birthday = ?, PhoneNumber = ?, Address = ?, UpdatedAt = ? WHERE Id = ?";
+        String sql = "UPDATE Users SET Gender = ?, Birthday = ?, PhoneNumber = ?, Address = ?, Avatar = ?, UpdatedAt = ? WHERE Id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -114,8 +114,9 @@ public class UserDAO implements IUserDAO {
             stmt.setDate(2, new java.sql.Date(user.getBirthday().getTime()));
             stmt.setString(3, user.getPhoneNumber());
             stmt.setString(4, user.getAddress());
-            stmt.setTimestamp(5, Timestamp.valueOf(java.time.LocalDateTime.now()));
-            stmt.setInt(6, user.getId());
+            stmt.setString(5, user.getAvatar()); // Thêm dòng này để cập nhật avatar
+            stmt.setTimestamp(6, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            stmt.setInt(7, user.getId());
 
             return stmt.executeUpdate() > 0;
 
