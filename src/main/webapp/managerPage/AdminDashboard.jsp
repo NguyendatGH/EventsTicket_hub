@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
+pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -30,7 +31,7 @@ pageEncoding="UTF-8"%>
         z-index: 1;
       }
 
-       .sidebar {
+      .sidebar {
         width: 16%;
         background: rgba(15, 23, 42, 0.9);
         backdrop-filter: blur(20px);
@@ -347,8 +348,15 @@ pageEncoding="UTF-8"%>
       }
 
       .request-text {
+        max-width: 490px;
         color: #e2e8f0;
         font-weight: 500;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
       }
 
       .request-actions {
@@ -386,6 +394,8 @@ pageEncoding="UTF-8"%>
         margin-top: 1rem;
         display: inline-block;
         transition: color 0.3s ease;
+        position: absolute;
+        bottom: 4%;
       }
 
       .view-more:hover {
@@ -462,23 +472,35 @@ pageEncoding="UTF-8"%>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-       <nav>
+        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link active">Bảng điều khiển</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard"
+                class="nav-link active"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents"
+                class="nav-link"
+                >Danh sách sự kiện</a
+              >
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
-                class="nav-link "
+                class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>
@@ -507,11 +529,11 @@ pageEncoding="UTF-8"%>
               </div>
               <span class="stat-content">
                 <img
-                  src="${pageContext.request.contextPath}/asset/Property 1=Group_light.svg"
+                  src="${pageContext.request.contextPath}/asset/Property1=Group_light.svg"
                   alt=""
                   class="stat-icon"
                 />
-                <div class="stat-value">100.000</div>
+                <div class="stat-value">${totalUser}</div>
               </span>
             </div>
           </div>
@@ -526,7 +548,7 @@ pageEncoding="UTF-8"%>
                   alt=""
                   class="stat-icon"
                 />
-                <div class="stat-value">30</div>
+                <div class="stat-value">${eventThisMonth}</div>
               </span>
             </div>
           </div>
@@ -553,45 +575,23 @@ pageEncoding="UTF-8"%>
           <div class="content-card">
             <h2 class="card-title">Top sự kiện hot</h2>
             <ul class="event-list">
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
+              <c:forEach var="event" items="${events}">
+                <li class="event-item">
+                  <div class="event-info">
+                    <div class="event-number">${event.ranking}</div>
+                    <span class="event-name">${event.name}</span>
+                  </div>
+                  <div class="event-date">
+                    <fmt:formatDate
+                      value="${event.startTime}"
+                      pattern="yyyy-MM-dd HH:mm:ss"
+                    />
+                  </div>
+                </li>
+              </c:forEach>
             </ul>
           </div>
 
-   
           <div class="content-card">
             <div class="request-header">
               <h2 class="card-title">Yêu cầu phê duyệt</h2>
@@ -602,76 +602,30 @@ pageEncoding="UTF-8"%>
               />
             </div>
 
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
+            <c:if test="${empty pendingList}">
+              <p>No pending events found.</p>
+            </c:if>
+            <c:if test="${not empty pendingList}">
+              <p style="color: white; margin-top: 14px; margin-bottom: 14px">
+                Found ${pendingList.size()} pending events.
+              </p>
+            </c:if>
+            <c:forEach var="event" items="${pendingList}" varStatus="status">
+              <div class="request-item">
+                <div class="request-info">
+                  <div class="request-number">${status.count}</div>
+                  <span class="request-text">${event.name}</span>
+                </div>
+                <div class="request-actions">
+                  <button
+                    class="btn-detail"
+                    onclick="handleEditEvent(${event.eventID})"
+                  >
+                    Chi tiết
+                  </button>
+                </div>
               </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
+            </c:forEach>
             <a href="#" class="view-more">Xem thêm ></a>
           </div>
         </div>
@@ -700,11 +654,11 @@ pageEncoding="UTF-8"%>
         });
       }
       function handleEditEvent(eventId) {
-    
         console.log("Redirecting to edit event:", eventId);
 
-        window.location.href = 'admin-servlet?action=viewEventDetail&eventId=' + eventId;
-    }
+        window.location.href =
+          "admin-servlet?action=viewEventDetail&eventId=" + eventId;
+      }
     </script>
   </body>
 </html>

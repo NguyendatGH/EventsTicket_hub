@@ -43,7 +43,7 @@ public class GoogleLoginServlet extends HttpServlet {
                 user.setGoogleId(googleId);
                 user.setRole("customer");
                 user.setCreatedAt(LocalDateTime.now());
-                user.setIsDeleted(false);
+                user.setIsLocked(false);
 
                 userDAO.insertUserFromGoogle(user);
                 user = userDAO.getUserByEmail(email);
