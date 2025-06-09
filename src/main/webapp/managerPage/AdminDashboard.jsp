@@ -537,7 +537,7 @@ pageEncoding="UTF-8"%>
               </div>
               <span class="stat-content">
                 <img
-                  src="${pageContext.request.contextPath}/asset/Property 1=Send_fill.svg"
+                  src="${pageContext.request.contextPath}/asset/Property1=Send_fill.svg"
                   alt=""
                   class="stat-icon"
                 />
@@ -597,7 +597,7 @@ pageEncoding="UTF-8"%>
               <h2 class="card-title">Approval Requests</h2>
               <img
                 class="bell_img"
-                src="${pageContext.request.contextPath}/asset/Property 1=Bell_pin_light.svg"
+                src="${pageContext.request.contextPath}/asset/Property1=Bell_pin_light.svg"
                 alt=""
               />
             </div>
@@ -700,11 +700,10 @@ pageEncoding="UTF-8"%>
         });
       }
       function handleEditEvent(eventId) {
-        // Kiểm tra ID (debug)
+    
         console.log("Redirecting to edit event:", eventId);
 
-        // Redirect đến Servlet
-        window.location.href = 'AdminServlet?action=viewEventDetail&eventId=' + eventId;
+        window.location.href = 'admin-servlet?action=viewEventDetail&eventId=' + eventId;
     }
     </script>
   </body>

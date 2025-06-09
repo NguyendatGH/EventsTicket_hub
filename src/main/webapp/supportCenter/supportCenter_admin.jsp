@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
-prefix="c" %>
+pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
+uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -30,7 +31,7 @@ prefix="c" %>
         z-index: 1;
       }
 
-       .sidebar {
+      .sidebar {
         width: 16%;
         background: rgba(15, 23, 42, 0.9);
         backdrop-filter: blur(20px);
@@ -160,44 +161,8 @@ prefix="c" %>
         font-weight: 600;
         backdrop-filter: blur(20px);
       }
-
-      .search-container {
-        position: relative;
-        width: 30%;
-      }
-
-      .search-box {
-        width: 100%;
-        padding: 15px 50px 15px 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        color: white;
-        font-size: 16px;
-        outline: none;
-        transition: all 0.3s ease;
-      }
-
-      .search-box:focus {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(100, 150, 255, 0.5);
-      }
-
-      .search-box::placeholder {
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      .search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: rgba(255, 255, 255, 0.6);
-      }
-
       /* Table */
       .data-table {
-        background: #1b1c21;
         border-radius: 15px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -221,19 +186,21 @@ prefix="c" %>
 
       .table-columns {
         display: grid;
-        grid-template-columns: 50px 1fr 1fr 1fr 1fr 120px;
+        grid-template-columns: 60px 2fr 2fr 1.5fr 1fr;
         gap: 20px;
-        padding: 10px;
-        background: rgba(87, 87, 87, 0.34);
+        padding: 15px 20px;
+        background: rgba(35, 35, 35, 0.46);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         color: white;
+        font-weight: 500;
       }
 
       .table-row {
         display: grid;
-        grid-template-columns: 50px 1fr 1fr 1fr 1fr 120px;
+        grid-template-columns: 60px 2fr 2fr 1.5fr 1fr;
         gap: 20px;
         padding: 20px;
+        background-color: rgba(63, 62, 62, 0.46);
         border-bottom: 1px solid #3e3e3e;
         transition: all 0.3s ease;
         align-items: center;
@@ -241,7 +208,11 @@ prefix="c" %>
       }
 
       .table-row:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background-color: rgba(87, 85, 85, 0.46);
+      }
+
+      .table-row.isActive {
+        background-color: rgba(87, 85, 85, 0.46);
       }
 
       .table-row:last-child {
@@ -253,35 +224,16 @@ prefix="c" %>
         text-decoration: underline;
       }
 
-      .password-field {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .password-dots {
-        color: rgba(255, 255, 255, 0.7);
-      }
-
-      .toggle-password {
-        cursor: pointer;
-        color: rgba(255, 255, 255, 0.6);
-        transition: color 0.3s ease;
-      }
-
-      .toggle-password:hover {
-        color: #64b5f6;
-      }
-
       .actions {
         display: flex;
-        gap: 10px;
+        gap: 14px;
+        justify-content: flex-start;
       }
 
       .action-btn {
-        width: 35px;
-        height: 35px;
-        border-radius: 8px;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
         border: none;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -290,22 +242,23 @@ prefix="c" %>
         justify-content: center;
       }
 
-      .lock-btn {
-        background: rgba(255, 193, 7, 0.2);
-        color: #ffc107;
+      .Respond {
+        background-color: transparent;
+        color: white;
+        border-radius: 8px;
+        border: 1px solid white;
+        padding: 6px 10px;
+        width: 90px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .Respond:hover {
+        background-color: #cbf9ff29;
       }
 
-      .lock-btn:hover {
-        background: rgba(255, 193, 7, 0.3);
-      }
-
-      .edit-btn {
-        background: rgba(40, 167, 69, 0.2);
-        color: #28a745;
-      }
-
-      .edit-btn:hover {
-        background: rgba(40, 167, 69, 0.3);
+      .action-btn img {
+        width: 18px;
+        height: 18px;
       }
 
       .delete-btn {
@@ -317,6 +270,7 @@ prefix="c" %>
         background: rgba(220, 53, 69, 0.3);
       }
 
+      /* Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -327,12 +281,12 @@ prefix="c" %>
       }
 
       ::-webkit-scrollbar-thumb {
-        background: rgba(38, 62, 114, 0.5);
+        background: rgba(100, 150, 255, 0.5);
         border-radius: 10px;
       }
 
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(45, 70, 126, 0.7);
+        background: rgba(100, 150, 255, 0.7);
       }
 
       /* Responsive */
@@ -369,7 +323,7 @@ prefix="c" %>
     </style>
   </head>
   <body>
-  <img
+    <img
       class="bg_elips firstElement"
       src="${pageContext.request.contextPath}/asset/full.svg"
     />
@@ -381,7 +335,7 @@ prefix="c" %>
       <!-- Sidebar -->
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
-
+        
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -390,14 +344,14 @@ prefix="c" %>
               />
             </svg>
           </div>
-          <div class="admin-name">Admin</div>
+         <div class="admin-name">Admin</div>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-         <nav>
+       <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link ">Bảng điều khiển</a>
             </li>
             <li class="nav-item">
               <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
@@ -405,17 +359,20 @@ prefix="c" %>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
-                class="nav-link active"
+                class="nav-link "
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link active">Hỗ trợ khách hàng</a>
             </li>
           </ul>
         </nav>
 
-        <a href="${pageContext.request.contextPath}/logout" class="logout">
+        <a
+          href="${pageContext.request.contextPath}/LogoutServlet"
+          class="logout"
+        >
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
             <path
@@ -428,85 +385,48 @@ prefix="c" %>
       <!-- Main Content -->
       <div class="main-content">
         <header class="header">
-          <div class="control-panel">Quản lí người dùng</div>
+          <div class="control-panel">Hỗ trợ khách hàng</div>
         </header>
-
         <div class="data-table">
           <div class="table-header">
-            <div class="page-title">Danh sách người dùng</div>
-            <div class="search-container">
-              <input
-                type="text"
-                class="search-box"
-                placeholder="Bạn muốn tìm gì?"
-              />
-              <div class="search-icon">🔍</div>
-            </div>
+            <div class="page-title">Danh sách hỗ trợ</div>
           </div>
           <div class="table-columns">
             <div></div>
-            <div>Tên người dùng</div>
-            <div>Email</div>
-            <div>Mật khẩu</div>
-            <div>Ngày tạo</div>
-            <div></div>
+            <div>Đến từ</div>
+            <div>Tiêu đề</div>
+            <div>Ngày gửi</div>
+            <div>Tùy chọn</div>
           </div>
 
-          <c:forEach var="user" items="${userList}" varStatus="status">
-            <div class="table-row">
-              <div>${status.count}</div>
-              <div><c:out value="${user.username}" /></div>
+          <c:forEach var="support" items="${supportList}" varStatus="loop">
+            <div class="table-row ${support.isActive ? 'isActive' : ''}">
+              <div>${loop.count}</div>
               <div>
-                <a href="mailto:${user.email}" class="email-link"
-                  ><c:out value="${user.email}"
-                /></a>
+                <a href="mailto:${support.email}" class="email-link"
+                  >${support.email}</a
+                >
               </div>
-              <div class="password-field">
-                <span class="password-dots">•••••••••••••</span>
-                <span class="toggle-password" data-password="${user.password}">
-                  <svg
-                    class="eye-open"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                    />
-                  </svg>
-                  <svg
-                    class="eye-closed"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    style="display: none"
-                  >
-                    <path
-                      d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                    />
-                  </svg>
-                </span>
+              <div>${support.title}</div>
+              <div>
+                <fmt:formatDate
+                  value="${support.submitDate}"
+                  pattern="dd/MM/yyyy"
+                />
               </div>
-              <div><c:out value="${user.createdDate}" /></div>
               <div class="actions">
-                <button class="action-btn lock-btn">
-                  <img
-                    src="${pageContext.request.contextPath}/asset/Lock_duotone_line.svg"
-                    alt="Lock"
-                  />
+                <button
+                  class="action-btn Respond"
+                  onclick="respondToSupport('${support.id}')"
+                >
+                  Phản hồi
                 </button>
-                <button class="action-btn edit-btn">
-                  <img
-                    src="${pageContext.request.contextPath}/asset/Edit_fill.svg"
-                    alt="Edit"
-                  />
-                </button>
-                <button class="action-btn delete-btn">
+                <button
+                  class="action-btn delete-btn"
+                  onclick="deleteSupport('${support.id}')"
+                >
                   <img
                     src="${pageContext.request.contextPath}/asset/Trash.svg"
-                    alt="Delete"
                   />
                 </button>
               </div>
@@ -517,71 +437,32 @@ prefix="c" %>
     </div>
 
     <script>
-      document.querySelectorAll(".toggle-password").forEach((toggle) => {
-        toggle.addEventListener("click", function () {
-          const passwordDots = this.previousElementSibling;
-          const eyeOpen = this.querySelector(".eye-open");
-          const eyeClosed = this.querySelector(".eye-closed");
-          const password = this.getAttribute("data-password");
-
-          if (passwordDots.textContent === "•••••••••••••") {
-            passwordDots.textContent = password;
-            eyeOpen.style.display = "none";
-            eyeClosed.style.display = "block";
-          } else {
-            passwordDots.textContent = "•••••••••••••";
-            eyeOpen.style.display = "block";
-            eyeClosed.style.display = "none";
-          }
-        });
-      });
-
       // Navigation active state
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.addEventListener("click", function () {
-          document
-            .querySelectorAll(".nav-item")
-            .forEach((nav) => nav.classList.remove("active"));
-          this.classList.add("active");
-        });
-      });
-
-      // Action buttons
-      document.querySelectorAll(".action-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          const action = this.classList.contains("lock-btn")
-            ? "khóa"
-            : this.classList.contains("edit-btn")
-            ? "chỉnh sửa"
-            : "xóa";
-          const row = this.closest(".table-row");
-          const username = row.children[1].textContent;
-
-          if (confirm(`Bạn có chắc muốn ${action} người dùng "${username}"?`)) {
-            console.log(`${action} người dùng: ${username}`);
-          }
-        });
-      });
-
-      // Search functionality
-      document
-        .querySelector(".search-box")
-        .addEventListener("input", function () {
-          const searchTerm = this.value.toLowerCase();
-          const rows = document.querySelectorAll(".table-row");
-
-          rows.forEach((row) => {
-            const username = row.children[1].textContent.toLowerCase();
-            const email = row.children[2].textContent.toLowerCase();
-
-            if (username.includes(searchTerm) || email.includes(searchTerm)) {
-              row.style.display = "grid";
-            } else {
-              row.style.display = "none";
-            }
+          document.querySelectorAll(".nav-item").forEach((nav) => {
+            nav.querySelector(".nav-link").classList.remove("active");
           });
+          this.querySelector(".nav-link").classList.add("active");
         });
+      });
+
+      // Action button handlers
+      function respondToSupport(supportId) {
+        if (confirm("Bạn có chắc muốn phản hồi yêu cầu hỗ trợ này?")) {
+          window.location.href =
+            "${pageContext.request.contextPath}/AdminServlet?action=respondSupport&id=" +
+            supportId;
+        }
+      }
+
+      function deleteSupport(supportId) {
+        if (confirm("Bạn có chắc muốn xóa yêu cầu hỗ trợ này?")) {
+          window.location.href =
+            "${pageContext.request.contextPath}/AdminServlet?action=deleteSupport&id=" +
+            supportId;
+        }
+      }
     </script>
   </body>
 </html>
-

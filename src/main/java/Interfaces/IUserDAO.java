@@ -4,7 +4,27 @@
  */
 package Interfaces;
 
-public interface IUserDAO {
-    boolean checkLogin(String email, String password);
-}
+import models.User;
 
+public interface IUserDAO {
+
+    User login(String email, String password);
+
+    boolean insertUser(User user);
+
+    boolean isEmailTaken(String email);
+
+    boolean updateProfile(User user);
+
+    boolean updatePasswordByEmail(String email, String newPassword);
+
+    boolean changePassword(int userId, String oldPassword, String newPassword);
+
+    User getUserByEmail(String email);
+    
+    boolean updatePassword(int userId, String newPasswordHash);
+    
+    boolean insertUserFromGoogle(User user);
+
+}
+    

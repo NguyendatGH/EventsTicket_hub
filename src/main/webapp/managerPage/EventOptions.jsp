@@ -496,13 +496,14 @@
   <body>
      <img
             class="bg_elips firstElement"
-            src="${pageContext.request.contextPath}/asset/full.svg"
+            src="<%= request.getContextPath() %>/asset/full.svg"
             />
         <img
             class="bg_elips secondElement"
-            src="${pageContext.request.contextPath}/asset/full2.svg"
+            src="<%= request.getContextPath() %>/asset/full2.svg"
             /> 
 
+        
     <div class="container">
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
@@ -522,6 +523,7 @@
         <nav>
           <ul class="nav-menu">
             <li class="nav-item">
+<<<<<<< HEAD
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard"
                 class="nav-link active"
@@ -538,12 +540,15 @@
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
+
                 class="nav-link"
                 >Account List</a
               >
             </li>
             <li class="nav-item">
-              <a href="#" class="nav-link">Customer Support</a>
+
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link active">Hỗ trợ khách hàng</a>
+
             </li>
           </ul>
         </nav>
@@ -652,10 +657,10 @@
               <div class="poster-content content">
                 <div class="content-wrapper">
                   <div class="">
-                    <img src="${pageContext.request.contextPath}/asset/Banner_primary.svg" class="poster-primary" alt=""/>
+                    <img src="<%= request.getContextPath() %>/asset/Banner_primary.svg" class="poster-primary" alt=""/>
                   </div>
                   <div class="">
-                    <img src="${pageContext.request.contextPath}/asset/Banner_secondary.svg" class="poster-secondary" alt=""/>
+                    <img src="<%= request.getContextPath() %>/asset/Banner_secondary.svg" class="poster-secondary" alt=""/>
                   </div>
                 </div>
               </div>
@@ -664,7 +669,7 @@
               <h3 class="event-organizer-header autoGap">Logo</h3>
               <div class="event-organizer-wrapper content">
                 <div class="content-wrapper">
-                  <img src="${pageContext.request.contextPath}/asset/Logo.svg" alt="" />
+                  <img src="${pageContext.request.contextPath}/asset/Logo.svg" alt="logo" />
                 </div>
               </div>
             </div>
