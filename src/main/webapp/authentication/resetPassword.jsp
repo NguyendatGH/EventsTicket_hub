@@ -1,14 +1,9 @@
-<%-- 
-    Document   : otp
-    Created on : May 28, 2025, 7:43:36 AM
-    Author     : phanh
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Nhập mã OTP</title>
+    <title>Đặt lại mật khẩu</title>
     <style>
         * {
             margin: 0;
@@ -25,7 +20,7 @@
             background: linear-gradient(135deg, #000428, #2c003e, #360033);
         }
 
-        .otp-container {
+        .reset-container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(25px);
             border-radius: 20px;
@@ -33,46 +28,40 @@
             width: 500px;
             text-align: center;
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+            color: white;
         }
 
-        .otp-container h2 {
-            color: white;
+        .reset-container h2 {
             font-size: 36px;
             font-weight: 400;
             margin-bottom: 25px;
         }
 
-        .otp-container p {
+        .reset-container label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
             color: #ccc;
             font-size: 15px;
-            margin-bottom: 30px;
         }
 
-        .otp-inputs {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 35px;
-        }
-
-        .otp-inputs input {
-            width: 60px;
-            height: 70px;
-            font-size: 32px;
-            text-align: center;
+        .reset-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
             border: none;
             border-radius: 12px;
             background-color: rgba(255, 255, 255, 0.08);
             color: white;
-            transition: 0.2s ease;
+            font-size: 16px;
         }
 
-        .otp-inputs input:focus {
+        .reset-container input:focus {
             outline: none;
             background-color: rgba(255, 255, 255, 0.2);
         }
 
-        button {
+        .reset-container button {
             background: linear-gradient(to right, #64f3ff, #e74cfa);
             border: none;
             color: white;
@@ -83,8 +72,14 @@
             transition: 0.3s ease;
         }
 
-        button:hover {
+        .reset-container button:hover {
             opacity: 0.9;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 15px;
+            font-size: 14px;
         }
 
         .bottom-text {
@@ -103,30 +98,27 @@
         }
     </style>
 </head>
-
-
-
 <body>
-    
-<div class="otp-container">
-    <h2>Nhập mã OTP</h2>
-    <p>Vui lòng kiểm tra email và nhập mã xác thực:</p>
-    <form action="OtpServlet" method="post">
-        <div class="otp-inputs">
-            <input type="text" name="digit1" maxlength="1" required>
-            <input type="text" name="digit2" maxlength="1" required>
-            <input type="text" name="digit3" maxlength="1" required>
-            <input type="text" name="digit4" maxlength="1" required>
-            <input type="text" name="digit5" maxlength="1" required>
-        </div>
-        <button type="submit">Xác Nhận</button>
+<div class="reset-container">
+    <h2>Đặt lại mật khẩu</h2>
+
+    <c:if test="${not empty error}">
+        <p class="error-message">${error}</p>
+    </c:if>
+
+    <form action="${pageContext.request.contextPath}/resetPassword" method="post">
+        <label for="otp">Mã xác nhận (OTP):</label>
+        <input type="text" id="otp" name="otp" required>
+
+        <label for="newPassword">Mật khẩu mới:</label>
+        <input type="password" id="newPassword" name="newPassword" required>
+
+        <button type="submit">Xác nhận</button>
     </form>
+
     <div class="bottom-text">
-        Đã có tài khoản trước đó? <a href="login.jsp">Đăng nhập</a>
+        Đã có tài khoản? <a href="login.jsp">Đăng nhập</a>
     </div>
 </div>
 </body>
 </html>
-
-
-

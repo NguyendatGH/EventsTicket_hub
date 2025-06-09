@@ -1,32 +1,19 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package controller;
 
-import jakarta.servlet.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
 import java.io.IOException;
 
-import dao.UserDAO;
-
-@WebServlet("/ForgotPasswordServlet")
+@WebServlet("/forgotPassword")
 public class ForgotPasswordServlet extends HttpServlet {
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String email = request.getParameter("email");
-        UserDAO userDAO = new UserDAO();
-        String newPassword = userDAO.resetPassword(email);
-
-        if (newPassword != null) {
-            request.setAttribute("message", "Your new password is: " + newPassword);
-        } else {
-            request.setAttribute("error", "Email not found or update failed.");
-        }
-        request.getRequestDispatcher("forgot_password.jsp").forward(request, response);
-
+        request.getRequestDispatcher("authentication/forgotPassword.jsp").forward(request, response);
     }
 }

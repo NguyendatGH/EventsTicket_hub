@@ -1,3 +1,7 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
+uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -375,41 +379,30 @@
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lí website masterTicket</div>
+           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-        <nav>
+       <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a
-                href="${pageContext.request.contextPath}/AdminServlet?action=adminDashboard"
-                class="nav-link"
-                >Bảng điều khiển</a
-              >
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link ">Bảng điều khiển</a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/AdminServlet?action=manageEvents"
-                class="nav-link"
-                >Danh sách sự kiện</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                href="${pageContext.request.contextPath}/AdminServlet?action=manageUserAccount"
-                class="nav-link"
+                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
+                class="nav-link "
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a
-                href="${pageContext.request.contextPath}/AdminServlet?action=supportCenter"
-                class="nav-link active"
-                >Hỗ trợ khách hàng</a
-              >
+              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link active">Hỗ trợ khách hàng</a>
             </li>
           </ul>
         </nav>
+
         <a href="#" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
@@ -417,11 +410,11 @@
               d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
             />
           </svg>
-          Đăng xuất
+         Đăng xuất
         </a>
       </aside>
       <!-- Main Content -->
-      <div class="main-content">
+    <div class="main-content">
         <header>
           <div class="header-wrapper">
             <h3 class="control-panel">Hỗ Trợ khách hàng</h3>
@@ -444,26 +437,19 @@
               <div class="greeting">Chào Anh/Chị,</div>
 
               <div class="email-body">
-                Cảm ơn Anh/Chị đã quan tâm đến sự kiện của chúng tôi. Sau đây là
-                các bước để đặt vé:
+                Cảm ơn Anh/Chị đã quan tâm đến sự kiện của chúng tôi. Sau đây là các bước để đặt vé:
 
                 <ol class="step-list">
                   <li>Truy cập website tại địa chỉ [website].</li>
-                  <li>
-                    Chọn mục "Sự kiện" và tìm sự kiện Anh/Chị muốn tham gia.
-                  </li>
+                  <li>Chọn mục "Sự kiện" và tìm sự kiện Anh/Chị muốn tham gia.</li>
                   <li>Nhấn vào "Đặt vé" ở trang thông tin sự kiện.</li>
-                  <li>
-                    Chọn loại vé, số lượng và điền thông tin cá nhân (tên, etc).
-                  </li>
+                  <li>Chọn loại vé, số lượng và điền thông tin cá nhân (tên, etc).</li>
                   <li>Điền đầy đủ thông tin cá nhân theo yêu cầu.</li>
                   <li>Chọn phương thức thanh toán và hoàn tất giao dịch.</li>
                 </ol>
 
-                Sau khi đặt vé thành công, Anh/Chị sẽ nhận được email xác nhận
-                kèm mã vé.<br />
-                Nếu cần hỗ trợ thêm, Anh/Chị vui lòng liên hệ qua [hotline/email
-                hỗ trợ].
+                Sau khi đặt vé thành công, Anh/Chị sẽ nhận được email xác nhận kèm mã vé.<br />
+                Nếu cần hỗ trợ thêm, Anh/Chị vui lòng liên hệ qua [hotline/email hỗ trợ].
               </div>
 
               <div class="email-footer">
@@ -477,16 +463,15 @@
             </div>
           </div>
         </div>
-      </div>
+    </div>
     </div>
     <script>
       function handleEditEvent(eventId) {
-        // Kiểm tra ID (debug)
+
         console.log("Redirecting to edit event:", eventId);
 
-        // Redirect đến Servlet
         window.location.href =
-          "AdminServlet?action=viewEventDetail&eventId=" + eventId;
+          "admin-servlet?action=viewEventDetail&eventId=" + eventId;
       }
     </script>
   </body>

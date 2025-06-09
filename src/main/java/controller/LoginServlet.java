@@ -11,24 +11,44 @@ import java.io.IOException;
 
 import dao.UserDAO;
 import Interfaces.IUserDAO;
+import dao.EventDAO;
+import java.util.List;
+import models.Event;
+import models.User;
 
-@WebServlet("/LoginServlet")
+@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
+    private final IUserDAO userDAO = new UserDAO(); // Sửa lại cho đúng
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("authentication/login.jsp").forward(request, response);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String user = request.getParameter("user");
-        String pass = request.getParameter("pass");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
 
-        IUserDAO userDAO = new UserDAO();
-        boolean isValid = userDAO.checkLogin(user, pass);
+        User user = userDAO.login(email, password);
 
-        if (isValid) {
-            response.sendRedirect("home.jsp");
+        if (user != null) {
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+
+            EventDAO eventDAO = new EventDAO();
+            List<Event> events = eventDAO.getAllApprovedEvents();
+            request.setAttribute("events", events); 
+
+            request.getRequestDispatcher("userPage/userHomePage.jsp").forward(request, response);
+
         } else {
-            request.setAttribute("error", "Sai tài khoản hoặc mật khẩu!");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.setAttribute("error", "Email hoặc mật khẩu không đúng!");
+            request.getRequestDispatcher("authentication/login.jsp").forward(request, response);
         }
     }
 }
