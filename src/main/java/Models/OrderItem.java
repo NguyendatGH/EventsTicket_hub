@@ -8,14 +8,14 @@ public class OrderItem {
     private int orderId;
     private int ticketInfoId;
     private int eventId;
-    private int ticketId; // Có thể là SeatId nếu là vé ghế ngồi
+    private int ticketId; 
     private double unitPrice;
     private int quantity;
     private double totalPrice;
     private Date assignedAt;
     private Date createdAt;
     
-    // Thêm các thuộc tính phụ để hiển thị trên giao diện (tùy chọn nhưng rất hữu ích)
+    
     private String eventName;
     private String ticketTypeName;
     private String seatInfo;
@@ -24,7 +24,7 @@ public class OrderItem {
     public OrderItem() {
     }
 
-    // Constructor đầy đủ tham số (dựa trên bảng CSDL)
+   
     public OrderItem(int orderItemId, int orderId, int ticketInfoId, int eventId, int ticketId, double unitPrice, int quantity, double totalPrice, Date assignedAt, Date createdAt) {
         this.orderItemId = orderItemId;
         this.orderId = orderId;

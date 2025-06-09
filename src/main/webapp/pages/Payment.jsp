@@ -24,21 +24,21 @@
                 --warning: #ffcc00;
                 --danger: #ff3333;
 
-                /* Thêm biến màu cho các phần tử UI */
+                
                 --white: #ffffff;
                 --dark-gray: #333333;
                 --light-text-color: #666666;
                 --border-color: #e0e0e0;
                 --background-light: #f8f8f8;
-                --primary-color: #00c713; /* Đổi màu xanh lá cây cho primary */
-                --red-coupon: #ff4444; /* Màu đỏ cho tag coupon */
+                --primary-color: #00c713; 
+                --red-coupon: #ff4444; 
             }
 
             body {
                 font-family: 'Montserrat', sans-serif;
                 margin: 0;
                 background-color: var(--background-light);
-                color: var(--dark-gray); /* Đổi màu chữ body thành dark-gray để phù hợp với nền sáng */
+                color: var(--dark-gray); 
             }
 
             .header-container {

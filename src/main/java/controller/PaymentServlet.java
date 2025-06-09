@@ -28,7 +28,7 @@ public class PaymentServlet extends HttpServlet {
 
         User currentUser = (User) session.getAttribute("account");
         if (currentUser == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect(request.getContextPath() + "/authentication/login.jsp");
             return;
         }
 
@@ -50,15 +50,15 @@ public class PaymentServlet extends HttpServlet {
                             OrderItem item = new OrderItem();
                             item.setTicketInfoId(ticket.getTicketInforID());
                             item.setQuantity(quantity);
-                            
+
                             // Sử dụng đúng phương thức setUnitPrice
                             item.setUnitPrice(ticket.getPrice().doubleValue());
-                            
+
                             item.setTicketTypeName(ticket.getTicketName());
                             item.setEventName(ticket.getTicketName());
 
                             cart.add(item);
-                            
+
                             // Sử dụng đúng phương thức getUnitPrice
                             totalAmount += item.getUnitPrice() * quantity;
                         }

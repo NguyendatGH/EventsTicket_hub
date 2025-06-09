@@ -27,21 +27,14 @@ public class Order {
     private Date createdAt;
     private Date updatedAt;
     
-    // ================== PHẦN THÊM VÀO ==================
-    // Thuộc tính này không có trong CSDL nhưng rất cần thiết trong code Java
-    // để chứa danh sách các sản phẩm thuộc về đơn hàng này.
+
     private List<OrderItem> items;
     // ======================================================
 
 
-    // Constructor không tham số
     public Order() {
     }
     
-    // (Constructor đầy đủ tham số có thể giữ nguyên hoặc cập nhật nếu muốn)
-
-    // ================== PHẦN THÊM VÀO ==================
-    // Getter và Setter cho danh sách items
     public List<OrderItem> getItems() {
         return items;
     }
@@ -49,9 +42,6 @@ public class Order {
     public void setItems(List<OrderItem> items) {
         this.items = items;
     }
-    // ======================================================
-
-    // (Toàn bộ các getter và setter khác của bạn giữ nguyên ở dưới đây)
     
     public int getOrderId() {
         return orderId;
