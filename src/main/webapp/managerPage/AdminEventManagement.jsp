@@ -627,12 +627,12 @@
         </div>
         <div class="data-table">
           <div class="table-header-secondary">
-            <div class="page-title">Sự kiện gần đây</div>
+            <div class="page-title">Recent Events</div>
             <div class="search-container">
               <input
                 type="text"
                 class="search-box"
-                placeholder="Bạn muốn tìm gì?"
+                placeholder="What are you looking for?"
               />
               <div class="search-icon">🔍</div>
             </div>

@@ -21,3 +21,7 @@ Thumbs.db
 mvnw
 mvnw.cmd
 .target/
+
+
+# Build artifacts
+.pom.xml

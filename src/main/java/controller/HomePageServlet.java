@@ -24,8 +24,7 @@ public class HomePageServlet extends HttpServlet {
         
          EventDAO eventDAO = new EventDAO();
         List<Event> events = eventDAO.getAllApprovedEvents();
-          request.setAttribute("events", events);
-        // Forward tới homePage.jsp
+          request.setAttribute("events", events);      
         request.getRequestDispatcher("/pages/homePage.jsp").forward(request, response);
     }
 }
