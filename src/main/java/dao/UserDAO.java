@@ -5,8 +5,11 @@
 package dao;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import Interfaces.IUserDAO;
+import models.Event;
 import models.User;
 import context.DBConnection;
 import utils.HashUtil;
@@ -16,7 +19,7 @@ public class UserDAO implements IUserDAO {
     @Override
     public User login(String email, String password) {
         User user = null;
-        String sql = "SELECT * FROM Users WHERE Email = ? AND PasswordHash = ? AND IsDeleted = 0";
+        String sql = "SELECT * FROM Users WHERE Email = ? AND PasswordHash = ? AND IsLocked = 0";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -48,7 +51,7 @@ public class UserDAO implements IUserDAO {
                 user.setPhoneNumber(rs.getString("PhoneNumber"));
                 user.setAddress(rs.getString("Address"));
                 user.setAvatar(rs.getString("Avatar"));
-                user.setIsDeleted(rs.getBoolean("IsDeleted"));
+                user.setIsLocked(rs.getBoolean("IsDeleted"));
 
                 Timestamp lastLogin = rs.getTimestamp("LastLoginAt");
                 if (lastLogin != null) {
@@ -65,10 +68,10 @@ public class UserDAO implements IUserDAO {
         return user;
     }
 
-    //Thêm người dùng là "Customer"
+    // Thêm người dùng là "Customer"
     @Override
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO Users (Email, PasswordHash, Role, CreatedAt, UpdatedAt, Gender, Birthday, PhoneNumber, Address, IsDeleted) "
+        String sql = "INSERT INTO Users (Email, PasswordHash, Role, CreatedAt, UpdatedAt, Gender, Birthday, PhoneNumber, Address, IsLocked) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -81,7 +84,7 @@ public class UserDAO implements IUserDAO {
             stmt.setDate(7, new java.sql.Date(user.getBirthday().getTime()));
             stmt.setString(8, user.getPhoneNumber());
             stmt.setString(9, user.getAddress());
-            stmt.setBoolean(10, user.getIsDeleted());
+            stmt.setBoolean(10, user.getIsLocked());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -103,7 +106,7 @@ public class UserDAO implements IUserDAO {
         }
     }
 
-    //Update profile của "Customer"
+    // Update profile của "Customer"
     @Override
     public boolean updateProfile(User user) {
         String sql = "UPDATE Users SET Gender = ?, Birthday = ?, PhoneNumber = ?, Address = ?, Avatar = ?, UpdatedAt = ? WHERE Id = ?";
@@ -128,7 +131,7 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean updatePasswordByEmail(String email, String newPassword) {
-        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = ? WHERE Email = ? AND IsDeleted = 0";
+        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = ? WHERE Email = ? AND IsLocked = 0";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, newPassword);
@@ -144,9 +147,10 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean changePassword(int userId, String oldPassword, String newPassword) {
-        String checkSql = "SELECT PasswordHash FROM Users WHERE Id = ? AND IsDeleted = 0";
+        String checkSql = "SELECT PasswordHash FROM Users WHERE Id = ? AND IsLocked = 0";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
 
             checkStmt.setInt(1, userId);
             ResultSet rs = checkStmt.executeQuery();
@@ -207,7 +211,7 @@ public class UserDAO implements IUserDAO {
                     user.setPhoneNumber(rs.getString("phoneNumber"));
                     user.setAddress(rs.getString("address"));
                     user.setAvatar(rs.getString("avatar"));
-                    user.setIsDeleted(rs.getBoolean("isDeleted"));
+                    user.setIsLocked(rs.getBoolean("isDeleted"));
 
                     Timestamp lastLoginAt = rs.getTimestamp("lastLoginAt");
                     user.setLastLoginAt(lastLoginAt != null ? lastLoginAt.toLocalDateTime() : null);
@@ -243,12 +247,12 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean insertUserFromGoogle(User user) {
-        String sql = "INSERT INTO Users (Email, Role, CreatedAt, IsDeleted, GoogleId) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (Email, Role, CreatedAt, IsLocked, GoogleId) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getRole());
             ps.setTimestamp(3, Timestamp.valueOf(user.getCreatedAt()));
-            ps.setBoolean(4, user.getIsDeleted());
+            ps.setBoolean(4, user.getIsLocked());
             ps.setString(5, user.getGoogleId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -257,6 +261,78 @@ public class UserDAO implements IUserDAO {
         return false;
     }
 
+    @Override
+    public int getNumOfUser() {
+        int res = 0;
+        String sql = "SELECT COUNT(*) FROM Users;";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                res = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
+    public List<User> getAllUserAccount() {
+        List<User> list = new ArrayList<>();
+        String sql = "select * from users u where u.role != 'admin';";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("Id"));
+                user.setEmail(rs.getString("Email"));
+                user.setPasswordHash(rs.getString("PasswordHash"));
+                user.setRole(rs.getString("Role"));
+                Timestamp created = rs.getTimestamp("CreatedAt");
+                if (created != null) {
+                    user.setCreatedAt(created.toLocalDateTime());
+                }
+                Timestamp updated = rs.getTimestamp("UpdatedAt");
+                if (updated != null) {
+                    user.setUpdatedAt(updated.toLocalDateTime());
+                }
+                user.setGender(rs.getString("Gender"));
+                user.setBirthday(rs.getDate("Birthday"));
+                user.setPhoneNumber(rs.getString("PhoneNumber"));
+                user.setAddress(rs.getString("Address"));
+                user.setAvatar(rs.getString("Avatar"));
+                user.setIsLocked(rs.getBoolean("IsLocked"));
+
+                Timestamp lastLogin = rs.getTimestamp("LastLoginAt");
+                if (lastLogin != null) {
+                    user.setLastLoginAt(lastLogin.toLocalDateTime());
+                }
+
+                user.setGoogleId(rs.getString("GoogleId"));
+
+                list.add(user);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    @Override
+    public User findWithID(int id) {
+
+        return null;
+    }
+
+    @Override
+    public boolean deleteUser(int id) {
+        return true;
+    }
     
-//  publ
 }

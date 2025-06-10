@@ -71,7 +71,7 @@ public class RegisterServlet extends HttpServlet {
         user.setRole("customer");
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setIsDeleted(false);
+        user.setIsLocked(false);
         user.setGoogleId(null);
         user.setLastLoginAt(null);
 

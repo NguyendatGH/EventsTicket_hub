@@ -103,7 +103,11 @@
         }
     </style>
 </head>
+
+
+
 <body>
+    
 <div class="otp-container">
     <h2>Nhập mã OTP</h2>
     <p>Vui lòng kiểm tra email và nhập mã xác thực:</p>

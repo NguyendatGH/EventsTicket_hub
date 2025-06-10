@@ -16,14 +16,14 @@ public class User {
     private String phoneNumber;
     private String address;
     private String avatar;
-    private boolean isDeleted;
+    private boolean isLocked;
     private LocalDateTime lastLoginAt;
     private String googleId;
 
     public User() {
     }
 
-    public User(int id, String email, String passwordHash, String role, LocalDateTime createdAt, LocalDateTime updatedAt, String gender, Date birthday, String phoneNumber, String address, String avatar, boolean isDeleted, LocalDateTime lastLoginAt, String googleId) {
+    public User(int id, String email, String passwordHash, String role, LocalDateTime createdAt, LocalDateTime updatedAt, String gender, Date birthday, String phoneNumber, String address, String avatar, boolean isLocked, LocalDateTime lastLoginAt, String googleId) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -35,7 +35,7 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.avatar = avatar;
-        this.isDeleted = isDeleted;
+        this.isLocked = isLocked;
         this.lastLoginAt = lastLoginAt;
         this.googleId = googleId;
     }
@@ -120,11 +120,11 @@ public class User {
         this.avatar = avatar;
     }
 
-    public boolean getIsDeleted() {
-        return isDeleted;
+    public boolean getIsLocked() {
+        return isLocked;
     }
-    public void setIsDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setIsLocked(boolean isDeleted) {
+        this.isLocked = isDeleted;
     }
 
     public LocalDateTime getLastLoginAt() {
@@ -140,4 +140,10 @@ public class User {
     public void setGoogleId(String googleId) {
         this.googleId = googleId;
     }
+    
+    @Override
+    public String toString() {
+        return this.role + this.email;
+    }
+
 }

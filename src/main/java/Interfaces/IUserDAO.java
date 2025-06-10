@@ -4,6 +4,8 @@
  */
 package Interfaces;
 
+import java.util.List;
+
 import models.User;
 
 public interface IUserDAO {
@@ -26,5 +28,12 @@ public interface IUserDAO {
     
     boolean insertUserFromGoogle(User user);
 
+    int getNumOfUser();
+
+    List<User> getAllUserAccount();
+
+    User findWithID(int id);
+
+    boolean deleteUser(int id);
 }
     

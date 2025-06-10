@@ -149,10 +149,10 @@
 
             <form action="${pageContext.request.contextPath}/login" method="post">
                 <label>Email</label>
-                <input type="text" name="email" placeholder="Enter your email" required />
+                <input type="text" name="email" placeholder="Nhập email" required />
 
-                <label>Password</label>
-                <input type="password" name="password" placeholder="Enter your password" required />
+                <label>Mật khẩu </label>
+                <input type="password" name="password" placeholder="Nhập mật khẩu" required />
 
                 <div class="checkbox">
                     <input type="checkbox" name="remember" />
@@ -160,7 +160,7 @@
                 </div>
 
                 <div class="actions">
-                    <a href="${pageContext.request.contextPath}/authentication/forgotPassword.jsp">Quên mật khẩu?</a>
+                    <a href="${pageContext.request.contextPath}/authentication/forgotPassword.jsp">Quên mật khẩu ?</a>
 
                 </div>
 

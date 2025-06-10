@@ -2,6 +2,8 @@ package dao;
 
 import models.Event;
 import context.DBConnection;
+
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +17,9 @@ public class EventDAO {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
@@ -30,9 +34,10 @@ public class EventDAO {
 
     public Event getEventById(int eventId) {
         Event event = null;
-        String sql = "SELECT * FROM Events WHERE EventID = ? AND isDeleted = 0"; // Giả sử isDeleted = 0 là không bị xóa
+        String sql = "SELECT * FROM Events WHERE EventID = ? AND isDeleted = 0";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, eventId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -43,21 +48,93 @@ public class EventDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return event;
+    }
+
+    public int getAllEventCreatedThisMonthNums() {
+        int res = 0;
+        String sql = "EXEC GetEventsCountThisMonth";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                res = rs.getInt("EventCount");
+                System.out.println("[DEBUG] EventCount found: " + res);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return res;
+    }
+
+    public List<Event> getListTopEvents() {
+        List<Event> list = new ArrayList<>();
+        String sql = "{CALL GetTopHotEvents(?)}";
+        int topCount = 5;
+
+        try (Connection conn = DBConnection.getConnection();
+             CallableStatement stmt = conn.prepareCall(sql)) {
+
+            stmt.setInt(1, topCount);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Event event = new Event(
+                        rs.getInt("EventID"),
+                        rs.getString("Name"),
+                        rs.getTimestamp("StartTime"),
+                        rs.getTimestamp("EndTime"),
+                        rs.getInt("TotalTicketCount"),
+                        rs.getString("Status"),
+                        rs.getLong("Ranking")
+                );
+                list.add(event);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<Event> getPendingEvents() {
+        List<Event> list = new ArrayList<>();
+        String sql = "SELECT * FROM Events WHERE Status = 'pending'";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Event event = mapRowToEvent(rs);
+                list.add(event);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
     public List<Event> getSuggestedEvents(int currentEventId) {
         List<Event> suggestedList = new ArrayList<>();
-        Event currentEvent = getEventById(currentEventId); // Lấy thông tin sự kiện hiện tại để biết GenreID
+        Event currentEvent = getEventById(currentEventId);
 
         String sql;
 
-        // Ưu tiên gợi ý theo GenreID nếu có
         if (currentEvent != null && currentEvent.getGenreID() != null) {
             sql = "SELECT * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC LIMIT 3";
-            try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+
                 ps.setInt(1, currentEvent.getGenreID());
                 ps.setInt(2, currentEventId);
+
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         suggestedList.add(mapRowToEvent(rs));
@@ -68,7 +145,6 @@ public class EventDAO {
             }
         }
 
-        // Nếu không có gợi ý theo GenreID (hoặc không đủ), lấy thêm các sự kiện khác
         if (suggestedList.size() < 3) {
             int limit = 3 - suggestedList.size();
             List<Integer> excludeIds = new ArrayList<>();
@@ -93,7 +169,8 @@ public class EventDAO {
                     + excludeClause.toString()
                     + " ORDER BY StartTime DESC LIMIT ?";
 
-            try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 int paramIndex = 1;
                 for (Integer excludeId : excludeIds) {
@@ -101,24 +178,19 @@ public class EventDAO {
                 }
                 ps.setInt(paramIndex, limit);
 
-                // Giả sử lỗi xảy ra trong khối try-with-resources cho ResultSet này
-                // Sửa 'ry' thành 'try' nếu đó là lỗi gõ phím
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        // Lấy EventID từ ResultSet ra một biến trước khi dùng trong lambda
                         final int eventIdFromRs = rs.getInt("EventID");
 
                         if (suggestedList.stream().noneMatch(e -> e.getEventID() == eventIdFromRs)) {
-                            // mapRowToEvent(rs) vẫn có thể ném SQLException, 
-                            // nhưng nó sẽ được bắt bởi khối catch (SQLException e) bên ngoài này.
                             suggestedList.add(mapRowToEvent(rs));
                             if (suggestedList.size() >= 3) {
-                                break; // Đảm bảo không vượt quá 3 gợi ý tổng cộng
+                                break;
                             }
                         }
                     }
-                } // Kết thúc try-with-resources cho ResultSet
-            } catch (SQLException e) { // Khối catch này xử lý SQLException từ Connection, PreparedStatement, ResultSet
+                }
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
@@ -126,8 +198,6 @@ public class EventDAO {
         return suggestedList;
     }
 
-    // Phương thức tiện ích để map một dòng ResultSet thành đối tượng Event
-    // (Tách ra để tránh lặp code)
     private Event mapRowToEvent(ResultSet rs) throws SQLException {
         Event event = new Event();
         event.setEventID(rs.getInt("EventID"));
@@ -136,7 +206,6 @@ public class EventDAO {
         event.setPhysicalLocation(rs.getString("PhysicalLocation"));
         event.setStartTime(rs.getTimestamp("StartTime"));
         event.setEndTime(rs.getTimestamp("EndTime"));
-        // Xử lý cẩn thận các trường có thể NULL
         event.setTotalTicketCount(rs.getObject("TotalTicketCount") != null ? rs.getInt("TotalTicketCount") : null);
         event.setIsApproved(rs.getObject("IsApproved") != null ? rs.getBoolean("IsApproved") : null);
         event.setStatus(rs.getString("Status"));

@@ -111,7 +111,7 @@
         </button>
     </form>
     <div class="login-link">
-        Đã có tài khoản trước đó ? <a href="login.jsp">Đăng nhập</a>
+        Đã có tài khoản trước đó ? <a href="/authentication/login.jsp">Đăng nhập</a>
     </div>
 </div>
 </body>

@@ -30,7 +30,7 @@ prefix="c" %>
         z-index: 1;
       }
 
-       .sidebar {
+      .sidebar {
         width: 16%;
         background: rgba(15, 23, 42, 0.9);
         backdrop-filter: blur(20px);
@@ -253,24 +253,14 @@ prefix="c" %>
         text-decoration: underline;
       }
 
-      .password-field {
+      .phoneNum-field {
         display: flex;
         align-items: center;
         gap: 10px;
       }
 
-      .password-dots {
+      .phoneNum-detail {
         color: rgba(255, 255, 255, 0.7);
-      }
-
-      .toggle-password {
-        cursor: pointer;
-        color: rgba(255, 255, 255, 0.6);
-        transition: color 0.3s ease;
-      }
-
-      .toggle-password:hover {
-        color: #64b5f6;
       }
 
       .actions {
@@ -369,7 +359,7 @@ prefix="c" %>
     </style>
   </head>
   <body>
-  <img
+    <img
       class="bg_elips firstElement"
       src="${pageContext.request.contextPath}/asset/full.svg"
     />
@@ -394,13 +384,21 @@ prefix="c" %>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-         <nav>
+        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard"
+                class="nav-link"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents"
+                class="nav-link"
+                >Danh sách sự kiện</a
+              >
             </li>
             <li class="nav-item">
               <a
@@ -410,7 +408,11 @@ prefix="c" %>
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>
@@ -445,51 +447,26 @@ prefix="c" %>
           </div>
           <div class="table-columns">
             <div></div>
-            <div>Tên người dùng</div>
+            <div>Vai trò</div>
             <div>Email</div>
-            <div>Mật khẩu</div>
-            <div>Ngày tạo</div>
+            <div>Số di động</div>
+            <div>Ngày tạo tài khoản</div>
             <div></div>
           </div>
 
-          <c:forEach var="user" items="${userList}" varStatus="status">
+          <c:forEach var="user" items="${users}" varStatus="status">
             <div class="table-row">
               <div>${status.count}</div>
-              <div><c:out value="${user.username}" /></div>
+              <div><c:out value="${user.role}" /></div>
               <div>
                 <a href="mailto:${user.email}" class="email-link"
                   ><c:out value="${user.email}"
                 /></a>
               </div>
-              <div class="password-field">
-                <span class="password-dots">•••••••••••••</span>
-                <span class="toggle-password" data-password="${user.password}">
-                  <svg
-                    class="eye-open"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                    />
-                  </svg>
-                  <svg
-                    class="eye-closed"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    style="display: none"
-                  >
-                    <path
-                      d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                    />
-                  </svg>
-                </span>
+              <div class="phoneNum-field">
+                <span class="phoneNum-detail">${user.phoneNumber}</span>
               </div>
-              <div><c:out value="${user.createdDate}" /></div>
+              <div><c:out value="${user.createdAt}" /></div>
               <div class="actions">
                 <button class="action-btn lock-btn">
                   <img
@@ -516,26 +493,8 @@ prefix="c" %>
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      document.querySelectorAll(".toggle-password").forEach((toggle) => {
-        toggle.addEventListener("click", function () {
-          const passwordDots = this.previousElementSibling;
-          const eyeOpen = this.querySelector(".eye-open");
-          const eyeClosed = this.querySelector(".eye-closed");
-          const password = this.getAttribute("data-password");
-
-          if (passwordDots.textContent === "•••••••••••••") {
-            passwordDots.textContent = password;
-            eyeOpen.style.display = "none";
-            eyeClosed.style.display = "block";
-          } else {
-            passwordDots.textContent = "•••••••••••••";
-            eyeOpen.style.display = "block";
-            eyeClosed.style.display = "none";
-          }
-        });
-      });
-
       // Navigation active state
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.addEventListener("click", function () {
@@ -545,21 +504,30 @@ prefix="c" %>
           this.classList.add("active");
         });
       });
-
-      // Action buttons
       document.querySelectorAll(".action-btn").forEach((btn) => {
         btn.addEventListener("click", function () {
           const action = this.classList.contains("lock-btn")
-            ? "khóa"
+            ? "Khóa"
             : this.classList.contains("edit-btn")
-            ? "chỉnh sửa"
-            : "xóa";
+            ? "Chỉnh sửa"
+            : this.classList.contains("delete-btn")
+            ? "Xóa"
+            : "Không xác định";
           const row = this.closest(".table-row");
-          const username = row.children[1].textContent;
-
-          if (confirm(`Bạn có chắc muốn ${action} người dùng "${username}"?`)) {
-            console.log(`${action} người dùng: ${username}`);
-          }
+          const email = row.children[2].textContent;
+          Swal.fire({
+            title: `Xác nhận ${action}`,
+            text: `Bạn có chắc muốn ${action.toLowerCase()} người dùng "${email}"?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Có",
+            cancelButtonText: "Hủy",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Gửi yêu cầu đến server (như ở bước 3)
+              Swal.fire(`${action} thành công!`, "", "success");
+            }
+          });
         });
       });
 
@@ -573,8 +541,13 @@ prefix="c" %>
           rows.forEach((row) => {
             const username = row.children[1].textContent.toLowerCase();
             const email = row.children[2].textContent.toLowerCase();
+            const phoneNum = row.children[3].textContent.toLowerCase();
 
-            if (username.includes(searchTerm) || email.includes(searchTerm)) {
+            if (
+              username.includes(searchTerm) ||
+              email.includes(searchTerm) ||
+              phoneNum.includes(searchTerm)
+            ) {
               row.style.display = "grid";
             } else {
               row.style.display = "none";
@@ -584,4 +557,3 @@ prefix="c" %>
     </script>
   </body>
 </html>
-
