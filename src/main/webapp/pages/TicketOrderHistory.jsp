@@ -15,6 +15,20 @@
 
         <title>MasterTicket</title>
         <style>
+
+
+            :root {
+                --primary: #4a4aff;
+                --secondary: #ff4da6;
+                --dark-bg: #0f0f1a;
+                --darker-bg: #000015;
+                --card-bg: #1a1a2e;
+                --text-light: #ffffff;
+                --text-muted: #aaaaaa;
+                --success: #00cc66;
+                --warning: #ffcc00;
+                --danger: #ff3333;
+            }
             * {
                 margin: 0;
                 padding: 0;
@@ -29,14 +43,21 @@
             }
 
 
-            /* Header */
+            /* Header Styles */
+            .header-container {
+                display: flex;
+                justify-content: center;
+                background-color: var(--dark-bg);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+
             .header {
+                max-width: 1300px;
+                width: 100%;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 padding: 15px 40px;
-                background-color: #0f0f1a;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             }
 
             .logo {
@@ -63,7 +84,7 @@
             .search button {
                 padding: 10px 15px;
                 margin-left: 10px;
-                background-color: #4a4aff;
+                background-color: var(--primary);
                 border: none;
                 border-radius: 25px;
                 color: white;
@@ -83,7 +104,7 @@
             }
 
             .primary-btn {
-                background-color: #ff4da6;
+                background-color: var(--secondary);
                 border: none;
                 padding: 10px 20px;
                 color: white;
@@ -395,19 +416,22 @@
 
 
             /* Footer */
-            .footer {
-                background: linear-gradient(to right, #2c2c54, #1e1e2f, #0f0f1c);
-                padding: 30px 50px;
-                color: white;
-                border-top: 3px solid #00f0ff;
+            .footer-content {
+                max-width: 1300px; /* same as main-content */
+                margin: 0 auto;    /* center alignment */
+                box-sizing: border-box;
             }
 
+            /* Container for footer sections */
             .footer-container {
                 display: flex;
                 justify-content: space-between;
                 flex-wrap: wrap;
+                gap: 20px;
+                padding: 0px 15px;
             }
 
+            /* Each section in footer */
             .footer-section {
                 flex: 1;
                 min-width: 250px;
@@ -424,30 +448,29 @@
                 padding: 0;
             }
 
+            .footer-section ul li {
+                padding: 10px 0;
+            }
+
             .footer-section ul li a {
                 text-decoration: none;
                 color: #aaa;
                 transition: 0.3s;
             }
 
-            .footer-section ul li a:hover {
+            .footer-section ul li a:hover,
+            .footer-section a:hover {
                 color: #fff;
             }
 
-            .footer-section p,
-            .footer-section a {
+            .footer-section p, .footer-section a {
                 color: #aaa;
                 margin: 5px 0;
-                text-decoration: none;
+                text-decoration: underline;
             }
 
             .footer-section li {
-                padding: 5px 0px 5px 0px;
-            }
-
-
-            .footer-section a:hover {
-                color: #fff;
+                padding: 5px 0;
             }
 
             .subscribe-box {
@@ -458,8 +481,12 @@
                 padding: 5px 10px;
                 background: #000;
                 margin-bottom: 15px;
-                gap: 8px;
-                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .fa-envelope:before {
+                content: "\f0e0";
+                color: #15d715;
             }
 
             .subscribe-box input {
@@ -467,30 +494,22 @@
                 border: none;
                 background: transparent;
                 color: white;
-                padding: 5px;
+                padding: 8px;
                 outline: none;
+                font-size: 14px;
             }
 
             .subscribe-box button {
-                background: transparent;
-                border: none;
-                color: limegreen;
-                cursor: pointer;
-                font-size: 15px;
-            }
-
-            .submit-btn {
-                padding: 5px 12px;
                 background: #6f42c1;
                 border: none;
                 border-radius: 5px;
+                padding: 8px 12px;
                 color: white;
                 cursor: pointer;
-                font-weight: bold;
                 transition: background 0.3s;
             }
 
-            .submit-btn:hover {
+            .subscribe-box button:hover {
                 background: #5a339e;
             }
 
@@ -525,18 +544,20 @@
     </head>
     <body>
         <!-- Header -->
-        <header class="header">
-            <div class="logo">MasterTicket</div>
-            <div class="search">
-                <input type="text" placeholder="Bạn tìm gì hôm nay?">
-                <button>Tìm kiếm</button>
-            </div>
-            <div class="actions">
-                <button class="primary-btn">Tạo sự kiện</button>
-                <a href="#" class="link">Vé đã mua</a>
-                <div class="account">Tài khoản</div>
-            </div>
-        </header>
+        <div class="header-container">
+            <header class="header">
+                <div class="logo">MasterTicket</div>
+                <div class="search">
+                    <input type="text" placeholder="What are you looking for today?">
+                    <button>Search</button>
+                </div>
+                <div class="actions">
+                    <button class="primary-btn">Create Event</button>
+                    <a href="#" class="link">Purchased Tickets</a>
+                    <div class="account">Account</div>
+                </div>
+            </header>
+        </div>
 
         <!-- Main Container -->
         <div class="main-container">
@@ -548,15 +569,15 @@
                             <i class="fas fa-user-circle"></i>
                         </div>
                         <div class="profile-info-box">
-                            <span class="profile-label">Tài khoản của</span><br>
+                            <span class="profile-label">Account of</span><br>
                             <span class="profile-username">Phuoc Hat Le</span>
                         </div>
                     </div>
                     <ul class="profile-menu">
-                        <li><i class="fas fa-user"></i> Cài đặt tài khoản</li>
-                        <li><i class="fas fa-info-circle"></i> Thông tin tài khoản</li>
-                        <li class="active"><i class="fas fa-ticket-alt"></i> Vé đã mua</li>
-                        <li><i class="fas fa-calendar-alt"></i> Sự kiện của tôi</li>
+                        <li><i class="fas fa-user"></i> Account Settings</li>
+                        <li><i class="fas fa-info-circle"></i> Account Information</li>
+                        <li class="active"><i class="fas fa-ticket-alt"></i> Purchased Tickets</li>
+                        <li><i class="fas fa-calendar-alt"></i> My Events</li>
                     </ul>
                 </div>
             </div>
@@ -564,130 +585,61 @@
             <!-- Main Content -->
             <div class="main-content">
                 <!-- Filter Tabs -->
-
-
-                <!-- Tickets Header -->
                 <div class="tickets-header">
-                    <h2 class="tickets-title">Vé đã mua</h2>
+                    <h2 class="tickets-title">Purchased Tickets</h2>
                 </div>
 
                 <div class="filter-tabs">
-                    <button class="filter-tab active">Tất cả</button>
-                    <button class="filter-tab">Thành công</button>
-                    <button class="filter-tab">Đang xử lý</button>
-                    <button class="filter-tab">Đã hủy</button>
+                    <button class="filter-tab active">All</button>
+                    <button class="filter-tab">Successful</button>
+                    <button class="filter-tab">Processing</button>
+                    <button class="filter-tab">Cancelled</button>
                 </div>
 
                 <!-- Status Buttons -->
                 <div class="status-buttons">
-                    <button class="status-btn upcoming">Sắp diễn ra</button>
-                    <button class="status-btn ended">Đã kết thúc</button>
+                    <button class="status-btn upcoming">Upcoming</button>
+                    <button class="status-btn ended">Ended</button>
                 </div>
 
                 <!-- Empty State -->
                 <div class="empty-state">
                     <div class="empty-icon">💡</div>
-                    <div class="empty-text">Bạn chưa có vé nào</div>
+                    <div class="empty-text">You don't have any tickets yet</div>
                 </div>
 
                 <!-- Suggestions Section -->
                 <div class="suggestions-section">
-                    <h2 class="suggestions-title">Có Thể Bạn Cũng Thích</h2>
-
                     <div class="suggestions-grid">
                         <div class="suggestion-card">
                             <div class="card-image">Event Image</div>
                             <div class="card-content">
-                                <div class="card-title">WORKSHOP - VẺ ĐẸP CÔNG NGHỆ BLOCKCHAIN & NFT</div>
-                                <div class="card-date">Từ Thứng 03, 07/08</div>
+                                <div class="card-title">WORKSHOP - FOOD AND BEVERAGE INDUSTRY</div>
+                                <div class="card-date">From Thursday 02, 22/08</div>
                             </div>
                         </div>
 
                         <div class="suggestion-card">
                             <div class="card-image">Event Image</div>
                             <div class="card-content">
-                                <div class="card-title">HỘI THỞ VỀ KỸ NĂNG MỀM CHO SINH VIÊN</div>
-                                <div class="card-date">Từ Thứng 04, 09/08</div>
+                                <div class="card-title">SUPER CHEF - COOKING COMPETITION FOR STUDENTS</div>
+                                <div class="card-date">From Thursday 04, 24/08</div>
                             </div>
                         </div>
 
                         <div class="suggestion-card">
                             <div class="card-image">Event Image</div>
                             <div class="card-content">
-                                <div class="card-title">HỘI THỞ VỀ KỸ THUẬT VÀ CÔNG NGHỆ 2024</div>
-                                <div class="card-date">Từ Thứng 04, 10/08</div>
+                                <div class="card-title">CONFERENCE ON WEBSITE AND APP EXPLOITATION</div>
+                                <div class="card-date">From Thursday 06, 26/08</div>
                             </div>
                         </div>
 
                         <div class="suggestion-card">
                             <div class="card-image">Event Image</div>
                             <div class="card-content">
-                                <div class="card-title">CHƯƠNG TRÌNH TƯ VẤN HƯỚNG NGHIỆP</div>
-                                <div class="card-date">Từ Thứng 07, 13/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">WORKSHOP - THIẾT KẾ ĐỒ HỌA VÀ MARKETING</div>
-                                <div class="card-date">Từ Thứng 02, 15/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">HỌC BỔN - PHƯƠNG PHÁP HỌC TẬP HIỆU QUẢ</div>
-                                <div class="card-date">Từ Thứng 04, 17/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">TỂT FATTAMA - LỄ HỘI ĂN UỐNG</div>
-                                <div class="card-date">Từ Thứng 06, 19/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">COURSE: GIẢO TẠI CHÍNH VÀ ĐẦU TƯ</div>
-                                <div class="card-date">Từ Thứng 07, 20/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">WORKSHOP - NGHÀNH NẤỤÂN VÀ ĐỒ UỐNG</div>
-                                <div class="card-date">Từ Thứng 02, 22/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">SUPPER CHEF - CUỘC THI NẤU ĂN CHO HỌC SINH</div>
-                                <div class="card-date">Từ Thứng 04, 24/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">HỘI THỞ VỀ KHAI THÁC WEBSITE VÀ APP</div>
-                                <div class="card-date">Từ Thứng 06, 26/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">HỘI THỞ VỀ KỶ THUẬT VÀ MẶT NHẬT BẢN</div>
-                                <div class="card-date">Từ Thứng 07, 27/08</div>
+                                <div class="card-title">CONFERENCE ON JAPANESE TECHNOLOGY AND MARKET</div>
+                                <div class="card-date">From Thursday 07, 27/08</div>
                             </div>
                         </div>
                     </div>
@@ -697,51 +649,53 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <div class="footer-container">
-                <div class="footer-section">
-                    <h3>Customer Services</h3>
-                    <ul>
-                        <li><a href="#">FAQS</a></li>
-                        <li><a href="#">Contact us</a></li>
-                        <li><a href="#">Pricy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
-                    <p>Email:</p>
-                    <p><i class="fas fa-envelope"></i> <a href="mailto:support@masterTicket.vn">support@masterTicket.vn</a></p>
-                </div>
-
-                <div class="footer-section">
-                    <h3>SiteMap</h3>
-                    <ul>
-                        <li><a href="#">Create Account</a></li>
-                        <li><a href="#">News</a></li>
-                        <li><a href="#">Top-Rated Event</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h3>Subscribe for event updates.</h3>
-                    <form class="subscribe-box">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" placeholder="Your email..." required />
-                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
-                        <button type="submit" class="submit-btn">Submit</button>
-                    </form>
-                    <div class="language">
-                        <p>Language:</p>
-                        <img src="https://flagcdn.com/w40/vn.png" alt="Vietnamese" />
-                        <img src="https://flagcdn.com/w40/gb.png" alt="English" />
+            <div class="footer-content">
+                <div class="footer-container">
+                    <!-- Customer Services -->
+                    <div class="footer-section">
+                        <h3>Customer Services</h3>
+                        <ul>
+                            <li><a href="#">FAQS</a></li>
+                            <li><a href="#">Contact us</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                        <p><i class="fas fa-envelope"></i> <a href="mailto:support@masterTicket.vn">support@masterTicket.vn</a></p>
                     </div>
-                    <div class="social-icons">
-                        <p>Follow us:</p>
-                        <div class="social-images">
-                            <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
-                            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />
-                            <!--<img src="https://static.cdninstagram.com/rsrc.php/v3/yS/r/fnFD6YDgZ3X.png" alt="Threads" />-->
-                            <img src="https://cdn-icons-png.flaticon.com/512/3046/3046120.png" alt="TikTok" />
+
+                    <!-- Sitemap -->
+                    <div class="footer-section">
+                        <h3>SiteMap</h3>
+                        <ul>
+                            <li><a href="#">Create Account</a></li>
+                            <li><a href="#">News</a></li>
+                            <li><a href="#">Top-Rated Event</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Subscribe -->
+                    <div class="footer-section">
+                        <h3>Subscribe for event updates.</h3>
+                        <form class="subscribe-box">
+                            <input type="email" placeholder="Your email..." required />                            
+                            <button type="submit"><i class="fas fa-paper-plane"></i></button>                          
+                        </form>
+
+                        <div class="language">
+                            <p>Language:</p>
+                            <img src="https://flagcdn.com/w40/vn.png" alt="Vietnamese" />
+                            <img src="https://flagcdn.com/w40/gb.png" alt="English" />
+                        </div>
+
+                        <div class="social-icons">
+                            <p>Follow us:</p>
+                            <div class="social-images">
+                                <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
+                                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />
+                                <img src="https://cdn-icons-png.flaticon.com/512/3046/3046120.png" alt="TikTok" />
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </footer>
