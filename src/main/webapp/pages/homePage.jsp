@@ -591,7 +591,7 @@
             <div class="ticket-content">
                 <h2 class="ticket-title">Mua vé của bạn</h2>
                 <p class="ticket-subtitle">Đơn giản, nhanh chóng và an toàn</p>
-                <a href="#" class="btn btn-primary">Bắt đầu mua vé</a>
+                <a href="login" class="btn btn-primary">Bắt đầu mua vé</a>
             </div>
         </div>
     </main>

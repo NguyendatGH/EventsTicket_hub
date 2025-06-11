@@ -14,7 +14,7 @@ public class DBConnection {
     private static final String DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=EventTicketDB2;encrypt=true;trustServerCertificate=true;"; //your database name
     private static final String USER_DB = "sa"; //your username 
-    private static final String PASS_DB = "admin2404"; //your password
+    private static final String PASS_DB = "12345"; //your password
     
     private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
