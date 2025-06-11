@@ -623,12 +623,47 @@
             </div>
             <% } %>
 
-            <!-- Ticket Purchase Section -->
-            <div class="ticket-section">
-                <div class="ticket-content">
-                    <h2 class="ticket-title">Mua vé của bạn</h2>
-                    <p class="ticket-subtitle">Đơn giản, nhanh chóng và an toàn</p>
-                    <a href="#" class="btn btn-primary">Bắt đầu mua vé</a>
+        <div class="ticket-section">
+            <div class="ticket-content">
+                <h2 class="ticket-title">Mua vé của bạn</h2>
+                <p class="ticket-subtitle">Đơn giản, nhanh chóng và an toàn</p>
+                <a href="login" class="btn btn-primary">Bắt đầu mua vé</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Dịch vụ khách hàng</h3>
+                <ul>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="#">Chính sách</a></li>
+                    <li><a href="#">Điều khoản</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Về chúng tôi</h3>
+                <ul>
+                    <li><a href="#">Tạo tài khoản</a></li>
+                    <li><a href="#">Tin tức</a></li>
+                    <li><a href="#">Sự kiện hàng đầu</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Đăng ký nhận thông tin</h3>
+                <p>Nhận thông báo về các sự kiện mới</p>
+                <div class="newsletter">
+                    <input type="email" placeholder="Email của bạn...">
+                    <button class="btn btn-primary">Đăng ký</button>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-link">f</a>
+                    <a href="#" class="social-link">t</a>
+                    <a href="#" class="social-link">i</a>
+
                 </div>
             </div>
         </main>
