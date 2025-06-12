@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Interfaces.IUserDAO;
-import models.Event;
+import models.TopEventOwner;
 import models.User;
 import context.DBConnection;
 import utils.HashUtil;
@@ -51,7 +51,7 @@ public class UserDAO implements IUserDAO {
                 user.setPhoneNumber(rs.getString("PhoneNumber"));
                 user.setAddress(rs.getString("Address"));
                 user.setAvatar(rs.getString("Avatar"));
-                user.setIsLocked(rs.getBoolean("IsDeleted"));
+                user.setIsLocked(rs.getBoolean("IsLocked"));
 
                 Timestamp lastLogin = rs.getTimestamp("LastLoginAt");
                 if (lastLogin != null) {
@@ -211,7 +211,7 @@ public class UserDAO implements IUserDAO {
                     user.setPhoneNumber(rs.getString("phoneNumber"));
                     user.setAddress(rs.getString("address"));
                     user.setAvatar(rs.getString("avatar"));
-                    user.setIsLocked(rs.getBoolean("isDeleted"));
+                    user.setIsLocked(rs.getBoolean("isLocked"));
 
                     Timestamp lastLoginAt = rs.getTimestamp("lastLoginAt");
                     user.setLastLoginAt(lastLoginAt != null ? lastLoginAt.toLocalDateTime() : null);
@@ -229,7 +229,7 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean updatePassword(int userId, String newPasswordHash) {
-        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = CURRENT_TIMESTAMP WHERE Id = ? AND IsDeleted = 0";
+        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = CURRENT_TIMESTAMP WHERE Id = ? AND IsLocked = 0";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -334,5 +334,45 @@ public class UserDAO implements IUserDAO {
     public boolean deleteUser(int id) {
         return true;
     }
-    
+
+    @Override
+    public List<TopEventOwner> getTopEventOwner() {
+        List<TopEventOwner> list = new ArrayList<>();
+        Connection conn = null;
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "{call GetTopEventOrganizers}";
+            stmt = conn.prepareCall(sql);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                TopEventOwner owner = new TopEventOwner();
+                owner.setId(rs.getInt("Id"));
+                owner.setName(rs.getString("Tên tổ chức"));
+                owner.setNumsOfEvent(rs.getInt("Số sự kiện"));
+                owner.setNumsOfTicketSelled(rs.getInt("Tổng vé đã bán"));
+                owner.setStatus(rs.getBoolean("Trạng thái tài khoản"));
+                owner.setAvatarURL(rs.getString("Avatar"));
+                list.add(owner);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null)
+                    rs.close();
+                if (stmt != null)
+                    stmt.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
+
 }

@@ -335,7 +335,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
       <!-- Sidebar -->
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
-        
+
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -344,27 +344,39 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               />
             </svg>
           </div>
-         <div class="admin-name">Admin</div>
+          <div class="admin-name">Admin</div>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-       <nav>
+        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link ">Bảng điều khiển</a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
+                class="nav-link active"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
-                class="nav-link "
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
+                class="nav-link"
+                >Danh sách sự kiện</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
+                class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link active">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>

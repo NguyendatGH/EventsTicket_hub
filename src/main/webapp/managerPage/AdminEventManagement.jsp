@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -16,8 +17,8 @@
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
-        min-height: 100vh;
-        overflow: hidden;
+        /* min-height: 100vh;
+        overflow: hidden; */
         position: relative;
         background-color: #070a17;
       }
@@ -137,6 +138,7 @@
         flex-direction: column;
         gap: 2rem;
       }
+
       .header {
         display: flex;
         justify-content: space-between;
@@ -186,7 +188,6 @@
       .stat-wrapper {
         display: flex;
         flex-direction: row;
-
         width: 100%;
         gap: 10px;
         align-items: stretch;
@@ -199,6 +200,7 @@
         margin-bottom: 1rem;
         width: 50%;
       }
+
       .stat-header h1 {
         font-size: 40px;
         font-weight: bold;
@@ -223,6 +225,7 @@
         word-wrap: break-word;
         max-width: 100%;
       }
+
       .table-section {
         display: flex;
         flex-direction: row;
@@ -244,11 +247,11 @@
         gap: 16px;
         margin-bottom: 1.75rem;
       }
+
       .table-header {
         color: white;
       }
-      .table-section {
-      }
+
       .table-container {
         border-radius: 8px;
         overflow: hidden;
@@ -265,6 +268,7 @@
       .table_head {
         background: rgba(21, 0, 97, 0.78);
       }
+
       th {
         padding: 18px 16px;
         text-align: left;
@@ -283,10 +287,12 @@
       .td_head {
         font-weight: bold;
       }
+
       tbody tr {
         background: rgba(255, 255, 255, 0.18);
         border-bottom: 1px solid #555555;
       }
+
       tbody tr:hover {
         transition: all 0.3s ease;
         background: rgba(255, 255, 255, 0.1);
@@ -296,6 +302,7 @@
         transition: all 0.3s ease;
         background: rgba(255, 255, 255, 0.18);
       }
+
       tbody tr:nth-child(even):hover {
         transition: all 0.3s ease;
         background: rgba(255, 255, 255, 0.1);
@@ -317,7 +324,6 @@
         cursor: pointer;
       }
 
-      /* Table */
       .data-table {
         background: #1b1c21;
         border-radius: 15px;
@@ -327,27 +333,24 @@
 
       .table-header-secondary {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-columns: 1fr auto;
         gap: 20px;
         align-items: center;
         background: rgba(21, 0, 97, 0.78);
         padding: 20px;
       }
+
       .page-title {
         font-size: 24px;
         font-weight: 600;
         color: #fff;
-        grid-column: 1 / 2;
-        font-size: 24px;
-        font-weight: 600;
       }
+
       .search-container {
         position: relative;
-        width: 30%;
-        grid-column: 2/4;
-        justify-self: center;
         width: 100%;
         max-width: 300px;
+        justify-self: end;
       }
 
       .search-box {
@@ -381,7 +384,7 @@
 
       .table-row {
         display: grid;
-        grid-template-columns: 50px 1fr 1fr 1fr 100px;
+        grid-template-columns: 50px 2fr 1fr 1fr 100px;
         gap: 20px;
         padding: 20px;
         border-bottom: 1px solid #3e3e3e;
@@ -397,6 +400,7 @@
       .table-row:last-child {
         border-bottom: none;
       }
+
       .event-status {
         padding: 6px 30px;
         border-radius: 8px;
@@ -404,21 +408,25 @@
         width: 164px;
         text-align: center;
       }
+
       .success {
         background-color: rgba(169, 223, 216, 0.12);
         color: #3ad33a;
         border: 1px solid #3ec73e;
       }
+
       .error {
         background-color: rgba(95, 67, 42, 0.12);
         color: #ff0c0c;
         border: 1px solid #c53131;
       }
+
       .warning {
         background-color: rgba(95, 67, 42, 0.12);
         color: #c9bc04;
         border: 1px solid #c9bc04;
       }
+
       .actions {
         display: flex;
         gap: 10px;
@@ -454,7 +462,6 @@
         background: rgba(220, 53, 69, 0.3);
       }
 
-      /* Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -473,7 +480,6 @@
         background: rgba(45, 70, 126, 0.7);
       }
 
-      /* Responsive */
       @media (max-width: 768px) {
         .container {
           flex-direction: column;
@@ -484,22 +490,25 @@
           height: auto;
         }
 
-        .table-columns,
         .table-row {
           grid-template-columns: 1fr;
           gap: 10px;
         }
       }
+
       .bg_elips {
         width: 800px;
         height: 800px;
         object-fit: cover;
-        position: absolute;
+        position: fixed;
+        pointer-events: none;
       }
+
       .firstElement {
         top: -200px;
         left: -50px;
       }
+
       .secondElement {
         bottom: -400px;
         right: -200px;
@@ -516,10 +525,8 @@
       src="${pageContext.request.contextPath}/asset/full2.svg"
     />
     <div class="container">
-      <!-- Sidebar -->
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
-
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -531,28 +538,39 @@
           <div class="admin-name">Admin</div>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
-
         <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link active">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
+                class="nav-link"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
-                class="nav-link "
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
+                class="nav-link active"
+                >Danh sách sự kiện</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
+                class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>
-        <a href="#" class="logout">
+        <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
             <path
@@ -562,12 +580,10 @@
           Đăng xuất
         </a>
       </aside>
-      <!-- Main Content -->
       <div class="main-content">
         <header class="header">
           <div class="control-panel">Danh sách sự kiện</div>
         </header>
-
         <div class="dashboard-container">
           <h2 class="table-header">Bảng xếp hạng</h2>
           <div class="table-section">
@@ -582,43 +598,67 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="actived">
-                    <td class="td_head">Mây Lang Thang</td>
-                    <td>20</td>
-                    <td>1000</td>
-                    <td><button class="status-tag">Đang hoạt động</button></td>
-                  </tr>
-                  <tr>
-                    <td class="td_head">Mây Lang Thang</td>
-                    <td>20</td>
-                    <td>1000</td>
-                    <td><button class="status-tag">Đang hoạt động</button></td>
-                  </tr>
-                  <tr>
-                    <td class="td_head">Mây Lang Thang</td>
-                    <td>20</td>
-                    <td>1000</td>
-                    <td><button class="status-tag">Đang hoạt động</button></td>
-                  </tr>
-                  <tr>
-                    <td class="td_head">Mây Lang Thang</td>
-                    <td>20</td>
-                    <td>1000</td>
-                    <td><button class="status-tag">Đang hoạt động</button></td>
-                  </tr>
+                  <c:choose>
+                    <c:when test="${not empty topOrganizers}">
+                      <c:forEach
+                        var="organizer"
+                        items="${topOrganizers}"
+                        varStatus="status"
+                      >
+                        <tr class="${status.first ? 'active' : ''}">
+                          <td class="td_head">
+                            <c:out value="${organizer.name}" />
+                          </td>
+                          <td><c:out value="${organizer.numsOfEvent}" /></td>
+                          <td>
+                            <c:out value="${organizer.numsOfTicketSelled}" />
+                          </td>
+                          <td>
+                            <button class="status-tag">
+                              <c:choose>
+                                <c:when test="${organizer.status}">Khóa</c:when>
+                                <c:otherwise>Đang hoạt động</c:otherwise>
+                              </c:choose>
+                            </button>
+                          </td>
+                        </tr>
+                      </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                      <tr>
+                        <td colspan="4">Không có tổ chức sự kiện nào.</td>
+                      </tr>
+                    </c:otherwise>
+                  </c:choose>
                 </tbody>
               </table>
             </div>
             <div class="stat-item">
               <div class="stat-wrapper">
                 <div class="stat-header">
-                  <h1>1st</h1>
-                  <span class="stat-title">Mây Lang Thang</span>
+                  <c:choose>
+                    <c:when test="${not empty topOrganizers}">
+                      <h1>1st</h1>
+                      <span class="stat-title"
+                        ><c:out value="${topOrganizers[0].name}"
+                      /></span>
+                    </c:when>
+                    <c:otherwise>
+                      <h1>1st</h1>
+                      <span class="stat-title">Không có tổ chức</span>
+                    </c:otherwise>
+                  </c:choose>
                 </div>
                 <span class="stat-content">
-                  <img
-                    src="${pageContext.request.contextPath}/asset/MayLangThangAvt.svg"
-                    class="Top-EventOwner"
+                  <img src="<c:choose
+                    ><c:when
+                      test="${not empty topOrganizers and not empty topOrganizers[0].avatarURL}"
+                      >${pageContext.request.contextPath}/${topOrganizers[0].avatarURL}</c:when
+                    ><c:otherwise
+                      >${pageContext.request.contextPath}/asset/MayLangThangAvt.svg</c:otherwise
+                    ></c:choose
+                  >" class="Top-EventOwner" alt="Top Organizer"
+                  onerror="this.src='${pageContext.request.contextPath}/asset/MayLangThangAvt.svg'"
                   />
                 </span>
               </div>
@@ -637,104 +677,107 @@
               <div class="search-icon">🔍</div>
             </div>
           </div>
-
-          <div class="table-row">
-            <div>1</div>
-            <div>Sự kiện vẽ tranh hoạt hình</div>
-            <div class="date">20/5/2025 - 25/5/2025</div>
-            <div class="">
-              <div class="event-status success">Đang hoạt động</div>
+          <c:if test="${empty events}">
+            <p style="color: white; padding: 20px">No events found.</p>
+          </c:if>
+          <c:forEach var="event" items="${events}" varStatus="status">
+            <div class="table-row">
+              <div>${status.count}</div>
+              <div>${event.name}</div>
+              <div class="date">
+                <fmt:formatDate
+                  value="${event.startTime}"
+                  pattern="dd/MM/yyyy"
+                />
+                -
+                <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" />
+              </div>
+              <div>
+                <div
+                  class="event-status ${event.status == 'active' ? 'success' : event.status == 'pending' ? 'warning' : 'error'}"
+                >
+                  ${event.status == 'active' ? 'Đang hoạt động' : event.status
+                  == 'pending' ? 'Đang chờ duyệt' : 'Đã dừng'}
+                </div>
+              </div>
+              <div class="actions">
+                <button
+                  class="action-btn edit-btn"
+                  onclick="handleEditEvent(${event.eventID})"
+                >
+                  <img
+                    src="${pageContext.request.contextPath}/asset/Edit_fill.svg"
+                    alt="Edit"
+                  />
+                </button>
+                <button
+                  class="action-btn delete-btn"
+                  onclick="handleDeleteEvent(${event.eventID})"
+                >
+                  <img
+                    src="${pageContext.request.contextPath}/asset/Trash.svg"
+                    alt="Delete"
+                  />
+                </button>
+              </div>
             </div>
-            <div class="actions">
-              <button class="action-btn edit-btn" onclick="handleEditEvent(${event.eventId})"">
-                <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="${pageContext.request.contextPath}/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-          <div class="table-row">
-            <div>1</div>
-            <div>Sự kiện vẽ tranh hoạt hình</div>
-            <div class="date">20/5/2025 - 25/5/2025</div>
-            <div class="">
-              <div class="event-status error">Đã Dừng</div>
-            </div>
-            <div class="actions">
-              <button class="action-btn edit-btn" onclick="handleEditEvent(${event.eventId})">
-                <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="${pageContext.request.contextPath}/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-          <div class="table-row">
-            <div>1</div>
-            <div>Sự kiện vẽ tranh hoạt hình</div>
-            <div class="date">20/5/2025 - 25/5/2025</div>
-            <div class="">
-              <div class="event-status warning">Đang chờ duyệt</div>
-            </div>
-            <div class="actions">
-              <button class="action-btn edit-btn">
-                <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="${pageContext.request.contextPath}/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-           <div class="table-row">
-            <div>1</div>
-            <div>Sự kiện vẽ tranh hoạt hình</div>
-            <div class="date">20/5/2025 - 25/5/2025</div>
-            <div class="">
-              <div class="event-status warning">Đang chờ duyệt</div>
-            </div>
-            <div class="actions">
-              <button class="action-btn edit-btn" onclick="handleEditEvent(${event.eventId})">
-                <img src="${pageContext.request.contextPath}/asset/Edit_fill.svg" />
-              </button>
-              <button class="action-btn delete-btn">
-                <img src="${pageContext.request.contextPath}/asset/Trash.svg" />
-              </button>
-            </div>
-          </div>
-          
+          </c:forEach>
         </div>
       </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-     
-      // Search functionality
       document
         .querySelector(".search-box")
         .addEventListener("input", function () {
           const searchTerm = this.value.toLowerCase();
           const rows = document.querySelectorAll(".table-row");
-
           rows.forEach((row) => {
-            const username = row.children[1].textContent.toLowerCase();
-            const email = row.children[2].textContent.toLowerCase();
-
-            if (username.includes(searchTerm) || email.includes(searchTerm)) {
+            const eventName = row.children[1].textContent.toLowerCase();
+            const date = row.children[2].textContent.toLowerCase();
+            if (eventName.includes(searchTerm) || date.includes(searchTerm)) {
               row.style.display = "grid";
             } else {
               row.style.display = "none";
             }
           });
         });
-        
-         function handleEditEvent(eventId) {
-        // Kiểm tra ID (debug)
-        console.log("Redirecting to edit event:", eventId);
 
-        // Redirect đến Servlet
-        window.location.href = 'admin-servlet?action=viewEventDetail&eventId=' + eventId;
-    }
+      function handleEditEvent(eventID) {
+        console.log("Redirecting to edit event:", eventID);
+        window.location.href =
+          "${pageContext.request.contextPath}/admin-servlet/event-management/event-detail?actio=?eventID=" +
+          eventID;
+      }
+
+      function handleDeleteEvent(eventID) {
+        Swal.fire({
+          title: "Xác nhận xóa",
+          text: "Bạn có chắc muốn xóa sự kiện này?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Có",
+          cancelButtonText: "Hủy",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(
+              "${pageContext.request.contextPath}/admin-servlet/event-management?action=delete&eventID=" +
+                eventID,
+              {
+                method: "POST",
+              }
+            ).then((response) => {
+              if (response.ok) {
+                Swal.fire("Xóa thành công!", "", "success").then(() => {
+                  window.location.reload();
+                });
+              } else {
+                Swal.fire("Lỗi!", "Không thể xóa sự kiện.", "error");
+              }
+            });
+          }
+        });
+      }
     </script>
   </body>
 </html>
