@@ -123,8 +123,8 @@ public class User {
     public boolean getIsLocked() {
         return isLocked;
     }
-    public void setIsLocked(boolean isDeleted) {
-        this.isLocked = isDeleted;
+    public void setIsLocked(boolean isLocked) {
+        this.isLocked = isLocked;
     }
 
     public LocalDateTime getLastLoginAt() {

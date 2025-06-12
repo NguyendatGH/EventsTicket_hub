@@ -6,6 +6,7 @@ package Interfaces;
 
 import java.util.List;
 
+import models.TopEventOwner;
 import models.User;
 
 public interface IUserDAO {
@@ -35,5 +36,6 @@ public interface IUserDAO {
     User findWithID(int id);
 
     boolean deleteUser(int id);
+    List<TopEventOwner> getTopEventOwner();
 }
     

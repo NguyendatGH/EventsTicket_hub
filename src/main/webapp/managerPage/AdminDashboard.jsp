@@ -476,28 +476,28 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <ul class="nav-menu">
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard"
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
                 class="nav-link active"
                 >Bảng điều khiển</a
               >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents"
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
                 class="nav-link"
                 >Danh sách sự kiện</a
               >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
                 class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter"
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
                 class="nav-link"
                 >Hỗ trợ khách hàng</a
               >

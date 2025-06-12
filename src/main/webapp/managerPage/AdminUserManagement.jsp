@@ -388,35 +388,34 @@ prefix="c" %>
           <ul class="nav-menu">
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard"
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
                 class="nav-link"
                 >Bảng điều khiển</a
               >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents"
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
                 class="nav-link"
                 >Danh sách sự kiện</a
               >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
                 class="nav-link active"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter"
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
                 class="nav-link"
                 >Hỗ trợ khách hàng</a
               >
             </li>
           </ul>
         </nav>
-
         <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
@@ -469,10 +468,11 @@ prefix="c" %>
               <div><c:out value="${user.createdAt}" /></div>
               <div class="actions">
                 <button class="action-btn lock-btn">
-                  <img
-                    src="${pageContext.request.contextPath}/asset/Lock_duotone_line.svg"
-                    alt="Lock"
-                  />
+                  <a href="${pageContext.request.contextPath}/">
+                    <img
+                      src="${pageContext.request.contextPath}/asset/Lock_duotone_line.svg"
+                      alt="Lock"
+                  /></a>
                 </button>
                 <button class="action-btn edit-btn">
                   <img

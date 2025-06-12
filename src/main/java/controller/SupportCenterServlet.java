@@ -1,48 +1,59 @@
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import models.User;
+import models.IssueItem;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
-public class SupportCenterServlet extends HttpServlet {
+public class SupportCenterServlet implements AdminSubServlet {
 
-     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-           
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet TicketInforServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet TicketInforServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+    private static final Logger logger = Logger.getLogger(SupportCenterServlet.class.getName());
+    private static final String SUPPORT_CENTER_JSP = "supportCenter/supportCenter_admin.jsp";
+
+    @Override
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            List<IssueItem> issueList = createMockIssueList();
+            logIssueItems(issueList);
+            request.setAttribute("issueList", issueList);
+            forwardToJsp(request, response, SUPPORT_CENTER_JSP);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error loading support center data", e);
+            throw new ServletException("Failed to load support center data", e);
         }
-    } 
-
-
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-       
-        super.doGet(req, resp);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        super.doPost(req, resp);
+    private List<IssueItem> createMockIssueList() {
+        List<IssueItem> issueList = new ArrayList<>();
+        return issueList;
     }
 
+    private void logIssueItems(List<IssueItem> issueList) {
+        if (issueList != null && !issueList.isEmpty()) {
+            logger.info("Found " + issueList.size() + " issue items");
+            for (IssueItem item : issueList) {
+                logger.fine("Issue item: " + item.toString());
+            }
+        }
+    }
 
+    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, String targetJsp)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/" + targetJsp);
+        if (dispatcher == null) {
+            String errorMsg = "JSP file not found: " + targetJsp;
+            logger.severe(errorMsg);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
+            return;
+        }
+        logger.info("Forwarding to JSP: " + targetJsp);
+        dispatcher.forward(request, response);
+    }
 }
