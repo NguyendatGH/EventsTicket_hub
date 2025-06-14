@@ -21,6 +21,8 @@ CREATE TABLE Users (
     CONSTRAINT CK_Users_Birthday CHECK (Birthday IS NULL OR Birthday <= GETDATE())
 );
 
+
+
 -- Bảng Genre
 CREATE TABLE Genres (
     GenreID INT IDENTITY(1,1) PRIMARY KEY,
