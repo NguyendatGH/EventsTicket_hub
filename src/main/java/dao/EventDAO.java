@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventDAO {
 
@@ -18,8 +20,8 @@ public class EventDAO {
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
@@ -37,7 +39,7 @@ public class EventDAO {
         String sql = "SELECT * FROM Events WHERE EventID = ? AND isDeleted = 0";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, eventId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -57,7 +59,7 @@ public class EventDAO {
         String sql = "EXEC GetEventsCountThisMonth";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -77,7 +79,7 @@ public class EventDAO {
         int topCount = 5;
 
         try (Connection conn = DBConnection.getConnection();
-             CallableStatement stmt = conn.prepareCall(sql)) {
+                CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, topCount);
             ResultSet rs = stmt.executeQuery();
@@ -90,8 +92,7 @@ public class EventDAO {
                         rs.getTimestamp("EndTime"),
                         rs.getInt("TotalTicketCount"),
                         rs.getString("Status"),
-                        rs.getLong("Ranking")
-                );
+                        rs.getLong("Ranking"));
                 list.add(event);
             }
         } catch (SQLException e) {
@@ -106,7 +107,7 @@ public class EventDAO {
         String sql = "SELECT * FROM Events WHERE Status = 'pending'";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -130,7 +131,7 @@ public class EventDAO {
             sql = "SELECT * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC LIMIT 3";
 
             try (Connection conn = DBConnection.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 ps.setInt(1, currentEvent.getGenreID());
                 ps.setInt(2, currentEventId);
@@ -170,7 +171,7 @@ public class EventDAO {
                     + " ORDER BY StartTime DESC LIMIT ?";
 
             try (Connection conn = DBConnection.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 int paramIndex = 1;
                 for (Integer excludeId : excludeIds) {
@@ -219,9 +220,66 @@ public class EventDAO {
         return event;
     }
 
-    public boolean deleteEvent(int event_id){
+    public boolean deleteEvent(int event_id) {
         String sqlString = "Delete from Events e where e.EventID = ?";
-            
+
         return true;
     }
+
+    public Map<String, Integer> getEventByStatus() {
+        Map<String, Integer> stats = new HashMap<>();
+
+        String sql = "Select status, count(*) as count from Events where IsDeleted = 0 group by status";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                stats.put(rs.getString("status"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    public Map<String, Integer> getEventStatsByGenre() {
+        Map<String, Integer> stats = new HashMap<>();
+        String sql = "SELECT g.GenreName as GenreName, COUNT(e.EventID) as count FROM Genres g  LEFT JOIN Events e ON g.GenreID = e.GenreID AND e.isDeleted = 0  GROUP BY g.GenreID, g.GenreName  ORDER BY count DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery();) {
+            while (rs.next()) {
+                stats.put(rs.getString("GenreName"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return stats;
+    }
+
+    public List<Map<String, Object>> getMonthlyEventStats() {
+        List<Map<String, Object>> stats = new ArrayList<>();
+        String sql = "SELECT YEAR(CreatedAt) as year, MONTH(CreatedAt) as month, COUNT(*) as count FROM Events WHERE isDeleted = 0 AND CreatedAt >= DATEADD(MONTH, -6, GETDATE()) GROUP BY YEAR(CreatedAt), MONTH(CreatedAt) ORDER BY year, month";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> monthData = new HashMap<>();
+                monthData.put("year", rs.getInt("year"));
+                monthData.put("month", rs.getInt("month"));
+                monthData.put("count", rs.getInt("count"));
+                stats.add(monthData);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return stats;
+    }
+
+   
 }
