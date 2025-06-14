@@ -21,6 +21,8 @@ CREATE TABLE Users (
     CONSTRAINT CK_Users_Birthday CHECK (Birthday IS NULL OR Birthday <= GETDATE())
 );
 
+
+
 -- Bảng Genre
 CREATE TABLE Genres (
     GenreID INT IDENTITY(1,1) PRIMARY KEY,
@@ -323,6 +325,7 @@ CREATE TABLE Refunds (
 Go
 
 
+
 -- =============================================
 -- INDEXES để tối ưu hiệu suất
 -- =============================================
@@ -379,6 +382,7 @@ CREATE INDEX IX_Refunds_RefundStatus ON Refunds(RefundStatus);
 CREATE INDEX IX_Refunds_CreatedAt ON Refunds(CreatedAt);
 CREATE INDEX IX_Refunds_IsDeleted ON Refunds(IsDeleted);
 GO
+
 
 -- =============================================
 -- Procedure
@@ -477,7 +481,7 @@ BEGIN
 END;
 
 
-exec GetTopEventOrganizers
+
 -- =============================================
 -- TRIGGERS
 -- =============================================
@@ -688,10 +692,13 @@ VALUES
 ( N'TayNguyen Sound','organizer@ticketbox.vn', '058caa5e5eec0aa2911b924607646627dbf0815d513576ada793072e78810691', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', 'https://i1.sndcdn.com/avatars-2RgyZdB5k8fW6HXl-lENkFQ-t500x500.jpg', 0, GETDATE()),
 ( N'Mây Lang Thang','music_events@hcmc.com','e51a4dbbf6c5021893e89253da30c135286bb8cdfb8019d87d666e5483e21c21', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', 'https://yt3.googleusercontent.com/ytc/AIdro_l4eBctyyqzD3BxJ7-cWiEjr0y35flQ8TCI1KUFjgIV6g=w544-c-h544-k-c0x00ffffff-no-l90-rj', 0, GETDATE()),
 ( N'VFF','sports_events@hcmc.com','42148a0e9fdc241f7d762b460c4ee97442621455745864c23adb3e4abbcdf17c', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDO9aNJzXLps11YKgoXkwEqHNvvet0RKlwV7Ps2LNSUIUXS_iJ65s4SKf8iJVgigVdW-c&usqp=CAU', 0, GETDATE()),
-( N'Lê Văn A','customer1@ticketbox.vn','1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', 'https://whatisxwearing.com/wp-content/uploads/2024/07/glenn-quagmire-feature-image-768x549.png', 0, GETDATE());
+( N'Lê Văn A','customer1@ticketbox.vn','1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', 'https://whatisxwearing.com/wp-content/uploads/2024/07/glenn-quagmire-feature-image-768x549.png', 0, GETDATE()),
+( N'Trần Văn B', 'tranvanb@ticketbox.vn', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6', 'customer', 'Male', '1992-04-15', '0956789012', '303 Customer St, HCMC', 'https://imgv3.fotor.com/images/gallery/generate-a-3d-style-ai-avatar-of-a-boy-in-fotor.jpg', 0, GETDATE()),
+( N'Nguyễn Thị C', 'nguyenthic@ticketbox.vn', 'b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1', 'customer', 'Female', '1994-06-22', '0967890123', '404 Customer Rd, HCMC', 'https://imgv3.fotor.com/images/gallery/generate-a-game-style-ai-avatar-of-a-female-in-fotor.jpg', 0, GETDATE()),
+( N'Hà Nội Events', 'hanevents@hcmc.com', 'c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2', 'event_owner', 'Other', '1987-09-10', '0978901234', '505 Event Ave, Hanoi', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYMzUNHez9pc5Z4yvGkVtNXnR1HjnRpAbgEw&s', 0, GETDATE()),
+( N'Sài Gòn Sports', 'saigonsports@hcmc.com', 'd4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3', 'event_owner', 'Male', '1983-12-05', '0989012345', '606 Sports Ln, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTx55BGjl7TzD_zOf6Do6UAPgcX_gh2z0GRCA&s', 0, GETDATE()),
+( N'Phạm Thị D', 'phamthid@ticketbox.vn', 'e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4', 'customer', 'Female', '1998-08-30', '0990123456', '707 Customer Pl, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNt9UpcsobJNOGFHPeBt-88iRmqjflBnIjhw&s', 0, GETDATE());
 
-
-select * from Users;
 
 --select * from users;
 --adminEventWeb@support.com: admin123@
@@ -703,9 +710,14 @@ select * from Users;
 -- Insert into Genres
 INSERT INTO Genres (GenreName, Description)
 VALUES
-('Theater and Art', 'Theater performances and art shows'),
-('Music', 'Music concerts and performances'),
-('Sport', 'Sporting events'),
+(N'Theater and Art', N'Theater performances and art shows'),
+(N'Music', N'Music concerts and performances'),
+(N'Sport', N'Sporting events'),
+(N'Nhạc Pop', N'Nhạc Pop hiện đại'),
+(N'Rock', N'Nhạc Rock và Metal'),
+(N'Hài kịch', N'Chương trình hài kịch'),
+(N'Thể thao', N'Các sự kiện thể thao'),
+(N'Hội nghị', N'Hội nghị và seminar'),
 ('Others', 'Miscellaneous events');
 
 --select * from Genres;
@@ -713,14 +725,14 @@ VALUES
 -- Insert into Events
 INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted)
 VALUES
-(N'Nhà Hát Kịch IDECAF: 12 Bà Mụ', 'A captivating theater performance', 'Ho Chi Minh City', '2025-06-05 12:30:00', '2025-06-05 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7c/18/6f/b32013793b1dbda15606e1cca4ab40ac.jpg', 0, 0),
+(N'Nhà Hát Kịch IDECAF: 12 Bà Mụ', 'A captivating theater performance', 'Ho Chi Minh City', '2025-06-05 12:30:00', '2025-06-05 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7c/18/6f/b32013793b1dbda15606e1cca4ab40ac.jpg', 1, 0),
 (N'The Island And The Bay', 'A scenic cultural event', 'Ho Chi Minh City', '2025-06-07 07:00:00', '2025-06-07 09:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7d/cd/82/bea62d09033db74784ee82e8f811ff60.png', 0, 0),
 (N'Địa Đạo Củ Chi : Trăng Chiến Khu', 'Historical reenactment', 'Ho Chi Minh City', '2025-06-07 11:00:00', '2025-06-07 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/a6/0a/4a/60e9e35f58d00a4df2f987fe5f02803c.jpg', 0, 0),
 (N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI', 'A vibrant theater show', 'Ho Chi Minh City', '2025-06-07 12:30:00', '2025-06-07 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/1a/2c/a1/8d41e6a6d325f907b7e14b4582428461.jpg', 0, 0),
 (N'NGÀY AN LÀNH - khoá tu 1 ngày cuối tuần', 'A peaceful retreat', 'Ho Chi Minh City', '2025-06-08 01:30:00', '2025-06-08 03:30:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/d5/f7/31/b8dc405591074e95b041acf1f3d4d57e.jpg', 0, 0),
-(N'[Dốc Mộng Mơ] Hãy Để Anh Đi - Quốc Thiên & Bùi Công Nam', 'Music concert with popular artists', 'Ho Chi Minh City', '2025-06-08 12:30:00', '2025-06-08 14:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/a2/70/f0/a39e4fd823cd2f7b4186138c2c983012.jpg', 0, 0),
+(N'[Dốc Mộng Mơ] Hãy Để Anh Đi - Quốc Thiên & Bùi Công Nam', 'Music concert with popular artists', 'Ho Chi Minh City', '2025-06-08 12:30:00', '2025-06-08 14:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/a2/70/f0/a39e4fd823cd2f7b4186138c2c983012.jpg', 1, 0),
 (N'ISAAC WITH LOVE - FANMEETING IN HO CHI MINH', 'Fan meeting with Isaac', 'Ho Chi Minh City', '2025-06-13 10:00:00', '2025-06-13 12:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/9a/10/52/9efce559d9ab037ff649429ea74a2a4a.jpg', 0, 0),
-(N'LULULOLA SHOW HƯƠNG TRÀM | MỘT NỬA SỰ THẬT', 'Hương Tràm live performance', 'Ho Chi Minh City', '2025-06-14 10:30:00', '2025-06-14 12:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/77/67/54/d1ee978159818ef0d07bbefa3e3cd6cb.png', 0, 0),
+(N'LULULOLA SHOW HƯƠNG TRÀM | MỘT NỬA SỰ THẬT', 'Hương Tràm live performance', 'Ho Chi Minh City', '2025-06-14 10:30:00', '2025-06-14 12:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/77/67/54/d1ee978159818ef0d07bbefa3e3cd6cb.png', 1, 0),
 (N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-06-14 11:00:00', '2025-06-14 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/3a/b7/00/2eb78869acb58fc6980137a595b89b53.jpg', 0, 0),
 (N'[CONCERT] ANH TRAI VƯỢT NGÀN CHÔNG GAI DAY5, DAY6', 'Popular music concert', 'Ho Chi Minh City', '2025-06-14 11:00:00', '2025-06-14 13:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/23/f2/8c/da6aee269301e6142fafc511a801be51.jpg', 0, 0),
 (N'SAXOPHONE FESTIVAL - SMOKE & SILK', 'Jazz saxophone event', 'Ho Chi Minh City', '2025-06-14 12:00:00', '2025-06-14 14:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/5f/1f/06/163a5bb4ca28688762920970ff950111.png', 0, 0),
@@ -829,6 +841,7 @@ VALUES
 ('VNPay', 'VNPAY0', 'Free transaction fee - Pay with VNPay mobile app', 1),
 ('E-Wallet', 'EWALLET0', 'Free transaction fee - Pay with mobile apps like Momo', 1);
 
+--select * from PaymentMethod
 -- Insert into Orders
 INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes)
 VALUES
@@ -840,7 +853,7 @@ VALUES
 ('ORD00000006', 5, 1, 280000, 0, 280000, 'paid', 'delivered', 3, '0945678901', 'customer1@ticketbox.vn', NULL),
 ('ORD00000007', 5, 1, 350000, 0, 350000, 'pending', 'created', 1, '0945678901', 'customer1@ticketbox.vn', NULL);
 
---select * from Orders
+
 -- Insert into OrderItems
 INSERT INTO OrderItems (OrderID, TicketInfoID, EventID, TicketID, UnitPrice, Quantity, TotalPrice)
 VALUES
@@ -856,7 +869,6 @@ VALUES
 (6, 8, 8, 10, 280000, 1, 280000),
 (7, 10, 10, 13, 350000, 1, 350000);
 
---select * from OrderItems
 -- Insert into Feedback
 INSERT INTO Feedback (UserID, EventID, OrderID, Rating, Content, IsApproved)
 VALUES
@@ -911,5 +923,3 @@ INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, R
 VALUES
 (1, 1, 5, 150000, 'Change of plans', 'pending', 2),
 (2, NULL, 5, 530000, 'Double booking', 'pending', 1);
-
-
