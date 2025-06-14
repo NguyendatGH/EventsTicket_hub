@@ -19,7 +19,7 @@ import models.User;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    private final IUserDAO userDAO = new UserDAO(); // Sửa lại cho đúng
+    private final IUserDAO userDAO = new UserDAO(); 
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

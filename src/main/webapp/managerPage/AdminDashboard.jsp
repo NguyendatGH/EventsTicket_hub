@@ -469,7 +469,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lí website masterTicket</div>
+          <div class="admin-role">MasterTicket Website Manager</div>
         </div>
 
         <nav>
@@ -512,20 +512,20 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
             />
           </svg>
-          Đăng xuất
+          Logout
         </a>
       </aside>
 
       <main class="main-content">
         <header class="header">
-          <div class="control-panel">Bảng điều khiển</div>
+          <div class="control-panel">Control Panel</div>
         </header>
 
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-wrapper">
               <div class="stat-header">
-                <span class="stat-title">Tổng người dùng</span>
+                <span class="stat-title">Total Users</span>
               </div>
               <span class="stat-content">
                 <img
@@ -540,7 +540,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <div class="stat-card">
             <div class="stat-wrapper">
               <div class="stat-header">
-                <span class="stat-title">Sự kiện tháng này</span>
+                <span class="stat-title">Events This Month</span>
               </div>
               <span class="stat-content">
                 <img
@@ -555,7 +555,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <div class="stat-card">
             <div class="stat-wrapper">
               <div class="stat-header">
-                <span class="stat-title">Lượt truy cập</span>
+                <span class="stat-title">Total Visits</span>
               </div>
               <span class="stat-content">
                 <img
@@ -563,7 +563,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   alt=""
                   class="stat-icon"
                 />
-                <div class="stat-value">100.000</div>
+                <div class="stat-value">100,000</div>
               </span>
             </div>
           </div>
@@ -573,7 +573,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <div class="content-grid">
           <!-- Hot Events -->
           <div class="content-card">
-            <h2 class="card-title">Top sự kiện hot</h2>
+            <h2 class="card-title">Top Hot Events</h2>
             <ul class="event-list">
               <c:forEach var="event" items="${events}">
                 <li class="event-item">
@@ -594,14 +594,13 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
           <div class="content-card">
             <div class="request-header">
-              <h2 class="card-title">Yêu cầu phê duyệt</h2>
+              <h2 class="card-title">Approval Requests</h2>
               <img
                 class="bell_img"
                 src="${pageContext.request.contextPath}/asset/Property1=Bell_pin_light.svg"
                 alt=""
               />
             </div>
-
             <c:if test="${empty pendingList}">
               <p>No pending events found.</p>
             </c:if>
