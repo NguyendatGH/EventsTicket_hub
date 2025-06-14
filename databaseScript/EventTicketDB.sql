@@ -829,7 +829,6 @@ VALUES
 ('VNPay', 'VNPAY0', 'Free transaction fee - Pay with VNPay mobile app', 1),
 ('E-Wallet', 'EWALLET0', 'Free transaction fee - Pay with mobile apps like Momo', 1);
 
---select * from PaymentMethod
 -- Insert into Orders
 INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes)
 VALUES
