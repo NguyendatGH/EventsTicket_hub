@@ -7,456 +7,24 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MasterTicket Dashboard</title>
-
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
-        min-height: 100vh;
-        overflow: hidden;
-        position: relative;
-        background-color: #070a17;
-      }
-
-      .container {
-        display: flex;
-        height: 100vh;
-        position: relative;
-        z-index: 1;
-      }
-
-      .sidebar {
-        width: 16%;
-        background: rgba(15, 23, 42, 0.9);
-        backdrop-filter: blur(20px);
-        border-right: 1px solid #4d4d4d;
-        padding: 2rem 0;
-      }
-
-      .logo {
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 5rem;
-        padding: 0 2rem;
-      }
-
-      .admin-section {
-        padding: 0 2rem;
-        margin-bottom: 3rem;
-      }
-
-      .admin-avatar {
-        width: 120px;
-        height: 120px;
-        background: rgba(71, 85, 105, 0.8);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 2rem;
-      }
-
-      .admin-avatar svg {
-        width: 80px;
-        height: 80px;
-        color: #94a3b8;
-      }
-
-      .admin-name {
-        color: white;
-        font-size: 24px;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 0.5rem;
-      }
-
-      .admin-role {
-        color: #94a3b8;
-        font-size: 0.875rem;
-        text-align: center;
-      }
-
-      .nav-menu {
-        list-style: none;
-      }
-
-      .nav-item {
-        border-bottom: 1px solid rgba(15, 23, 42, 0.14);
-      }
-
-      .nav-link {
-        display: block;
-        color: white;
-        background-color: rgba(255, 255, 255, 0.18);
-        text-decoration: none;
-        padding: 1rem 2rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        position: relative;
-      }
-
-      .nav-link.active {
-        background: rgba(255, 255, 255, 0.05);
-        color: white;
-      }
-
-      .nav-link:hover {
-        color: white;
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      .logout {
-        position: absolute;
-        bottom: 2rem;
-        left: 2rem;
-        right: 2rem;
-        color: #94a3b8;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 500;
-        transition: color 0.3s ease;
-      }
-
-      .logout:hover {
-        color: white;
-      }
-
-      .main-content {
-        flex: 1;
-        padding: 0 94px;
-        padding-top: 2rem;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-      }
-
-      .page-title {
-        color: white;
-        font-size: 2rem;
-        font-weight: 700;
-      }
-
-      .control-panel {
-        background: rgba(255, 255, 255, 0.18);
-        border-radius: 12px;
-        padding: 12px 24px;
-        color: #e2e8f0;
-        font-weight: 600;
-        backdrop-filter: blur(20px);
-      }
-
-      .stats-grid {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 37px;
-        margin-bottom: 37px;
-      }
-
-      .stat-card,
-      .stat-wrapper,
-      .stat-content,
-      .stat-header {
-        box-sizing: border-box;
-      }
-
-      .stat-card {
-        width: fit-content;
-        min-width: 230px;
-        max-width: 100%;
-        background: rgba(255, 255, 255, 0.18);
-        border-radius: 12px;
-        padding: 2rem;
-        backdrop-filter: blur(20px);
-        transition: all 0.3s ease;
-      }
-
-      .stat-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(255, 255, 255, 0.2);
-      }
-
-      .stat-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-      }
-
-      .stat-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-        width: 100%;
-      }
-
-      .stat-icon {
-        width: 52px;
-        height: 52px;
-        max-width: 100%;
-        height: auto;
-        flex-shrink: 0;
-      }
-
-      .stat-content {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 5px;
-        width: 100%;
-        flex-wrap: wrap;
-      }
-
-      .stat-title {
-        color: #ffffff;
-        font-size: 1rem;
-        font-weight: 500;
-        word-wrap: break-word;
-      }
-
-      .stat-value {
-        color: white;
-        font-size: 24px;
-        font-weight: 700;
-        word-wrap: break-word;
-        max-width: 100%;
-      }
-
-      .content-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 37px;
-      }
-
-      .content-card {
-        background: rgba(255, 255, 255, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 2rem;
-        backdrop-filter: blur(20px);
-      }
-
-      .card-title {
-        color: white;
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-      }
-
-      .event-list {
-        list-style: none;
-      }
-
-      .event-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .event-item:last-child {
-        border-bottom: none;
-      }
-
-      .event-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .event-number {
-        background: rgba(59, 130, 246, 0.2);
-        color: #60a5fa;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.875rem;
-      }
-
-      .event-name {
-        color: #e2e8f0;
-        font-weight: 500;
-      }
-
-      .event-date {
-        background: rgba(252, 184, 89, 0.12);
-        color: #fcb859;
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
-        border: 1px solid #fcb859;
-        font-size: 0.75rem;
-        font-weight: 600;
-      }
-
-      .request-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .bell-icon {
-        width: 24px;
-        height: 24px;
-      }
-      .request-item:last-child {
-        border-bottom: none;
-      }
-
-      .request-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .request-number {
-        background: rgba(16, 185, 129, 0.2);
-        color: #34d399;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.875rem;
-      }
-
-      .request-text {
-        max-width: 490px;
-        color: #e2e8f0;
-        font-weight: 500;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.4;
-      }
-
-      .request-actions {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-      }
-
-      .btn-detail {
-        background: rgba(71, 85, 105, 0.8);
-        color: #e2e8f0;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .btn-detail:hover {
-        background: rgba(71, 85, 105, 1);
-      }
-
-      .check-icon {
-        width: 20px;
-        height: 20px;
-        color: #34d399;
-      }
-
-      .view-more {
-        color: #60a5fa;
-        text-decoration: none;
-        font-weight: 500;
-        margin-top: 1rem;
-        display: inline-block;
-        transition: color 0.3s ease;
-        position: absolute;
-        bottom: 4%;
-      }
-
-      .view-more:hover {
-        color: #93c5fd;
-      }
-
-      .request-header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .bell-icon {
-        width: 20px;
-        height: 20px;
-        color: #60a5fa;
-      }
-
-      @media (max-width: 1200px) {
-        .content-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      @media (max-width: 768px) {
-        .stats-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .sidebar {
-          width: 240px;
-        }
-      }
-      .bg_elips {
-        width: 800px;
-        height: 800px;
-        object-fit: cover;
-        position: absolute;
-      }
-      .firstElement {
-        top: -200px;
-        left: -50px;
-      }
-      .secondElement {
-        bottom: -400px;
-        right: -200px;
-      }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/asset/css/AdminDashboard.css"/>
   </head>
   <body>
     <img
       class="bg_elips firstElement"
-      src="${pageContext.request.contextPath}/asset/full.svg"
+      src="${pageContext.request.contextPath}/asset/image/full.svg"
     />
     <img
       class="bg_elips secondElement"
-      src="${pageContext.request.contextPath}/asset/full2.svg"
+      src="${pageContext.request.contextPath}/asset/image/full2.svg"
     />
-
+    <button class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
     <div class="container">
+      <div class="overlay"></div>
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
 
@@ -544,7 +112,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               </div>
               <span class="stat-content">
                 <img
-                  src="${pageContext.request.contextPath}/asset/Ticket_duotone.svg"
+                  src="${pageContext.request.contextPath}/asset/image/Ticket_duotone.svg"
                   alt=""
                   class="stat-icon"
                 />
@@ -559,7 +127,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               </div>
               <span class="stat-content">
                 <img
-                  src="${pageContext.request.contextPath}/asset/Property1=Send_fill.svg"
+                  src="${pageContext.request.contextPath}/asset/image/Property1=Send_fill.svg"
                   alt=""
                   class="stat-icon"
                 />
@@ -573,7 +141,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <div class="content-grid">
           <!-- Hot Events -->
           <div class="content-card">
-            <h2 class="card-title">Top Hot Events</h2>
+            <h2 class="card-title">Top sự kiện hot</h2>
             <ul class="event-list">
               <c:forEach var="event" items="${events}">
                 <li class="event-item">
@@ -597,7 +165,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               <h2 class="card-title">Approval Requests</h2>
               <img
                 class="bell_img"
-                src="${pageContext.request.contextPath}/asset/Property1=Bell_pin_light.svg"
+                src="${pageContext.request.contextPath}/asset/image/Property1=Bell_pin_light.svg"
                 alt=""
               />
             </div>
@@ -658,6 +226,39 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         window.location.href =
           "admin-servlet?action=viewEventDetail&eventId=" + eventId;
       }
+      const hamburger = document.querySelector(".hamburger");
+      const sidebar = document.querySelector(".sidebar");
+      const overlay = document.querySelector(".overlay");
+
+      hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+      });
+
+      // Close sidebar and overlay when clicking a nav link on mobile
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 992) {
+            hamburger.classList.remove("active");
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+          }
+        });
+      });
+
+      // Close sidebar and overlay when clicking outside
+      document.addEventListener("click", (e) => {
+        if (
+          window.innerWidth <= 992 &&
+          !sidebar.contains(e.target) &&
+          !hamburger.contains(e.target)
+        ) {
+          hamburger.classList.remove("active");
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        }
+      });
     </script>
   </body>
 </html>

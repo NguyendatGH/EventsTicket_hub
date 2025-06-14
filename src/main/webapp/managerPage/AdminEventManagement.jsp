@@ -6,525 +6,28 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="${pageContext.request.contextPath}/asset/css/AdminEventManagement.css"
+    />
     <title>MasterTicket Admin</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
-        /* min-height: 100vh;
-        overflow: hidden; */
-        position: relative;
-        background-color: #070a17;
-      }
-
-      .container {
-        display: flex;
-        height: 100vh;
-        position: relative;
-        z-index: 1;
-      }
-
-      .sidebar {
-        width: 16%;
-        background: rgba(15, 23, 42, 0.9);
-        backdrop-filter: blur(20px);
-        border-right: 1px solid #4d4d4d;
-        padding: 2rem 0;
-      }
-
-      .logo {
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 5rem;
-        padding: 0 2rem;
-      }
-
-      .admin-section {
-        padding: 0 2rem;
-        margin-bottom: 3rem;
-      }
-
-      .admin-avatar {
-        width: 120px;
-        height: 120px;
-        background: rgba(71, 85, 105, 0.8);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 2rem;
-      }
-
-      .admin-avatar svg {
-        width: 80px;
-        height: 80px;
-        color: #94a3b8;
-      }
-
-      .admin-name {
-        color: white;
-        font-size: 24px;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 0.5rem;
-      }
-
-      .admin-role {
-        color: #94a3b8;
-        font-size: 0.875rem;
-        text-align: center;
-      }
-
-      .nav-menu {
-        list-style: none;
-      }
-
-      .nav-item {
-        border-bottom: 1px solid rgba(15, 23, 42, 0.14);
-      }
-
-      .nav-link {
-        display: block;
-        color: white;
-        background-color: rgba(255, 255, 255, 0.18);
-        text-decoration: none;
-        padding: 1rem 2rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        position: relative;
-      }
-
-      .nav-link.active {
-        background: rgba(255, 255, 255, 0.05);
-        color: white;
-      }
-
-      .nav-link:hover {
-        color: white;
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      .logout {
-        position: absolute;
-        bottom: 2rem;
-        left: 2rem;
-        right: 2rem;
-        color: #94a3b8;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 500;
-        transition: color 0.3s ease;
-      }
-
-      .logout:hover {
-        color: white;
-      }
-
-      .main-content {
-        flex: 1;
-        padding: 0 94px;
-        padding-top: 2rem;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-      }
-
-      .page-title {
-        color: white;
-        font-size: 24px;
-        font-weight: 700;
-      }
-
-      .control-panel {
-        background: rgba(255, 255, 255, 0.18);
-        border-radius: 12px;
-        padding: 12px 24px;
-        color: #e2e8f0;
-        font-weight: 600;
-        backdrop-filter: blur(20px);
-      }
-
-      .stat-item,
-      .stat-header {
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box;
-        color: #ffffff;
-      }
-
-      .stat-item {
-        width: fit-content;
-        min-width: 230px;
-        max-width: 100%;
-        background: rgba(255, 255, 255, 0.18);
-        border-radius: 12px;
-        padding: 2rem;
-        backdrop-filter: blur(20px);
-        transition: all 0.3s ease;
-      }
-
-      .stat-item:hover {
-        transform: translateY(-2px);
-        border-color: rgba(255, 255, 255, 0.2);
-      }
-
-      .stat-wrapper {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-        gap: 10px;
-        align-items: stretch;
-      }
-
-      .stat-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-        width: 50%;
-      }
-
-      .stat-header h1 {
-        font-size: 40px;
-        font-weight: bold;
-      }
-
-      .stat-content {
-        width: 100%;
-        object-fit: cover;
-      }
-
-      .stat-title {
-        color: #ffffff;
-        font-size: 1rem;
-        font-weight: bold;
-        word-wrap: break-word;
-      }
-
-      .stat-value {
-        color: white;
-        font-size: 24px;
-        font-weight: 700;
-        word-wrap: break-word;
-        max-width: 100%;
-      }
-
-      .table-section {
-        display: flex;
-        flex-direction: row;
-        color: white;
-        width: 100%;
-        gap: 3rem;
-      }
-
-      .Top-EventOwner {
-        width: 100%;
-        height: 100%;
-      }
-
-      .dashboard-container {
-        display: flex;
-        flex-direction: column;
-        align-items: start;
-        width: 100%;
-        gap: 16px;
-        margin-bottom: 1.75rem;
-      }
-
-      .table-header {
-        color: white;
-      }
-
-      .table-container {
-        border-radius: 8px;
-        overflow: hidden;
-        width: 64%;
-        flex: 1;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        color: white;
-      }
-
-      .table_head {
-        background: rgba(21, 0, 97, 0.78);
-      }
-
-      th {
-        padding: 18px 16px;
-        text-align: left;
-        font-weight: Bold;
-        font-size: 15px;
-        color: #e5e7eb;
-        border: none;
-      }
-
-      td {
-        padding: 12px 19px;
-        font-size: 14px;
-        color: white;
-      }
-
-      .td_head {
-        font-weight: bold;
-      }
-
-      tbody tr {
-        background: rgba(255, 255, 255, 0.18);
-        border-bottom: 1px solid #555555;
-      }
-
-      tbody tr:hover {
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      tbody tr:nth-child(even) {
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.18);
-      }
-
-      tbody tr:nth-child(even):hover {
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      .actived {
-        background-color: #0d457c;
-      }
-
-      .status-tag {
-        background: rgba(255, 255, 255, 0.12);
-        border: 2px solid #007bff;
-        color: #ffffff;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-        cursor: pointer;
-      }
-
-      .data-table {
-        background: #1b1c21;
-        border-radius: 15px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .table-header-secondary {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 20px;
-        align-items: center;
-        background: rgba(21, 0, 97, 0.78);
-        padding: 20px;
-      }
-
-      .page-title {
-        font-size: 24px;
-        font-weight: 600;
-        color: #fff;
-      }
-
-      .search-container {
-        position: relative;
-        width: 100%;
-        max-width: 300px;
-        justify-self: end;
-      }
-
-      .search-box {
-        width: 100%;
-        padding: 8px 50px 8px 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        color: white;
-        font-size: 14px;
-        outline: none;
-        transition: all 0.3s ease;
-      }
-
-      .search-box:focus {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(100, 150, 255, 0.5);
-      }
-
-      .search-box::placeholder {
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      .search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: rgba(255, 255, 255, 0.6);
-      }
-
-      .table-row {
-        display: grid;
-        grid-template-columns: 50px 2fr 1fr 1fr 100px;
-        gap: 20px;
-        padding: 20px;
-        border-bottom: 1px solid #3e3e3e;
-        transition: all 0.3s ease;
-        align-items: center;
-        color: white;
-      }
-
-      .table-row:hover {
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      .table-row:last-child {
-        border-bottom: none;
-      }
-
-      .event-status {
-        padding: 6px 30px;
-        border-radius: 8px;
-        font-size: 14px;
-        width: 164px;
-        text-align: center;
-      }
-
-      .success {
-        background-color: rgba(169, 223, 216, 0.12);
-        color: #3ad33a;
-        border: 1px solid #3ec73e;
-      }
-
-      .error {
-        background-color: rgba(95, 67, 42, 0.12);
-        color: #ff0c0c;
-        border: 1px solid #c53131;
-      }
-
-      .warning {
-        background-color: rgba(95, 67, 42, 0.12);
-        color: #c9bc04;
-        border: 1px solid #c9bc04;
-      }
-
-      .actions {
-        display: flex;
-        gap: 10px;
-      }
-
-      .action-btn {
-        width: 35px;
-        height: 35px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .edit-btn {
-        background: rgba(40, 167, 69, 0.2);
-        color: #28a745;
-      }
-
-      .edit-btn:hover {
-        background: rgba(40, 167, 69, 0.3);
-      }
-
-      .delete-btn {
-        background: rgba(220, 53, 69, 0.2);
-        color: #dc3545;
-      }
-
-      .delete-btn:hover {
-        background: rgba(220, 53, 69, 0.3);
-      }
-
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background: rgba(38, 62, 114, 0.5);
-        border-radius: 10px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: rgba(45, 70, 126, 0.7);
-      }
-
-      @media (max-width: 768px) {
-        .container {
-          flex-direction: column;
-        }
-
-        .sidebar {
-          width: 100%;
-          height: auto;
-        }
-
-        .table-row {
-          grid-template-columns: 1fr;
-          gap: 10px;
-        }
-      }
-
-      .bg_elips {
-        width: 800px;
-        height: 800px;
-        object-fit: cover;
-        position: fixed;
-        pointer-events: none;
-      }
-
-      .firstElement {
-        top: -200px;
-        left: -50px;
-      }
-
-      .secondElement {
-        bottom: -400px;
-        right: -200px;
-      }
-    </style>
   </head>
   <body>
     <img
       class="bg_elips firstElement"
-      src="${pageContext.request.contextPath}/asset/full.svg"
+      src="${pageContext.request.contextPath}/asset/image/full.svg"
     />
     <img
       class="bg_elips secondElement"
-      src="${pageContext.request.contextPath}/asset/full2.svg"
+      src="${pageContext.request.contextPath}/asset/image/full2.svg"
     />
+    <button class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
     <div class="container">
+      <div class="overlay"></div>
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
         <div class="admin-section">
@@ -538,19 +41,20 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <div class="admin-name">Admin</div>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
-        <nav>
+
+          <nav>
           <ul class="nav-menu">
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/admin-servlet/dashboard"
-                class="nav-link"
+                class="nav-link active"
                 >Bảng điều khiển</a
               >
             </li>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/admin-servlet/event-management"
-                class="nav-link active"
+                class="nav-link"
                 >Danh sách sự kiện</a
               >
             </li>
@@ -570,6 +74,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </li>
           </ul>
         </nav>
+
         <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
@@ -655,10 +160,10 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                       test="${not empty topOrganizers and not empty topOrganizers[0].avatarURL}"
                       >${pageContext.request.contextPath}/${topOrganizers[0].avatarURL}</c:when
                     ><c:otherwise
-                      >${pageContext.request.contextPath}/asset/MayLangThangAvt.svg</c:otherwise
+                      >${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg</c:otherwise
                     ></c:choose
                   >" class="Top-EventOwner" alt="Top Organizer"
-                  onerror="this.src='${pageContext.request.contextPath}/asset/MayLangThangAvt.svg'"
+                  onerror="this.src='${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg'"
                   />
                 </span>
               </div>
@@ -706,7 +211,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   onclick="handleEditEvent(${event.eventID})"
                 >
                   <img
-                    src="${pageContext.request.contextPath}/asset/Edit_fill.svg"
+                    src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg"
                     alt="Edit"
                   />
                 </button>
@@ -715,7 +220,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   onclick="handleDeleteEvent(${event.eventID})"
                 >
                   <img
-                    src="${pageContext.request.contextPath}/asset/Trash.svg"
+                    src="${pageContext.request.contextPath}/asset/image/Trash.svg"
                     alt="Delete"
                   />
                 </button>
@@ -778,6 +283,39 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           }
         });
       }
+      const hamburger = document.querySelector(".hamburger");
+      const sidebar = document.querySelector(".sidebar");
+      const overlay = document.querySelector(".overlay");
+
+      hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+      });
+
+      // Close sidebar and overlay when clicking a nav link on mobile
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 992) {
+            hamburger.classList.remove("active");
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+          }
+        });
+      });
+
+      // Close sidebar and overlay when clicking outside
+      document.addEventListener("click", (e) => {
+        if (
+          window.innerWidth <= 992 &&
+          !sidebar.contains(e.target) &&
+          !hamburger.contains(e.target)
+        ) {
+          hamburger.classList.remove("active");
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        }
+      });
     </script>
   </body>
 </html>

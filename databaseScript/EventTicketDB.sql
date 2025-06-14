@@ -2,8 +2,9 @@
 
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
+    Username NVARCHAR(255) NOT NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE,
-    PasswordHash NVARCHAR(255) NOT NULL,
+    PasswordHash NVARCHAR(MAX) NOT NULL,
     Role NVARCHAR(50) CHECK (Role IN ('guest', 'customer', 'event_owner', 'admin')),
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
@@ -11,17 +12,15 @@ CREATE TABLE Users (
     Birthday DATE,
     PhoneNumber NVARCHAR(20),
     Address NVARCHAR(255),
-    Avatar NVARCHAR(255),
+    Avatar NVARCHAR(MAX),
     IsLocked BIT DEFAULT 0,
     LastLoginAt DATETIME,
-	GoogleId NVARCHAR(255) ,
+	GoogleId NVARCHAR(MAX) ,
     CONSTRAINT CK_Users_Email CHECK (Email LIKE '%@%.%' AND LEN(Email) >= 5),
     CONSTRAINT CK_Users_PhoneNumber CHECK (PhoneNumber IS NULL OR PhoneNumber LIKE '[0-9]%'),
     CONSTRAINT CK_Users_Birthday CHECK (Birthday IS NULL OR Birthday <= GETDATE())
 );
 
-
-select * from users u where u.role != 'admin'; 
 -- Bảng Genre
 CREATE TABLE Genres (
     GenreID INT IDENTITY(1,1) PRIMARY KEY,
@@ -323,14 +322,16 @@ CREATE TABLE Refunds (
 );
 Go
 
+
 -- =============================================
 -- INDEXES để tối ưu hiệu suất
 -- =============================================
 
 -- Indexes cho bảng Users
+CREATE INDEX IX_Users_name ON USers(Username);
 CREATE INDEX IX_Users_Email ON Users(Email);
 CREATE INDEX IX_Users_Role ON Users(Role);
-CREATE INDEX IX_Users_IsDeleted ON Users(IsDeleted);
+CREATE INDEX IX_Users_IsLcoked ON Users(IsLocked);
 
 -- Indexes cho bảng Events
 CREATE INDEX IX_Events_StartTime ON Events(StartTime);
@@ -681,14 +682,16 @@ END;
 
 
 -- Insert into Users (Administrator with Id=1)
-INSERT INTO Users (Email, PasswordHash, Role, Gender, Birthday, PhoneNumber, Address, Avatar, isLocked, LastLoginAt)
+INSERT INTO Users (Username, Email, PasswordHash, Role, Gender, Birthday, PhoneNumber, Address, Avatar, isLocked, LastLoginAt)
 VALUES
-('adminEventWeb@support.com', 'ddfa08f04ffbedd937ce079026ead9826c0f4572feee5e45ff2a66d058c0c9d5', 'admin', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', "https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png", 0, GETDATE()),
-('organizer@ticketbox.vn', '058caa5e5eec0aa2911b924607646627dbf0815d513576ada793072e78810691', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', "https://i1.sndcdn.com/avatars-2RgyZdB5k8fW6HXl-lENkFQ-t500x500.jpg", 0, GETDATE()),
-('music_events@hcmc.com', 'e51a4dbbf6c5021893e89253da30c135286bb8cdfb8019d87d666e5483e21c21', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', "https://yt3.googleusercontent.com/ytc/AIdro_l4eBctyyqzD3BxJ7-cWiEjr0y35flQ8TCI1KUFjgIV6g=w544-c-h544-k-c0x00ffffff-no-l90-rj", 0, GETDATE()),
-('sports_events@hcmc.com', '42148a0e9fdc241f7d762b460c4ee97442621455745864c23adb3e4abbcdf17c', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDO9aNJzXLps11YKgoXkwEqHNvvet0RKlwV7Ps2LNSUIUXS_iJ65s4SKf8iJVgigVdW-c&usqp=CAU", 0, GETDATE()),
-('customer1@ticketbox.vn', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', "https://whatisxwearing.com/wp-content/uploads/2024/07/glenn-quagmire-feature-image-768x549.png", 0, GETDATE());
+( N'Admin','adminEventWeb@support.com', 'ddfa08f04ffbedd937ce079026ead9826c0f4572feee5e45ff2a66d058c0c9d5', 'admin', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', 'https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png', 0, GETDATE()),
+( N'TayNguyen Sound','organizer@ticketbox.vn', '058caa5e5eec0aa2911b924607646627dbf0815d513576ada793072e78810691', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', 'https://i1.sndcdn.com/avatars-2RgyZdB5k8fW6HXl-lENkFQ-t500x500.jpg', 0, GETDATE()),
+( N'Mây Lang Thang','music_events@hcmc.com','e51a4dbbf6c5021893e89253da30c135286bb8cdfb8019d87d666e5483e21c21', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', 'https://yt3.googleusercontent.com/ytc/AIdro_l4eBctyyqzD3BxJ7-cWiEjr0y35flQ8TCI1KUFjgIV6g=w544-c-h544-k-c0x00ffffff-no-l90-rj', 0, GETDATE()),
+( N'VFF','sports_events@hcmc.com','42148a0e9fdc241f7d762b460c4ee97442621455745864c23adb3e4abbcdf17c', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDO9aNJzXLps11YKgoXkwEqHNvvet0RKlwV7Ps2LNSUIUXS_iJ65s4SKf8iJVgigVdW-c&usqp=CAU', 0, GETDATE()),
+( N'Lê Văn A','customer1@ticketbox.vn','1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', 'https://whatisxwearing.com/wp-content/uploads/2024/07/glenn-quagmire-feature-image-768x549.png', 0, GETDATE());
 
+
+select * from Users;
 
 --select * from users;
 --adminEventWeb@support.com: admin123@
@@ -909,6 +912,5 @@ INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, R
 VALUES
 (1, 1, 5, 150000, 'Change of plans', 'pending', 2),
 (2, NULL, 5, 530000, 'Double booking', 'pending', 1);
-
 
 
