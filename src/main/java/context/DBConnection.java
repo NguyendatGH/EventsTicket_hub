@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class DBConnection {
 
     private static final String DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=EventTicketDB2;encrypt=true;trustServerCertificate=true";
+    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=EventTicketDB3;encrypt=true;trustServerCertificate=true";
     private static final String USER_DB = "sa"; //your username 
 
     private static final String PASS_DB = "12345"; //your password
