@@ -351,31 +351,42 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-            <div class="admin-role">Quản lí website masterTicket</div>
+          <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-    <nav>
+        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link ">Bảng điều khiển</a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
+                class="nav-link active"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
-                class="nav-link "
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
+                class="nav-link"
+                >Danh sách sự kiện</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
+                class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link active">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>
 
-            
         <a href="#" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
@@ -406,43 +417,48 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               <span>To: admin@customerService.com</span>
             </div>
 
-               <div class="email-content">
-        <div class="email-subject">
-            Header: Cần hỗ trợ cách sử dụng chức năng đặt vé trên nền tảng MasterTicket
-        </div>
+            <div class="email-content">
+              <div class="email-subject">
+                Header: Cần hỗ trợ cách sử dụng chức năng đặt vé trên nền tảng
+                MasterTicket
+              </div>
 
-        <div class="email-date">Đã gửi lúc: 19:00 GMT, 20/4/2025</div>
+              <div class="email-date">Đã gửi lúc: 19:00 GMT, 20/4/2025</div>
 
-        <div class="email-body">
-            <p>
-                Hiện tại mình đang gặp khó khăn trong việc sử dụng chức năng đặt vé trên nền tảng MasterTicket. Mình đã thử thực hiện các bước như chọn sự kiện và chỗ ngồi, nhưng không rõ sau đó cần thao tác gì để hoàn tất việc đặt vé.
-            </p>
+              <div class="email-body">
+                <p>
+                  Hiện tại mình đang gặp khó khăn trong việc sử dụng chức năng
+                  đặt vé trên nền tảng MasterTicket. Mình đã thử thực hiện các
+                  bước như chọn sự kiện và chỗ ngồi, nhưng không rõ sau đó cần
+                  thao tác gì để hoàn tất việc đặt vé.
+                </p>
 
-            <p>
-                Ngoài ra, mình cũng không thấy thông báo xác nhận sau khi nhấn "Đặt vé".
-            </p>
+                <p>
+                  Ngoài ra, mình cũng không thấy thông báo xác nhận sau khi nhấn
+                  "Đặt vé".
+                </p>
 
-            <p>
-                Mong admin có thể hướng dẫn chi tiết giúp mình quy trình đặt vé đúng cách, cũng như kiểm tra giúp mình xem vé đã được đặt thành công chưa.
-            </p>
+                <p>
+                  Mong admin có thể hướng dẫn chi tiết giúp mình quy trình đặt
+                  vé đúng cách, cũng như kiểm tra giúp mình xem vé đã được đặt
+                  thành công chưa.
+                </p>
 
-            <p>Mong quản trị viên sớm phản hồi!</p>
-        </div>
+                <p>Mong quản trị viên sớm phản hồi!</p>
+              </div>
 
-        <div class="clearfix">
-            <button class="reply-button">Phản hồi</button>
-        </div>
-    </div>
+              <div class="clearfix">
+                <button class="reply-button">Phản hồi</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <script>
       function handleEditEvent(eventId) {
-       
         console.log("Redirecting to edit event:", eventId);
 
-        
         window.location.href =
           "admin-servlet?action=viewEventDetail&eventId=" + eventId;
       }

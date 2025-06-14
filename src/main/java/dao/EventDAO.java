@@ -218,4 +218,10 @@ public class EventDAO {
         event.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
         return event;
     }
+
+    public boolean deleteEvent(int event_id){
+        String sqlString = "Delete from Events e where e.EventID = ?";
+            
+        return true;
+    }
 }

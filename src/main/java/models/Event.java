@@ -177,6 +177,6 @@ public class Event {
         this.ranking = ranking;
     }
     public String toString(){
-        return "e: " +this.eventID + this.name ;
+        return "e: " +this.eventID + this.name + this.status;
     }
 }

@@ -19,7 +19,7 @@ import models.User;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    private final IUserDAO userDAO = new UserDAO(); 
+    private final IUserDAO userDAO = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,10 +39,13 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-
+            if (user.getId() == 1) {
+                response.sendRedirect(request.getContextPath() + "/admin-servlet");
+                return;
+            }
             EventDAO eventDAO = new EventDAO();
             List<Event> events = eventDAO.getAllApprovedEvents();
-            request.setAttribute("events", events); 
+            request.setAttribute("events", events);
 
             request.getRequestDispatcher("userPage/userHomePage.jsp").forward(request, response);
 

@@ -1,8 +1,4 @@
-<%-- 
-    Document   : register
-    Created on : May 27, 2025, 9:52:53 PM
-    Author     : phanh
---%>
+
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -111,7 +107,7 @@
         </button>
     </form>
     <div class="login-link">
-        Đã có tài khoản trước đó ? <a href="/authentication/login.jsp">Đăng nhập</a>
+        Đã có tài khoản trước đó ? <a href="${pageContext.request.contextPath}/authentication/login.jsp">Đăng nhập</a>
     </div>
 </div>
 </body>
