@@ -28,7 +28,7 @@ public class PaymentServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("user"); // Giả sử key là "user"
+        User currentUser = (User) session.getAttribute("user");
 
         if (currentUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -59,8 +59,8 @@ public class PaymentServlet extends HttpServlet {
                             item.setTicketInfoId(ticket.getTicketInforID());
                             item.setQuantity(quantity);
                             item.setUnitPrice(ticket.getPrice().doubleValue());
-                            item.setEventName(event.getName()); // Lấy tên sự kiện
-                            item.setTicketTypeName(ticket.getTicketName()); // Lấy tên loại vé
+                            item.setEventName(event.getName());
+                            item.setTicketTypeName(ticket.getTicketName());
 
                             orderItems.add(item);
                             totalQuantity += quantity;
@@ -75,23 +75,18 @@ public class PaymentServlet extends HttpServlet {
                 return;
             }
 
-            // Tạo đối tượng Order để gói dữ liệu
             Order order = new Order();
             order.setUserId(currentUser.getId());
             order.setContactEmail(currentUser.getEmail());
-
-// ✅ THÊM DÒNG NÀY ĐỂ GẮN EVENT VÀO ORDER
             order.setEvent(event);
-
             order.setItems(orderItems);
             order.setTotalQuantity(totalQuantity);
             order.setTotalAmount(totalAmount);
             order.setOrderStatus("PENDING_PAYMENT");
             order.setCreatedAt(new Date());
 
-// Đặt order vào session để servlet tiếp theo có thể truy cập
             session.setAttribute("order", order);
-            request.setAttribute("event", event); // Vẫn gửi event để hiển thị thêm
+            request.setAttribute("event", event);
 
             request.getRequestDispatcher("/pages/Payment.jsp").forward(request, response);
 
