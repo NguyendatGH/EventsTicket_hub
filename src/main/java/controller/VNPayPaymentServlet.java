@@ -30,12 +30,10 @@ public class VNPayPaymentServlet extends HttpServlet {
         }
         Order order = (Order) session.getAttribute("order");
 
-        // ================== BƯỚC DEBUG QUAN TRỌNG NHẤT ==================
         System.out.println("--- VNPAY DEBUG START ---");
         System.out.println("TmnCode Gửi Đi: '" + VnPayConfig.vnp_TmnCode + "'");
         System.out.println("HashSecret Dùng Để Ký: '" + VnPayConfig.vnp_HashSecret + "'");
         System.out.println("--- VNPAY DEBUG END ---");
-        // =================================================================
 
         String vnp_TxnRef = String.valueOf(System.currentTimeMillis());
         String vnp_OrderInfo = "Thanh toan don hang " + vnp_TxnRef;
@@ -63,11 +61,9 @@ public class VNPayPaymentServlet extends HttpServlet {
         String vnp_ExpireDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
-        // SỬ DỤNG HÀM hashAllFields CÓ SẴN TRONG VnPayConfig ĐỂ TẠO CHỮ KÝ ĐÚNG
         String vnp_SecureHash = VnPayConfig.hashAllFields(vnp_Params);
         vnp_Params.put("vnp_SecureHash", vnp_SecureHash);
 
-        // XÂY DỰNG URL ĐÚNG LOGIC: CHỈ ENCODE KHI ĐƯA LÊN URL
         StringBuilder queryUrl = new StringBuilder();
         for (Map.Entry<String, String> entry : vnp_Params.entrySet()) {
             if (entry.getValue() != null && !entry.getValue().isEmpty()) {
@@ -77,7 +73,7 @@ public class VNPayPaymentServlet extends HttpServlet {
                 queryUrl.append('&');
             }
         }
-        // Xóa dấu & cuối cùng
+        
         if (queryUrl.length() > 0) {
             queryUrl.setLength(queryUrl.length() - 1);
         }

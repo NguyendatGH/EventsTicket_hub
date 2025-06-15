@@ -2,7 +2,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%-- Import các lớp Java bạn cần, lưu ý đúng package --%>
 <%@ page import="java.util.List" %>
 <%@ page import="models.TicketInfor" %>
 <%@ page import="java.math.BigDecimal" %>
@@ -17,16 +16,15 @@
         <title>MasterTicket - Chọn vé</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <style>
-            /* === BẢNG MÀU ĐỒNG BỘ VỚI TRANG TRƯỚC === */
             :root {
-                --primary: #667aff;      /* Màu xanh dương dịu */
-                --secondary: #e06bce;    /* Màu hồng/tím nhẹ nhàng */
-                --dark-bg: #161b22;      /* Nền tối (hơi ngả xanh) */
-                --darker-bg: #0d1117;    /* Nền tối hơn */
-                --card-bg: #21262d;      /* Nền cho các thẻ thông tin */
-                --border-color: #30363d; /* Màu viền tinh tế */
-                --text-light: #e6edf3;   /* Màu chữ trắng ngà */
-                --text-muted: #8b949e;   /* Màu chữ phụ */
+                --primary: #667aff;
+                --secondary: #e06bce;
+                --dark-bg: #161b22;
+                --darker-bg: #0d1117;
+                --card-bg: #21262d;
+                --border-color: #30363d;
+                --text-light: #e6edf3;
+                --text-muted: #8b949e;
             }
 
             * {
@@ -45,7 +43,6 @@
                 min-height: 100vh;
             }
 
-            /* === HEADER STYLE (giữ đồng bộ) === */
             .header-container {
                 display: flex;
                 justify-content: center;
@@ -88,7 +85,6 @@
                 border-radius: 25px;
             }
 
-            /* === BỐ CỤC CHÍNH 2 CỘT === */
             .container {
                 max-width: 1300px;
                 width: 100%;
@@ -124,11 +120,10 @@
                 align-items: start;
             }
 
-            /* === CỘT CHỌN VÉ BÊN TRÁI === */
             .ticket-selection-area {
                 display: flex;
                 flex-direction: column;
-                gap: 20px; /* Khoảng cách giữa các card vé */
+                gap: 20px;
             }
 
             .ticket-item {
@@ -178,7 +173,7 @@
                 width: 32px;
                 height: 32px;
                 font-size: 22px;
-                line-height: 32px; /* căn giữa dấu + - */
+                line-height: 32px;
                 text-align: center;
                 cursor: pointer;
                 transition: background-color 0.2s;
@@ -197,7 +192,7 @@
                 text-align: center;
                 font-size: 16px;
                 font-weight: bold;
-                -moz-appearance: textfield; /* Firefox */
+                -moz-appearance: textfield;
             }
             .quantity-input::-webkit-outer-spin-button,
             .quantity-input::-webkit-inner-spin-button {
@@ -205,14 +200,13 @@
                 margin: 0;
             }
 
-            /* === CỘT TÓM TẮT BÊN PHẢI (STICKY) === */
             .summary-panel {
                 background-color: var(--card-bg);
                 padding: 25px;
                 border-radius: 8px;
                 border: 1px solid var(--border-color);
                 position: sticky;
-                top: 40px; /* Dính lại khi cuộn, cách top 40px */
+                top: 40px;
             }
 
             .event-details {
@@ -243,7 +237,7 @@
             }
             
             #selected-tickets-summary {
-                 min-height: 40px; /* Giữ không gian dù chưa có vé */
+                min-height: 40px;
             }
 
             .summary-item {
@@ -287,7 +281,7 @@
             }
 
             .continue-button:hover:not(:disabled) {
-                 background-color: #5566dd;
+                background-color: #5566dd;
             }
             
             .continue-button:disabled {
@@ -318,7 +312,6 @@
             </h1>
 
             <div class="ticket-layout-grid">
-                <%-- CỘT BÊN TRÁI: DANH SÁCH VÉ --%>
                 <main class="ticket-selection-area">
                     <form id="ticketOrderForm" action="${pageContext.request.contextPath}/PaymentServlet" method="POST" style="display: contents;">
                         <c:if test="${not empty event}">
@@ -354,7 +347,6 @@
                     </form>
                 </main>
 
-                <%-- CỘT BÊN PHẢI: TÓM TẮT --%>
                 <aside class="summary-panel">
                     <div class="event-details">
                         <c:if test="${not empty event}">
@@ -394,13 +386,11 @@
                 }
 
                 function updateSummaryAndTotal() {
-                    // Xóa nội dung tóm tắt cũ
                     summaryContainer.innerHTML = ''; 
                     
                     let totalAmount = 0;
                     let totalQuantity = 0;
 
-                    // Nếu không có vé nào được chọn, hiển thị thông báo
                     if (selectedTickets.size === 0) {
                          summaryContainer.innerHTML = '<p class="no-tickets-selected">Vui lòng chọn vé.</p>';
                     }
@@ -460,7 +450,6 @@
 
                     increaseBtn.addEventListener('click', () => {
                         let currentValue = parseInt(quantityInput.value);
-                        // Optional: Add a max limit if needed, e.g., if (currentValue >= 10) return;
                         currentValue++;
                         quantityInput.value = currentValue;
                         selectedTickets.set(ticketId, { name: ticketName, price: ticketPrice, quantity: currentValue });
@@ -468,7 +457,6 @@
                     });
                 });
                 
-                // Initial call to set the correct state
                 updateSummaryAndTotal();
             });
         </script>

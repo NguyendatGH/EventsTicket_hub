@@ -30,7 +30,6 @@ public class ProcessPaymentServlet extends HttpServlet {
         
         switch (paymentMethod) {
             case "VNPAY":
-                // Chuyển hướng đến đúng URL của VNPayPaymentServlet
                 response.sendRedirect(request.getContextPath() + "/VNPayPaymentServlet");
                 break;
                 
@@ -48,7 +47,6 @@ public class ProcessPaymentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // Không cho phép truy cập GET, chuyển hướng về trang chủ
         response.sendRedirect(request.getContextPath() + "/");
     }
 }

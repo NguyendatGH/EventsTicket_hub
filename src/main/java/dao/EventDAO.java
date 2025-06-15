@@ -19,9 +19,8 @@ public class EventDAO {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1";
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
@@ -38,8 +37,9 @@ public class EventDAO {
         Event event = null;
         String sql = "SELECT * FROM Events WHERE EventID = ? AND isDeleted = 0";
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
 
             ps.setInt(1, eventId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -58,8 +58,9 @@ public class EventDAO {
         int res = 0;
         String sql = "EXEC GetEventsCountThisMonth";
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -78,8 +79,9 @@ public class EventDAO {
         String sql = "{CALL GetTopHotEvents(?)}";
         int topCount = 5;
 
-        try (Connection conn = DBConnection.getConnection();
-                CallableStatement stmt = conn.prepareCall(sql)) {
+
+        try (Connection conn = DBConnection.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
+
 
             stmt.setInt(1, topCount);
             ResultSet rs = stmt.executeQuery();
@@ -106,8 +108,9 @@ public class EventDAO {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE Status = 'pending'";
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -130,8 +133,8 @@ public class EventDAO {
         if (currentEvent != null && currentEvent.getGenreID() != null) {
             sql = "SELECT * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC LIMIT 3";
 
-            try (Connection conn = DBConnection.getConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 ps.setInt(1, currentEvent.getGenreID());
                 ps.setInt(2, currentEventId);
@@ -170,8 +173,9 @@ public class EventDAO {
                     + excludeClause.toString()
                     + " ORDER BY StartTime DESC LIMIT ?";
 
-            try (Connection conn = DBConnection.getConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
 
                 int paramIndex = 1;
                 for (Integer excludeId : excludeIds) {
@@ -225,6 +229,7 @@ public class EventDAO {
 
         return true;
     }
+
 
     public Map<String, Integer> getEventByStatus() {
         Map<String, Integer> stats = new HashMap<>();
@@ -281,5 +286,15 @@ public class EventDAO {
         return stats;
     }
 
-   
+    public List<Event> getUpcomingEvents() {
+        List<Event> list = new ArrayList<>();
+        String sql = "SELECT TOP 4 * FROM Events WHERE StartTime > GETDATE() ORDER BY StartTime ASC";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
