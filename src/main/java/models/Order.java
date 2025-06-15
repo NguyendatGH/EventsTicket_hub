@@ -3,7 +3,7 @@ package models;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List; // <-- THÊM IMPORT NÀY
-
+import models.Event;
 /**
  * Lớp này đại diện cho một đơn hàng trong hệ thống,
  * tương ứng với bảng 'Orders' trong cơ sở dữ liệu.
@@ -26,7 +26,7 @@ public class Order {
     private String notes;
     private Date createdAt;
     private Date updatedAt;
-    
+    private Event event;
 
     private List<OrderItem> items;
     // ======================================================
@@ -170,4 +170,12 @@ public class Order {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+    
+    public Event getEvent() { 
+    return event;
+}
+
+public void setEvent(Event event) { 
+    this.event = event;
+}
 }
