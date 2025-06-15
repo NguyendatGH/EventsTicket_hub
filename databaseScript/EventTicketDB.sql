@@ -21,8 +21,6 @@ CREATE TABLE Users (
     CONSTRAINT CK_Users_Birthday CHECK (Birthday IS NULL OR Birthday <= GETDATE())
 );
 
-
-
 -- Bảng Genre
 CREATE TABLE Genres (
     GenreID INT IDENTITY(1,1) PRIMARY KEY,
@@ -384,6 +382,7 @@ CREATE INDEX IX_Refunds_IsDeleted ON Refunds(IsDeleted);
 GO
 
 
+
 -- =============================================
 -- Procedure
 -- =============================================
@@ -688,16 +687,31 @@ END;
 -- Insert into Users (Administrator with Id=1)
 INSERT INTO Users (Username, Email, PasswordHash, Role, Gender, Birthday, PhoneNumber, Address, Avatar, isLocked, LastLoginAt)
 VALUES
-( N'Admin','adminEventWeb@support.com', 'ddfa08f04ffbedd937ce079026ead9826c0f4572feee5e45ff2a66d058c0c9d5', 'admin', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', 'https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png', 0, GETDATE()),
-( N'TayNguyen Sound','organizer@ticketbox.vn', '058caa5e5eec0aa2911b924607646627dbf0815d513576ada793072e78810691', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', 'https://i1.sndcdn.com/avatars-2RgyZdB5k8fW6HXl-lENkFQ-t500x500.jpg', 0, GETDATE()),
-( N'Mây Lang Thang','music_events@hcmc.com','e51a4dbbf6c5021893e89253da30c135286bb8cdfb8019d87d666e5483e21c21', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', 'https://yt3.googleusercontent.com/ytc/AIdro_l4eBctyyqzD3BxJ7-cWiEjr0y35flQ8TCI1KUFjgIV6g=w544-c-h544-k-c0x00ffffff-no-l90-rj', 0, GETDATE()),
-( N'VFF','sports_events@hcmc.com','42148a0e9fdc241f7d762b460c4ee97442621455745864c23adb3e4abbcdf17c', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDO9aNJzXLps11YKgoXkwEqHNvvet0RKlwV7Ps2LNSUIUXS_iJ65s4SKf8iJVgigVdW-c&usqp=CAU', 0, GETDATE()),
-( N'Lê Văn A','customer1@ticketbox.vn','1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', 'https://whatisxwearing.com/wp-content/uploads/2024/07/glenn-quagmire-feature-image-768x549.png', 0, GETDATE()),
-( N'Trần Văn B', 'tranvanb@ticketbox.vn', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6', 'customer', 'Male', '1992-04-15', '0956789012', '303 Customer St, HCMC', 'https://imgv3.fotor.com/images/gallery/generate-a-3d-style-ai-avatar-of-a-boy-in-fotor.jpg', 0, GETDATE()),
-( N'Nguyễn Thị C', 'nguyenthic@ticketbox.vn', 'b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1', 'customer', 'Female', '1994-06-22', '0967890123', '404 Customer Rd, HCMC', 'https://imgv3.fotor.com/images/gallery/generate-a-game-style-ai-avatar-of-a-female-in-fotor.jpg', 0, GETDATE()),
-( N'Hà Nội Events', 'hanevents@hcmc.com', 'c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2', 'event_owner', 'Other', '1987-09-10', '0978901234', '505 Event Ave, Hanoi', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYMzUNHez9pc5Z4yvGkVtNXnR1HjnRpAbgEw&s', 0, GETDATE()),
-( N'Sài Gòn Sports', 'saigonsports@hcmc.com', 'd4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3', 'event_owner', 'Male', '1983-12-05', '0989012345', '606 Sports Ln, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTx55BGjl7TzD_zOf6Do6UAPgcX_gh2z0GRCA&s', 0, GETDATE()),
-( N'Phạm Thị D', 'phamthid@ticketbox.vn', 'e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4', 'customer', 'Female', '1998-08-30', '0990123456', '707 Customer Pl, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNt9UpcsobJNOGFHPeBt-88iRmqjflBnIjhw&s', 0, GETDATE());
+(N'Admin', 'adminEventWeb@support.com', 'ddfa08f04ffbedd937ce079026ead9826c0f4572feee5e45ff2a66d058c0c9d5', 'admin', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', 'https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png', 0, GETDATE()),
+(N'TayNguyen Sound', 'organizer@ticketbox.vn', '058caa5e5eec0aa2911b924607646627dbf0815d513576ada793072e78810691', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', 'https://i1.sndcdn.com/avatars-2RgyZdB5k8fW6HXl-lENkFQ-t500x500.jpg', 0, GETDATE()),
+(N'Mây Lang Thang', 'music_events@hcmc.com', 'e51a4dbbf6c5021893e89253da30c135286bb8cdfb8019d87d666e5483e21c21', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', 'https://yt3.googleusercontent.com/ytc/AIdro_l4eBctyyqzD3BxJ7-cWiEjr0y35flQ8TCI1KUFjgIV6g=w544-c-h544-k-c0x00ffffff-no-l90-rj', 0, GETDATE()),
+(N'VFF', 'sports_events@hcmc.com', '42148a0e9fdc241f7d762b460c4ee97442621455745864c23adb3e4abbcdf17c', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDO9aNJzXLps11YKgoXkwEqHNvvet0RKlwV7Ps2LNSUIUXS_iJ65s4SKf8iJVgigVdW-c&usqp=CAU', 0, GETDATE()),
+(N'Lê Văn A', 'customer1@ticketbox.vn', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', 'https://whatisxwearing.com/wp-content/uploads/2024/07/glenn-quagmire-feature-image-768x549.png', 0, GETDATE()),
+(N'Trần Văn B', 'tranvanb@ticketbox.vn', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6', 'customer', 'Male', '1992-04-15', '0956789012', '303 Customer St, HCMC', 'https://imgv3.fotor.com/images/gallery/generate-a-3d-style-ai-avatar-of-a-boy-in-fotor.jpg', 0, GETDATE()),
+(N'Nguyễn Thị C', 'nguyenthic@ticketbox.vn', 'b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1', 'customer', 'Female', '1994-06-22', '0967890123', '404 Customer Rd, HCMC', 'https://imgv3.fotor.com/images/gallery/generate-a-game-style-ai-avatar-of-a-female-in-fotor.jpg', 0, GETDATE()),
+(N'Hà Nội Events', 'hanevents@hcmc.com', 'c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2', 'event_owner', 'Other', '1987-09-10', '0978901234', '505 Event Ave, Hanoi', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcTYMzUNHez9pc5Z4yvGkVtNXnR1HjnRpAbgEw&s', 0, GETDATE()),
+(N'Sài Gòn Sports', 'saigonsports@hcmc.com', 'd4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3', 'event_owner', 'Male', '1983-12-05', '0989012345', '606 Sports Ln, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcTx55BGjl7TzD_zOf6Do6UAPgcX_gh2z0GRCA&s', 0, GETDATE()),
+(N'Phạm Thị D', 'phamthid@ticketbox.vn', 'e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4', 'customer', 'Female', '1998-08-30', '0990123456', '707 Customer Pl, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcTNt9UpcsobJNOGFHPeBt-88iRmqjflBnIjhw&s', 0, GETDATE()),
+(N'Nguyễn Văn An', N'nguyen.van.an@gmail.com', N'hashedpassword1', N'customer', N'Male', '1990-05-15', N'0123456789', N'123 Nguyễn Trãi, Hà Nội', 'https://cdn.hackernoon.com/images/bfqrt3x6hAVgXkezEqVTPC5AAFA2-lbc3lp3.jpeg', 0, NULL),
+(N'Trần Thị Bình', N'tran.thi.binh@gmail.com', N'hashedpassword2', N'customer', N'Female', '1992-08-22', N'0987654321', N'456 Lê Lợi, Hồ Chí Minh', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcRvnjz9eaaGZclTeqFpP3FTR5ct0SM6EJf4hQ&s', 0, NULL),
+(N'Lê Minh Châu', N'le.minh.chau@gmail.com', N'hashedpassword3', N'event_owner', N'Male', '1988-12-03', N'0345678901', N'789 Trần Phú, Đà Nẵng', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcQuAtGQgXiMdA6EezJNLBblvBni6Rux33Jxerf4qhGN4_FoPQPwpQQ1f9RYDnKSHp9ngGc&usqp=CAU', 0, NULL),
+(N'Phạm Thùy Dung', N'pham.thuy.dung@gmail.com', N'hashedpassword4', N'customer', N'Female', '1995-03-18', N'0456789012', N'321 Bạch Đằng, Hải Phòng', 'https://pbs.twimg.com/profile_images/378800000008627217/72ba7f1e4c2f3cc3ceff43066926dea8_400x400.jpeg', 0, NULL),
+(N'Hoàng Quốc Duy', N'hoang.quoc.duy@gmail.com', N'hashedpassword5', N'customer', N'Other', '1991-07-09', N'0567890123', N'654 Đồng Khởi, Cần Thơ', 'https://cdn.24h.com.vn/upload/1-2025/images/2025-01-21/adt1737420908-ngan-ngam-thay-ca-si-jack-j97-72912__anh_cat_3_2_schema_article.jpg', 0, NULL),
+(N'Vũ Đình Hưng', N'vu.dinh.hung@gmail.com', N'hashedpassword6', N'customer', N'Male', '1993-11-25', N'0678901234', N'987 Lý Thường Kiệt, Huế', 'https://anhnail.vn/wp-content/uploads/2025/01/hinh-jack-j97-meme-19.webp', 0, NULL),
+(N'Đặng Thị Lan', N'dang.thi.lan@gmail.com', N'hashedpassword7', N'customer', N'Female', '1989-04-12', N'0789012345', N'159 Nguyễn Huệ, Vũng Tàu', N'https://i.pinimg.com/originals/65/5d/65/655d65cd95ddd4e408f2bf9bd6d25dd3.jpg', 0, NULL),
+(N'Bùi Văn Minh', N'bui.van.minh@gmail.com', N'hashedpassword8', N'event_owner', N'Male', '1994-09-30', N'0890123456', N'753 Lê Thánh Tôn, Nha Trang', 'https://play-lh.googleusercontent.com/aTTVA77bs4tVS1UvnsmD_T0w-rdZef7UmjpIsg-8RVDOVl_EVEHjmkn6qN7C0teRS3o=w240-h480-rw', 0, NULL),
+(N'Ngô Thị Nga', N'ngo.thi.nga@gmail.com', N'hashedpassword9', N'customer', N'Female', '1987-01-14', N'0901234567', N'852 Hai Bà Trưng, Quy Nhơn', 'https://m.media-amazon.com/images/M/MV5BNzczMzQ3MmItMGFjZC00NzEwLWEzZWYtZTliMjkwOWQ2YzIxXkEyXkFqcGdeQXRyYW5zY29kZS13b3JrZmxvdw@@._V1_.jpg', 0, NULL),
+(N'Đinh Công Phúc', N'dinh.cong.phuc@gmail.com', N'hashedpassword10', N'customer', N'Male', '1996-06-07', N'0912345678', N'741 Phan Chu Trinh, Đà Lạt', 'https://i.pinimg.com/236x/a8/8d/d0/a88dd0ca40e1d6d9d21be2ff40c60688.jpg', 0, NULL),
+(N'Mai Thị Quỳnh', N'mai.thi.quynh@gmail.com', N'hashedpassword11', N'customer', N'Other', '1990-10-28', N'0923456789', N'963 Nguyễn Thị Minh Khai, Phan Thiết', 'https://forum.plutonium.pw/assets/uploads/profile/uid-3277129/3277129-profileavatar-1713595666789.png', 0, NULL),
+(N'Chu Thị Sương', N'chu.thi.suong@gmail.com', N'hashedpassword12', N'customer', N'Female', '1992-02-19', N'0934567890', N'147 Võ Văn Tần, Long An', 'https://static.wikia.nocookie.net/17304df8-37ad-444c-a525-15a227cf46d2/scale-to-width/755', 0, NULL),
+(N'Lý Văn Tùng', N'ly.van.tung@gmail.com', N'hashedpassword13', N'event_owner', N'Male', '1985-08-11', N'0945678901', N'258 Cách Mạng Tháng 8, Biên Hòa', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcQNH1PS3jqSe__oz_xA31yrtRidjG-Ya1584A&s', 0, NULL),
+(N'Dương Thị Uyên', N'duong.thi.uyen@gmail.com', N'hashedpassword14', N'customer', N'Female', '1998-12-05', N'0956789012', N'369 An Dương Vương, Mỹ Tho', 'https://i.imgflip.com/4/2wifvo.jpg', 0, NULL),
+(N'Trịnh Minh Vũ', N'trinh.minh.vu@gmail.com', N'hashedpassword15', N'customer', N'Male', '1991-05-23', N'0967890123', N'482 Nguyễn Văn Linh, Rạch Giá', 'https://i.imgflip.com/4/40noj6.jpg', 0, NULL);
 
 
 --select * from users;
@@ -853,7 +867,7 @@ VALUES
 ('ORD00000006', 5, 1, 280000, 0, 280000, 'paid', 'delivered', 3, '0945678901', 'customer1@ticketbox.vn', NULL),
 ('ORD00000007', 5, 1, 350000, 0, 350000, 'pending', 'created', 1, '0945678901', 'customer1@ticketbox.vn', NULL);
 
-
+--select * from Orders
 -- Insert into OrderItems
 INSERT INTO OrderItems (OrderID, TicketInfoID, EventID, TicketID, UnitPrice, Quantity, TotalPrice)
 VALUES
@@ -869,6 +883,7 @@ VALUES
 (6, 8, 8, 10, 280000, 1, 280000),
 (7, 10, 10, 13, 350000, 1, 350000);
 
+--select * from OrderItems
 -- Insert into Feedback
 INSERT INTO Feedback (UserID, EventID, OrderID, Rating, Content, IsApproved)
 VALUES
@@ -923,3 +938,111 @@ INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, R
 VALUES
 (1, 1, 5, 150000, 'Change of plans', 'pending', 2),
 (2, NULL, 5, 530000, 'Double booking', 'pending', 1);
+
+
+--delete from Ticket
+--DBCC CHECKIDENT ('Ticket', RESEED, 0);    
+
+
+-- select * from Ticket
+SELECT COUNT(*) FROM Users;
+                    
+
+
+select * from users u where u.role != 'admin'; 
+
+select * from AuditLog
+
+UPDATE Users
+SET CreatedAt = CASE
+    WHEN Id BETWEEN 1 AND 13 THEN 
+        CASE Id
+            WHEN 1 THEN '2025-03-15 09:00:00'  -- Start of 3-month window
+            WHEN 2 THEN '2025-03-25 14:30:00'
+            WHEN 3 THEN '2025-04-05 11:15:00'
+            WHEN 4 THEN '2025-04-15 16:45:00'
+            WHEN 5 THEN '2025-05-01 08:20:00'
+            WHEN 6 THEN '2025-05-10 13:50:00'
+            WHEN 7 THEN '2025-05-20 10:30:00'
+            WHEN 8 THEN '2025-06-01 15:15:00'
+            WHEN 9 THEN '2025-06-05 12:00:00'
+            WHEN 10 THEN '2025-06-10 09:30:00'
+            WHEN 11 THEN '2025-06-12 14:00:00'
+            WHEN 12 THEN '2025-06-14 11:45:00'
+            WHEN 13 THEN '2025-06-15 05:31:00'  -- Current time
+        END
+    ELSE 
+        CASE Id
+            WHEN 14 THEN '2024-07-01 08:00:00'
+            WHEN 15 THEN '2024-08-15 13:30:00'
+            WHEN 16 THEN '2024-09-20 10:15:00'
+            WHEN 17 THEN '2024-10-10 15:45:00'
+            WHEN 18 THEN '2024-11-05 09:20:00'
+            WHEN 19 THEN '2024-11-25 14:50:00'
+            WHEN 20 THEN '2024-12-10 11:30:00'
+            WHEN 21 THEN '2024-12-20 16:15:00'
+            WHEN 22 THEN '2025-01-05 08:40:00'
+            WHEN 23 THEN '2025-01-20 13:10:00'
+            WHEN 24 THEN '2025-02-01 10:25:00'
+            WHEN 25 THEN '2025-02-28 15:00:00'
+        END
+END
+WHERE Id BETWEEN 1 AND 25;
+
+UPDATE Users
+SET LastLoginAt = CASE Id
+    -- New Users (CreatedAt >= 2025-03-15, IDs 1–13)
+    WHEN 1 THEN '2025-04-01 08:15:22'  -- Peak (4 logins in April)
+    WHEN 2 THEN '2025-04-05 14:30:47'
+    WHEN 3 THEN '2025-04-10 11:45:19'
+    WHEN 4 THEN '2025-04-15 17:20:33'
+    WHEN 5 THEN '2025-05-01 09:10:28'  -- Medium (3 logins in May)
+    WHEN 6 THEN '2025-05-10 15:55:41'
+    WHEN 7 THEN '2025-05-20 12:25:16'
+    WHEN 8 THEN '2025-06-01 10:35:29'  -- Trough (1 login in June)
+    WHEN 9 THEN '2025-03-01 16:50:37'  -- Trough (1 login in March)
+    WHEN 10 THEN '2025-02-01 13:15:44' -- Trough (1 login in February, spillover)
+    WHEN 11 THEN '2025-01-01 19:30:21' -- Trough (1 login in January)
+    WHEN 12 THEN '2024-12-01 07:45:13' -- Trough (1 login in December, spillover)
+    WHEN 13 THEN '2024-11-01 14:20:35' -- Trough (1 login in November)
+    -- Old Users (CreatedAt < 2025-03-15, IDs 14–25)
+    WHEN 14 THEN '2024-08-01 09:20:35' -- Peak (4 logins in August)
+    WHEN 15 THEN '2024-08-05 16:10:48'
+    WHEN 16 THEN '2024-08-10 14:25:27'
+    WHEN 17 THEN '2024-08-15 20:15:39'
+    WHEN 18 THEN '2024-10-01 11:30:22' -- Peak (4 logins in October)
+    WHEN 19 THEN '2024-10-05 17:45:51'
+    WHEN 20 THEN '2024-10-10 08:55:14'
+    WHEN 21 THEN '2024-10-15 15:40:28'
+    WHEN 22 THEN '2024-12-01 12:20:33' -- Medium (3 logins in December)
+    WHEN 23 THEN '2024-12-05 10:35:46'
+    WHEN 24 THEN '2024-12-10 18:25:19'
+    WHEN 25 THEN '2024-07-01 13:50:42' -- Trough (1 login in July)
+    WHEN 26 THEN '2024-09-01 10:15:00' -- Trough (1 login in September)
+    ELSE LastLoginAt
+END
+WHERE Id BETWEEN 1 AND 25;
+
+
+-- SELECT Id, CreatedAt, LastLoginAt,
+--        CASE WHEN CreatedAt >= '2025-03-15 00:00:00' THEN 'new' ELSE 'old' END as UserType
+-- FROM Users
+-- WHERE Id BETWEEN 1 AND 25
+-- ORDER BY Id;
+
+-- SELECT 
+--     FORMAT(LastLoginAt, 'yyyy-MM') as LoginMonth,
+--     CASE 
+--         WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' 
+--         ELSE 'old' 
+--     END as UserType,
+--     COUNT(*) as LoginCount
+-- FROM Users 
+-- WHERE LastLoginAt IS NOT NULL 
+--     AND Role != 'Admin'
+-- GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'), 
+--          CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END
+-- ORDER BY LoginMonth;
+
+
+-- select * from users u where u.role != 'admin'; 

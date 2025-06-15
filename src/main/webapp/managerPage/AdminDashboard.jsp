@@ -725,7 +725,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-title">Doanh thu tháng này</div>
+            <div class="stat-title">Yêu cầu cần hỗ trợ</div>
             <span class="stat-content">
               <img
                 src="${pageContext.request.contextPath}/asset/image/Property1=Send_fill.svg"
