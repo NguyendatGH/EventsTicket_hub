@@ -5,8 +5,11 @@
 package dao;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Interfaces.IUserDAO;
 import models.TopEventOwner;
@@ -375,4 +378,57 @@ public class UserDAO implements IUserDAO {
         return list;
     }
 
+    @Override
+    public Map<String, Integer> getUserRoleDistribution() {
+        Map<String, Integer> roleDistribution = new HashMap<>();
+        String sql = "SELECT Role, COUNT(*) as count FROM Users GROUP BY Role";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                roleDistribution.put(rs.getString("Role"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return roleDistribution;
+    }
+
+    @Override
+    public Map<String, Map<String, Integer>> getLoginDistributionByMonth() {
+        Map<String, Map<String, Integer>> loginDistribution = new HashMap<>();
+        Map<String, Integer> newUsersLogin = new HashMap<>();
+        Map<String, Integer> oldUsersLogin = new HashMap<>();
+
+        String sql = "SELECT FORMAT(LastLoginAt, 'yyyy-MM') as LoginMonth, " +
+                "CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END as UserType, " +
+                "COUNT(*) as LoginCount " +
+                "FROM Users " +
+                "WHERE LastLoginAt IS NOT NULL AND Role != 'admin' " +
+                "GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'), " +
+                "         CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END " +
+                "ORDER BY LoginMonth";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                String loginMonth = rs.getString("LoginMonth");
+                String userType = rs.getString("UserType");
+                int loginCount = rs.getInt("LoginCount");
+                System.out.println("Month: " + loginMonth + ", Type: " + userType + ", Count: " + loginCount);                  
+                if ("new".equals(userType)) {
+                    newUsersLogin.put(loginMonth, loginCount);
+                } else {
+                    oldUsersLogin.put(loginMonth, loginCount);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        loginDistribution.put("new", newUsersLogin);
+        loginDistribution.put("old", oldUsersLogin);
+        return loginDistribution;
+    }
 }

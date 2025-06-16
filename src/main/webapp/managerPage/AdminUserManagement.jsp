@@ -17,15 +17,13 @@ prefix="c" %>
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
-        min-height: 100vh;
-        overflow: hidden;
         position: relative;
         background-color: #070a17;
+        overflow-x: hidden;
       }
 
       .container {
         display: flex;
-        height: 100vh;
         position: relative;
         z-index: 1;
       }
@@ -36,6 +34,8 @@ prefix="c" %>
         backdrop-filter: blur(20px);
         border-right: 1px solid #4d4d4d;
         padding: 2rem 0;
+        transition: transform 0.3s ease;
+        z-index: 1100;
       }
 
       .logo {
@@ -112,10 +112,10 @@ prefix="c" %>
       }
 
       .logout {
-        position: absolute;
+        position: fixed;
         bottom: 2rem;
         left: 2rem;
-        right: 2rem;
+        right: auto;
         color: #94a3b8;
         text-decoration: none;
         display: flex;
@@ -148,7 +148,7 @@ prefix="c" %>
 
       .page-title {
         color: white;
-        font-size: 2rem;
+        font-size: 24px;
         font-weight: 700;
       }
 
@@ -163,17 +163,19 @@ prefix="c" %>
 
       .search-container {
         position: relative;
-        width: 30%;
+        width: 100%;
+        max-width: 300px;
+        justify-self: end;
       }
 
       .search-box {
         width: 100%;
-        padding: 15px 50px 15px 20px;
+        padding: 8px 50px 8px 20px;
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 10px;
         color: white;
-        font-size: 16px;
+        font-size: 14px;
         outline: none;
         transition: all 0.3s ease;
       }
@@ -195,7 +197,6 @@ prefix="c" %>
         color: rgba(255, 255, 255, 0.6);
       }
 
-      /* Table */
       .data-table {
         background: #1b1c21;
         border-radius: 15px;
@@ -204,19 +205,12 @@ prefix="c" %>
       }
 
       .table-header {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
         align-items: center;
-        padding: 20px;
-        gap: 10%;
         background: rgba(21, 0, 97, 0.78);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .table-header .page-title {
-        font-size: 24px;
-        font-weight: 600;
-        color: #fff;
-        margin: 0;
+        padding: 20px;
       }
 
       .table-columns {
@@ -325,50 +319,384 @@ prefix="c" %>
         background: rgba(45, 70, 126, 0.7);
       }
 
-      /* Responsive */
-      @media (max-width: 768px) {
-        .container {
-          flex-direction: column;
+      .bg_elips {
+        width: 800px;
+        height: 800px;
+        object-fit: cover;
+        position: fixed;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.7;
+      }
+
+      .firstElement {
+        top: -200px;
+        left: -50px;
+      }
+
+      .secondElement {
+        bottom: -400px;
+        right: -200px;
+      }
+
+      .hamburger {
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 34px;
+        z-index: 1100;
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        flex-direction: column;
+        justify-content: space-around;
+      }
+
+      .hamburger span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: white;
+        transition: all 0.3s ease;
+      }
+
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(2px, 2px);
+      }
+
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(21, 27, 58, 0.384);
+        backdrop-filter: blur(5px);
+        z-index: 950;
+        transition: opacity 0.3s ease;
+      }
+
+      .overlay.active {
+        display: block;
+        opacity: 1;
+      }
+
+      .charts-container {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .chart-wrapper {
+        background: #1b1c21;
+        border-radius: 15px;
+        padding: 20px;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .chart-wrapper:first-child {
+        flex: 0 0 auto;
+        width: 350px;
+      }
+
+      .chart-wrapper.fill {
+        flex: 1;
+        min-width: 0;
+        max-width: none;
+      }
+      .chart-wrapper h3 {
+        color: white;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        text-align: center;
+      }
+
+      .chart-wrapper {
+        height: 300px;
+        padding: 20px;
+      }
+
+      .chart-wrapper canvas {
+        max-height: 250px !important;
+      }
+
+      .chart-wrapper {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @media (max-width: 1400px) {
+        .main-content {
+          padding: 0 50px;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .sidebar {
+          width: 20%;
+        }
+
+        .main-content {
+          padding: 0 30px;
+        }
+
+        .bg_elips {
+          width: 600px;
+          height: 600px;
+        }
+
+        .firstElement {
+          top: -150px;
+          left: -30px;
+        }
+
+        .secondElement {
+          bottom: -300px;
+          right: -150px;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .hamburger {
+          display: flex;
         }
 
         .sidebar {
+          width: 260px;
+          position: fixed;
+          height: 100%;
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          padding: 0 20px;
+        }
+        .control-panel {
+          margin-top: 30px;
+        }
+
+        .search-container {
+          max-width: 100%;
+          justify-self: center;
+        }
+
+        .bg_elips {
+          width: 500px;
+          height: 500px;
+        }
+
+        .table-columns,
+        .table-row {
+          grid-template-columns: 50px 1fr 1fr 120px;
+          gap: 10px;
+        }
+
+        .table-columns div:nth-child(4),
+        .table-row div:nth-child(4) {
+          display: none;
+        }
+
+        .admin-avatar {
+          width: 100px;
+          height: 100px;
+        }
+
+        .admin-avatar svg {
+          width: 60px;
+          height: 60px;
+        }
+
+        .admin-name {
+          font-size: 20px;
+        }
+
+        .logo {
+          font-size: 1.3rem;
+        }
+        .logout {
+          left: 1rem;
+          bottom: 1rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          padding: 0 15px;
+        }
+
+        .page-title {
+          font-size: 1.5rem;
+        }
+
+        .control-panel {
+          margin-top: 30px;
+          padding: 8px 16px;
+          font-size: 0.875rem;
+        }
+
+        .table-columns,
+        .table-row {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          padding: 15px;
+        }
+
+        .table-columns div:nth-child(1),
+        .table-row div:nth-child(1),
+        .table-columns div:nth-child(5),
+        .table-row div:nth-child(5) {
+          display: none;
+        }
+
+        .search-box {
+          padding: 6px 40px 6px 15px;
+          font-size: 12px;
+        }
+
+        .search-icon {
+          right: 10px;
+        }
+
+        .bg_elips {
+          width: 400px;
+          height: 400px;
+          opacity: 0.5;
+        }
+
+        .firstElement {
+          top: -100px;
+          left: -15px;
+        }
+
+        .secondElement {
+          bottom: -200px;
+          right: -100px;
+        }
+
+        .actions {
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .sidebar {
           width: 100%;
-          height: auto;
+        }
+
+        .main-content {
+          padding: 0 10px;
+        }
+
+        .header {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: flex-start;
         }
 
         .table-columns,
         .table-row {
           grid-template-columns: 1fr;
-          gap: 10px;
+          gap: 8px;
+          padding: 10px;
+        }
+
+        .table-columns div:nth-child(3),
+        .table-row div:nth-child(3) {
+          display: none;
+        }
+
+        .table-columns {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .table-row div {
+          text-align: left;
+        }
+
+        .actions {
+          justify-content: flex-end;
+        }
+
+        .action-btn {
+          width: 30px;
+          height: 30px;
+        }
+
+        .bg_elips {
+          width: 300px;
+          height: 300px;
+          opacity: 0.4;
+        }
+
+        .firstElement {
+          top: -80px;
+          left: -10px;
+        }
+
+        .secondElement {
+          bottom: -150px;
+          right: -50px;
+        }
+        .logout {
+          left: 0.5rem;
+          bottom: 0.5rem;
+          padding: 0.5rem 0.75rem;
+          font-size: 0.875rem;
         }
       }
-      .bg_elips {
-        width: 800px;
-        height: 800px;
-        object-fit: cover;
-        position: absolute;
-      }
-      .firstElement {
-        top: -200px;
-        left: -50px;
-      }
-      .secondElement {
-        bottom: -400px;
-        right: -200px;
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+        100% {
+          transform: translateY(0);
+        }
       }
     </style>
   </head>
   <body>
     <img
       class="bg_elips firstElement"
-      src="${pageContext.request.contextPath}/asset/full.svg"
+      src="${pageContext.request.contextPath}/asset/image/full.svg"
     />
     <img
       class="bg_elips secondElement"
-      src="${pageContext.request.contextPath}/asset/full2.svg"
+      src="${pageContext.request.contextPath}/asset/image/full2.svg"
     />
+    <button class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
     <div class="container">
-      <!-- Sidebar -->
+      <div class="overlay"></div>
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
 
@@ -431,7 +759,16 @@ prefix="c" %>
         <header class="header">
           <div class="control-panel">Quản lí người dùng</div>
         </header>
-
+        <div class="charts-container">
+          <div class="chart-wrapper">
+            <h3>Phân bố vai trò người dùng</h3>
+            <canvas id="roleChart"></canvas>
+          </div>
+          <div class="chart-wrapper fill">
+            <h3>Số lượt đăng nhập theo tháng</h3>
+            <canvas id="loginMonthChart"></canvas>
+          </div>
+        </div>
         <div class="data-table">
           <div class="table-header">
             <div class="page-title">Danh sách người dùng</div>
@@ -445,12 +782,12 @@ prefix="c" %>
             </div>
           </div>
           <div class="table-columns">
-            <div></div>
+            <div>#</div>
             <div>Vai trò</div>
             <div>Email</div>
             <div>Số di động</div>
             <div>Ngày tạo tài khoản</div>
-            <div></div>
+            <div>Hành động</div>
           </div>
 
           <c:forEach var="user" items="${users}" varStatus="status">
@@ -470,19 +807,20 @@ prefix="c" %>
                 <button class="action-btn lock-btn">
                   <a href="${pageContext.request.contextPath}/">
                     <img
-                      src="${pageContext.request.contextPath}/asset/Lock_duotone_line.svg"
+                      src="${pageContext.request.contextPath}/asset/image/Lock_duotone_line.svg"
                       alt="Lock"
-                  /></a>
+                    />
+                  </a>
                 </button>
                 <button class="action-btn edit-btn">
                   <img
-                    src="${pageContext.request.contextPath}/asset/Edit_fill.svg"
+                    src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg"
                     alt="Edit"
                   />
                 </button>
                 <button class="action-btn delete-btn">
                   <img
-                    src="${pageContext.request.contextPath}/asset/Trash.svg"
+                    src="${pageContext.request.contextPath}/asset/image/Trash.svg"
                     alt="Delete"
                   />
                 </button>
@@ -494,7 +832,17 @@ prefix="c" %>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+      // Animate ellipses
+      function animateEllipses() {
+        const ellipses = document.querySelectorAll(".bg_elips");
+        ellipses.forEach((ellipse, index) => {
+          const duration = 8000 + index * 2000;
+          ellipse.style.animation = `float ${duration}ms ease-in-out infinite`;
+        });
+      }
+
       // Navigation active state
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.addEventListener("click", function () {
@@ -504,6 +852,8 @@ prefix="c" %>
           this.classList.add("active");
         });
       });
+
+      // Action buttons with SweetAlert
       document.querySelectorAll(".action-btn").forEach((btn) => {
         btn.addEventListener("click", function () {
           const action = this.classList.contains("lock-btn")
@@ -524,7 +874,6 @@ prefix="c" %>
             cancelButtonText: "Hủy",
           }).then((result) => {
             if (result.isConfirmed) {
-              // Gửi yêu cầu đến server (như ở bước 3)
               Swal.fire(`${action} thành công!`, "", "success");
             }
           });
@@ -539,12 +888,12 @@ prefix="c" %>
           const rows = document.querySelectorAll(".table-row");
 
           rows.forEach((row) => {
-            const username = row.children[1].textContent.toLowerCase();
+            const role = row.children[1].textContent.toLowerCase();
             const email = row.children[2].textContent.toLowerCase();
             const phoneNum = row.children[3].textContent.toLowerCase();
 
             if (
-              username.includes(searchTerm) ||
+              role.includes(searchTerm) ||
               email.includes(searchTerm) ||
               phoneNum.includes(searchTerm)
             ) {
@@ -554,6 +903,187 @@ prefix="c" %>
             }
           });
         });
+
+      // Hamburger menu functionality
+      const hamburger = document.querySelector(".hamburger");
+      const sidebar = document.querySelector(".sidebar");
+      const overlay = document.querySelector(".overlay");
+
+      hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+      });
+
+      // Close sidebar and overlay when clicking a nav link on mobile
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 992) {
+            hamburger.classList.remove("active");
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+          }
+        });
+      });
+
+      // Close sidebar and overlay when clicking outside
+      document.addEventListener("click", (e) => {
+        if (
+          window.innerWidth <= 992 &&
+          !sidebar.contains(e.target) &&
+          !hamburger.contains(e.target)
+        ) {
+          hamburger.classList.remove("active");
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        }
+      });
+
+      animateEllipses();
+
+      // Parse JSON data
+
+      var roleDistributionJson =
+        '<%= request.getAttribute("roleDistributionJson") %>';
+      var loginDistributionByMonthJson =
+        '<%= request.getAttribute("loginDistributionByMonthJson") %>';
+
+      let roleDistribution = {};
+      let loginDistributionByMonth = {};
+
+      try {
+        roleDistribution = JSON.parse(
+          roleDistributionJson.replace(/&quot;/g, '"').trim() || "{}"
+        );
+        loginDistributionByMonth = JSON.parse(
+          loginDistributionByMonthJson.replace(/"/g, '"').trim() || "{}"
+        );
+      } catch (e) {
+        console.error("Failed to parse JSON data:", e);
+        roleDistribution = {};
+      }
+
+      console.log("Parsed roleDistribution:", roleDistribution);
+      console.log("Parsed loginDistributionByMonth:", loginDistributionByMonth);
+      // Chart initialization
+      const chartColors = {
+        primary: "#6366f1",
+        success: "#10b981",
+        warning: "#f59e0b",
+        danger: "#ef4444",
+        info: "#06b6d4",
+        purple: "#8b5cf6",
+        pink: "#ec4899",
+        orange: "#f97316",
+      };
+
+      if (Object.keys(roleDistribution).length > 0) {
+        const roleChart = new Chart(document.getElementById("roleChart"), {
+          type: "pie",
+          data: {
+            labels: Object.keys(roleDistribution),
+            datasets: [
+              {
+                data: Object.values(roleDistribution),
+                backgroundColor: Object.keys(roleDistribution).map(
+                  (_, index) =>
+                    [
+                      chartColors.success,
+                      chartColors.warning,
+                      chartColors.danger,
+                      chartColors.info,
+                    ][index % 4]
+                ),
+                borderColor: "#1b1c21",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: "top", labels: { color: "white" } },
+              title: { display: false },
+            },
+          },
+        });
+      }
+      if (Object.keys(loginDistributionByMonth).length > 0) {
+        // Tạo danh sách 12 tháng gần nhất
+        const currentDate = new Date();
+        const months = [];
+        const monthLabels = [];
+
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth() - i,
+            1
+          );
+          const monthKey = date.toISOString().slice(0, 7); // Format: yyyy-MM
+          const monthLabel = date.toLocaleDateString("vi-VN", {
+            month: "short",
+            year: "numeric",
+          });
+          months.push(monthKey);
+          monthLabels.push(monthLabel);
+        }
+
+        const newData = months.map(
+          (month) => loginDistributionByMonth.new[month] || 0
+        );
+        const oldData = months.map(
+          (month) => loginDistributionByMonth.old[month] || 0
+        );
+
+        const loginMonthChart = new Chart(
+          document.getElementById("loginMonthChart"),
+          {
+            type: "bar",
+            data: {
+              labels: monthLabels, // Sử dụng nhãn tháng thân thiện
+              datasets: [
+                {
+                  label: "Người dùng mới",
+                  data: newData,
+                  backgroundColor: "#8b5cf6",
+                  borderColor: "#1b1c21",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Người dùng cũ",
+                  data: oldData,
+                  backgroundColor: "rgba(255, 255, 255, 0.5)",
+                  borderColor: "#1b1c21",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { position: "top", labels: { color: "white" } },
+                title: { display: false },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: { color: "white", stepSize: 1 },
+                  grid: { color: "rgba(255, 255, 255, 0.1)" },
+                },
+                x: {
+                  ticks: {
+                    color: "white",
+                    maxRotation: 45,
+                    minRotation: 45,
+                  },
+                  grid: { color: "rgba(255, 255, 255, 0.1)" },
+                },
+              },
+            },
+          }
+        );
+      }
     </script>
   </body>
 </html>
