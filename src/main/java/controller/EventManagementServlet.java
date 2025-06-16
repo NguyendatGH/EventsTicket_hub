@@ -1,10 +1,13 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import jakarta.servlet.ServletException;
@@ -49,21 +52,45 @@ public class EventManagementServlet implements AdminSubServlet {
 
     private void setEventToJsp(HttpServletRequest request, HttpServletResponse response) {
         List<Event> recentEvents = eventDAO.getAllApprovedEvents();
-        for (Event e : recentEvents) {
-            logger.info("Sự kiện: " + e.toString());
-        }
+
+        logger.info("Sự kiện: " + recentEvents.size());
+
         List<TopEventOwner> topOrganizers = userDAO.getTopEventOwner();
 
         if (topOrganizers == null || topOrganizers.isEmpty()) {
             logger.warning("Danh sách top organizers rỗng hoặc null");
             topOrganizers = new ArrayList<>();
-        }else{
-            for(TopEventOwner t: topOrganizers){
-                System.out.println(t);
-            }
+        } else {
+            logger.info("Tổng sụ kiện: " + topOrganizers.size());
         }
-        request.setAttribute("events", recentEvents);
-        request.setAttribute("topOrganizers", topOrganizers);
+        Map<String, Integer> statusStats = eventDAO.getEventByStatus();
+        Map<String, Integer> genreStats = eventDAO.getEventStatsByGenre();
+        List<Map<String, Object>> monthlyStats = eventDAO.getMonthlyEventStats();
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String statusStatsJson = mapper.writeValueAsString(statusStats != null ? statusStats : new HashMap<>());
+            String genreStatsJson = mapper.writeValueAsString(genreStats != null ? genreStats : new HashMap<>());
+            String monthlyStatsJson = mapper
+                    .writeValueAsString(monthlyStats != null ? monthlyStats : new ArrayList<>());
+
+            logger.info("Serialized statusStatsJson: " + statusStatsJson);
+            logger.info("Serialized genreStatsJson: " + genreStatsJson);
+            logger.info("Serialized monthlyStatsJson: " + monthlyStatsJson);
+
+            request.setAttribute("events", recentEvents);
+            request.setAttribute("topOrganizers", topOrganizers);
+            request.setAttribute("statusStatsJson", statusStatsJson);
+            request.setAttribute("genreStatsJson", genreStatsJson);
+            request.setAttribute("monthlyStatsJson", monthlyStatsJson);
+
+        } catch (Exception e) {
+            logger.severe("Error serializing JSON data: " + e.getMessage());
+            request.setAttribute("statusStatsJson", "{}");
+            request.setAttribute("genreStatsJson", "{}");
+            request.setAttribute("monthlyStatsJson", "[]");
+
+        }
     }
 
     private void handleEventDetailRequest(HttpServletRequest request, HttpServletResponse response)
@@ -183,7 +210,8 @@ public class EventManagementServlet implements AdminSubServlet {
             return;
         }
         String status = request.getParameter("status");
-        if (!"pending".equals(status) && !"active".equals(status) && !"cancelled".equals(status) && !"completed".equals(status)) {
+        if (!"pending".equals(status) && !"active".equals(status) && !"cancelled".equals(status)
+                && !"completed".equals(status)) {
             logger.warning("Trạng thái không hợp lệ: " + status);
             request.setAttribute("error", "Trạng thái không hợp lệ");
             request.setAttribute("event", event);
@@ -197,12 +225,13 @@ public class EventManagementServlet implements AdminSubServlet {
 
         // boolean updated = eventDAO.updateEvent(event);
         // if (updated) {
-        //     response.sendRedirect(request.getContextPath() + "/admin-servlet/event-management");
+        // response.sendRedirect(request.getContextPath() +
+        // "/admin-servlet/event-management");
         // } else {
-        //     request.setAttribute("error", "Không thể cập nhật sự kiện");
-        //     request.setAttribute("event", event);
-        //     request.setAttribute("editMode", true);
-        //     forwardUtils.toJsp(request, response, EVENT_DETAIL_JSP);
+        // request.setAttribute("error", "Không thể cập nhật sự kiện");
+        // request.setAttribute("event", event);
+        // request.setAttribute("editMode", true);
+        // forwardUtils.toJsp(request, response, EVENT_DETAIL_JSP);
         // }
     }
 }

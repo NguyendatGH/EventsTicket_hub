@@ -1,6 +1,6 @@
 package controller;
 
-import dao.EventDAO; 
+import dao.EventDAO;
 import dao.TicketInforDAO;
 import java.io.IOException;
 import java.util.List;
@@ -9,7 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import models.Event; 
+import models.Event;
 import models.TicketInfor;
 
 @WebServlet(name = "TicketInforServlet", urlPatterns = {"/TicketInforServlet"})
@@ -21,7 +21,6 @@ public class TicketInforServlet extends HttpServlet {
 
         String eventIdParam = request.getParameter("eventId");
 
-    
         if (eventIdParam == null || eventIdParam.trim().isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Event ID is required.");
             return;
@@ -29,34 +28,28 @@ public class TicketInforServlet extends HttpServlet {
 
         try {
             int eventId = Integer.parseInt(eventIdParam);
-            
-            
+
             EventDAO eventDAO = new EventDAO();
             TicketInforDAO ticketDAO = new TicketInforDAO();
 
-            // Lấy đối tượng Event
             Event event = eventDAO.getEventById(eventId);
 
-            
             if (event == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Event not found.");
                 return;
             }
 
-            
-            List<TicketInfor> listTicket = ticketDAO.getTicketInfosByEventID(eventId); 
+            List<TicketInfor> listTicket = ticketDAO.getTicketInfosByEventID(eventId);
 
-            
-            request.setAttribute("event", event); 
-            request.setAttribute("listTicket", listTicket); 
+            request.setAttribute("event", event);
+            request.setAttribute("listTicket", listTicket);
 
-            // Chuyển tiếp đến JSP
             request.getRequestDispatcher("/pages/TicketInfor.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid Event ID format.");
         } catch (Exception e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An unexpected error occurred.");
         }
     }
@@ -64,7 +57,6 @@ public class TicketInforServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Hiện tại, doPost có thể để trống hoặc gọi doGet nếu cần
         doGet(request, response);
     }
 }

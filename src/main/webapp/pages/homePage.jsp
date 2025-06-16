@@ -1,7 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="models.Event"%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
 <!DOCTYPE html>
@@ -491,8 +491,18 @@
 
                 </ul>
                 <div class="auth-buttons">
-                    <a href="login" class="btn btn-outline">Đăng nhập</a>
-                    <a href="register" class="btn btn-primary">Đăng ký</a>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.user}">
+                            <%-- Nếu người dùng đã đăng nhập, hiển thị email và nút Đăng xuất --%>
+                            <span style="color: white; align-self: center; margin-right: 15px;">Xin chào, ${sessionScope.user.email}</span>
+                            <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline">Đăng xuất</a>
+                        </c:when>
+                        <c:otherwise>
+                            <%-- Nếu người dùng chưa đăng nhập, hiển thị như cũ --%>
+                            <a href="${pageContext.request.contextPath}/login" class="btn btn-outline">Đăng nhập</a>
+                            <a href="${pageContext.request.contextPath}/register" class="btn btn-primary">Đăng ký</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </nav>
         </header>
