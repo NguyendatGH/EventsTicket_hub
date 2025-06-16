@@ -1,13 +1,11 @@
-<%-- 
-    Document   : TicketOrderHistory
-    Created on : May 26, 2025, 7:18:08 PM
-    Author     : admin
---%>
+
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
-    <head>
+<html lang="vi"
+      <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -560,92 +558,80 @@
         </div>
 
         <!-- Main Container -->
-        <div class="main-container">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="profile-card">
-                    <div class="profile-header">
-                        <div class="profile-avatar">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <div class="profile-info-box">
-                            <span class="profile-label">Account of</span><br>
-                            <span class="profile-username">Phuoc Hat Le</span>
-                        </div>
-                    </div>
-                    <ul class="profile-menu">
-                        <li><i class="fas fa-user"></i> Account Settings</li>
-                        <li><i class="fas fa-info-circle"></i> Account Information</li>
-                        <li class="active"><i class="fas fa-ticket-alt"></i> Purchased Tickets</li>
-                        <li><i class="fas fa-calendar-alt"></i> My Events</li>
-                    </ul>
-                </div>
+        <div class="main-content">
+            <div class="tickets-header">
+                <h2 class="tickets-title">Purchased Tickets</h2>
             </div>
 
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Filter Tabs -->
-                <div class="tickets-header">
-                    <h2 class="tickets-title">Purchased Tickets</h2>
-                </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active">All</button>
+                <button class="filter-tab">Successful</button>
+                <button class="filter-tab">Processing</button>
+                <button class="filter-tab">Cancelled</button>
+            </div>
 
-                <div class="filter-tabs">
-                    <button class="filter-tab active">All</button>
-                    <button class="filter-tab">Successful</button>
-                    <button class="filter-tab">Processing</button>
-                    <button class="filter-tab">Cancelled</button>
-                </div>
+            <div class="status-buttons">
+                <button class="status-btn upcoming">Upcoming</button>
+                <button class="status-btn ended">Ended</button>
+            </div>
 
-                <!-- Status Buttons -->
-                <div class="status-buttons">
-                    <button class="status-btn upcoming">Upcoming</button>
-                    <button class="status-btn ended">Ended</button>
-                </div>
-
-                <!-- Empty State -->
-                <div class="empty-state">
-                    <div class="empty-icon">💡</div>
-                    <div class="empty-text">You don't have any tickets yet</div>
-                </div>
-
-                <!-- Suggestions Section -->
-                <div class="suggestions-section">
-                    <div class="suggestions-grid">
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">WORKSHOP - FOOD AND BEVERAGE INDUSTRY</div>
-                                <div class="card-date">From Thursday 02, 22/08</div>
+            <%-- =================== HIỂN THỊ DANH SÁCH VÉ ĐÃ MUA =================== --%>
+            <c:choose>
+                <c:when test="${not empty orderHistory}">
+                    <div class="order-list">
+                        <c:forEach var="order" items="${orderHistory}">
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <span class="order-event-name">${order.event.name}</span>
+                                    <span class="order-status status-${order.status.toLowerCase()}">${order.status}</span>
+                                </div>
+                                <div class="order-body">
+                                    <p><strong>Ngày đặt:</strong> <fmt:formatDate value="${order.orderDate}" pattern="HH:mm, dd/MM/yyyy"/></p>
+                                    <p><strong>Tổng tiền:</strong> <fmt:formatNumber value="${order.totalAmount}" type="currency" currencySymbol="đ"/></p>
+                                </div>
+                                <div class="order-footer">
+                                    <c:if test="${order.status == 'PAID' && order.event.startTime > java.util.Calendar.getInstance().getTime()}">
+                                        <form action="refund" method="POST" style="display:inline;">
+                                            <input type="hidden" name="orderId" value="${order.orderId}"/>
+                                            <button type="submit" class="btn-refund">Hoàn vé</button>
+                                        </form>
+                                    </c:if>
+                                    <a href="#" class="btn-view-details">Xem chi tiết vé</a>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">SUPER CHEF - COOKING COMPETITION FOR STUDENTS</div>
-                                <div class="card-date">From Thursday 04, 24/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">CONFERENCE ON WEBSITE AND APP EXPLOITATION</div>
-                                <div class="card-date">From Thursday 06, 26/08</div>
-                            </div>
-                        </div>
-
-                        <div class="suggestion-card">
-                            <div class="card-image">Event Image</div>
-                            <div class="card-content">
-                                <div class="card-title">CONFERENCE ON JAPANESE TECHNOLOGY AND MARKET</div>
-                                <div class="card-date">From Thursday 07, 27/08</div>
-                            </div>
-                        </div>
+                        </c:forEach>
                     </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="empty-state">
+                        <div class="empty-icon">💡</div>
+                        <div class="empty-text">You don't have any tickets yet</div>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+
+            <div class="suggestions-section">
+                <h3 class="suggestions-title">Upcoming Events</h3>
+                <div class="suggestions-grid">
+                    <%-- =================== HIỂN THỊ CÁC SỰ KIỆN GỢI Ý =================== --%>
+                    <c:forEach var="event" items="${suggestedEvents}">
+                        <div class="suggestion-card">
+                            <div class="card-image" style="background-image: url('${event.imageUrl}');">
+                                <%-- Nếu không có ảnh, hiển thị chữ --%>
+                                <c:if test="${empty event.imageUrl}">Event Image</c:if>
+                                </div>
+                                <div class="card-content">
+                                    <div class="card-title">${event.name}</div>
+                                <div class="card-date">
+                                    From <fmt:formatDate value="${event.startTime}" pattern="EEEE dd, MM/yyyy"/>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
                 </div>
             </div>
         </div>
+
 
         <!-- Footer -->
         <footer class="footer">
