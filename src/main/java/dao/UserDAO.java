@@ -339,6 +339,35 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
+    public boolean changeUserAccountStatus(int id, int status) {
+        // status = 0 -> lock, status = 1 -> unlock
+        String sql = "";
+        if (status == 0) {
+            sql = "Update Users SET isLocked = 1 where id = ?";
+        } else {
+            sql = "Update Users SET isLocked = 0 where id = ?";
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            int rowsUpdated = stmt.executeUpdate();
+
+            return rowsUpdated > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateUserInfo(User u) {
+        return true;
+    }
+
+    @Override
     public List<TopEventOwner> getTopEventOwner() {
         List<TopEventOwner> list = new ArrayList<>();
         Connection conn = null;
@@ -416,7 +445,7 @@ public class UserDAO implements IUserDAO {
                 String loginMonth = rs.getString("LoginMonth");
                 String userType = rs.getString("UserType");
                 int loginCount = rs.getInt("LoginCount");
-                System.out.println("Month: " + loginMonth + ", Type: " + userType + ", Count: " + loginCount);                  
+                System.out.println("Month: " + loginMonth + ", Type: " + userType + ", Count: " + loginCount);
                 if ("new".equals(userType)) {
                     newUsersLogin.put(loginMonth, loginCount);
                 } else {

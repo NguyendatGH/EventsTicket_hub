@@ -5,13 +5,15 @@ package dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import context.DBConnection;
 import models.Promotion;
 
 public class PromotionDAO {
     private Connection connection;
     
-    public PromotionDAO(Connection connection) {
-        this.connection = connection;
+
+    public PromotionDAO() {
+        this.connection = DBConnection.getConnection();
     }
     
     public boolean createPromotion(Promotion promotion) {

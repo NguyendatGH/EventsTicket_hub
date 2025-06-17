@@ -537,6 +537,12 @@ prefix="c" %>
           left: 1rem;
           bottom: 1rem;
         }
+        .charts-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 2rem;
+        }
       }
 
       @media (max-width: 768px) {
@@ -769,6 +775,13 @@ prefix="c" %>
             <canvas id="loginMonthChart"></canvas>
           </div>
         </div>
+        <c:if test="${not empty sessionScope.message}">
+          <div class="message-alert message-${sessionScope.messageType}">
+            ${sessionScope.message}
+          </div>
+          <c:remove var="message" scope="session" />
+          <c:remove var="messageType" scope="session" />
+        </c:if>
         <div class="data-table">
           <div class="table-header">
             <div class="page-title">Danh sách người dùng</div>
@@ -793,32 +806,56 @@ prefix="c" %>
           <c:forEach var="user" items="${users}" varStatus="status">
             <div class="table-row">
               <div>${status.count}</div>
-              <div><c:out value="${user.role}" /></div>
               <div>
-                <a href="mailto:${user.email}" class="email-link"
-                  ><c:out value="${user.email}"
-                /></a>
+                <span
+                  class="status-indicator ${user.isLocked ? 'status-locked' : 'status-active'}"
+                ></span>
+                <c:out value="${user.role}" />
+              </div>
+              <div>
+                <a href="mailto:${user.email}" class="email-link">
+                  <c:out value="${user.email}" />
+                </a>
               </div>
               <div class="phoneNum-field">
                 <span class="phoneNum-detail">${user.phoneNumber}</span>
               </div>
               <div><c:out value="${user.createdAt}" /></div>
               <div class="actions">
-                <button class="action-btn lock-btn">
-                  <a href="${pageContext.request.contextPath}/">
-                    <img
-                      src="${pageContext.request.contextPath}/asset/image/Lock_duotone_line.svg"
-                      alt="Lock"
-                    />
-                  </a>
-                </button>
-                <button class="action-btn edit-btn">
+                <c:choose>
+                  <c:when test="${user.isLocked}">
+                    <button
+                      class="action-btn lock-btn locked"
+                      onclick="toggleUserLock(${user.id}, 'unlock', '${user.email}')"
+                      title="Unlock user"
+                    >
+                      🔒
+                      <!-- <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt=""> -->
+                    </button>
+                  </c:when>
+                  <c:otherwise>
+                    <button
+                      class="action-btn lock-btn unlocked"
+                      onclick="toggleUserLock(${user.id}, 'lock', ${user.email})"
+                      title="Lock user"
+                    >
+                      🔒
+                    </button>
+                  </c:otherwise>
+                </c:choose>
+                <button
+                  class="action-btn edit-btn"
+                  onclick="editUser(${user.id})"
+                >
                   <img
                     src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg"
                     alt="Edit"
                   />
                 </button>
-                <button class="action-btn delete-btn">
+                <button
+                  class="action-btn delete-btn"
+                  onclick="deleteUser(${user.id}, '${user.email}')"
+                >
                   <img
                     src="${pageContext.request.contextPath}/asset/image/Trash.svg"
                     alt="Delete"
@@ -842,7 +879,7 @@ prefix="c" %>
           ellipse.style.animation = `float ${duration}ms ease-in-out infinite`;
         });
       }
-
+      animateEllipses();
       // Navigation active state
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.addEventListener("click", function () {
@@ -853,32 +890,7 @@ prefix="c" %>
         });
       });
 
-      // Action buttons with SweetAlert
-      document.querySelectorAll(".action-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          const action = this.classList.contains("lock-btn")
-            ? "Khóa"
-            : this.classList.contains("edit-btn")
-            ? "Chỉnh sửa"
-            : this.classList.contains("delete-btn")
-            ? "Xóa"
-            : "Không xác định";
-          const row = this.closest(".table-row");
-          const email = row.children[2].textContent;
-          Swal.fire({
-            title: `Xác nhận ${action}`,
-            text: `Bạn có chắc muốn ${action.toLowerCase()} người dùng "${email}"?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Có",
-            cancelButtonText: "Hủy",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Swal.fire(`${action} thành công!`, "", "success");
-            }
-          });
-        });
-      });
+      //sweetAlert
 
       // Search functionality
       document
@@ -938,8 +950,6 @@ prefix="c" %>
           overlay.classList.remove("active");
         }
       });
-
-      animateEllipses();
 
       // Parse JSON data
 
@@ -1083,6 +1093,35 @@ prefix="c" %>
             },
           }
         );
+      }
+
+      //toggle user
+      function toggleUserLock(userId, action, email) {
+        const actionText = action === "lock" ? "khóa" : "mở khóa";
+        const icon = action === "lock" ? "warning" : "question";
+        console.log(actionText);
+        Swal.fire({
+          title: String(`Xác nhận ${actionText} tài khoản`),
+          text: String(`Bạn có chắc muốn ${actionText} tài khoản ${email} ?`),
+          icon: icon,
+          showCancelButton: true,
+          confirmButtonText: "Có",
+          cancelButtonText: "Hủy",
+          confirmButtonColor: action === "lock" ? "#dc3545" : "#28a745",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            console.log(`xác nhận ${actionText}`);
+            console.log(userId);
+            console.log(email);
+            setTimeout(3000, console.log("processing"));
+            window.location.href = `${pageContext.request.contextPath}/admin-servlet/user-management/lock-user?userId=${userId}&action=${action}`;
+          }
+        });
+      }
+      const message =
+        '<%= session.getAttribute("message") != null ? session.getAttribute("message") : "" %>';
+      if (message) {
+        console.log("Server message:", message);
       }
     </script>
   </body>
