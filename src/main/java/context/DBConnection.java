@@ -18,6 +18,8 @@ public class DBConnection {
     private static final String PASS_DB = "123"; //your password
 
 
+
+
     private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
     public static Connection getConnection() {
