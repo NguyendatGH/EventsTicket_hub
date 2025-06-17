@@ -1,7 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="models.Event"%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
 <!DOCTYPE html>
@@ -491,8 +491,18 @@
 
                 </ul>
                 <div class="auth-buttons">
-                    <a href="login" class="btn btn-outline">Đăng nhập</a>
-                    <a href="register" class="btn btn-primary">Đăng ký</a>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.user}">
+                            <%-- Nếu người dùng đã đăng nhập, hiển thị email và nút Đăng xuất --%>
+                            <span style="color: white; align-self: center; margin-right: 15px;">Xin chào, ${sessionScope.user.email}</span>
+                            <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline">Đăng xuất</a>
+                        </c:when>
+                        <c:otherwise>
+                            <%-- Nếu người dùng chưa đăng nhập, hiển thị như cũ --%>
+                            <a href="${pageContext.request.contextPath}/login" class="btn btn-outline">Đăng nhập</a>
+                            <a href="${pageContext.request.contextPath}/register" class="btn btn-primary">Đăng ký</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </nav>
         </header>
@@ -613,14 +623,7 @@
             </div>
             <% } %>
 
-<<<<<<< HEAD
-            <!-- Ticket Purchase Section -->
-            <div class="ticket-section">
-                <div class="ticket-content">
-                    <h2 class="ticket-title">Mua vé của bạn</h2>
-                    <p class="ticket-subtitle">Đơn giản, nhanh chóng và an toàn</p>
-                    <a href="#" class="btn btn-primary">Bắt đầu mua vé</a>
-=======
+
         <!-- Ticket Purchase Section -->
         <div class="ticket-section">
             <div class="ticket-content">
@@ -662,46 +665,10 @@
                     <a href="#" class="social-link">f</a>
                     <a href="#" class="social-link">t</a>
                     <a href="#" class="social-link">i</a>
->>>>>>> 2338d9e (feat/buyTicket: Tạo đường dẫn đăng nhập khi khách vãng lai ấn mua vé)
                 </div>
             </div>
         </main>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Dịch vụ khách hàng</h3>
-                    <ul>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Liên hệ</a></li>
-                        <li><a href="#">Chính sách</a></li>
-                        <li><a href="#">Điều khoản</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Về chúng tôi</h3>
-                    <ul>
-                        <li><a href="#">Tạo tài khoản</a></li>
-                        <li><a href="#">Tin tức</a></li>
-                        <li><a href="#">Sự kiện hàng đầu</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Đăng ký nhận thông tin</h3>
-                    <p>Nhận thông báo về các sự kiện mới</p>
-                    <div class="newsletter">
-                        <input type="email" placeholder="Email của bạn...">
-                        <button class="btn btn-primary">Đăng ký</button>
-                    </div>
-                    <div class="social-links">
-                        <a href="#" class="social-link">f</a>
-                        <a href="#" class="social-link">t</a>
-                        <a href="#" class="social-link">i</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
 
         <script>
             // Function to handle event selection

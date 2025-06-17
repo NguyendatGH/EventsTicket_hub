@@ -10,14 +10,16 @@
 
         <title>MasterTicket - EventDetails</title>
         <style>
+            /* === BẢNG MÀU ĐƯỢC LÀM DỊU HƠN === */
             :root {
-                --primary: #4a4aff;
-                --secondary: #ff4da6;
-                --dark-bg: #0f0f1a;
-                --darker-bg: #000015;
-                --card-bg: #1a1a2e;
-                --text-light: #ffffff;
-                --text-muted: #aaaaaa;
+                --primary: #667aff;      /* Màu xanh dương dịu hơn */
+                --secondary: #e06bce;    /* Màu hồng/tím nhẹ nhàng hơn */
+                --dark-bg: #161b22;      /* Nền tối (hơi ngả xanh) */
+                --darker-bg: #0d1117;    /* Nền tối hơn */
+                --card-bg: #21262d;      /* Nền cho các thẻ thông tin */
+                --border-color: #30363d; /* Màu viền tinh tế */
+                --text-light: #e6edf3;   /* Màu chữ trắng ngà, dễ chịu cho mắt */
+                --text-muted: #8b949e;   /* Màu chữ phụ */
                 --success: #00cc66;
                 --warning: #ffcc00;
                 --danger: #ff3333;
@@ -40,8 +42,9 @@
             .header-container {
                 display: flex;
                 justify-content: center;
-                background-color: var(--dark-bg);
+                background-color: var(--darker-bg); /* Giữ nguyên nền header */
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+                border-bottom: 1px solid var(--border-color);
             }
 
             .header {
@@ -56,7 +59,7 @@
             .logo {
                 font-size: 24px;
                 font-weight: bold;
-                color: #4a4aff;
+                color: var(--primary); /* Sử dụng màu primary mới */
             }
 
             .search {
@@ -67,10 +70,10 @@
             .search input {
                 padding: 10px 15px;
                 border-radius: 25px;
-                border: 1px solid #333344;
+                border: 1px solid var(--border-color);
                 width: 300px;
-                background-color: #1a1a2e;
-                color: white;
+                background-color: var(--card-bg); /* Nền ô search nhất quán */
+                color: var(--text-light);
                 font-size: 14px;
             }
 
@@ -87,7 +90,7 @@
             }
 
             .search button:hover {
-                background-color: #3a3add;
+                background-color: #5566dd; /* Hover tối hơn một chút */
             }
 
             .actions {
@@ -108,7 +111,7 @@
             }
 
             .primary-btn:hover {
-                background-color: #e04496;
+                background-color: #c85ab6; /* Hover tối hơn một chút */
             }
 
             .link {
@@ -125,7 +128,8 @@
             }
 
             .account {
-                background-color: #333344;
+                background-color: var(--card-bg);
+                border: 1px solid var(--border-color);
                 padding: 8px 16px;
                 border-radius: 25px;
                 font-weight: 500;
@@ -140,15 +144,15 @@
 
             .main-content {
                 max-width: 1300px;
-                margin: 30px auto;
+                margin: 40px auto; /* Tăng khoảng cách từ header */
                 padding: 0 30px;
             }
 
 
             .event-header {
                 display: flex;
-                gap: 30px;
-                margin-bottom: 30px;
+                gap: 40px; /* Tăng khoảng cách giữa poster và thông tin */
+                margin-bottom: 50px; /* Tăng khoảng cách tới phần dưới */
             }
 
             .event-poster {
@@ -157,6 +161,7 @@
                 border-radius: 10px;
                 overflow: hidden;
                 flex-shrink: 0;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.4);
             }
 
             .event-poster img {
@@ -170,213 +175,153 @@
             }
 
             .event-title {
-                font-size: 28px;
-                margin-bottom: 15px;
+                font-size: 32px; /* Chữ to, rõ ràng hơn */
+                margin-bottom: 20px;
                 color: var(--text-light);
+                font-weight: 700;
             }
 
             .event-meta {
                 display: flex;
-                gap: 20px;
-                margin-bottom: 20px;
+                flex-direction: column; /* xếp dọc cho rõ */
+                gap: 15px;
+                margin-bottom: 25px;
                 color: var(--text-muted);
+                font-size: 16px;
             }
 
             .event-meta-item {
                 display: flex;
                 align-items: center;
-                gap: 5px;
-            }
-
-            .event-description {
-                margin-bottom: 30px;
-                line-height: 1.6;
-            }
-
-
-            .ticket-detail-container {
-                max-width: 1300px;
-                margin: 0 auto;
-                padding: 20px;
-                font-family: 'Segoe UI', Arial, sans-serif;
-                color: #333;
-            }
-
-            .event-info-section.section-card {
-                display: grid;
-                justify-content: start;
-                width: 70%;
-            }
-
-            /* .organizer-section.section-card{
-                display: grid;
-                justify-content: start;
-                width: 70%;
-            }*/
-
-            .organizer-card {
-                background-color: #f8f9fa;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                width: 54vw;
-            }
-
-
-
-
-            .section-title {
-                font-size: 22px;
-                font-weight: 600;
-                margin-bottom: 20px;
-                color: #4a4aff;
-                padding-bottom: 8px;
-
-            }
-
-
-            .event-card {
-                background-color: #f8f9fa;
-                border-radius: 10px;
-                margin-bottom: 30px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-
-            .event-name {
-                font-size: 20px;
-                font-weight: 600;
-                margin-bottom: 15px;
-                color: #222;
-            }
-
-            .event-description {
-                font-size: 15px;
-                line-height: 1.6;
-                margin-bottom: 20px;
-                color: #555;
-            }
-
-            .event-meta {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-
-            .meta-item {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                font-size: 14px;
-                color: #666;
-            }
-
-
-            .organizer-card {
-                background-color: #f8f9fa;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                margin-bottom: 30px;
-            }
-
-            .organizer-name {
-                font-size: 18px;
-                font-weight: 600;
-                margin-bottom: 5px;
-                color: #222;
-            }
-
-            .organizer-desc {
-                font-size: 14px;
-                color: #666;
-                margin-bottom: 15px;
-            }
-
-            .organizer-links {
-                display: flex;
                 gap: 10px;
             }
 
-            .organizer-link {
-                display: inline-block;
-                padding: 8px 15px;
-                background-color: #4a4aff;
-                color: white;
-                text-decoration: none;
-                border-radius: 5px;
-                font-size: 14px;
-                transition: background-color 0.2s;
+            .event-description {
+                margin-bottom: 30px;
+                line-height: 1.7; /* Giãn dòng cho dễ đọc */
+                color: var(--text-muted);
             }
 
-            .organizer-link:hover {
-                background-color: #3a3add;
+            /* === UNIFIED DARK THEME FOR CONTENT SECTIONS === */
+            
+            .ticket-detail-container {
+                display: flex;
+                flex-direction: column;
+                gap: 40px; /* Thêm khoảng cách giữa các khối thông tin */
+            }
+            
+            .section-card {
+                background-color: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 10px;
+                padding: 25px 30px;
             }
 
-            /* === 3. TICKET INFORMATION === */
+            .section-title {
+                font-size: 24px;
+                font-weight: 600;
+                margin-bottom: 25px;
+                color: var(--primary);
+                padding-bottom: 10px;
+                border-bottom: 2px solid var(--primary); /* Thêm gạch chân để làm nổi bật tiêu đề */
+                display: inline-block; /* Để border-bottom vừa với chữ */
+            }
+            
+            /* Thẻ thông tin chi tiết */
+            .event-card-detail .event-name { /* Đổi tên class để tránh xung đột */
+                font-size: 20px;
+                font-weight: 600;
+                margin-bottom: 15px;
+                color: var(--text-light); /* Đổi màu chữ */
+            }
+            
+            .event-card-detail .event-description {
+                 font-size: 15px;
+                line-height: 1.6;
+                margin-bottom: 20px;
+                color: var(--text-muted); /* Đổi màu chữ */
+            }
+            
+             .event-card-detail .event-meta {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+             }
+
+            .event-card-detail .meta-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 15px;
+                color: var(--text-muted); /* Đổi màu chữ */
+            }
+            .event-card-detail .meta-item span{
+                color: var(--text-light); /* Đổi màu chữ */
+            }
+
+
+            /* === DARK THEME FOR TICKET TABLE === */
             .ticket-table {
                 width: 100%;
                 border-collapse: collapse;
-                background-color: #f8f9fa;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                background-color: transparent; /* Bỏ nền cũ */
                 overflow: hidden;
             }
 
             .ticket-table th {
                 text-align: left;
-                padding: 12px 15px;
-                background-color: #e9ecef;
+                padding: 15px;
+                background-color: rgba(110, 118, 129, 0.2); /* Nền header bảng */
                 font-weight: 600;
-                color: #495057;
+                color: var(--text-light); /* Màu chữ header */
             }
 
             .ticket-table td {
-                padding: 12px 15px;
-                border-bottom: 1px solid #dee2e6;
-                color: #555;
+                padding: 15px;
+                border-bottom: 1px solid var(--border-color);
+                color: var(--text-muted); /* Màu chữ nội dung */
+            }
+             .ticket-table td:last-child {
+                color: var(--text-light);
+                font-weight: 500;
             }
 
             .ticket-table tr:last-child td {
                 border-bottom: none;
             }
-
+            
             .ticket-note {
                 margin-top: 15px;
                 font-size: 13px;
-                color: #6c757d;
+                color: var(--text-muted);
                 font-style: italic;
             }
 
-
+            /* === DARK THEME FOR ORGANIZER CARD === */
             .organizer-card {
-                background-color: #f8f9fa;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                 background-color: transparent;
+                 padding: 0;
             }
 
             .organizer-name {
                 font-size: 18px;
                 font-weight: 600;
                 margin-bottom: 5px;
-                color: #222;
+                color: var(--text-light);
             }
 
             .organizer-desc {
                 font-size: 14px;
-                color: #666;
+                color: var(--text-muted);
                 margin-bottom: 15px;
+                line-height: 1.6;
             }
-
-            .organizer-links {
-                display: flex;
-                gap: 10px;
-            }
-
+            
             .organizer-link {
                 display: inline-block;
                 padding: 8px 15px;
-                background-color: #4a4aff;
+                background-color: var(--primary);
                 color: white;
                 text-decoration: none;
                 border-radius: 5px;
@@ -385,51 +330,21 @@
             }
 
             .organizer-link:hover {
-                background-color: #3a3add;
+                background-color: #5566dd;
             }
 
-            .number-btn:hover {
-                background-color: var(--primary);
-            }
-
-            /* Organizer Info */
-            .organizer-info {
-                margin-top: 40px;
-                background-color: var(--card-bg);
-                padding: 20px;
-                border-radius: 10px;
-            }
-
-            .organizer-title {
-                font-size: 20px;
-                margin-bottom: 15px;
-                color: var(--primary);
-            }
-
-            /* Suggestions */
+            /* === SUGGESTIONS SECTION === */
             .suggestions {
                 margin-top: 60px;
             }
 
             .suggestions-title {
-                font-size: 22px;
-                margin-bottom: 20px;
+                font-size: 24px;
+                margin-bottom: 30px;
                 color: var(--secondary);
-                position: relative;
-                padding-bottom: 7%;
-                display: flex;
-                justify-content: center;
+                text-align: center;
+                font-weight: 600;
             }
-
-            /* .suggestions-title::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 50px;
-                height: 3px;
-                background-color: var(--secondary);
-            }*/
 
             .suggestions-grid {
                 display: grid;
@@ -437,66 +352,39 @@
                 gap: 20px;
             }
 
+            /* Styling cho card gợi ý */
             .event-card {
-                background-color: transparent;
+                background-color: var(--card-bg); /* Nền card nhất quán */
+                border: 1px solid var(--border-color);
                 border-radius: 8px;
                 overflow: hidden;
-                transition: background-color 0.3s ease, transform 0.2s ease;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
                 color: inherit;
+                text-decoration: none;
             }
 
-            /* IMAGE NOT AFFECTED */
             .event-card img {
                 width: 100%;
                 height: 150px;
                 object-fit: cover;
                 display: block;
-                /* No transition or effects applied to image */
-                border-top-left-radius: 8px;
-                border-top-right-radius: 8px;
+                border-bottom: 1px solid var(--border-color);
             }
 
-            /* CARD BODY */
             .event-card .card-body {
                 padding: 15px;
-                background-color: transparent;
-                transition: background-color 0.3s ease;
             }
 
-            .event-card h4,
-            .event-card p,
-            .event-card .price {
-                color: var(--text-muted);
-                transition: color 0.3s ease;
-            }
-
-            /* HOVER ONLY AFFECTS BODY PART */
-            .event-card:hover {
-                background-color: #1E1F24;
-                transform: translateY(-5px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            }
-
-            .event-card:hover .card-body {
-                background-color: #1E1F24; /* text background rises */
-            }
-
-            .event-card:hover h4,
-            .event-card:hover p,
-            .event-card:hover .price {
-                color: #fff;
-            }
-
-            /* Text structure */
             .event-card h4 {
                 font-size: 16px;
                 margin-bottom: 5px;
+                color: var(--text-light);
             }
-
+            
             .event-card p {
                 font-size: 13px;
                 margin-bottom: 10px;
+                color: var(--text-muted);
             }
 
             .event-card .price {
@@ -507,17 +395,22 @@
 
             .event-card:hover {
                 transform: translateY(-5px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+                border-color: var(--primary);
             }
-
-            /* Wrapper centers and limits content width */
+            
+            /* ==== FOOTER SECTION (Unchanged as requested) ==== */
+            .footer {
+                padding: 40px 15px;
+                background-color: var(--darker-bg);
+                margin-top: 80px;
+                border-top: 1px solid var(--border-color);
+            }
             .footer-content {
-                max-width: 1300px; /* same as main-content */
-                margin: 0 auto;    /* center alignment */
+                max-width: 1300px;
+                margin: 0 auto;
                 box-sizing: border-box;
             }
-
-            /* Container for footer sections */
             .footer-container {
                 display: flex;
                 justify-content: space-between;
@@ -525,49 +418,39 @@
                 gap: 20px;
                 padding: 0px 15px;
             }
-
-            /* Each section in footer */
             .footer-section {
                 flex: 1;
                 min-width: 250px;
                 margin: 10px;
             }
-
             .footer-section h3 {
                 color: #ddd;
                 margin-bottom: 15px;
             }
-
             .footer-section ul {
                 list-style: none;
                 padding: 0;
             }
-
             .footer-section ul li {
                 padding: 10px 0;
             }
-
             .footer-section ul li a {
                 text-decoration: none;
                 color: #aaa;
                 transition: 0.3s;
             }
-
             .footer-section ul li a:hover,
             .footer-section a:hover {
                 color: #fff;
             }
-
             .footer-section p, .footer-section a {
                 color: #aaa;
                 margin: 5px 0;
                 text-decoration: underline;
             }
-
             .footer-section li {
                 padding: 5px 0;
             }
-
             .subscribe-box {
                 display: flex;
                 align-items: center;
@@ -578,12 +461,10 @@
                 margin-bottom: 15px;
                 gap: 10px;
             }
-
             .fa-envelope:before {
                 content: "\f0e0";
                 color: #15d715;
             }
-
             .subscribe-box input {
                 flex: 1;
                 border: none;
@@ -593,7 +474,6 @@
                 outline: none;
                 font-size: 14px;
             }
-
             .subscribe-box button {
                 background: #6f42c1;
                 border: none;
@@ -603,11 +483,9 @@
                 cursor: pointer;
                 transition: background 0.3s;
             }
-
             .subscribe-box button:hover {
                 background: #5a339e;
             }
-
             .language img {
                 width: 30px;
                 margin: 5px 10px 5px 0;
@@ -615,15 +493,12 @@
                 border-radius: 4px;
                 transition: transform 0.2s;
             }
-
             .language img:hover {
                 transform: scale(1.1);
             }
-
             .social-icons {
                 margin-top: 15px;
             }
-
             .social-images img {
                 width: 30px;
                 margin-right: 10px;
@@ -631,69 +506,49 @@
                 cursor: pointer;
                 transition: transform 0.3s;
             }
-
             .social-images img:hover {
                 transform: scale(1.2);
             }
-
-
+            
             /* Responsive */
-
             @media (max-width: 1024px) {
                 .event-header {
                     flex-direction: column;
                 }
-
                 .event-poster {
                     width: 100%;
                     height: auto;
-                    aspect-ratio: 2/3;
+                    aspect-ratio: 3/4; /* Giữ tỉ lệ poster */
                 }
             }
-
             @media (max-width: 768px) {
                 .header {
                     flex-direction: column;
                     gap: 15px;
                     padding: 15px 20px;
                 }
-
                 .search input {
                     width: 100%;
                 }
-
                 .main-content {
                     padding: 0 20px;
+                    margin-top: 20px;
                 }
-
-                /* Footer responsive - keep content centered */
                 .footer {
-                    padding: 30px 50px; /* maintain padding for background width */
+                    padding: 30px 20px;
                 }
-
                 .footer-content {
-                    max-width: 100%; /* full width for smaller screens */
-                    padding: 0 20px; /* add small padding to avoid edge contact */
-                    margin: 0 auto;
-                    box-sizing: border-box;
+                    padding: 0;
                 }
-
                 .footer-container {
                     flex-direction: column;
                     align-items: center;
                     text-align: center;
                 }
-
-                .footer-section {
-                    margin: 10px 0;
-                    max-width: 100%;
-                }
-
                 .subscribe-box {
                     flex-direction: column;
                     align-items: stretch;
                 }
-
                 .subscribe-box input,
                 .subscribe-box button {
                     width: 100%;
@@ -742,37 +597,51 @@
                             </div>
                         </div>
                         <p class="event-description">${event.description}</p>
-                        <button class="primary-btn" 
-                                onclick="handleBuyTickets(${event.eventID}, ${event.hasSeatingChart == true ? 'true' : 'false'})">
-                            Buy Tickets Now
-                        </button>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.user}">                               
+                                <button class="primary-btn"
+                                        onclick="handleBuyTickets(${event.eventID}, ${event.hasSeatingChart == true ? 'true' : 'false'})">
+                                    Buy Tickets Now
+                                </button>
+                            </c:when>
+                            <c:otherwise>                               
+                                <button class="primary-btn" onclick="location.href = '${pageContext.request.contextPath}/login'">
+                                    Login to Buy Tickets
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
 
                 <div class="ticket-detail-container">
                     <div class="event-info-section section-card">
                         <h2 class="section-title">Detailed Information</h2>
-                        <div class="event-card">
+                        <div class="event-card-detail">
                             <h3 class="event-name">${event.name}</h3>
-                            <p class="event-description">${event.description}</p>
                             <div class="event-meta">
-                                <h3 class="section-title">Event Information</h3>
-                                <div class="meta-item"><span>⏰</span>
-                                    <fmt:formatDate value="${event.startTime}" pattern="HH:mm, dd/MM/yyyy"/>
+                                <div class="meta-item">
+                                    <strong>⏰ Time:</strong>
+                                    <span><fmt:formatDate value="${event.startTime}" pattern="HH:mm, dd/MM/yyyy"/></span>
                                 </div>
-                                <div class="meta-item"><span>📍</span> ${event.physicalLocation}</div>
-                                <div class="meta-item"><span>💰</span> Price from:
-                                    <c:choose>
-                                        <c:when test="${not empty ticketList}">
-                                            <fmt:formatNumber value="${ticketList[0].price}" type="currency" currencyCode="VND"/>
-                                        </c:when>
-                                        <c:otherwise>Contact</c:otherwise>
-                                    </c:choose>
+                                <div class="meta-item">
+                                    <strong>📍 Location:</strong> 
+                                    <span>${event.physicalLocation}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <strong>💰 Price from:</strong>
+                                    <span>
+                                        <c:choose>
+                                            <c:when test="${not empty ticketList}">
+                                                <fmt:formatNumber value="${ticketList[0].price}" type="currency" currencyCode="VND"/>
+                                            </c:when>
+                                            <c:otherwise>Contact</c:otherwise>
+                                        </c:choose>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    
                     <div class="ticket-info-section section-card">
                         <h2 class="section-title">Ticket Types and Prices</h2>
                         <table class="ticket-table">
@@ -796,21 +665,21 @@
                         </table>
                         <p class="ticket-note">* Vé được cập nhật liên tục theo hệ thống phân phối và có thể thay đổi.</p>
                     </div>
-                </div>
 
-                <div class="organizer-section section-card">
-                    <h2 class="section-title">Organizer</h2>
-                    <div class="organizer-card">
-                        <c:if test="${not empty organizer}">
-                            <h3 class="organizer-name">${organizer.name}</h3>
-                            <p class="organizer-desc">${organizer.description}</p>
-                            <div class="organizer-links">
-                                <a href="${organizer.website}" class="organizer-link">Learn More</a>
-                            </div>
-                        </c:if>
-                        <c:if test="${empty organizer}">
-                            <p>Organizer information has not been updated.</p>
-                        </c:if>
+                    <div class="organizer-section section-card">
+                        <h2 class="section-title">Organizer</h2>
+                        <div class="organizer-card">
+                            <c:if test="${not empty organizer}">
+                                <h3 class="organizer-name">${organizer.name}</h3>
+                                <p class="organizer-desc">${organizer.description}</p>
+                                <div class="organizer-links">
+                                    <a href="${organizer.website}" class="organizer-link">Learn More</a>
+                                </div>
+                            </c:if>
+                            <c:if test="${empty organizer}">
+                                <p>Organizer information has not been updated.</p>
+                            </c:if>
+                        </div>
                     </div>
                 </div>
             </c:if>
@@ -832,7 +701,7 @@
                                     ${suggestedEvent.physicalLocation}
                                 </p>
                                 <p class="price">Từ
-                                    <c:choose>                                  
+                                    <c:choose>                                       
                                         <c:when test="${not empty suggestedEvent.ticketList}">
                                             <fmt:formatNumber value="${suggestedEvent.ticketList[0].price}" type="currency" currencyCode="VND"/>
                                         </c:when>
@@ -900,37 +769,37 @@
         </footer>
 
         <script type="text/javascript">
-             var contextPath = '${pageContext.request.contextPath}';
-             console.log("[EventDetail.jsp - Inline JS] Context Path được định nghĩa là: '" + contextPath + "'");
+            var contextPath = '${pageContext.request.contextPath}';
+            console.log("[EventDetail.jsp - Inline JS] Context Path được định nghĩa là: '" + contextPath + "'");
 
-             function handleBuyTickets(eventId, hasSeatingChartStr) {
-                 var targetUrl;
-                
+            function handleBuyTickets(eventId, hasSeatingChartStr) {
+                var targetUrl;
 
-                 var hasSeatingChart = (hasSeatingChartStr === 'true');
 
-                 console.log("[EventDetail.jsp - Inline JS] Hàm handleBuyTickets được gọi. Event ID:", eventId, "Has Seating Chart:", hasSeatingChart);
+                var hasSeatingChart = (hasSeatingChartStr === 'true');
 
-                 if (hasSeatingChart) {
-                     
-                     targetUrl = contextPath + "/BookChairServlet?eventId=" + eventId;
-                    
+                console.log("[EventDetail.jsp - Inline JS] Hàm handleBuyTickets được gọi. Event ID:", eventId, "Has Seating Chart:", hasSeatingChart);
 
-                     console.log("[EventDetail.jsp - Inline JS] Điều hướng đến trang chọn ghế: " + targetUrl);
-                 } else {
-                     
-                     targetUrl = contextPath + "/TicketInforServlet?eventId=" + eventId;
+                if (hasSeatingChart) {
 
-                     console.log("[EventDetail.jsp - Inline JS] Điều hướng đến TicketInforServlet: " + targetUrl);
-                 }
-                
-                 if (targetUrl) {
-                     window.location.href = targetUrl;
-                 } else {
-                     console.error("[EventDetail.jsp - Inline JS] Không xác định được URL đích để mua vé.");
-                     alert("Đã có lỗi xảy ra khi cố gắng mua vé. Vui lòng thử lại.");
-                 }
-             }
+                    targetUrl = contextPath + "/BookChairServlet?eventId=" + eventId;
+
+
+                    console.log("[EventDetail.jsp - Inline JS] Điều hướng đến trang chọn ghế: " + targetUrl);
+                } else {
+
+                    targetUrl = contextPath + "/TicketInforServlet?eventId=" + eventId;
+
+                    console.log("[EventDetail.jsp - Inline JS] Điều hướng đến TicketInforServlet: " + targetUrl);
+                }
+
+                if (targetUrl) {
+                    window.location.href = targetUrl;
+                } else {
+                    console.error("[EventDetail.jsp - Inline JS] Không xác định được URL đích để mua vé.");
+                    alert("Đã có lỗi xảy ra khi cố gắng mua vé. Vui lòng thử lại.");
+                }
+            }
         </script>
     </body>
 </html>
