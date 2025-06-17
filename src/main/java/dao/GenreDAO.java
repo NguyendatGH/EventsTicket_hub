@@ -1,16 +1,17 @@
 package dao;
 
-//import com.masterticket.model.Genre;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import model.Genre;
+
+import context.DBConnection;
+import models.Genre;
 
 public class GenreDAO {
     private Connection connection;
     
-    public GenreDAO(Connection connection) {
-        this.connection = connection;
+    public GenreDAO() {
+        this.connection = DBConnection.getConnection();
     }
     
     public List<Genre> getAllGenres() {

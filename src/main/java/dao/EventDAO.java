@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,8 +20,14 @@ public class EventDAO {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1";
 
+<<<<<<< HEAD
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+=======
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+>>>>>>> 6895ed6 (fix/ resolve conflict dependency & EventOwner role)
 
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
@@ -37,9 +44,14 @@ public class EventDAO {
         Event event = null;
         String sql = "SELECT * FROM Events WHERE EventID = ? AND isDeleted = 0";
 
+<<<<<<< HEAD
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
+=======
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+>>>>>>> 6895ed6 (fix/ resolve conflict dependency & EventOwner role)
 
             ps.setInt(1, eventId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -61,7 +73,6 @@ public class EventDAO {
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 res = rs.getInt("EventCount");
@@ -79,10 +90,15 @@ public class EventDAO {
         String sql = "{CALL GetTopHotEvents(?)}";
         int topCount = 5;
 
+<<<<<<< HEAD
 
         try (Connection conn = DBConnection.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
 
+=======
+        try (Connection conn = DBConnection.getConnection();
+                CallableStatement stmt = conn.prepareCall(sql)) {
+>>>>>>> 6895ed6 (fix/ resolve conflict dependency & EventOwner role)
             stmt.setInt(1, topCount);
             ResultSet rs = stmt.executeQuery();
 
@@ -108,9 +124,13 @@ public class EventDAO {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE Status = 'pending'";
 
+<<<<<<< HEAD
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+=======
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+>>>>>>> 6895ed6 (fix/ resolve conflict dependency & EventOwner role)
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -133,9 +153,14 @@ public class EventDAO {
         if (currentEvent != null && currentEvent.getGenreID() != null) {
             sql = "SELECT * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC LIMIT 3";
 
+<<<<<<< HEAD
 
             try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
+=======
+            try (Connection conn = DBConnection.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+>>>>>>> 6895ed6 (fix/ resolve conflict dependency & EventOwner role)
                 ps.setInt(1, currentEvent.getGenreID());
                 ps.setInt(2, currentEventId);
 
@@ -175,7 +200,6 @@ public class EventDAO {
 
 
             try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
 
                 int paramIndex = 1;
                 for (Integer excludeId : excludeIds) {
@@ -230,6 +254,22 @@ public class EventDAO {
         return true;
     }
 
+<<<<<<< HEAD
+=======
+    public List<Event> getUpcomingEvents() {
+        List<Event> list = new ArrayList<>();
+        String sql = "SELECT TOP 4 * FROM Events WHERE StartTime > GETDATE() ORDER BY StartTime ASC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+>>>>>>> 6895ed6 (fix/ resolve conflict dependency & EventOwner role)
 
     public Map<String, Integer> getEventByStatus() {
         Map<String, Integer> stats = new HashMap<>();
@@ -285,48 +325,46 @@ public class EventDAO {
 
         return stats;
     }
+
     public boolean createEvent(Event event) {
-        String sql = "INSERT INTO events (event_name, event_info, event_type, location_name, " +
-                    "province, district, ward, street_number, full_address, start_time, end_time, " +
-                    "has_seat, total_tickets, logo_image, background_image, sponsor_image, " +
-                    "organizer_name, organizer_info, genre_id, user_id, status, created_at) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, event.getEventName());
-            pstmt.setString(2, event.getEventInfo());
-            pstmt.setString(3, event.getEventType());
-            pstmt.setString(4, event.getLocationName());
-            pstmt.setString(5, event.getProvince());
-            pstmt.setString(6, event.getDistrict());
-            pstmt.setString(7, event.getWard());
-            pstmt.setString(8, event.getStreetNumber());
-            pstmt.setString(9, event.getFullAddress());
-            pstmt.setTimestamp(10, event.getStartTime());
-            pstmt.setTimestamp(11, event.getEndTime());
-            pstmt.setBoolean(12, event.isHasSeat());
-            pstmt.setInt(13, event.getTotalTickets());
-            pstmt.setString(14, event.getLogoImage());
-            pstmt.setString(15, event.getBackgroundImage());
-            pstmt.setString(16, event.getSponsorImage());
-            pstmt.setString(17, event.getOrganizerName());
-            pstmt.setString(18, event.getOrganizerInfo());
-            pstmt.setInt(19, event.getGenreID());
-            pstmt.setInt(20, event.getUserID());
-            pstmt.setString(21, event.getStatus());
-            pstmt.setTimestamp(22, event.getCreatedAt());
-            
+        String sql = "INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, " +
+                "TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, " +
+                "HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt, Ranking) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setString(1, event.getName());
+            pstmt.setString(2, event.getDescription());
+            pstmt.setString(3, event.getPhysicalLocation());
+            pstmt.setTimestamp(4, new java.sql.Timestamp(event.getStartTime().getTime()));
+            pstmt.setTimestamp(5, new java.sql.Timestamp(event.getEndTime().getTime()));
+            pstmt.setInt(6, event.getTotalTicketCount() != null ? event.getTotalTicketCount() : 0);
+            pstmt.setBoolean(7, event.getIsApproved() != null ? event.getIsApproved() : false);
+            pstmt.setString(8, event.getStatus());
+            pstmt.setInt(9, event.getGenreID() != null ? event.getGenreID() : 0);
+            pstmt.setInt(10, event.getOwnerID() != null ? event.getOwnerID() : 0);
+            pstmt.setString(11, event.getImageURL());
+            pstmt.setBoolean(12, event.getHasSeatingChart() != null ? event.getHasSeatingChart() : false);
+            pstmt.setBoolean(13, event.getIsDeleted() != null ? event.getIsDeleted() : false);
+            pstmt.setTimestamp(14, new java.sql.Timestamp(event.getCreatedAt().getTime()));
+            pstmt.setTimestamp(15, new java.sql.Timestamp(event.getUpdatedAt().getTime()));
+            pstmt.setLong(16, event.getRanking());
+
             int affectedRows = pstmt.executeUpdate();
-            
+
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         event.setEventID(generatedKeys.getInt(1));
+                        System.out.println("Event created successfully with ID: " + event.getEventID());
                         return true;
                     }
                 }
             }
         } catch (SQLException e) {
+            System.err.println("Error when creating event: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
