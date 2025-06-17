@@ -5,8 +5,14 @@
 package dao;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import Interfaces.IUserDAO;
+import models.TopEventOwner;
 import models.User;
 import context.DBConnection;
 import utils.HashUtil;
@@ -16,7 +22,7 @@ public class UserDAO implements IUserDAO {
     @Override
     public User login(String email, String password) {
         User user = null;
-        String sql = "SELECT * FROM Users WHERE Email = ? AND PasswordHash = ? AND IsDeleted = 0";
+        String sql = "SELECT * FROM Users WHERE Email = ? AND PasswordHash = ? AND IsLocked = 0";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -48,7 +54,7 @@ public class UserDAO implements IUserDAO {
                 user.setPhoneNumber(rs.getString("PhoneNumber"));
                 user.setAddress(rs.getString("Address"));
                 user.setAvatar(rs.getString("Avatar"));
-                user.setIsDeleted(rs.getBoolean("IsDeleted"));
+                user.setIsLocked(rs.getBoolean("IsLocked"));
 
                 Timestamp lastLogin = rs.getTimestamp("LastLoginAt");
                 if (lastLogin != null) {
@@ -65,10 +71,10 @@ public class UserDAO implements IUserDAO {
         return user;
     }
 
-    //Thêm người dùng là "Customer"
+    // Thêm người dùng là "Customer"
     @Override
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO Users (Email, PasswordHash, Role, CreatedAt, UpdatedAt, Gender, Birthday, PhoneNumber, Address, IsDeleted) "
+        String sql = "INSERT INTO Users (Email, PasswordHash, Role, CreatedAt, UpdatedAt, Gender, Birthday, PhoneNumber, Address, IsLocked) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -81,7 +87,7 @@ public class UserDAO implements IUserDAO {
             stmt.setDate(7, new java.sql.Date(user.getBirthday().getTime()));
             stmt.setString(8, user.getPhoneNumber());
             stmt.setString(9, user.getAddress());
-            stmt.setBoolean(10, user.getIsDeleted());
+            stmt.setBoolean(10, user.getIsLocked());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -103,7 +109,7 @@ public class UserDAO implements IUserDAO {
         }
     }
 
-    //Update profile của "Customer"
+    // Update profile của "Customer"
     @Override
     public boolean updateProfile(User user) {
         String sql = "UPDATE Users SET Gender = ?, Birthday = ?, PhoneNumber = ?, Address = ?, Avatar = ?, UpdatedAt = ? WHERE Id = ?";
@@ -128,7 +134,7 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean updatePasswordByEmail(String email, String newPassword) {
-        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = ? WHERE Email = ? AND IsDeleted = 0";
+        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = ? WHERE Email = ? AND IsLocked = 0";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, newPassword);
@@ -144,9 +150,10 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean changePassword(int userId, String oldPassword, String newPassword) {
-        String checkSql = "SELECT PasswordHash FROM Users WHERE Id = ? AND IsDeleted = 0";
+        String checkSql = "SELECT PasswordHash FROM Users WHERE Id = ? AND IsLocked = 0";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
 
             checkStmt.setInt(1, userId);
             ResultSet rs = checkStmt.executeQuery();
@@ -207,7 +214,7 @@ public class UserDAO implements IUserDAO {
                     user.setPhoneNumber(rs.getString("phoneNumber"));
                     user.setAddress(rs.getString("address"));
                     user.setAvatar(rs.getString("avatar"));
-                    user.setIsDeleted(rs.getBoolean("isDeleted"));
+                    user.setIsLocked(rs.getBoolean("isLocked"));
 
                     Timestamp lastLoginAt = rs.getTimestamp("lastLoginAt");
                     user.setLastLoginAt(lastLoginAt != null ? lastLoginAt.toLocalDateTime() : null);
@@ -225,7 +232,7 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean updatePassword(int userId, String newPasswordHash) {
-        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = CURRENT_TIMESTAMP WHERE Id = ? AND IsDeleted = 0";
+        String sql = "UPDATE Users SET PasswordHash = ?, UpdatedAt = CURRENT_TIMESTAMP WHERE Id = ? AND IsLocked = 0";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -243,12 +250,12 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean insertUserFromGoogle(User user) {
-        String sql = "INSERT INTO Users (Email, Role, CreatedAt, IsDeleted, GoogleId) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (Email, Role, CreatedAt, IsLocked, GoogleId) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getRole());
             ps.setTimestamp(3, Timestamp.valueOf(user.getCreatedAt()));
-            ps.setBoolean(4, user.getIsDeleted());
+            ps.setBoolean(4, user.getIsLocked());
             ps.setString(5, user.getGoogleId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -257,6 +264,200 @@ public class UserDAO implements IUserDAO {
         return false;
     }
 
-    
-//  publ
+    @Override
+    public int getNumOfUser() {
+        int res = 0;
+        String sql = "SELECT COUNT(*) FROM Users;";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                res = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @Override
+    public List<User> getAllUserAccount() {
+        List<User> list = new ArrayList<>();
+        String sql = "select * from users u where u.role != 'admin';";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("Id"));
+                user.setEmail(rs.getString("Email"));
+                user.setPasswordHash(rs.getString("PasswordHash"));
+                user.setRole(rs.getString("Role"));
+                Timestamp created = rs.getTimestamp("CreatedAt");
+                if (created != null) {
+                    user.setCreatedAt(created.toLocalDateTime());
+                }
+                Timestamp updated = rs.getTimestamp("UpdatedAt");
+                if (updated != null) {
+                    user.setUpdatedAt(updated.toLocalDateTime());
+                }
+                user.setGender(rs.getString("Gender"));
+                user.setBirthday(rs.getDate("Birthday"));
+                user.setPhoneNumber(rs.getString("PhoneNumber"));
+                user.setAddress(rs.getString("Address"));
+                user.setAvatar(rs.getString("Avatar"));
+                user.setIsLocked(rs.getBoolean("IsLocked"));
+
+                Timestamp lastLogin = rs.getTimestamp("LastLoginAt");
+                if (lastLogin != null) {
+                    user.setLastLoginAt(lastLogin.toLocalDateTime());
+                }
+
+                user.setGoogleId(rs.getString("GoogleId"));
+
+                list.add(user);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    @Override
+    public User findWithID(int id) {
+
+        return null;
+    }
+
+    @Override
+    public boolean deleteUser(int id) {
+        return true;
+    }
+
+    @Override
+    public boolean changeUserAccountStatus(int id, int status) {
+        // status = 0 -> lock, status = 1 -> unlock
+        String sql = "";
+        if (status == 0) {
+            sql = "Update Users SET isLocked = 1 where id = ?";
+        } else {
+            sql = "Update Users SET isLocked = 0 where id = ?";
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            int rowsUpdated = stmt.executeUpdate();
+
+            return rowsUpdated > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateUserInfo(User u) {
+        return true;
+    }
+
+    @Override
+    public List<TopEventOwner> getTopEventOwner() {
+        List<TopEventOwner> list = new ArrayList<>();
+        Connection conn = null;
+        CallableStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            String sql = "{call GetTopEventOrganizers}";
+            stmt = conn.prepareCall(sql);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                TopEventOwner owner = new TopEventOwner();
+                owner.setId(rs.getInt("Id"));
+                owner.setName(rs.getString("Tên tổ chức"));
+                owner.setNumsOfEvent(rs.getInt("Số sự kiện"));
+                owner.setNumsOfTicketSelled(rs.getInt("Tổng vé đã bán"));
+                owner.setStatus(rs.getBoolean("Trạng thái tài khoản"));
+                owner.setAvatarURL(rs.getString("Avatar"));
+                list.add(owner);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null)
+                    rs.close();
+                if (stmt != null)
+                    stmt.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public Map<String, Integer> getUserRoleDistribution() {
+        Map<String, Integer> roleDistribution = new HashMap<>();
+        String sql = "SELECT Role, COUNT(*) as count FROM Users GROUP BY Role";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                roleDistribution.put(rs.getString("Role"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return roleDistribution;
+    }
+
+    @Override
+    public Map<String, Map<String, Integer>> getLoginDistributionByMonth() {
+        Map<String, Map<String, Integer>> loginDistribution = new HashMap<>();
+        Map<String, Integer> newUsersLogin = new HashMap<>();
+        Map<String, Integer> oldUsersLogin = new HashMap<>();
+
+        String sql = "SELECT FORMAT(LastLoginAt, 'yyyy-MM') as LoginMonth, " +
+                "CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END as UserType, " +
+                "COUNT(*) as LoginCount " +
+                "FROM Users " +
+                "WHERE LastLoginAt IS NOT NULL AND Role != 'admin' " +
+                "GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'), " +
+                "         CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END " +
+                "ORDER BY LoginMonth";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                String loginMonth = rs.getString("LoginMonth");
+                String userType = rs.getString("UserType");
+                int loginCount = rs.getInt("LoginCount");
+                System.out.println("Month: " + loginMonth + ", Type: " + userType + ", Count: " + loginCount);
+                if ("new".equals(userType)) {
+                    newUsersLogin.put(loginMonth, loginCount);
+                } else {
+                    oldUsersLogin.put(loginMonth, loginCount);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        loginDistribution.put("new", newUsersLogin);
+        loginDistribution.put("old", oldUsersLogin);
+        return loginDistribution;
+    }
 }

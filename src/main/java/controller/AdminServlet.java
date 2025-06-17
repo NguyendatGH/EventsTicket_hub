@@ -7,91 +7,71 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.RequestDispatcher;
-import java.time.LocalDateTime;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
+import dao.EventDAO;
+import dao.UserDAO;
 import models.IssueItem;
 import models.User;
+import models.Event;
 
-@WebServlet(name = "admin-servlet", urlPatterns = {"/admin-servlet"})
+@WebServlet(name = "AdminServlet", urlPatterns = { "/admin-servlet/*" })
 public class AdminServlet extends HttpServlet {
+
+    private static final Logger logger = Logger.getLogger(AdminServlet.class.getName());
+
+    private UserManagementServlet userManagementServlet;
+    private EventManagementServlet eventManagementServlet;
+    private SupportCenterServlet supportCenterServlet;
+    private DashboardServlet dashboardServlet;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        userManagementServlet = new UserManagementServlet();
+        eventManagementServlet = new EventManagementServlet();
+        supportCenterServlet = new SupportCenterServlet();
+        dashboardServlet = new DashboardServlet();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+        logger.info("Processing admin request for path: " + pathInfo);
+
         try {
-            String action = request.getParameter("action");
-            System.out.println("[AdminServlet] Action parameter: '" + action + "'");
-            RequestDispatcher dispatcher;
-            String targetJsp;
-
-            if (action == null || action.trim().isEmpty()) {
-                action = "AdminDashboard";
+            if (pathInfo == null || pathInfo.equals("/") || pathInfo.equals("/dashboard")) {
+                dashboardServlet.handleRequest(request, response);
+            } else if (pathInfo.startsWith("/user-management")) {
+                userManagementServlet.handleRequest(request, response);
+            } else if (pathInfo.startsWith("/event-management")) {
+                eventManagementServlet.handleRequest(request, response);
+            } else if (pathInfo.startsWith("/support-center")) {
+                supportCenterServlet.handleRequest(request, response);
+            } else {
+                logger.warning("Unknown path: " + pathInfo);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid admin path");
             }
-
-            switch (action.toLowerCase()) {
-                case "admindashboard":
-                    targetJsp = "managerPage/AdminDashboard.jsp";
-                    break;
-
-                case "manageuseraccount":
-                    
-//                    request.setAttribute("userList", userList);
-                    targetJsp = "managerPage/AdminUserManagement.jsp";
-                    break;
-
-                case "manageevents":
-                    targetJsp = "managerPage/AdminEventManagement.jsp";
-                    break;
-
-                case "vieweventdetail":
-                    targetJsp = "managerPage/EventOptions.jsp";
-                    break;
-
-                case "supportcenter":
-                    targetJsp = "supportCenter/supportCenter_admin.jsp";
-                    List<IssueItem> list = new ArrayList<>();
-                    LocalDateTime now = LocalDateTime.now();
-                    list.add(new IssueItem("testEmail@gmail.com", "need help when booking ticket", now));
-                    list.add(new IssueItem("testEmail@gmail.com", "need help when booking ticket", now.plusMinutes(1)));
-                    list.add(new IssueItem("testEmail@gmail.com", "need help when booking ticket", now.plusMinutes(2)));
-                    for (IssueItem i : list) {
-                        System.out.println("i: " + i);
-                    }
-
-                    break;
-
-                default:
-                    targetJsp = "managerPage/AdminDashboard.jsp";
-                    break;
-            }
-
-            dispatcher = request.getRequestDispatcher(targetJsp);
-            if (dispatcher == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "JSP file not found: " + targetJsp);
-                return;
-            }
-
-            dispatcher.forward(request, response);
-
         } catch (Exception e) {
-            System.err.println("[AdminServlet] Error in doGet: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error processing admin request", e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Unable to process request: " + (e.getMessage() != null ? e.getMessage() : "Unknown error"));
+                    "Unable to process request: " + e.getMessage());
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("[AdminServlet] Handling POST request, delegating to doGet");
+        logger.info("POST request received, delegating to doGet");
         doGet(request, response);
     }
 
     @Override
     public String getServletInfo() {
-        return "Admin Servlet for managing admin dashboard and user accounts";
+        return "Admin Servlet for managing admin dashboard, user accounts, events, and support center";
     }
 }

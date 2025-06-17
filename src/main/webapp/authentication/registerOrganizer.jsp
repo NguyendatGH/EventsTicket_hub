@@ -1,8 +1,3 @@
-<%-- 
-    Document   : registerOrganizer
-    Created on : May 27, 2025, 10:02:42 PM
-    Author     : phanh
---%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>

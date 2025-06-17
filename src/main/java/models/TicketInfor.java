@@ -1,26 +1,30 @@
 
+
 package models;
 
+
+import java.math.BigDecimal; 
 import java.time.LocalDateTime;
 
 public class TicketInfor {
-    private int ticketInfoID;
+    private int ticketInforID;
     private String ticketName;
     private String ticketDescription;
     private String category;
-    private double price;
+    private BigDecimal price; 
     private LocalDateTime salesStartTime;
     private LocalDateTime salesEndTime;
     private int eventID;
     private int maxQuantityPerOrder;
     private boolean isActive;
+    
 
     public TicketInfor() {
     }
 
-    public TicketInfor(int ticketInfoID, String ticketName, String ticketDescription, String category, double price,
-                      LocalDateTime salesStartTime, LocalDateTime salesEndTime, int eventID, int maxQuantityPerOrder, boolean isActive) {
-        this.ticketInfoID = ticketInfoID;
+    public TicketInfor(int ticketInforID, String ticketName, String ticketDescription, String category, BigDecimal price, // Changed to BigDecimal
+                       LocalDateTime salesStartTime, LocalDateTime salesEndTime, int eventID, int maxQuantityPerOrder, boolean isActive) {
+        this.ticketInforID = ticketInforID;
         this.ticketName = ticketName;
         this.ticketDescription = ticketDescription;
         this.category = category;
@@ -29,17 +33,15 @@ public class TicketInfor {
         this.salesEndTime = salesEndTime;
         this.eventID = eventID;
         this.maxQuantityPerOrder = maxQuantityPerOrder;
-        this.isActive = isActive;
+        this.isActive = isActive;        
     }
 
-    // Getters and Setters
-
-    public int getTicketInfoID() {
-        return ticketInfoID;
+    public int getTicketInforID() {
+        return ticketInforID;
     }
 
-    public void setTicketInfoID(int ticketInfoID) {
-        this.ticketInfoID = ticketInfoID;
+    public void setTicketInforID(int ticketInfoID) {
+        this.ticketInforID = ticketInfoID;
     }
 
     public String getTicketName() {
@@ -66,11 +68,11 @@ public class TicketInfor {
         this.category = category;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() { // Changed to BigDecimal
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) { // Changed to BigDecimal
         this.price = price;
     }
 
@@ -114,10 +116,28 @@ public class TicketInfor {
         isActive = active;
     }
 
+    /* Nếu bạn muốn đọc CreatedAt và UpdatedAt từ DB, uncomment các phần này
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    */
+
     @Override
     public String toString() {
-        return "TicketInfo{" +
-                "ticketInfoID=" + ticketInfoID +
+        return "TicketInfor{" +
+                "ticketInfoID=" + ticketInforID +
                 ", ticketName='" + ticketName + '\'' +
                 ", ticketDescription='" + ticketDescription + '\'' +
                 ", category='" + category + '\'' +
@@ -129,9 +149,4 @@ public class TicketInfor {
                 ", isActive=" + isActive +
                 '}';
     }
-
-    public void setIsActive(boolean aBoolean) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }
-

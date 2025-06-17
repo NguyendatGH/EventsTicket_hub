@@ -4,6 +4,10 @@
  */
 package Interfaces;
 
+import java.util.List;
+import java.util.Map;
+
+import models.TopEventOwner;
 import models.User;
 
 public interface IUserDAO {
@@ -21,10 +25,26 @@ public interface IUserDAO {
     boolean changePassword(int userId, String oldPassword, String newPassword);
 
     User getUserByEmail(String email);
-    
+
     boolean updatePassword(int userId, String newPasswordHash);
-    
+
     boolean insertUserFromGoogle(User user);
 
+    int getNumOfUser();
+
+    List<User> getAllUserAccount();
+
+    User findWithID(int id);
+
+    boolean deleteUser(int id);
+
+    boolean changeUserAccountStatus(int id, int status);
+
+    boolean updateUserInfo(User u);
+
+    List<TopEventOwner> getTopEventOwner();
+
+    Map<String, Integer> getUserRoleDistribution();
+
+     Map<String, Map<String, Integer>> getLoginDistributionByMonth();
 }
-    

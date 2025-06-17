@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
+pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MasterTicket Dashboard</title>
-
+    <title>MasterTicket Admin</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
       * {
         margin: 0;
@@ -17,10 +18,10 @@ pageEncoding="UTF-8"%>
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
-        min-height: 100vh;
-        overflow: hidden;
         position: relative;
         background-color: #070a17;
+        min-height: 100vh;
+        overflow-x: hidden;
       }
 
       .container {
@@ -30,12 +31,14 @@ pageEncoding="UTF-8"%>
         z-index: 1;
       }
 
-       .sidebar {
+      .sidebar {
         width: 16%;
         background: rgba(15, 23, 42, 0.9);
         backdrop-filter: blur(20px);
         border-right: 1px solid #4d4d4d;
         padding: 2rem 0;
+        transition: transform 0.3s ease;
+        z-index: 1100;
       }
 
       .logo {
@@ -148,7 +151,7 @@ pageEncoding="UTF-8"%>
 
       .page-title {
         color: white;
-        font-size: 2rem;
+        font-size: 24px;
         font-weight: 700;
       }
 
@@ -163,28 +166,19 @@ pageEncoding="UTF-8"%>
 
       .stats-grid {
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 37px;
-        margin-bottom: 37px;
-      }
-
-      .stat-card,
-      .stat-wrapper,
-      .stat-content,
-      .stat-header {
-        box-sizing: border-box;
+        gap: 30px;
+        flex-wrap: wrap;
       }
 
       .stat-card {
-        width: fit-content;
-        min-width: 230px;
-        max-width: 100%;
+        flex: 1;
+        min-width: 200px;
         background: rgba(255, 255, 255, 0.18);
         border-radius: 12px;
         padding: 2rem;
         backdrop-filter: blur(20px);
         transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       .stat-card:hover {
@@ -192,264 +186,463 @@ pageEncoding="UTF-8"%>
         border-color: rgba(255, 255, 255, 0.2);
       }
 
-      .stat-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
+      .stat-title {
+        color: #94a3b8;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
       }
 
-      .stat-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-        width: 100%;
-      }
-
-      .stat-icon {
-        width: 52px;
-        height: 52px;
-        max-width: 100%;
-        height: auto;
-        flex-shrink: 0;
+      .stat-value {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
       }
 
       .stat-content {
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: flex-start;
-        gap: 5px;
-        width: 100%;
-        flex-wrap: wrap;
-      }
-
-      .stat-title {
-        color: #ffffff;
-        font-size: 1rem;
-        font-weight: 500;
-        word-wrap: break-word;
-      }
-
-      .stat-value {
-        color: white;
-        font-size: 24px;
-        font-weight: 700;
-        word-wrap: break-word;
-        max-width: 100%;
       }
 
       .content-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 37px;
+        gap: 30px;
       }
 
-      .content-card {
+      .chart-section,
+      .table-section {
         background: rgba(255, 255, 255, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
+        border-radius: 12px;
         padding: 2rem;
         backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+      }
+      .chart-container {
+        flex: 1;
+        position: relative;
+        height: 350px;
+        max-height: 350px;
       }
 
-      .card-title {
+      #userStatsChart {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      .section-title {
         color: white;
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-      }
-
-      .event-list {
-        list-style: none;
-      }
-
-      .event-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .event-item:last-child {
-        border-bottom: none;
-      }
-
-      .event-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .event-number {
-        background: rgba(59, 130, 246, 0.2);
-        color: #60a5fa;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.875rem;
-      }
-
-      .event-name {
-        color: #e2e8f0;
-        font-weight: 500;
-      }
-
-      .event-date {
-        background: rgba(252, 184, 89, 0.12);
-        color: #fcb859;
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
-        border: 1px solid #fcb859;
-        font-size: 0.75rem;
+        font-size: 1.25rem;
         font-weight: 600;
+        margin-bottom: 1rem;
       }
 
-      .request-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .bell-icon {
-        width: 24px;
-        height: 24px;
-      }
-      .request-item:last-child {
-        border-bottom: none;
-      }
-
-      .request-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .request-number {
-        background: rgba(16, 185, 129, 0.2);
-        color: #34d399;
-        width: 32px;
-        height: 32px;
+      /* .chart-placeholder {
+        height: 200px;
+        background: rgba(0, 0, 0, 0.2);
         border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
-        font-size: 0.875rem;
+        color: #94a3b8;
+      } */
+
+      .table-container {
+        height: 350px;
+        max-height: 350px;
+        overflow-x: auto;
+        overflow-y: auto;
       }
 
-      .request-text {
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: white;
+      }
+
+      th,
+      td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      th {
+        font-weight: 600;
         color: #e2e8f0;
+      }
+
+      tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .status-tag {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
         font-weight: 500;
+        text-wrap: nowrap;
       }
 
-      .request-actions {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
+      .status-active {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
       }
 
-      .btn-detail {
-        background: rgba(71, 85, 105, 0.8);
-        color: #e2e8f0;
+      .status-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+      }
+
+      .status-inactive {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+      }
+
+      .hamburger {
+        display: none;
+        position: fixed;
+        top: 34px;
+        right: 34px;
+        z-index: 1100;
+        background: none;
         border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-size: 0.75rem;
-        font-weight: 600;
+        padding: 8px;
         cursor: pointer;
+        width: 32px;
+        height: 32px;
+        flex-direction: column;
+        justify-content: space-around;
+      }
+
+      .hamburger span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: white;
         transition: all 0.3s ease;
       }
 
-      .btn-detail:hover {
-        background: rgba(71, 85, 105, 1);
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(2px, 2px);
       }
 
-      .check-icon {
-        width: 20px;
-        height: 20px;
-        color: #34d399;
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
       }
 
-      .view-more {
-        color: #60a5fa;
-        text-decoration: none;
-        font-weight: 500;
-        margin-top: 1rem;
-        display: inline-block;
-        transition: color 0.3s ease;
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
       }
 
-      .view-more:hover {
-        color: #93c5fd;
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(21, 27, 58, 0.384);
+        backdrop-filter: blur(5px);
+        z-index: 950;
+        transition: opacity 0.3s ease;
       }
 
-      .request-header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 0.5rem;
+      .overlay.active {
+        display: block;
+        opacity: 1;
       }
 
-      .bell-icon {
-        width: 20px;
-        height: 20px;
-        color: #60a5fa;
-      }
-
-      @media (max-width: 1200px) {
-        .content-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      @media (max-width: 768px) {
-        .stats-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .sidebar {
-          width: 240px;
-        }
-      }
       .bg_elips {
         width: 800px;
         height: 800px;
         object-fit: cover;
-        position: absolute;
+        position: fixed;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.7;
       }
+
       .firstElement {
         top: -200px;
         left: -50px;
       }
+
       .secondElement {
         bottom: -400px;
         right: -200px;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(38, 62, 114, 0.5);
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(45, 70, 126, 0.7);
+      }
+
+      @media (max-width: 1400px) {
+        .header {
+          margin-top: 30px;
+        }
+        .main-content {
+          padding: 0 50px;
+        }
+
+        .stats-grid {
+          gap: 20px;
+        }
+
+        .content-grid {
+          gap: 20px;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .header {
+          margin-top: 30px;
+        }
+
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          width: 20%;
+        }
+
+        .main-content {
+          padding: 0 30px;
+        }
+        .chart-section,
+        .table-section {
+          height: 400px;
+        }
+
+        .chart-container,
+        .table-container {
+          height: 300px;
+          max-height: 300px;
+        }
+        .bg_elips {
+          width: 600px;
+          height: 600px;
+        }
+
+        .firstElement {
+          top: -150px;
+          left: -30px;
+        }
+
+        .secondElement {
+          bottom: -300px;
+          right: -150px;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .control-panel {
+          display: none;
+        }
+
+        .sidebar {
+          width: 260px;
+          position: fixed;
+          height: 100%;
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          padding: 0 20px;
+        }
+
+        .stats-grid {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .stat-card {
+          min-width: 100%;
+        }
+
+        .admin-avatar {
+          width: 100px;
+          height: 100px;
+        }
+
+        .admin-avatar svg {
+          width: 60px;
+          height: 60px;
+        }
+
+        .admin-name {
+          font-size: 20px;
+        }
+
+        .logo {
+          font-size: 1.3rem;
+        }
+
+        .bg_elips {
+          width: 500px;
+          height: 500px;
+        }
+
+        .firstElement {
+          top: -120px;
+          left: -20px;
+        }
+
+        .secondElement {
+          bottom: -250px;
+          right: -120px;
+        }
+
+        .hamburger {
+          display: flex;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          padding: 0 15px;
+        }
+
+        .page-title {
+          font-size: 1.5rem;
+        }
+
+        .control-panel {
+          margin-top: 30px;
+          padding: 8px 16px;
+          font-size: 0.875rem;
+        }
+        .chart-section,
+        .table-section {
+          height: 350px;
+        }
+
+        .chart-container,
+        .table-container {
+          height: 250px;
+          max-height: 250px;
+        }
+
+        .bg_elips {
+          width: 400px;
+          height: 400px;
+          opacity: 0.5;
+        }
+
+        .firstElement {
+          top: -100px;
+          left: -15px;
+        }
+
+        .secondElement {
+          bottom: -200px;
+          right: -100px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .sidebar {
+          width: 100%;
+        }
+
+        .main-content {
+          padding: 0 10px;
+        }
+
+        .header {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: flex-start;
+        }
+
+        .stats-grid {
+          gap: 15px;
+        }
+
+        .content-grid {
+          gap: 15px;
+        }
+
+        .bg_elips {
+          width: 300px;
+          height: 300px;
+          opacity: 0.4;
+        }
+
+        .firstElement {
+          top: -80px;
+          left: -10px;
+        }
+
+        .secondElement {
+          bottom: -150px;
+          right: -50px;
+        }
+        .content-grid {
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+        100% {
+          transform: translateY(0);
+        }
       }
     </style>
   </head>
   <body>
     <img
       class="bg_elips firstElement"
-      src="${pageContext.request.contextPath}/asset/full.svg"
+      src="${pageContext.request.contextPath}/asset/image/full.svg"
+      alt="Background Ellipse 1"
     />
     <img
       class="bg_elips secondElement"
-      src="${pageContext.request.contextPath}/asset/full2.svg"
+      src="${pageContext.request.contextPath}/asset/image/full2.svg"
+      alt="Background Ellipse 2"
     />
-
+    <button class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
     <div class="container">
+      <div class="overlay"></div>
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
-
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -459,31 +652,41 @@ pageEncoding="UTF-8"%>
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lí website masterTicket</div>
+          <div class="admin-role">Quản lý website MasterTicket</div>
         </div>
-
-       <nav>
+        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link active">Bảng điều khiển</a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
+                class="nav-link active"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
-                class="nav-link "
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
+                class="nav-link"
+                >Danh sách sự kiện</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
+                class="nav-link"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>
-
-        <a href="#" class="logout">
+        <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
             <path
@@ -493,205 +696,129 @@ pageEncoding="UTF-8"%>
           Đăng xuất
         </a>
       </aside>
-
       <main class="main-content">
         <header class="header">
-          <div class="control-panel">Bảng điều khiển</div>
+          <h1 class="page-title">Bảng điều khiển</h1>
+          <div class="control-panel">Tổng quan</div>
         </header>
-
-        <div class="stats-grid">
+        <section class="stats-grid">
           <div class="stat-card">
-            <div class="stat-wrapper">
-              <div class="stat-header">
-                <span class="stat-title">Tổng người dùng</span>
-              </div>
-              <span class="stat-content">
-                <img
-                  src="${pageContext.request.contextPath}/asset/Property 1=Group_light.svg"
-                  alt=""
-                  class="stat-icon"
-                />
-                <div class="stat-value">100.000</div>
-              </span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-wrapper">
-              <div class="stat-header">
-                <span class="stat-title">Sự kiện tháng này</span>
-              </div>
-              <span class="stat-content">
-                <img
-                  src="${pageContext.request.contextPath}/asset/Ticket_duotone.svg"
-                  alt=""
-                  class="stat-icon"
-                />
-                <div class="stat-value">30</div>
-              </span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-wrapper">
-              <div class="stat-header">
-                <span class="stat-title">Lượt truy cập</span>
-              </div>
-              <span class="stat-content">
-                <img
-                  src="${pageContext.request.contextPath}/asset/Property1=Send_fill.svg"
-                  alt=""
-                  class="stat-icon"
-                />
-                <div class="stat-value">100.000</div>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Content Grid -->
-        <div class="content-grid">
-          <!-- Hot Events -->
-          <div class="content-card">
-            <h2 class="card-title">Top sự kiện hot</h2>
-            <ul class="event-list">
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-              <li class="event-item">
-                <div class="event-info">
-                  <div class="event-number">01</div>
-                  <span class="event-name">Home Decore Range</span>
-                </div>
-                <div class="event-date">15/5/2025</div>
-              </li>
-            </ul>
-          </div>
-
-   
-          <div class="content-card">
-            <div class="request-header">
-              <h2 class="card-title">Yêu cầu phê duyệt</h2>
+            <div class="stat-title">Sự kiện tháng này</div>
+            <div class="stat-content">
               <img
-                class="bell_img"
-                src="${pageContext.request.contextPath}/asset/Property1=Bell_pin_light.svg"
+                src="${pageContext.request.contextPath}/asset/image/Ticket_duotone.svg"
                 alt=""
+                class="stat-icon"
               />
+              <div class="stat-value">${eventThisMonth}</div>
             </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="request-item">
-              <div class="request-info">
-                <div class="request-number">01</div>
-                <span class="request-text">Sự kiện về tranh hoài linh</span>
-              </div>
-              <div class="request-actions">
-                <button class="btn-detail" onclick="handleEditEvent(${event.eventId})">Chi tiết</button>
-                <img
-                  src="${pageContext.request.contextPath}/asset/Variant52.svg"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <a href="#" class="view-more">Xem thêm ></a>
           </div>
-        </div>
+          <div class="stat-card">
+            <div class="stat-title">Tổng số người dùng</div>
+            <div class="stat-content">
+              <img
+                src="${pageContext.request.contextPath}/asset/image/Property1=Group_light.svg"
+                alt=""
+                class="stat-icon"
+              />
+              <div class="stat-value">${totalUser}</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Yêu cầu cần hỗ trợ</div>
+            <span class="stat-content">
+              <img
+                src="${pageContext.request.contextPath}/asset/image/Property1=Send_fill.svg"
+                alt=""
+                class="stat-icon"
+              />
+              <div class="stat-value">
+                <fmt:formatNumber
+                  value="${monthlyRevenue}"
+                  type="currency"
+                  currencySymbol="₫"
+                />
+              </div>
+            </span>
+          </div>
+        </section>
+        <section class="content-grid">
+          <div class="chart-section">
+            <h2 class="section-title">Thống kê nguời dùng</h2>
+            <div class="chart-container">
+              <canvas id="userStatsChart"></canvas>
+            </div>
+          </div>
+          <div class="table-section">
+            <h2 class="section-title">Top sự kiện hot</h2>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tên sự kiện</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <c:forEach var="event" items="${events}">
+                    <tr>
+                      <td>${event.name}</td>
+                      <td>
+                        <fmt:formatDate
+                          value="${event.startTime}"
+                          pattern="dd/MM/yyyy"
+                        />
+                      </td>
+                      <td>
+                        <span class="status-tag status-${event.status}">
+                          ${event.status == 'active' ? 'Đang hoạt động' :
+                          event.status == 'pending' ? 'Đang chờ duyệt' : 'Đã
+                          dừng'}
+                        </span>
+                      </td>
+                    </tr>
+                  </c:forEach>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
-
     <script>
-      document.querySelectorAll(".stat-card").forEach((card) => {
-        card.addEventListener("mouseenter", () => {
-          card.style.transform = "translateY(-4px)";
-          card.style.boxShadow = "0 20px 40px rgba(0,0,0,0.3)";
-        });
+      const hamburger = document.querySelector(".hamburger");
+      const sidebar = document.querySelector(".sidebar");
+      const overlay = document.querySelector(".overlay");
 
-        card.addEventListener("mouseleave", () => {
-          card.style.transform = "translateY(0)";
-          card.style.boxShadow = "none";
+      hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+      });
+
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 992) {
+            hamburger.classList.remove("active");
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+          }
         });
       });
 
-      // Animate ellipses
+      document.addEventListener("click", (e) => {
+        if (
+          window.innerWidth <= 992 &&
+          !sidebar.contains(e.target) &&
+          !hamburger.contains(e.target)
+        ) {
+          hamburger.classList.remove("active");
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        }
+      });
+
       function animateEllipses() {
         const ellipses = document.querySelectorAll(".bg_elips");
         ellipses.forEach((ellipse, index) => {
@@ -699,12 +826,79 @@ pageEncoding="UTF-8"%>
           ellipse.style.animation = `float ${duration}ms ease-in-out infinite`;
         });
       }
-      function handleEditEvent(eventId) {
-    
-        console.log("Redirecting to edit event:", eventId);
+      animateEllipses();
 
-        window.location.href = 'admin-servlet?action=viewEventDetail&eventId=' + eventId;
-    }
+      const userStatsData = {
+        labels: [
+          "Tháng 1",
+          "Tháng 2",
+          "Tháng 3",
+          "Tháng 4",
+          "Tháng 5",
+          "Tháng 6",
+        ],
+        datasets: [
+          {
+            label: "Người dùng mới",
+            data: [12, 19, 15, 25, 22, 30],
+            borderColor: "rgba(59, 130, 246, 1)",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+          },
+          {
+            label: "Tổng người dùng",
+            data: [50, 69, 84, 109, 131, 161],
+            borderColor: "rgba(16, 185, 129, 1)",
+            backgroundColor: "rgba(16, 185, 129, 0.1)",
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      };
+
+      const config = {
+        type: "line",
+        data: userStatsData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: "#e2e8f0",
+                font: {
+                  size: 12,
+                },
+              },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: "rgba(255, 255, 255, 0.1)",
+              },
+              ticks: {
+                color: "#94a3b8",
+              },
+            },
+            x: {
+              grid: {
+                color: "rgba(255, 255, 255, 0.1)",
+              },
+              ticks: {
+                color: "#94a3b8",
+              },
+            },
+          },
+        },
+      };
+
+      const ctx = document.getElementById("userStatsChart").getContext("2d");
+      const userChart = new Chart(ctx, config);
     </script>
   </body>
 </html>

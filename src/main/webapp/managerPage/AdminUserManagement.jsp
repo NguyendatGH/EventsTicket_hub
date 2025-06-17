@@ -17,25 +17,25 @@ prefix="c" %>
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
-        min-height: 100vh;
-        overflow: hidden;
         position: relative;
         background-color: #070a17;
+        overflow-x: hidden;
       }
 
       .container {
         display: flex;
-        height: 100vh;
         position: relative;
         z-index: 1;
       }
 
-       .sidebar {
+      .sidebar {
         width: 16%;
         background: rgba(15, 23, 42, 0.9);
         backdrop-filter: blur(20px);
         border-right: 1px solid #4d4d4d;
         padding: 2rem 0;
+        transition: transform 0.3s ease;
+        z-index: 1100;
       }
 
       .logo {
@@ -112,10 +112,10 @@ prefix="c" %>
       }
 
       .logout {
-        position: absolute;
+        position: fixed;
         bottom: 2rem;
         left: 2rem;
-        right: 2rem;
+        right: auto;
         color: #94a3b8;
         text-decoration: none;
         display: flex;
@@ -148,7 +148,7 @@ prefix="c" %>
 
       .page-title {
         color: white;
-        font-size: 2rem;
+        font-size: 24px;
         font-weight: 700;
       }
 
@@ -163,17 +163,19 @@ prefix="c" %>
 
       .search-container {
         position: relative;
-        width: 30%;
+        width: 100%;
+        max-width: 300px;
+        justify-self: end;
       }
 
       .search-box {
         width: 100%;
-        padding: 15px 50px 15px 20px;
+        padding: 8px 50px 8px 20px;
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 10px;
         color: white;
-        font-size: 16px;
+        font-size: 14px;
         outline: none;
         transition: all 0.3s ease;
       }
@@ -195,7 +197,6 @@ prefix="c" %>
         color: rgba(255, 255, 255, 0.6);
       }
 
-      /* Table */
       .data-table {
         background: #1b1c21;
         border-radius: 15px;
@@ -204,19 +205,12 @@ prefix="c" %>
       }
 
       .table-header {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
         align-items: center;
-        padding: 20px;
-        gap: 10%;
         background: rgba(21, 0, 97, 0.78);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .table-header .page-title {
-        font-size: 24px;
-        font-weight: 600;
-        color: #fff;
-        margin: 0;
+        padding: 20px;
       }
 
       .table-columns {
@@ -253,24 +247,14 @@ prefix="c" %>
         text-decoration: underline;
       }
 
-      .password-field {
+      .phoneNum-field {
         display: flex;
         align-items: center;
         gap: 10px;
       }
 
-      .password-dots {
+      .phoneNum-detail {
         color: rgba(255, 255, 255, 0.7);
-      }
-
-      .toggle-password {
-        cursor: pointer;
-        color: rgba(255, 255, 255, 0.6);
-        transition: color 0.3s ease;
-      }
-
-      .toggle-password:hover {
-        color: #64b5f6;
       }
 
       .actions {
@@ -335,50 +319,390 @@ prefix="c" %>
         background: rgba(45, 70, 126, 0.7);
       }
 
-      /* Responsive */
-      @media (max-width: 768px) {
-        .container {
-          flex-direction: column;
+      .bg_elips {
+        width: 800px;
+        height: 800px;
+        object-fit: cover;
+        position: fixed;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.7;
+      }
+
+      .firstElement {
+        top: -200px;
+        left: -50px;
+      }
+
+      .secondElement {
+        bottom: -400px;
+        right: -200px;
+      }
+
+      .hamburger {
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 34px;
+        z-index: 1100;
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        flex-direction: column;
+        justify-content: space-around;
+      }
+
+      .hamburger span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: white;
+        transition: all 0.3s ease;
+      }
+
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(2px, 2px);
+      }
+
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(21, 27, 58, 0.384);
+        backdrop-filter: blur(5px);
+        z-index: 950;
+        transition: opacity 0.3s ease;
+      }
+
+      .overlay.active {
+        display: block;
+        opacity: 1;
+      }
+
+      .charts-container {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .chart-wrapper {
+        background: #1b1c21;
+        border-radius: 15px;
+        padding: 20px;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .chart-wrapper:first-child {
+        flex: 0 0 auto;
+        width: 350px;
+      }
+
+      .chart-wrapper.fill {
+        flex: 1;
+        min-width: 0;
+        max-width: none;
+      }
+      .chart-wrapper h3 {
+        color: white;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        text-align: center;
+      }
+
+      .chart-wrapper {
+        height: 300px;
+        padding: 20px;
+      }
+
+      .chart-wrapper canvas {
+        max-height: 250px !important;
+      }
+
+      .chart-wrapper {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @media (max-width: 1400px) {
+        .main-content {
+          padding: 0 50px;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .sidebar {
+          width: 20%;
+        }
+
+        .main-content {
+          padding: 0 30px;
+        }
+
+        .bg_elips {
+          width: 600px;
+          height: 600px;
+        }
+
+        .firstElement {
+          top: -150px;
+          left: -30px;
+        }
+
+        .secondElement {
+          bottom: -300px;
+          right: -150px;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .hamburger {
+          display: flex;
         }
 
         .sidebar {
+          width: 260px;
+          position: fixed;
+          height: 100%;
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          padding: 0 20px;
+        }
+        .control-panel {
+          margin-top: 30px;
+        }
+
+        .search-container {
+          max-width: 100%;
+          justify-self: center;
+        }
+
+        .bg_elips {
+          width: 500px;
+          height: 500px;
+        }
+
+        .table-columns,
+        .table-row {
+          grid-template-columns: 50px 1fr 1fr 120px;
+          gap: 10px;
+        }
+
+        .table-columns div:nth-child(4),
+        .table-row div:nth-child(4) {
+          display: none;
+        }
+
+        .admin-avatar {
+          width: 100px;
+          height: 100px;
+        }
+
+        .admin-avatar svg {
+          width: 60px;
+          height: 60px;
+        }
+
+        .admin-name {
+          font-size: 20px;
+        }
+
+        .logo {
+          font-size: 1.3rem;
+        }
+        .logout {
+          left: 1rem;
+          bottom: 1rem;
+        }
+        .charts-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 2rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          padding: 0 15px;
+        }
+
+        .page-title {
+          font-size: 1.5rem;
+        }
+
+        .control-panel {
+          margin-top: 30px;
+          padding: 8px 16px;
+          font-size: 0.875rem;
+        }
+
+        .table-columns,
+        .table-row {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          padding: 15px;
+        }
+
+        .table-columns div:nth-child(1),
+        .table-row div:nth-child(1),
+        .table-columns div:nth-child(5),
+        .table-row div:nth-child(5) {
+          display: none;
+        }
+
+        .search-box {
+          padding: 6px 40px 6px 15px;
+          font-size: 12px;
+        }
+
+        .search-icon {
+          right: 10px;
+        }
+
+        .bg_elips {
+          width: 400px;
+          height: 400px;
+          opacity: 0.5;
+        }
+
+        .firstElement {
+          top: -100px;
+          left: -15px;
+        }
+
+        .secondElement {
+          bottom: -200px;
+          right: -100px;
+        }
+
+        .actions {
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .sidebar {
           width: 100%;
-          height: auto;
+        }
+
+        .main-content {
+          padding: 0 10px;
+        }
+
+        .header {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: flex-start;
         }
 
         .table-columns,
         .table-row {
           grid-template-columns: 1fr;
-          gap: 10px;
+          gap: 8px;
+          padding: 10px;
+        }
+
+        .table-columns div:nth-child(3),
+        .table-row div:nth-child(3) {
+          display: none;
+        }
+
+        .table-columns {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .table-row div {
+          text-align: left;
+        }
+
+        .actions {
+          justify-content: flex-end;
+        }
+
+        .action-btn {
+          width: 30px;
+          height: 30px;
+        }
+
+        .bg_elips {
+          width: 300px;
+          height: 300px;
+          opacity: 0.4;
+        }
+
+        .firstElement {
+          top: -80px;
+          left: -10px;
+        }
+
+        .secondElement {
+          bottom: -150px;
+          right: -50px;
+        }
+        .logout {
+          left: 0.5rem;
+          bottom: 0.5rem;
+          padding: 0.5rem 0.75rem;
+          font-size: 0.875rem;
         }
       }
-      .bg_elips {
-        width: 800px;
-        height: 800px;
-        object-fit: cover;
-        position: absolute;
-      }
-      .firstElement {
-        top: -200px;
-        left: -50px;
-      }
-      .secondElement {
-        bottom: -400px;
-        right: -200px;
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+        100% {
+          transform: translateY(0);
+        }
       }
     </style>
   </head>
   <body>
-  <img
+    <img
       class="bg_elips firstElement"
-      src="${pageContext.request.contextPath}/asset/full.svg"
+      src="${pageContext.request.contextPath}/asset/image/full.svg"
     />
     <img
       class="bg_elips secondElement"
-      src="${pageContext.request.contextPath}/asset/full2.svg"
+      src="${pageContext.request.contextPath}/asset/image/full2.svg"
     />
+    <button class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
     <div class="container">
-      <!-- Sidebar -->
+      <div class="overlay"></div>
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
 
@@ -394,27 +718,38 @@ prefix="c" %>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
 
-         <nav>
+        <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=adminDashboard" class="nav-link">Bảng điều khiển</a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=manageEvents" class="nav-link ">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
+                class="nav-link"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
               <a
-                href="${pageContext.request.contextPath}/admin-servlet?action=manageUserAccount"
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
+                class="nav-link"
+                >Danh sách sự kiện</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
                 class="nav-link active"
                 >Danh sách tài khoản</a
               >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet?action=supportCenter" class="nav-link">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>
-
         <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
@@ -430,7 +765,23 @@ prefix="c" %>
         <header class="header">
           <div class="control-panel">Quản lí người dùng</div>
         </header>
-
+        <div class="charts-container">
+          <div class="chart-wrapper">
+            <h3>Phân bố vai trò người dùng</h3>
+            <canvas id="roleChart"></canvas>
+          </div>
+          <div class="chart-wrapper fill">
+            <h3>Số lượt đăng nhập theo tháng</h3>
+            <canvas id="loginMonthChart"></canvas>
+          </div>
+        </div>
+        <c:if test="${not empty sessionScope.message}">
+          <div class="message-alert message-${sessionScope.messageType}">
+            ${sessionScope.message}
+          </div>
+          <c:remove var="message" scope="session" />
+          <c:remove var="messageType" scope="session" />
+        </c:if>
         <div class="data-table">
           <div class="table-header">
             <div class="page-title">Danh sách người dùng</div>
@@ -444,68 +795,69 @@ prefix="c" %>
             </div>
           </div>
           <div class="table-columns">
-            <div></div>
-            <div>Tên người dùng</div>
+            <div>#</div>
+            <div>Vai trò</div>
             <div>Email</div>
-            <div>Mật khẩu</div>
-            <div>Ngày tạo</div>
-            <div></div>
+            <div>Số di động</div>
+            <div>Ngày tạo tài khoản</div>
+            <div>Hành động</div>
           </div>
 
-          <c:forEach var="user" items="${userList}" varStatus="status">
+          <c:forEach var="user" items="${users}" varStatus="status">
             <div class="table-row">
               <div>${status.count}</div>
-              <div><c:out value="${user.username}" /></div>
               <div>
-                <a href="mailto:${user.email}" class="email-link"
-                  ><c:out value="${user.email}"
-                /></a>
+                <span
+                  class="status-indicator ${user.isLocked ? 'status-locked' : 'status-active'}"
+                ></span>
+                <c:out value="${user.role}" />
               </div>
-              <div class="password-field">
-                <span class="password-dots">•••••••••••••</span>
-                <span class="toggle-password" data-password="${user.password}">
-                  <svg
-                    class="eye-open"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                    />
-                  </svg>
-                  <svg
-                    class="eye-closed"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    style="display: none"
-                  >
-                    <path
-                      d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"
-                    />
-                  </svg>
-                </span>
+              <div>
+                <a href="mailto:${user.email}" class="email-link">
+                  <c:out value="${user.email}" />
+                </a>
               </div>
-              <div><c:out value="${user.createdDate}" /></div>
+              <div class="phoneNum-field">
+                <span class="phoneNum-detail">${user.phoneNumber}</span>
+              </div>
+              <div><c:out value="${user.createdAt}" /></div>
               <div class="actions">
-                <button class="action-btn lock-btn">
+                <c:choose>
+                  <c:when test="${user.isLocked}">
+                    <button
+                      class="action-btn lock-btn locked"
+                      onclick="toggleUserLock(${user.id}, 'unlock', '${user.email}')"
+                      title="Unlock user"
+                    >
+                      🔒
+                      <!-- <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt=""> -->
+                    </button>
+                  </c:when>
+                  <c:otherwise>
+                    <button
+                      class="action-btn lock-btn unlocked"
+                      onclick="toggleUserLock(${user.id}, 'lock', ${user.email})"
+                      title="Lock user"
+                    >
+                      🔒
+                    </button>
+                  </c:otherwise>
+                </c:choose>
+                <button
+                  class="action-btn edit-btn"
+                  onclick="editUser(${user.id})"
+                >
                   <img
-                    src="${pageContext.request.contextPath}/asset/Lock_duotone_line.svg"
-                    alt="Lock"
-                  />
-                </button>
-                <button class="action-btn edit-btn">
-                  <img
-                    src="${pageContext.request.contextPath}/asset/Edit_fill.svg"
+                    src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg"
                     alt="Edit"
                   />
                 </button>
-                <button class="action-btn delete-btn">
+                <button
+                  class="action-btn delete-btn"
+                  onclick="deleteUser(${user.id}, '${user.email}')"
+                >
                   <img
-                    src="${pageContext.request.contextPath}/asset/Trash.svg"
+                    src="${pageContext.request.contextPath}/asset/image/Trash.svg"
                     alt="Delete"
                   />
                 </button>
@@ -516,26 +868,18 @@ prefix="c" %>
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      document.querySelectorAll(".toggle-password").forEach((toggle) => {
-        toggle.addEventListener("click", function () {
-          const passwordDots = this.previousElementSibling;
-          const eyeOpen = this.querySelector(".eye-open");
-          const eyeClosed = this.querySelector(".eye-closed");
-          const password = this.getAttribute("data-password");
-
-          if (passwordDots.textContent === "•••••••••••••") {
-            passwordDots.textContent = password;
-            eyeOpen.style.display = "none";
-            eyeClosed.style.display = "block";
-          } else {
-            passwordDots.textContent = "•••••••••••••";
-            eyeOpen.style.display = "block";
-            eyeClosed.style.display = "none";
-          }
+      // Animate ellipses
+      function animateEllipses() {
+        const ellipses = document.querySelectorAll(".bg_elips");
+        ellipses.forEach((ellipse, index) => {
+          const duration = 8000 + index * 2000;
+          ellipse.style.animation = `float ${duration}ms ease-in-out infinite`;
         });
-      });
-
+      }
+      animateEllipses();
       // Navigation active state
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.addEventListener("click", function () {
@@ -546,22 +890,7 @@ prefix="c" %>
         });
       });
 
-      // Action buttons
-      document.querySelectorAll(".action-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-          const action = this.classList.contains("lock-btn")
-            ? "khóa"
-            : this.classList.contains("edit-btn")
-            ? "chỉnh sửa"
-            : "xóa";
-          const row = this.closest(".table-row");
-          const username = row.children[1].textContent;
-
-          if (confirm(`Bạn có chắc muốn ${action} người dùng "${username}"?`)) {
-            console.log(`${action} người dùng: ${username}`);
-          }
-        });
-      });
+      //sweetAlert
 
       // Search functionality
       document
@@ -571,17 +900,229 @@ prefix="c" %>
           const rows = document.querySelectorAll(".table-row");
 
           rows.forEach((row) => {
-            const username = row.children[1].textContent.toLowerCase();
+            const role = row.children[1].textContent.toLowerCase();
             const email = row.children[2].textContent.toLowerCase();
+            const phoneNum = row.children[3].textContent.toLowerCase();
 
-            if (username.includes(searchTerm) || email.includes(searchTerm)) {
+            if (
+              role.includes(searchTerm) ||
+              email.includes(searchTerm) ||
+              phoneNum.includes(searchTerm)
+            ) {
               row.style.display = "grid";
             } else {
               row.style.display = "none";
             }
           });
         });
+
+      // Hamburger menu functionality
+      const hamburger = document.querySelector(".hamburger");
+      const sidebar = document.querySelector(".sidebar");
+      const overlay = document.querySelector(".overlay");
+
+      hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+      });
+
+      // Close sidebar and overlay when clicking a nav link on mobile
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 992) {
+            hamburger.classList.remove("active");
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+          }
+        });
+      });
+
+      // Close sidebar and overlay when clicking outside
+      document.addEventListener("click", (e) => {
+        if (
+          window.innerWidth <= 992 &&
+          !sidebar.contains(e.target) &&
+          !hamburger.contains(e.target)
+        ) {
+          hamburger.classList.remove("active");
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        }
+      });
+
+      // Parse JSON data
+
+      var roleDistributionJson =
+        '<%= request.getAttribute("roleDistributionJson") %>';
+      var loginDistributionByMonthJson =
+        '<%= request.getAttribute("loginDistributionByMonthJson") %>';
+
+      let roleDistribution = {};
+      let loginDistributionByMonth = {};
+
+      try {
+        roleDistribution = JSON.parse(
+          roleDistributionJson.replace(/&quot;/g, '"').trim() || "{}"
+        );
+        loginDistributionByMonth = JSON.parse(
+          loginDistributionByMonthJson.replace(/"/g, '"').trim() || "{}"
+        );
+      } catch (e) {
+        console.error("Failed to parse JSON data:", e);
+        roleDistribution = {};
+      }
+
+      console.log("Parsed roleDistribution:", roleDistribution);
+      console.log("Parsed loginDistributionByMonth:", loginDistributionByMonth);
+      // Chart initialization
+      const chartColors = {
+        primary: "#6366f1",
+        success: "#10b981",
+        warning: "#f59e0b",
+        danger: "#ef4444",
+        info: "#06b6d4",
+        purple: "#8b5cf6",
+        pink: "#ec4899",
+        orange: "#f97316",
+      };
+
+      if (Object.keys(roleDistribution).length > 0) {
+        const roleChart = new Chart(document.getElementById("roleChart"), {
+          type: "pie",
+          data: {
+            labels: Object.keys(roleDistribution),
+            datasets: [
+              {
+                data: Object.values(roleDistribution),
+                backgroundColor: Object.keys(roleDistribution).map(
+                  (_, index) =>
+                    [
+                      chartColors.success,
+                      chartColors.warning,
+                      chartColors.danger,
+                      chartColors.info,
+                    ][index % 4]
+                ),
+                borderColor: "#1b1c21",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: "top", labels: { color: "white" } },
+              title: { display: false },
+            },
+          },
+        });
+      }
+      if (Object.keys(loginDistributionByMonth).length > 0) {
+        // Tạo danh sách 12 tháng gần nhất
+        const currentDate = new Date();
+        const months = [];
+        const monthLabels = [];
+
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date(
+            currentDate.getFullYear(),
+            currentDate.getMonth() - i,
+            1
+          );
+          const monthKey = date.toISOString().slice(0, 7); // Format: yyyy-MM
+          const monthLabel = date.toLocaleDateString("vi-VN", {
+            month: "short",
+            year: "numeric",
+          });
+          months.push(monthKey);
+          monthLabels.push(monthLabel);
+        }
+
+        const newData = months.map(
+          (month) => loginDistributionByMonth.new[month] || 0
+        );
+        const oldData = months.map(
+          (month) => loginDistributionByMonth.old[month] || 0
+        );
+
+        const loginMonthChart = new Chart(
+          document.getElementById("loginMonthChart"),
+          {
+            type: "bar",
+            data: {
+              labels: monthLabels, // Sử dụng nhãn tháng thân thiện
+              datasets: [
+                {
+                  label: "Người dùng mới",
+                  data: newData,
+                  backgroundColor: "#8b5cf6",
+                  borderColor: "#1b1c21",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Người dùng cũ",
+                  data: oldData,
+                  backgroundColor: "rgba(255, 255, 255, 0.5)",
+                  borderColor: "#1b1c21",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { position: "top", labels: { color: "white" } },
+                title: { display: false },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: { color: "white", stepSize: 1 },
+                  grid: { color: "rgba(255, 255, 255, 0.1)" },
+                },
+                x: {
+                  ticks: {
+                    color: "white",
+                    maxRotation: 45,
+                    minRotation: 45,
+                  },
+                  grid: { color: "rgba(255, 255, 255, 0.1)" },
+                },
+              },
+            },
+          }
+        );
+      }
+
+      //toggle user
+      function toggleUserLock(userId, action, email) {
+        const actionText = action === "lock" ? "khóa" : "mở khóa";
+        const icon = action === "lock" ? "warning" : "question";
+        console.log(actionText);
+        Swal.fire({
+          title: String(`Xác nhận ${actionText} tài khoản`),
+          text: String(`Bạn có chắc muốn ${actionText} tài khoản ${email} ?`),
+          icon: icon,
+          showCancelButton: true,
+          confirmButtonText: "Có",
+          cancelButtonText: "Hủy",
+          confirmButtonColor: action === "lock" ? "#dc3545" : "#28a745",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            console.log(`xác nhận ${actionText}`);
+            console.log(userId);
+            console.log(email);
+            setTimeout(3000, console.log("processing"));
+            window.location.href = `${pageContext.request.contextPath}/admin-servlet/user-management/lock-user?userId=${userId}&action=${action}`;
+          }
+        });
+      }
+      const message =
+        '<%= session.getAttribute("message") != null ? session.getAttribute("message") : "" %>';
+      if (message) {
+        console.log("Server message:", message);
+      }
     </script>
   </body>
 </html>
-
