@@ -38,6 +38,10 @@ public interface IUserDAO {
 
     boolean deleteUser(int id);
 
+    boolean changeUserAccountStatus(int id, int status);
+
+    boolean updateUserInfo(User u);
+
     List<TopEventOwner> getTopEventOwner();
 
     Map<String, Integer> getUserRoleDistribution();
