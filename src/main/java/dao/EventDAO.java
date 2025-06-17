@@ -293,49 +293,55 @@ public class EventDAO {
     }
 
     public boolean createEvent(Event event) {
-        String sql = "INSERT INTO events (event_name, event_info, event_type, location_name, " +
-                "province, district, ward, street_number, full_address, start_time, end_time, " +
-                "has_seat, total_tickets, logo_image, background_image, sponsor_image, " +
-                "organizer_name, organizer_info, genre_id, user_id, status, created_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, event.getEventName());
-            pstmt.setString(2, event.getEventInfo());
-            pstmt.setString(3, event.getEventType());
-            pstmt.setString(4, event.getLocationName());
-            pstmt.setString(5, event.getProvince());
-            pstmt.setString(6, event.getDistrict());
-            pstmt.setString(7, event.getWard());
-            pstmt.setString(8, event.getStreetNumber());
-            pstmt.setString(9, event.getFullAddress());
-            pstmt.setTimestamp(10, event.getStartTime());
-            pstmt.setTimestamp(11, event.getEndTime());
-            pstmt.setBoolean(12, event.isHasSeat());
-            pstmt.setInt(13, event.getTotalTickets());
-            pstmt.setString(14, event.getLogoImage());
-            pstmt.setString(15, event.getBackgroundImage());
-            pstmt.setString(16, event.getSponsorImage());
-            pstmt.setString(17, event.getOrganizerName());
-            pstmt.setString(18, event.getOrganizerInfo());
-            pstmt.setInt(19, event.getGenreID());
-            pstmt.setInt(20, event.getUserID());
-            pstmt.setString(21, event.getStatus());
-            pstmt.setTimestamp(22, event.getCreatedAt());
 
-            int affectedRows = pstmt.executeUpdate();
+        // ##### need fix
+       
+       
+       
+        // String sql = "INSERT INTO events (event_name, event_info, event_type, location_name, " +
+        //         "province, district, ward, street_number, full_address, start_time, end_time, " +
+        //         "has_seat, total_tickets, logo_image, background_image, sponsor_image, " +
+        //         "organizer_name, organizer_info, genre_id, user_id, status, created_at) " +
+        //         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        event.setEventID(generatedKeys.getInt(1));
-                        return true;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        //     pstmt.setString(1, event.getEventName());
+        //     pstmt.setString(2, event.getEventInfo());
+        //     pstmt.setString(3, event.getEventType());
+        //     pstmt.setString(4, event.getLocationName());
+        //     pstmt.setString(5, event.getProvince());
+        //     pstmt.setString(6, event.getDistrict());
+        //     pstmt.setString(7, event.getWard());
+        //     pstmt.setString(8, event.getStreetNumber());
+        //     pstmt.setString(9, event.getFullAddress());
+        //     pstmt.setTimestamp(10, event.getStartTime());
+        //     pstmt.setTimestamp(11, event.getEndTime());
+        //     pstmt.setBoolean(12, event.isHasSeat());
+        //     pstmt.setInt(13, event.getTotalTickets());
+        //     pstmt.setString(14, event.getLogoImage());
+        //     pstmt.setString(15, event.getBackgroundImage());
+        //     pstmt.setString(16, event.getSponsorImage());
+        //     pstmt.setString(17, event.getOrganizerName());
+        //     pstmt.setString(18, event.getOrganizerInfo());
+        //     pstmt.setInt(19, event.getGenreID());
+        //     pstmt.setInt(20, event.getUserID());
+        //     pstmt.setString(21, event.getStatus());
+        //     pstmt.setTimestamp(22, event.getCreatedAt());
+
+        //     int affectedRows = pstmt.executeUpdate();
+
+        //     if (affectedRows > 0) {
+        //         try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+        //             if (generatedKeys.next()) {
+        //                 event.setEventID(generatedKeys.getInt(1));
+        //                 return true;
+        //             }
+        //         }
+        //     }
+        // } catch (SQLException e) {
+        //     e.printStackTrace();
+        // }
         return false;
     }
 }
