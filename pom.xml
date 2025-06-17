@@ -22,11 +22,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+<<<<<<< HEAD
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
         <dependency>
+=======
+>>>>>>> mem/dat
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
             <version>3.0.0</version>
@@ -36,7 +39,10 @@
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
             <version>3.0.1</version>
         </dependency>
+<<<<<<< HEAD
 
+=======
+>>>>>>> mem/dat
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
@@ -65,12 +71,23 @@
             <version>v2-rev157-1.25.0</version>
         </dependency>
         <dependency>
+<<<<<<< HEAD
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
             <version>1.35.0</version> </dependency>
         </dependencies>
 
         <dependency>
+=======
+<<<<<<< HEAD
+=======
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-jackson2</artifactId>
+            <version>1.35.0</version>
+        </dependency>
+        <dependency>
+>>>>>>> 6895ed6 (fix/ resolve conflict dependency & EventOwner role)
+>>>>>>> mem/dat
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
             <version>2.0.1</version>
@@ -89,6 +106,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>2.17.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-jackson2</artifactId>
+            <version>1.35.0</version>
         </dependency>
     </dependencies>
     <build>

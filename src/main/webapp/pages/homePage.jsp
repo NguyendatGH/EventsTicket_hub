@@ -623,7 +623,6 @@
             </div>
             <% } %>
 
-        <!-- Ticket Purchase Section -->
         <div class="ticket-section">
             <div class="ticket-content">
                 <h2 class="ticket-title">Mua vé của bạn</h2>
