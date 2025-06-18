@@ -12,18 +12,13 @@ import models.TicketInfor;
 
 public class TicketInforDAO {
 
-    // Câu lệnh SQL mới để lấy cả EventName bằng cách JOIN với bảng Events
     private static final String SELECT_TICKET_BY_ID_SQL = 
         "SELECT ti.*, e.Name AS EventName FROM TicketInfo ti JOIN Events e ON ti.EventID = e.EventID WHERE ti.TicketInfoID = ? AND ti.IsActive = 1";
     
     private static final String SELECT_TICKET_BY_EVENTID_SQL = 
         "SELECT ti.*, e.Name AS EventName FROM TicketInfo ti JOIN Events e ON ti.EventID = e.EventID WHERE ti.EventID = ? AND ti.IsActive = 1 ORDER BY ti.Price DESC";
 
-    /**
-     * TẠO MỚI: Phương thức quan trọng còn thiếu để lấy thông tin một vé cụ thể bằng ID.
-     * @param ticketId ID của loại vé cần lấy.
-     * @return một đối tượng TicketInfor hoặc null nếu không tìm thấy.
-     */
+   
     public TicketInfor getTicketInfoById(int ticketId) {
         TicketInfor ticket = null;
         try (Connection conn = DBConnection.getConnection();
@@ -52,9 +47,7 @@ public class TicketInforDAO {
         return ticket;
     }
 
-    /**
-     * Cập nhật lại phương thức này để sử dụng câu lệnh JOIN mới.
-     */
+    
     public List<TicketInfor> getTicketInfosByEventID(int eventID) {
         List<TicketInfor> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();

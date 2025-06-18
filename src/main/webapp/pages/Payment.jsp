@@ -332,10 +332,10 @@
             <div class="mt-main-container">
                 <div class="mt-main-left">
                     <div class="mt-card">
-                        <div class="mt-card-title">${sessionScope.order.event.name}</div>
+                        <div class="mt-card-title">${sessionScope.currentOrder.event.name}</div>
                         <div class="mt-event-detail">
-                            <div><i class="fa fa-clock"></i> <fmt:formatDate value="${sessionScope.order.event.startTime}" pattern="HH:mm, EEE, dd/MM/yyyy"/></div>
-                            <div><i class="fa fa-location-dot"></i> ${sessionScope.order.event.physicalLocation}</div>
+                            <div><i class="fa fa-clock"></i> <fmt:formatDate value="${sessionScope.currentOrder.event.startTime}" pattern="HH:mm, EEE, dd/MM/yyyy"/></div>
+                            <div><i class="fa fa-location-dot"></i> ${sessionScope.currentOrder.event.physicalLocation}</div>
                         </div>
                     </div>
 
@@ -369,7 +369,7 @@
                         <div class="mt-card">
                             <div class="mt-card-title">Thông tin đơn hàng</div>
 
-                            <c:forEach var="item" items="${sessionScope.order.items}">
+                            <c:forEach var="item" items="${sessionScope.currentOrder.items}">
                                 <div style="padding-bottom: 10px; margin-bottom: 10px;">
                                     <div class="mt-ticket-info-row">
                                         <span>${item.ticketTypeName} (x${item.quantity})</span>
@@ -380,7 +380,7 @@
 
                             <div class="mt-ticket-info-row mt-ticket-info-total">
                                 <span>Tổng tiền</span>
-                                <span><fmt:formatNumber value="${sessionScope.order.totalAmount}" type="currency" currencySymbol="đ" groupingUsed="true" maxFractionDigits="0"/></span>
+                                <span><fmt:formatNumber value="${sessionScope.currentOrder.totalAmount}" type="currency" currencySymbol="đ" groupingUsed="true" maxFractionDigits="0"/></span>
                             </div>
                         </div>
 

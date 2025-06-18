@@ -547,7 +547,7 @@
                 <% for (Event event : events) { %>
                 <div class="event-card searchable-event" 
                      data-event-id="<%= event.getEventID() %>"  <%-- Lưu EventID vào data attribute --%>
-                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))" 
+                     onclick="navigateToEventDetail('<%= event.getEventID() %>')" 
                      style="cursor: pointer;">
 
                     <div class="event-image">
@@ -579,14 +579,10 @@
                 <% } %>
             </div>
 
-            <%-- Đặt đoạn script này ở cuối trang, hoặc trong một file .js riêng --%>
             <script type="text/javascript">
                 function navigateToEventDetail(eventId) {
-                    if (eventId) {
-                        // Nếu ứng dụng của bạn có context path, bạn cần xử lý nó ở đây
-                        // ví dụ: var contextPath = "${pageContext.request.contextPath}";
-                        // window.location.href = contextPath + "/EventServlet?id=" + eventId;
-                        window.location.href = "EventServlet?id=" + eventId;
+                    if (eventId) {                      
+                        window.location.href = '${pageContext.request.contextPath}/EventServlet?id=' + eventId;
                     } else {
                         console.error("Event ID is missing.");
                     }

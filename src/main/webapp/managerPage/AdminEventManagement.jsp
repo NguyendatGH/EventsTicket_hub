@@ -1,12 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
 prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MasterTicket Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       * {
         margin: 0;
@@ -17,15 +19,13 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
-        /* min-height: 100vh;
-        overflow: hidden; */
         position: relative;
         background-color: #070a17;
+        overflow-x: hidden;
       }
 
       .container {
         display: flex;
-        height: 100vh;
         position: relative;
         z-index: 1;
       }
@@ -36,6 +36,8 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         backdrop-filter: blur(20px);
         border-right: 1px solid #4d4d4d;
         padding: 2rem 0;
+        transition: transform 0.3s ease;
+        z-index: 1100;
       }
 
       .logo {
@@ -272,7 +274,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       th {
         padding: 18px 16px;
         text-align: left;
-        font-weight: Bold;
+        font-weight: bold;
         font-size: 15px;
         color: #e5e7eb;
         border: none;
@@ -314,8 +316,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
       .status-tag {
         background: rgba(255, 255, 255, 0.12);
-        border: 2px solid #007bff;
-        color: #ffffff;
         border: none;
         padding: 6px 12px;
         border-radius: 4px;
@@ -480,20 +480,58 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         background: rgba(45, 70, 126, 0.7);
       }
 
-      @media (max-width: 768px) {
-        .container {
-          flex-direction: column;
-        }
+      .hamburger {
+        display: none;
+        position: fixed;
+        top: 20px;
+        right: 34px;
+        z-index: 1100;
+        background: none;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        flex-direction: column;
+        justify-content: space-around;
+      }
 
-        .sidebar {
-          width: 100%;
-          height: auto;
-        }
+      .hamburger span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: white;
+        transition: all 0.3s ease;
+      }
 
-        .table-row {
-          grid-template-columns: 1fr;
-          gap: 10px;
-        }
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(2px, 2px);
+      }
+
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(21, 27, 58, 0.384);
+        backdrop-filter: blur(5px);
+        z-index: 950;
+        transition: opacity 0.3s ease;
+      }
+
+      .overlay.active {
+        display: block;
+        opacity: 1;
       }
 
       .bg_elips {
@@ -501,7 +539,9 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         height: 800px;
         object-fit: cover;
         position: fixed;
+        z-index: -1;
         pointer-events: none;
+        opacity: 0.7;
       }
 
       .firstElement {
@@ -513,18 +553,406 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         bottom: -400px;
         right: -200px;
       }
+
+      .charts-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .chart-container {
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .chart-title {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .chart-wrapper {
+        position: relative;
+        height: 300px;
+      }
+
+      .monthly-chart {
+        grid-column: 1 / -1;
+      }
+
+      .monthly-chart .chart-wrapper {
+        height: 250px;
+      }
+
+      @media (max-width: 1400px) {
+        .main-content {
+          padding: 0 50px;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .sidebar {
+          width: 20%;
+        }
+
+        .main-content {
+          padding: 0 30px;
+        }
+
+        .bg_elips {
+          width: 600px;
+          height: 600px;
+        }
+
+        .firstElement {
+          top: -150px;
+          left: -30px;
+        }
+
+        .secondElement {
+          bottom: -300px;
+          right: -150px;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .control-panel {
+          margin-top: 30px;
+        }
+
+        .sidebar {
+          width: 260px;
+          position: fixed;
+          height: 100%;
+          transform: translateX(-100%);
+          z-index: 1000;
+        }
+
+        .sidebar.active {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          padding: 0 20px;
+        }
+
+        .admin-avatar {
+          width: 100px;
+          height: 100px;
+        }
+
+        .admin-avatar svg {
+          width: 60px;
+          height: 60px;
+        }
+
+        .admin-name {
+          font-size: 20px;
+        }
+
+        .logo {
+          font-size: 1.3rem;
+        }
+
+        .bg_elips {
+          width: 500px;
+          height: 500px;
+        }
+
+        .firstElement {
+          top: -120px;
+          left: -20px;
+        }
+
+        .secondElement {
+          bottom: -250px;
+          right: -120px;
+        }
+
+        .hamburger {
+          display: flex;
+        }
+        .charts-section {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+        .table-section {
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .table-container {
+          width: 100%;
+        }
+
+        .stat-item {
+          width: 100%;
+          min-width: unset;
+        }
+
+        .stat-wrapper {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .stat-header {
+          width: 100%;
+          align-items: center;
+          text-align: center;
+        }
+
+        .Top-EventOwner {
+          max-width: 200px;
+          height: auto;
+        }
+
+        .data-table {
+          margin-bottom: 2rem;
+        }
+
+        .table-header-secondary {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          padding: 15px;
+        }
+
+        .search-container {
+          max-width: 100%;
+          justify-self: center;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          padding: 0 15px;
+        }
+
+        .page-title {
+          font-size: 1.5rem;
+        }
+
+        .control-panel {
+          margin-top: 30px;
+          padding: 8px 16px;
+          font-size: 0.875rem;
+        }
+
+        .stat-item {
+          display: none;
+        }
+
+        .table-row {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .bg_elips {
+          width: 400px;
+          height: 400px;
+          opacity: 0.5;
+        }
+
+        .firstElement {
+          top: -100px;
+          left: -15px;
+        }
+
+        .secondElement {
+          bottom: -200px;
+          right: -100px;
+        }
+        .dashboard-container {
+          gap: 1rem;
+        }
+
+        .table-container {
+          overflow-x: hidden;
+        }
+
+        .table-container table {
+          width: 100%;
+          display: table;
+          table-layout: fixed;
+        }
+
+        .table-container th,
+        .table-container td {
+          padding: 10px;
+          font-size: 12px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        /* Hide the "Vé đã bán" column */
+        .table-container th:nth-child(3),
+        .table-container td:nth-child(3) {
+          display: none;
+        }
+
+        /* Adjust remaining columns to fit without horizontal scroll */
+        .table-container th:nth-child(1),
+        .table-container td:nth-child(1) {
+          width: 50%;
+        }
+
+        .table-container th:nth-child(2),
+        .table-container td:nth-child(2) {
+          width: 25%;
+        }
+
+        .table-container th:nth-child(4),
+        .table-container td:nth-child(4) {
+          width: 25%;
+        }
+
+        .status-tag {
+          padding: 4px 8px;
+          font-size: 10px;
+          width: 100%;
+          text-align: center;
+        }
+        .event-status {
+          width: 100%;
+          text-align: center;
+          padding: 8px;
+        }
+
+        .actions {
+          justify-content: center;
+        }
+        .charts-section {
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .chart-container {
+          padding: 1rem;
+        }
+
+        .chart-wrapper {
+          height: 200px !important;
+        }
+
+        .monthly-chart .chart-wrapper {
+          height: 180px !important;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .sidebar {
+          width: 100%;
+        }
+
+        .main-content {
+          padding: 0 10px;
+        }
+
+        .header {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: flex-start;
+        }
+
+        .bg_elips {
+          width: 300px;
+          height: 300px;
+          opacity: 0.4;
+        }
+
+        .firstElement {
+          top: -80px;
+          left: -10px;
+        }
+
+        .secondElement {
+          bottom: -150px;
+          right: -50px;
+        }
+        .table-header {
+          font-size: 1.2rem;
+        }
+
+        .table-container th,
+        .table-container td {
+          padding: 8px;
+          font-size: 11px;
+        }
+
+        .table-container th:nth-child(1),
+        .table-container td:nth-child(1) {
+          width: 45%;
+        }
+
+        .table-container th:nth-child(2),
+        .table-container td:nth-child(2) {
+          width: 30%;
+        }
+
+        .table-container th:nth-child(4),
+        .table-container td:nth-child(4) {
+          width: 25%;
+        }
+
+        .status-tag {
+          padding: 4px 8px;
+          font-size: 10px;
+        }
+
+        .action-btn {
+          width: 30px;
+          height: 30px;
+        }
+
+        .chart-title {
+          font-size: 1rem;
+        }
+
+        .search-box {
+          padding: 6px 40px 6px 15px;
+          font-size: 12px;
+        }
+
+        .search-icon {
+          right: 10px;
+        }
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
     </style>
   </head>
   <body>
     <img
       class="bg_elips firstElement"
-      src="${pageContext.request.contextPath}/asset/full.svg"
+      src="${pageContext.request.contextPath}/asset/image/full.svg"
     />
     <img
       class="bg_elips secondElement"
-      src="${pageContext.request.contextPath}/asset/full2.svg"
+      src="${pageContext.request.contextPath}/asset/image/full2.svg"
     />
+    <button class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
     <div class="container">
+      <div class="overlay"></div>
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
         <div class="admin-section">
@@ -538,6 +966,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <div class="admin-name">Admin</div>
           <div class="admin-role">Quản lí website masterTicket</div>
         </div>
+
         <nav>
           <ul class="nav-menu">
             <li class="nav-item">
@@ -570,6 +999,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </li>
           </ul>
         </nav>
+
         <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
@@ -614,7 +1044,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             <c:out value="${organizer.numsOfTicketSelled}" />
                           </td>
                           <td>
-                            <button class="status-tag">
+                            <button class="status-tag success">
                               <c:choose>
                                 <c:when test="${organizer.status}">Khóa</c:when>
                                 <c:otherwise>Đang hoạt động</c:otherwise>
@@ -655,13 +1085,35 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                       test="${not empty topOrganizers and not empty topOrganizers[0].avatarURL}"
                       >${pageContext.request.contextPath}/${topOrganizers[0].avatarURL}</c:when
                     ><c:otherwise
-                      >${pageContext.request.contextPath}/asset/MayLangThangAvt.svg</c:otherwise
+                      >${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg</c:otherwise
                     ></c:choose
                   >" class="Top-EventOwner" alt="Top Organizer"
-                  onerror="this.src='${pageContext.request.contextPath}/asset/MayLangThangAvt.svg'"
+                  onerror="this.src='${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg'"
                   />
                 </span>
               </div>
+            </div>
+          </div>
+        </div>
+        <div class="charts-section">
+          <div class="chart-container">
+            <h3 class="chart-title">Thống kê theo trạng thái</h3>
+            <div class="chart-wrapper">
+              <canvas id="statusChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <h3 class="chart-title">Thống kê theo thể loại</h3>
+            <div class="chart-wrapper">
+              <canvas id="genreChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-container monthly-chart">
+            <h3 class="chart-title">Thống kê theo tháng (6 tháng gần nhất)</h3>
+            <div class="chart-wrapper">
+              <canvas id="monthlyChart"></canvas>
             </div>
           </div>
         </div>
@@ -706,7 +1158,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   onclick="handleEditEvent(${event.eventID})"
                 >
                   <img
-                    src="${pageContext.request.contextPath}/asset/Edit_fill.svg"
+                    src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg"
                     alt="Edit"
                   />
                 </button>
@@ -715,7 +1167,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   onclick="handleDeleteEvent(${event.eventID})"
                 >
                   <img
-                    src="${pageContext.request.contextPath}/asset/Trash.svg"
+                    src="${pageContext.request.contextPath}/asset/image/Trash.svg"
                     alt="Delete"
                   />
                 </button>
@@ -778,6 +1230,309 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           }
         });
       }
+
+      const hamburger = document.querySelector(".hamburger");
+      const sidebar = document.querySelector(".sidebar");
+      const overlay = document.querySelector(".overlay");
+
+      hamburger.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+      });
+
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 992) {
+            hamburger.classList.remove("active");
+            sidebar.classList.remove("active");
+            overlay.classList.remove("active");
+          }
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (
+          window.innerWidth <= 992 &&
+          !sidebar.contains(e.target) &&
+          !hamburger.contains(e.target)
+        ) {
+          hamburger.classList.remove("active");
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+        }
+      });
+
+      function animateEllipses() {
+        const ellipses = document.querySelectorAll(".bg_elips");
+        ellipses.forEach((ellipse, index) => {
+          const duration = 8000 + index * 2000;
+          ellipse.style.animation = `float ${duration}ms ease-in-out infinite`;
+        });
+      }
+      animateEllipses();
+
+      const chartColors = {
+        primary: "#6366f1",
+        success: "#10b981",
+        warning: "#f59e0b",
+        danger: "#ef4444",
+        info: "#06b6d4",
+        purple: "#8b5cf6",
+        pink: "#ec4899",
+        orange: "#f97316",
+      };
+
+      var statusStatsData = '<%= request.getAttribute("statusStatsJson") %>';
+      var genreStatsData = '<%= request.getAttribute("genreStatsJson") %>';
+      var monthlyStatsData = '<%= request.getAttribute("monthlyStatsJson") %>';
+
+      let statusStats = {};
+      let genreStats = {};
+      let monthlyStats = [];
+
+      try {
+        statusStats = JSON.parse(
+          statusStatsData.replace(/&quot;/g, '"').trim() || "{}"
+        );
+      } catch (e) {
+        console.error(
+          "Failed to parse statusStatsJson:",
+          e,
+          "Raw value:",
+          statusStatsData
+        );
+        statusStats = {};
+      }
+
+      try {
+        genreStats = JSON.parse(
+          genreStatsData.replace(/&quot;/g, '"').trim() || "{}"
+        );
+      } catch (e) {
+        console.error(
+          "Failed to parse genreStatsJson:",
+          e,
+          "Raw value:",
+          genreStatsData
+        );
+        genreStats = {};
+      }
+
+      try {
+        monthlyStats = JSON.parse(
+          monthlyStatsData.replace(/&quot;/g, '"').trim() || "[]"
+        );
+      } catch (e) {
+        console.error(
+          "Failed to parse monthlyStatsJson:",
+          e,
+          "Raw value:",
+          monthlyStatsData
+        );
+        monthlyStats = [];
+      }
+
+  
+      // Debug the parsed results
+      console.log("Parsed statusStats:", statusStats);
+      console.log("Parsed genreStats:", genreStats);
+      console.log("Parsed monthlyStats:", monthlyStats);
+
+      // Chart initialization with data validation
+      if (Object.keys(statusStats).length > 0) {
+        const statusCtx = document
+          .getElementById("statusChart")
+          .getContext("2d");
+        const statusChart = new Chart(statusCtx, {
+          type: "doughnut",
+          data: {
+            labels: Object.keys(statusStats).map((status) => {
+              const statusMap = {
+                active: "Đang hoạt động",
+                pending: "Đang chờ duyệt",
+                cancelled: "Đã hủy",
+                completed: "Đã hoàn thành",
+              };
+              return statusMap[status] || status;
+            }),
+            datasets: [
+              {
+                data: Object.values(statusStats),
+                backgroundColor: Object.keys(statusStats).map(
+                  (_, index) =>
+                    [
+                      chartColors.success,
+                      chartColors.warning,
+                      chartColors.danger,
+                      chartColors.info,
+                    ][index % 4]
+                ),
+                borderWidth: 2,
+                borderColor: "rgba(255, 255, 255, 0.1)",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  color: "white",
+                  padding: 15,
+                  font: { size: 12 },
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                titleColor: "white",
+                bodyColor: "white",
+                borderColor: "rgba(255, 255, 255, 0.1)",
+                borderWidth: 1,
+              },
+            },
+          },
+        });
+      }
+
+      if (Object.keys(genreStats).length > 0) {
+        const genreCtx = document.getElementById("genreChart").getContext("2d");
+        const genreChart = new Chart(genreCtx, {
+          type: "bar",
+          data: {
+            labels: Object.keys(genreStats),
+            datasets: [
+              {
+                label: "Số lượng sự kiện",
+                data: Object.values(genreStats),
+                backgroundColor: Object.keys(genreStats).map(
+                  (_, index) =>
+                    [
+                      chartColors.primary,
+                      chartColors.success,
+                      chartColors.warning,
+                      chartColors.purple,
+                    ][index % 4]
+                ),
+                borderColor: chartColors.primary,
+                borderWidth: 1,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                titleColor: "white",
+                bodyColor: "white",
+                borderColor: "rgba(255, 255, 255, 0.1)",
+                borderWidth: 1,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: "white", stepSize: 1 },
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+              },
+              x: {
+                ticks: { color: "white", maxRotation: 45 },
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+              },
+            },
+          },
+        });
+      }
+
+      if (monthlyStats.length > 0) {
+        // Handle single data point by adding a default previous month if needed
+        if (monthlyStats.length === 1) {
+          monthlyStats = [
+            {
+              month: monthlyStats[0].month - 1,
+              year: monthlyStats[0].year,
+              count: 0,
+            },
+            ...monthlyStats,
+          ];
+        }
+        const monthlyLabels = monthlyStats.map((item) => {
+          const months = [
+            "Th1",
+            "Th2",
+            "Th3",
+            "Th4",
+            "Th5",
+            "Th6",
+            "Th7",
+            "Th8",
+            "Th9",
+            "Th10",
+            "Th11",
+            "Th12",
+          ];
+          return months[item.month - 1] + " " + item.year;
+        });
+
+        const monthlyCtx = document
+          .getElementById("monthlyChart")
+          .getContext("2d");
+        const monthlyChart = new Chart(monthlyCtx, {
+          type: "line",
+          data: {
+            labels: monthlyLabels,
+            datasets: [
+              {
+                label: "Số sự kiện mới",
+                data: monthlyStats.map((item) => item.count),
+                borderColor: chartColors.success,
+                backgroundColor: chartColors.success + "20",
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: chartColors.success,
+                pointBorderColor: "white",
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: "white", font: { size: 14 } } },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                titleColor: "white",
+                bodyColor: "white",
+                borderColor: "rgba(255, 255, 255, 0.1)",
+                borderWidth: 1,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: "white", stepSize: 1 },
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+              },
+              x: {
+                ticks: { color: "white" },
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+              },
+            },
+          },
+        });
+      }
+
+   
     </script>
   </body>
 </html>

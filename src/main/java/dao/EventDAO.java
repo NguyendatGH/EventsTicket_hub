@@ -8,8 +8,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventDAO {
 
@@ -85,8 +88,7 @@ public class EventDAO {
                         rs.getTimestamp("EndTime"),
                         rs.getInt("TotalTicketCount"),
                         rs.getString("Status"),
-                        rs.getLong("Ranking")
-                );
+                        rs.getLong("Ranking"));
                 list.add(event);
             }
         } catch (SQLException e) {
@@ -192,22 +194,45 @@ public class EventDAO {
 
     private Event mapRowToEvent(ResultSet rs) throws SQLException {
         Event event = new Event();
+
         event.setEventID(rs.getInt("EventID"));
         event.setName(rs.getString("Name"));
         event.setDescription(rs.getString("Description"));
         event.setPhysicalLocation(rs.getString("PhysicalLocation"));
+        event.setImageURL(rs.getString("ImageURL"));
+        event.setStatus(rs.getString("Status"));
+
+        
+        event.setHasSeatingChart(rs.getBoolean("HasSeatingChart"));
+
+       //Gán trực tiếp Timestamp vào Date, không cần .toLocalDateTime()
         event.setStartTime(rs.getTimestamp("StartTime"));
         event.setEndTime(rs.getTimestamp("EndTime"));
-        event.setTotalTicketCount(rs.getObject("TotalTicketCount") != null ? rs.getInt("TotalTicketCount") : null);
-        event.setIsApproved(rs.getObject("IsApproved") != null ? rs.getBoolean("IsApproved") : null);
-        event.setStatus(rs.getString("Status"));
-        event.setGenreID(rs.getObject("GenreID") != null ? rs.getInt("GenreID") : null);
-        event.setOwnerID(rs.getObject("OwnerID") != null ? rs.getInt("OwnerID") : null);
-        event.setImageURL(rs.getString("ImageURL"));
-        event.setHasSeatingChart(rs.getObject("HasSeatingChart") != null ? rs.getBoolean("HasSeatingChart") : null);
-        event.setIsDeleted(rs.getObject("IsDeleted") != null ? rs.getBoolean("IsDeleted") : null);
         event.setCreatedAt(rs.getTimestamp("CreatedAt"));
         event.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+
+        // Đọc các giá trị có thể NULL một cách an toàn
+        int totalTicketCount = rs.getInt("TotalTicketCount");
+        if (!rs.wasNull()) {
+            event.setTotalTicketCount(totalTicketCount);
+        }
+        int genreID = rs.getInt("GenreID");
+        if (!rs.wasNull()) {
+            event.setGenreID(genreID);
+        }
+        int ownerID = rs.getInt("OwnerID");
+        if (!rs.wasNull()) {
+            event.setOwnerID(ownerID);
+        }
+        boolean isApproved = rs.getBoolean("IsApproved");
+        if (!rs.wasNull()) {
+            event.setIsApproved(isApproved);
+        }
+        boolean isDeleted = rs.getBoolean("IsDeleted");
+        if (!rs.wasNull()) {
+            event.setIsDeleted(isDeleted);
+        }
+
         return event;
     }
 
@@ -219,13 +244,64 @@ public class EventDAO {
 
     public List<Event> getUpcomingEvents() {
         List<Event> list = new ArrayList<>();
-        String sql = "SELECT TOP 4 * FROM Events WHERE StartTime > GETDATE() ORDER BY StartTime ASC";
+        String sql = "SELECT TOP 4 * FROM Events WHERE StartTime > GETDATE() AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime ASC";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
+                list.add(mapRowToEvent(rs)); // Thêm dòng này
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
     }
+
+    public Map<String, Integer> getEventByStatus() {
+        Map<String, Integer> stats = new HashMap<>();
+
+        String sql = "Select status, count(*) as count from Events where IsDeleted = 0 group by status";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                stats.put(rs.getString("status"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    public Map<String, Integer> getEventStatsByGenre() {
+        Map<String, Integer> stats = new HashMap<>();
+        String sql = "SELECT g.GenreName as GenreName, COUNT(e.EventID) as count FROM Genres g  LEFT JOIN Events e ON g.GenreID = e.GenreID AND e.isDeleted = 0  GROUP BY g.GenreID, g.GenreName  ORDER BY count DESC";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
+            while (rs.next()) {
+                stats.put(rs.getString("GenreName"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return stats;
+    }
+
+    public List<Map<String, Object>> getMonthlyEventStats() {
+        List<Map<String, Object>> stats = new ArrayList<>();
+        String sql = "SELECT YEAR(CreatedAt) as year, MONTH(CreatedAt) as month, COUNT(*) as count FROM Events WHERE isDeleted = 0 AND CreatedAt >= DATEADD(MONTH, -6, GETDATE()) GROUP BY YEAR(CreatedAt), MONTH(CreatedAt) ORDER BY year, month";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> monthData = new HashMap<>();
+                monthData.put("year", rs.getInt("year"));
+                monthData.put("month", rs.getInt("month"));
+                monthData.put("count", rs.getInt("count"));
+                stats.add(monthData);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return stats;
+    }
+
 }

@@ -31,7 +31,7 @@ public class PaymentServlet extends HttpServlet {
         User currentUser = (User) session.getAttribute("user");
 
         if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
@@ -44,12 +44,19 @@ public class PaymentServlet extends HttpServlet {
             List<OrderItem> orderItems = new ArrayList<>();
             Map<String, String[]> parameterMap = request.getParameterMap();
 
-            int totalQuantity = 0;
             BigDecimal totalAmount = BigDecimal.ZERO;
 
+            // Vòng lặp để lấy thông tin các vé được chọn theo số lượng
             for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
                 if (entry.getKey().startsWith("quantity_")) {
-                    int quantity = Integer.parseInt(entry.getValue()[0]);
+                    int quantity = 0;
+                    try {
+                        quantity = Integer.parseInt(entry.getValue()[0]);
+                    } catch (NumberFormatException e) {
+                        // Bỏ qua nếu giá trị không phải là số
+                        continue;
+                    }
+
                     if (quantity > 0) {
                         int ticketId = Integer.parseInt(entry.getKey().substring("quantity_".length()));
                         TicketInfor ticket = ticketDAO.getTicketInfoById(ticketId);
@@ -63,32 +70,33 @@ public class PaymentServlet extends HttpServlet {
                             item.setTicketTypeName(ticket.getTicketName());
 
                             orderItems.add(item);
-                            totalQuantity += quantity;
                             totalAmount = totalAmount.add(ticket.getPrice().multiply(new BigDecimal(quantity)));
                         }
                     }
                 }
             }
 
+            // Nếu người dùng không chọn vé nào
             if (orderItems.isEmpty()) {
                 response.sendRedirect(request.getHeader("referer") + "?error=no_tickets_selected");
                 return;
             }
 
+            // Tạo đối tượng Order
             Order order = new Order();
             order.setUserId(currentUser.getId());
             order.setContactEmail(currentUser.getEmail());
             order.setEvent(event);
             order.setItems(orderItems);
-            order.setTotalQuantity(totalQuantity);
             order.setTotalAmount(totalAmount);
             order.setOrderStatus("PENDING_PAYMENT");
             order.setCreatedAt(new Date());
 
-            session.setAttribute("order", order);
-            request.setAttribute("event", event);
-
-            request.getRequestDispatcher("/pages/Payment.jsp").forward(request, response);
+            // [SỬA LỖI CỐT LÕI] Dùng key "currentOrder" để lưu vào session cho nhất quán
+            session.setAttribute("currentOrder", order);
+            
+            // Chuyển hướng đến trang thanh toán chung
+            response.sendRedirect(request.getContextPath() + "/pages/Payment.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();

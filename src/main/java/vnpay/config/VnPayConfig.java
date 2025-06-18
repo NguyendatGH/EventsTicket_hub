@@ -6,19 +6,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 public class VnPayConfig {
 
-    public static String vnp_HashSecret = "BDGJWOPSZYBL0ZRYOX11MP883P29UZRH"; 
-    
+    public static String vnp_HashSecret = "2XI0DW8NBKM72RQU2LV5B8EWFI6ZBX8Z";
+
     public static String vnp_TmnCode = "9536C0G4";
     public static String vnp_Version = "2.1.0";
     public static String vnp_Command = "pay";
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8081/OnlineSellingTicketEvents/VNPayReturnServlet";
+    public static String vnp_ReturnUrl = "http://localhost:8080/OnlineSellingTicketEvents/VNPayReturnServlet";
     public static String vnp_OrderType = "other";
+    public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
     public static String hmacSHA512(final String key, final String data) {
         try {
@@ -82,5 +84,15 @@ public class VnPayConfig {
             }
         }
         return hmacSHA512(vnp_HashSecret, sb.toString());
+    }
+
+    public static String getRandomNumber(int len) {
+        Random rnd = new Random();
+        String chars = "0123456789";
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 }

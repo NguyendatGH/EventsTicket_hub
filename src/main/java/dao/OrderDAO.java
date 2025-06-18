@@ -14,7 +14,6 @@ import java.util.List;
 
 public class OrderDAO {
 
-    // Phương thức tạo Order mới (Đã sửa lỗi transaction)
     public int createOrder(Order order) {
         String insertOrderSQL = "INSERT INTO dbo.Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes, CreatedAt, UpdatedAt) "
                 + "OUTPUT INSERTED.OrderID VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
