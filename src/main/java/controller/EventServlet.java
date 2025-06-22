@@ -1,9 +1,9 @@
 package controller;
 
 import dao.EventDAO;
-import dao.TicketInforDAO; // THAY ĐỔI IMPORT
+import dao.TicketInfoDAO; // SỬA: Import DAO đúng
 import models.Event;
-import models.TicketInfor;    // THAY ĐỔI IMPORT
+import models.TicketInfo;   // SỬA: Import Model đúng
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,12 +16,12 @@ import java.util.List;
 public class EventServlet extends HttpServlet {
 
     private EventDAO eventDAO;
-    private TicketInforDAO ticketInforDAO; // THAY ĐỔI Tên DAO
+    private TicketInfoDAO ticketInfoDAO; // SỬA: Tên biến DAO
 
     @Override
     public void init() throws ServletException {
         eventDAO = new EventDAO();
-        ticketInforDAO = new TicketInforDAO(); // THAY ĐỔI Khởi tạo
+        ticketInfoDAO = new TicketInfoDAO(); // SỬA: Khởi tạo DAO đúng
     }
 
     @Override
@@ -40,7 +40,8 @@ public class EventServlet extends HttpServlet {
             Event event = eventDAO.getEventById(eventId);
 
             if (event != null) {
-                List<TicketInfor> ticketList = ticketInforDAO.getTicketInfosByEventID(eventId);
+                // SỬA: Sử dụng ticketInfoDAO và kiểu List<TicketInfo>
+                List<TicketInfo> ticketList = ticketInfoDAO.getTicketInfosByEventID(eventId);
                 List<Event> suggestedEvents = eventDAO.getSuggestedEvents(eventId);
 
                 request.setAttribute("event", event);

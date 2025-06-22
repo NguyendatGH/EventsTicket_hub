@@ -797,7 +797,7 @@
                     window.location.href = '${pageContext.request.contextPath}/BookChairServlet?eventId=' + eventId;
                 } else {
                     console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
-                    window.location.href = '${pageContext.request.contextPath}/TicketInforServlet?eventId=' + eventId;
+                    window.location.href = '${pageContext.request.contextPath}/TicketInfoServlet?eventId=' + eventId;
                 }
             }
         </script>
