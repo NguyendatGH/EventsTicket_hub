@@ -1,4 +1,4 @@
-﻿create database EventTicketDB2
+create database EventTicketDB2
 
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -454,7 +454,7 @@ BEGIN
     FROM Events 
     WHERE IsDeleted = 0
       AND IsApproved = 1
-      AND Status IN ('active', 'pending')
+      AND Status IN ('active')
       AND EndTime > GETDATE()
     ORDER BY TotalTicketCount DESC, CreatedAt DESC;
 END;
@@ -1046,9 +1046,57 @@ GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'),
 ORDER BY LoginMonth;
 
 
--- select * from users u where u.role != 'admin'; 
+--query to view all revenue
+-- SELECT SUM(TotalAmount) AS TotalRevenue
+-- FROM Orders
+-- WHERE PaymentStatus = 'paid';
 
--- select * from Events
+--specific revenue
+-- SELECT e.Name AS EventName, COALESCE(SUM(o.TotalAmount), 0) AS EventRevenue
+-- FROM Orders o
+-- JOIN OrderItems oi ON o.OrderID = oi.OrderID
+-- JOIN Events e ON oi.EventID = e.EventID
+-- WHERE o.PaymentStatus = 'paid'
+-- GROUP BY e.Name
+-- ORDER BY EventRevenue DESC;
 
--- exec GetTopHotEvents
+--danh sách các giao dịch:
+-- SELECT 
+--     o.OrderID,
+--     o.OrderNumber,
+--     o.UserID,
+--     u.Username AS CustomerName,
+--     u.Email AS CustomerEmail,
+--     e.EventID,
+--     e.Name AS EventName,
+--     ti.TicketName,
+--     o.TotalQuantity,
+--     o.SubtotalAmount,
+--     o.DiscountAmount,
+--     o.TotalAmount,
+--     o.PaymentStatus,
+--     o.OrderStatus,
+--     pm.MethodName AS PaymentMethod,
+--     o.ContactPhone,
+--     o.ContactEmail,
+--     o.CreatedAt,
+--     o.UpdatedAt
+-- FROM Orders o
+-- JOIN OrderItems oi ON o.OrderID = oi.OrderID
+-- JOIN Events e ON oi.EventID = e.EventID
+-- JOIN TicketInfo ti ON oi.TicketInfoID = ti.TicketInfoID
+-- JOIN Users u ON o.UserID = u.Id
+-- LEFT JOIN PaymentMethod pm ON o.PaymentMethodID = pm.PaymentMethodID
+-- ORDER BY o.CreatedAt DESC;
 
+
+-- Update all qualifying events to 'pending'
+UPDATE e
+SET Status = 'pending',
+    UpdatedAt = GETDATE()
+FROM Events e
+JOIN TicketInfo ti ON e.EventID = ti.EventID
+JOIN TicketInventory tinv ON ti.TicketInfoID = tinv.TicketInfoID
+WHERE e.Status = 'active'
+  AND e.IsDeleted = 0
+  AND tinv.SoldQuantity = 0;

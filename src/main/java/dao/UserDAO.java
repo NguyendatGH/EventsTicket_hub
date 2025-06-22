@@ -334,11 +334,6 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public boolean deleteUser(int id) {
-        return true;
-    }
-
-    @Override
     public boolean changeUserAccountStatus(int id, int status) {
         // status = 0 -> lock, status = 1 -> unlock
         String sql = "";

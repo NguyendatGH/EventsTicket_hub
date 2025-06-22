@@ -69,7 +69,6 @@ public class AdminServlet extends HttpServlet {
         logger.info("POST request received, delegating to doGet");
         doGet(request, response);
     }
-
     @Override
     public String getServletInfo() {
         return "Admin Servlet for managing admin dashboard, user accounts, events, and support center";

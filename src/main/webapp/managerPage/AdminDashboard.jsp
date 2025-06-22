@@ -689,9 +689,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
-            <path
-              d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
-            />
+            <path d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z" />
           </svg>
           Đăng xuất
         </a>
@@ -733,18 +731,14 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 class="stat-icon"
               />
               <div class="stat-value">
-                <fmt:formatNumber
-                  value="${monthlyRevenue}"
-                  type="currency"
-                  currencySymbol="₫"
-                />
+                20
               </div>
             </span>
           </div>
         </section>
         <section class="content-grid">
           <div class="chart-section">
-            <h2 class="section-title">Thống kê nguời dùng</h2>
+            <h2 class="section-title">Thống kê truy cập</h2>
             <div class="chart-container">
               <canvas id="userStatsChart"></canvas>
             </div>
@@ -762,7 +756,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 </thead>
                 <tbody>
                   <c:forEach var="event" items="${events}">
-                    <tr>
+                    <tr onclick="handleEditEvent('${event.eventID}')">
                       <td>${event.name}</td>
                       <td>
                         <fmt:formatDate
@@ -787,6 +781,10 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       </main>
     </div>
     <script>
+
+      function handleEditEvent(eventID) {
+        window.location.href = "${pageContext.request.contextPath}/admin-servlet/event-management?action=edit-event&eventId=" + eventID;
+      }
       const hamburger = document.querySelector(".hamburger");
       const sidebar = document.querySelector(".sidebar");
       const overlay = document.querySelector(".overlay");
@@ -839,7 +837,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         ],
         datasets: [
           {
-            label: "Người dùng mới",
+            label: "truy cập mới",
             data: [12, 19, 15, 25, 22, 30],
             borderColor: "rgba(59, 130, 246, 1)",
             backgroundColor: "rgba(59, 130, 246, 0.1)",
@@ -848,7 +846,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             tension: 0.4,
           },
           {
-            label: "Tổng người dùng",
+            label: "Tổng truy cập",
             data: [50, 69, 84, 109, 131, 161],
             borderColor: "rgba(16, 185, 129, 1)",
             backgroundColor: "rgba(16, 185, 129, 0.1)",
