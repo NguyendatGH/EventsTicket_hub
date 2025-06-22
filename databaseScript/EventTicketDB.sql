@@ -21,6 +21,8 @@ CREATE TABLE Users (
     CONSTRAINT CK_Users_Birthday CHECK (Birthday IS NULL OR Birthday <= GETDATE())
 );
 
+
+
 -- Bảng Genre
 CREATE TABLE Genres (
     GenreID INT IDENTITY(1,1) PRIMARY KEY,
@@ -452,12 +454,15 @@ BEGIN
     FROM Events 
     WHERE IsDeleted = 0
       AND IsApproved = 1
-      AND Status IN ('active', 'pending')
+      AND Status IN ('active')
       AND EndTime > GETDATE()
     ORDER BY TotalTicketCount DESC, CreatedAt DESC;
 END;
 GO
-
+exec GetTopHotEvents
+go
+select * from Events
+go
 --4. get top event owner base on their ticket selling through platform
 CREATE PROCEDURE GetTopEventOrganizers
 AS
@@ -736,34 +741,30 @@ VALUES
 
 --select * from Genres;
 
+
 -- Insert into Events
-INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted)
+INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt)
 VALUES
-(N'Nhà Hát Kịch IDECAF: 12 Bà Mụ', 'A captivating theater performance', 'Ho Chi Minh City', '2025-06-05 12:30:00', '2025-06-05 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7c/18/6f/b32013793b1dbda15606e1cca4ab40ac.jpg', 1, 0),
-(N'The Island And The Bay', 'A scenic cultural event', 'Ho Chi Minh City', '2025-06-07 07:00:00', '2025-06-07 09:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7d/cd/82/bea62d09033db74784ee82e8f811ff60.png', 0, 0),
-(N'Địa Đạo Củ Chi : Trăng Chiến Khu', 'Historical reenactment', 'Ho Chi Minh City', '2025-06-07 11:00:00', '2025-06-07 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/a6/0a/4a/60e9e35f58d00a4df2f987fe5f02803c.jpg', 0, 0),
-(N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI', 'A vibrant theater show', 'Ho Chi Minh City', '2025-06-07 12:30:00', '2025-06-07 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/1a/2c/a1/8d41e6a6d325f907b7e14b4582428461.jpg', 0, 0),
-(N'NGÀY AN LÀNH - khoá tu 1 ngày cuối tuần', 'A peaceful retreat', 'Ho Chi Minh City', '2025-06-08 01:30:00', '2025-06-08 03:30:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/d5/f7/31/b8dc405591074e95b041acf1f3d4d57e.jpg', 0, 0),
-(N'[Dốc Mộng Mơ] Hãy Để Anh Đi - Quốc Thiên & Bùi Công Nam', 'Music concert with popular artists', 'Ho Chi Minh City', '2025-06-08 12:30:00', '2025-06-08 14:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/a2/70/f0/a39e4fd823cd2f7b4186138c2c983012.jpg', 1, 0),
-(N'ISAAC WITH LOVE - FANMEETING IN HO CHI MINH', 'Fan meeting with Isaac', 'Ho Chi Minh City', '2025-06-13 10:00:00', '2025-06-13 12:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/9a/10/52/9efce559d9ab037ff649429ea74a2a4a.jpg', 0, 0),
-(N'LULULOLA SHOW HƯƠNG TRÀM | MỘT NỬA SỰ THẬT', 'Hương Tràm live performance', 'Ho Chi Minh City', '2025-06-14 10:30:00', '2025-06-14 12:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/77/67/54/d1ee978159818ef0d07bbefa3e3cd6cb.png', 1, 0),
-(N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-06-14 11:00:00', '2025-06-14 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/3a/b7/00/2eb78869acb58fc6980137a595b89b53.jpg', 0, 0),
-(N'[CONCERT] ANH TRAI VƯỢT NGÀN CHÔNG GAI DAY5, DAY6', 'Popular music concert', 'Ho Chi Minh City', '2025-06-14 11:00:00', '2025-06-14 13:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/23/f2/8c/da6aee269301e6142fafc511a801be51.jpg', 0, 0),
-(N'SAXOPHONE FESTIVAL - SMOKE & SILK', 'Jazz saxophone event', 'Ho Chi Minh City', '2025-06-14 12:00:00', '2025-06-14 14:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/5f/1f/06/163a5bb4ca28688762920970ff950111.png', 0, 0),
-(N'Lion Championship 23 - 2025', 'MMA championship', 'Ho Chi Minh City', '2025-06-14 12:00:00', '2025-06-14 14:00:00', 200, 1, 'active', 3, 4, 'https://images.tkbcdn.com/2/608/332/ts/ds/51/5f/ca/fac991cc2a4bba8b33e563950a6aaa7a.jpg', 0, 0),
-(N'VBA 2025 - Saigon Heat vs CT Catfish', 'Basketball league match', 'Ho Chi Minh City', '2025-06-14 12:30:00', '2025-06-14 14:30:00', 200, 1, 'active', 3, 4, 'https://images.tkbcdn.com/2/608/332/ts/ds/93/0e/29/7f646019dd57ad00287f633b1f452087.jpg', 0, 0),
-(N'Vở cải lương "CÂU THƠ YÊN NGỰA"', 'Traditional Vietnamese opera', 'Ho Chi Minh City', '2025-06-14 13:00:00', '2025-06-14 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/5a/e0/78/9193c340c70ea454ed1ebaddedcf8dfc.jpg', 0, 0),
-(N'[Viện pháp HCM] CONCERT LUIZA', 'Classical music concert', 'Ho Chi Minh City', '2025-06-14 13:00:00', '2025-06-14 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/03/07/93/56c6b9b83197539cca52c3bb13397de5.png', 0, 0),
-(N'HBAshow: Lê Hiếu - Bạch Công Khanh "Bài Tình Ca Cho Em"', 'Romantic music show', 'Ho Chi Minh City', '2025-06-14 13:00:00', '2025-06-14 15:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/ce/ca/81/ee52041ca219455e6c63d567b432a1d9.png', 0, 0),
-(N'Vở cải lương "Sấm vang dòng Như Nguyệt"', 'Historical Vietnamese opera', 'Ho Chi Minh City', '2025-06-14 13:00:00', '2025-06-14 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/3e/83/b9/4cbc8280f4561730dc2111e7da0153a0.jpg', 0, 0),
-(N'THE BEST OF POP - ROCK - MOVIE MUSIC & FASHION RHYTHM', 'Pop and rock music event', 'Ho Chi Minh City', '2025-06-17 13:00:00', '2025-06-17 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/de/1d/3a/0e31e92b668d06ed9fa520aa76f23292.png', 0, 0),
-(N'autoFEST@HCMC [Music Party & Merchandise]', 'Music and automotive merchandise event', 'Ho Chi Minh City', '2025-06-19 02:00:00', '2025-06-19 04:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/87/43/e3/7e239ba463207db6e0e12cee4e433536.jpg', 0, 0),
-(N'Automotive Mobility Solutions Conference', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-06-19 03:00:00', '2025-06-19 05:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/4d/8c/8a/4b0586d8a8733d9ed6cc9f5115960529.png', 0, 0),
-(N'D''FESTA HANOI - KPOP VIRTUAL STAGE', N'others', N'Hanoi', '2023-11-27 03:00:00', '2023-11-27 05:00:00', 350000, 1, 'pending', 4, 2, 'https://images.tkbcdn.com/2/608/332/Upload/eventcover/2023/10/11/CEEE87.jpg', 0, 0),
-(N'[THE GREENERY ART] ART WORKSHOP "TRANH ĐẤT SÉT"', N'others', N'Hanoi', '2023-11-26 10:30:00', '2023-11-26 12:30:00', 385000, 1, 'pending', 4, 2, 'https://images.tkbcdn.com/2/608/332/Upload/eventcover/2023/11/01/26BCA9.jpg', 0, 0),
-(N'VIETNAM CEO: NGHĨ KHÁC LÀM KHÁC - GẶP GỠ ÔNG HOÀNG NAM TIẾN PCT HỘI ĐỒNG TRƯỜNG ĐẠI HỌC FPT', N'others', N'Hanoi', '2023-11-26 01:00:00', '2023-11-26 03:00:00', 298000, 1, 'pending', 4, 2, 'https://images.tkbcdn.com/2/608/332/Upload/eventcover/2023/10/25/5B3256.jpg', 0, 0);
-
-
+(N'Nhà Hát Kịch IDECAF: 12 Bà Mụ', 'A captivating theater performance', 'Ho Chi Minh City', '2025-06-25 12:30:00', '2025-06-25 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7c/18/6f/b32013793b1dbda15606e1cca4ab40ac.jpg', 1, 0, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
+(N'The Island And The Bay', 'A scenic cultural event', 'Ho Chi Minh City', '2025-06-27 07:00:00', '2025-06-27 09:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7d/cd/82/bea62d09033db74784ee82e8f811ff60.png', 0, 0, '2025-06-02 10:00:00', '2025-06-02 10:00:00'),
+(N'Địa Đạo Củ Chi : Trăng Chiến Khu', 'Historical reenactment', 'Ho Chi Minh City', '2025-06-28 11:00:00', '2025-06-28 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/a6/0a/4a/60e9e35f58d00a4df2f987fe5f02803c.jpg', 0, 0, '2025-06-03 11:00:00', '2025-06-03 11:00:00'),
+(N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI', 'A vibrant theater show', 'Ho Chi Minh City', '2025-06-29 12:30:00', '2025-06-29 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/1a/2c/a1/8d41e6a6d325f907b7e14b4582428461.jpg', 0, 0, '2025-06-04 12:00:00', '2025-06-04 12:00:00'),
+(N'NGÀY AN LÀNH - khoá tu 1 ngày cuối tuần', 'A peaceful retreat', 'Ho Chi Minh City', '2025-06-30 01:30:00', '2025-06-30 03:30:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/d5/f7/31/b8dc405591074e95b041acf1f3d4d57e.jpg', 0, 0, '2025-06-05 13:00:00', '2025-06-05 13:00:00'),
+(N'[Dốc Mộng Mơ] Hãy Để Anh Đi - Quốc Thiên & Bùi Công Nam', 'Music concert with popular artists', 'Ho Chi Minh City', '2025-07-01 12:30:00', '2025-07-01 14:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/a2/70/f0/a39e4fd823cd2f7b4186138c2c983012.jpg', 1, 0, '2025-06-06 14:00:00', '2025-06-06 14:00:00'),
+(N'ISAAC WITH LOVE - FANMEETING IN HO CHI MINH', 'Fan meeting with Isaac', 'Ho Chi Minh City', '2025-07-02 10:00:00', '2025-07-02 12:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/9a/10/52/9efce559d9ab037ff649429ea74a2a4a.jpg', 0, 0, '2025-06-07 15:00:00', '2025-06-07 15:00:00'),
+(N'LULULOLA SHOW HƯƠNG TRÀM | MỘT NỬA SỰ THẬT', 'Hương Tràm live performance', 'Ho Chi Minh City', '2025-07-03 10:30:00', '2025-07-03 12:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/77/67/54/d1ee978159818ef0d07bbefa3e3cd6cb.png', 1, 0, '2025-06-08 16:00:00', '2025-06-08 16:00:00'),
+(N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-07-04 11:00:00', '2025-07-04 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/3a/b7/00/2eb78869acb58fc6980137a595b89b53.jpg', 0, 0, '2025-06-09 17:00:00', '2025-06-09 17:00:00'),
+(N'[CONCERT] ANH TRAI VƯỢT NGÀN CHÔNG GAI DAY5, DAY6', 'Popular music concert', 'Ho Chi Minh City', '2025-07-05 11:00:00', '2025-07-05 13:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/23/f2/8c/da6aee269301e6142fafc511a801be51.jpg', 0, 0, '2025-06-10 18:00:00', '2025-06-10 18:00:00'),
+(N'SAXOPHONE FESTIVAL - SMOKE & SILK', 'Jazz saxophone event', 'Ho Chi Minh City', '2025-07-06 12:00:00', '2025-07-06 14:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/5f/1f/06/163a5bb4ca28688762920970ff950111.png', 0, 0, '2025-06-11 19:00:00', '2025-06-11 19:00:00'),
+(N'Lion Championship 23 - 2025', 'MMA championship', 'Ho Chi Minh City', '2025-07-07 12:00:00', '2025-07-07 14:00:00', 200, 1, 'active', 3, 4, 'https://images.tkbcdn.com/2/608/332/ts/ds/51/5f/ca/fac991cc2a4bba8b33e563950a6aaa7a.jpg', 0, 0, '2025-06-12 20:00:00', '2025-06-12 20:00:00'),
+(N'VBA 2025 - Saigon Heat vs CT Catfish', 'Basketball league match', 'Ho Chi Minh City', '2025-07-08 12:30:00', '2025-07-08 14:30:00', 200, 1, 'active', 3, 4, 'https://images.tkbcdn.com/2/608/332/ts/ds/93/0e/29/7f646019dd57ad00287f633b1f452087.jpg', 0, 0, '2025-06-13 21:00:00', '2025-06-13 21:00:00'),
+(N'Vở cải lương "CÂU THƠ YÊN NGỰA"', 'Traditional Vietnamese opera', 'Ho Chi Minh City', '2025-07-09 13:00:00', '2025-07-09 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/5a/e0/78/9193c340c70ea454ed1ebaddedcf8dfc.jpg', 0, 0, '2025-06-14 22:00:00', '2025-06-14 22:00:00'),
+(N'[Viện pháp HCM] CONCERT LUIZA', 'Classical music concert', 'Ho Chi Minh City', '2025-07-10 13:00:00', '2025-07-10 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/03/07/93/56c6b9b83197539cca52c3bb13397de5.png', 0, 0, '2025-06-15 23:00:00', '2025-06-15 23:00:00'),
+(N'HBAshow: Lê Hiếu - Bạch Công Khanh "Bài Tình Ca Cho Em"', 'Romantic music show', 'Ho Chi Minh City', '2025-07-11 13:00:00', '2025-07-11 15:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/ce/ca/81/ee52041ca219455e6c63d567b432a1d9.png', 0, 0, '2025-06-16 09:00:00', '2025-06-16 09:00:00'),
+(N'Vở cải lương "Sấm vang dòng Như Nguyệt"', 'Historical Vietnamese opera', 'Ho Chi Minh City', '2025-07-12 13:00:00', '2025-07-12 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/3e/83/b9/4cbc8280f4561730dc2111e7da0153a0.jpg', 0, 0, '2025-06-17 10:00:00', '2025-06-17 10:00:00'),
+(N'THE BEST OF POP - ROCK - MOVIE MUSIC & FASHION RHYTHM', 'Pop and rock music event', 'Ho Chi Minh City', '2025-07-13 13:00:00', '2025-07-13 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/de/1d/3a/0e31e92b668d06ed9fa520aa76f23292.png', 0, 0, '2025-06-18 11:00:00', '2025-06-18 11:00:00'),
+(N'autoFEST@HCMC [Music Party & Merchandise]', 'Music and automotive merchandise event', 'Ho Chi Minh City', '2025-07-14 02:00:00', '2025-07-14 04:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/87/43/e3/7e239ba463207db6e0e12cee4e433536.jpg', 0, 0, '2025-06-19 12:00:00', '2025-06-19 12:00:00'),
+(N'Automotive Mobility Solutions Conference', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-07-15 03:00:00', '2025-07-15 05:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/4d/8c/8a/4b0586d8a8733d9ed6cc9f5115960529.png', 0, 0, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
 
 --select * from Events;
 -- Insert into Seat (for events with seating charts, assuming some events have seats)
@@ -776,75 +777,74 @@ VALUES
 (8, 'C1', 'C', 'Premium', 'available'),
 (8, 'C2', 'C', 'Premium', 'available');
 
---select * from Seat
+
 -- Insert into TicketInfo
-INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive)
+INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive, CreatedAt, UpdatedAt)
 VALUES
-(N'Standard Ticket - 12 Bà Mụ', 'Regular seating', 'Standard', 150000, '2025-05-01 00:00:00', '2025-06-05 12:00:00', 1, 10, 1),
-(N'VIP Ticket - The Island', 'Premium seating', 'VIP', 200000, '2025-05-01 00:00:00', '2025-06-07 06:30:00', 2, 10, 1),
-(N'Standard Ticket - Địa Đạo', 'General admission', 'Standard', 120000, '2025-05-01 00:00:00', '2025-06-07 10:30:00', 3, 10, 1),
-(N'Premium Ticket - Xóm Vịt Trời', 'Enhanced experience', 'Premium', 180000, '2025-05-01 00:00:00', '2025-06-07 12:00:00', 4, 10, 1),
-(N'General Admission - Ngày An Lành', 'Open seating', 'General Admission', 100000, '2025-05-01 00:00:00', '2025-06-08 01:00:00', 5, 10, 1),
-(N'VIP Ticket - Hãy Để Anh Đi', 'Premium concert ticket', 'VIP', 250000, '2025-05-01 00:00:00', '2025-06-08 12:00:00', 6, 10, 1),
-(N'Meet & Greet - Isaac', 'Includes meet and greet', 'Meet & Greet', 300000, '2025-05-01 00:00:00', '2025-06-13 09:30:00', 7, 5, 1),
-(N'Premium Ticket - Hương Tràm', 'Premium concert ticket', 'Premium', 280000, '2025-05-01 00:00:00', '2025-06-14 10:00:00', 8, 10, 1),
-(N'Food Festival Pass', 'Entry to food festival', 'General Admission', 80000, '2025-05-01 00:00:00', '2025-06-14 10:30:00', 9, 10, 1),
-(N'VIP Concert - Anh Trai', 'VIP concert experience', 'VIP', 350000, '2025-05-01 00:00:00', '2025-06-14 10:30:00', 10, 10, 1),
-(N'Standard Ticket - Saxophone Festival', 'General admission', 'Standard', 160000, '2025-05-01 00:00:00', '2025-06-14 11:30:00', 11, 10, 1),
-(N'Ringside Ticket - Lion Championship', 'Premium ringside seats', 'Premium', 400000, '2025-05-01 00:00:00', '2025-06-14 11:30:00', 12, 8, 1),
-(N'Courtside Ticket - VBA Match', 'Courtside basketball seats', 'VIP', 300000, '2025-05-01 00:00:00', '2025-06-14 12:00:00', 13, 6, 1),
-(N'Standard Ticket - Cải Lương Câu Thơ', 'Traditional opera seating', 'Standard', 130000, '2025-05-01 00:00:00', '2025-06-14 12:30:00', 14, 10, 1),
-(N'Concert Ticket - Luiza', 'Classical music concert', 'Premium', 220000, '2025-05-01 00:00:00', '2025-06-14 12:30:00', 15, 10, 1),
-(N'Premium Ticket - Lê Hiếu Show', 'Premium romantic show', 'Premium', 260000, '2025-05-01 00:00:00', '2025-06-14 12:30:00', 16, 10, 1),
-(N'Standard Ticket - Sấm Vang', 'Traditional opera', 'Standard', 140000, '2025-05-01 00:00:00', '2025-06-14 12:30:00', 17, 10, 1),
-(N'VIP Ticket - Pop Rock Fashion', 'VIP experience', 'VIP', 320000, '2025-05-01 00:00:00', '2025-06-17 12:30:00', 18, 8, 1),
-(N'Party Pass - autoFEST', 'Music party admission', 'General Admission', 180000, '2025-05-01 00:00:00', '2025-06-19 01:30:00', 19, 10, 1),
-(N'Conference Pass - Automotive', 'Industry conference access', 'Professional', 250000, '2025-05-01 00:00:00', '2025-06-19 02:30:00', 20, 5, 1);
+(N'Standard Ticket - 12 Bà Mụ', 'Regular seating', 'Standard', 150000, '2025-06-01 00:00:00', '2025-06-25 12:00:00', 1, 10, 1, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
+(N'VIP Ticket - The Island', 'Premium seating', 'VIP', 200000, '2025-06-01 00:00:00', '2025-06-27 06:30:00', 2, 10, 1, '2025-06-02 10:00:00', '2025-06-02 10:00:00'),
+(N'Standard Ticket - Địa Đạo', 'General admission', 'Standard', 120000, '2025-06-01 00:00:00', '2025-06-28 10:30:00', 3, 10, 1, '2025-06-03 11:00:00', '2025-06-03 11:00:00'),
+(N'Premium Ticket - Xóm Vịt Trời', 'Enhanced experience', 'Premium', 180000, '2025-06-01 00:00:00', '2025-06-29 12:00:00', 4, 10, 1, '2025-06-04 12:00:00', '2025-06-04 12:00:00'),
+(N'General Admission - Ngày An Lành', 'Open seating', 'General Admission', 100000, '2025-06-01 00:00:00', '2025-06-30 01:00:00', 5, 10, 1, '2025-06-05 13:00:00', '2025-06-05 13:00:00'),
+(N'VIP Ticket - Hãy Để Anh Đi', 'Premium concert ticket', 'VIP', 250000, '2025-06-01 00:00:00', '2025-07-01 12:00:00', 6, 10, 1, '2025-06-06 14:00:00', '2025-06-06 14:00:00'),
+(N'Meet & Greet - Isaac', 'Includes meet and greet', 'Meet & Greet', 300000, '2025-06-01 00:00:00', '2025-07-02 09:30:00', 7, 5, 1, '2025-06-07 15:00:00', '2025-06-07 15:00:00'),
+(N'Premium Ticket - Hương Tràm', 'Premium concert ticket', 'Premium', 280000, '2025-06-01 00:00:00', '2025-07-03 10:00:00', 8, 10, 1, '2025-06-08 16:00:00', '2025-06-08 16:00:00'),
+(N'Food Festival Pass', 'Entry to food festival', 'General Admission', 80000, '2025-06-01 00:00:00', '2025-07-04 10:30:00', 9, 10, 1, '2025-06-09 17:00:00', '2025-06-09 17:00:00'),
+(N'VIP Concert - Anh Trai', 'VIP concert experience', 'VIP', 350000, '2025-06-01 00:00:00', '2025-07-05 10:30:00', 10, 10, 1, '2025-06-10 18:00:00', '2025-06-10 18:00:00'),
+(N'Standard Ticket - Saxophone Festival', 'General admission', 'Standard', 160000, '2025-06-01 00:00:00', '2025-07-06 11:30:00', 11, 10, 1, '2025-06-11 19:00:00', '2025-06-11 19:00:00'),
+(N'Ringside Ticket - Lion Championship', 'Premium ringside seats', 'Premium', 400000, '2025-06-01 00:00:00', '2025-07-07 11:30:00', 12, 8, 1, '2025-06-12 20:00:00', '2025-06-12 20:00:00'),
+(N'Courtside Ticket - VBA Match', 'Courtside basketball seats', 'VIP', 300000, '2025-06-01 00:00:00', '2025-07-08 12:00:00', 13, 6, 1, '2025-06-13 21:00:00', '2025-06-13 21:00:00'),
+(N'Standard Ticket - Cải Lương Câu Thơ', 'Traditional opera seating', 'Standard', 130000, '2025-06-01 00:00:00', '2025-07-09 12:30:00', 14, 10, 1, '2025-06-14 22:00:00', '2025-06-14 22:00:00'),
+(N'Concert Ticket - Luiza', 'Classical music concert', 'Premium', 220000, '2025-06-01 00:00:00', '2025-07-10 12:30:00', 15, 10, 1, '2025-06-15 23:00:00', '2025-06-15 23:00:00'),
+(N'Premium Ticket - Lê Hiếu Show', 'Premium romantic show', 'Premium', 260000, '2025-06-01 00:00:00', '2025-07-11 12:30:00', 16, 10, 1, '2025-06-16 09:00:00', '2025-06-16 09:00:00'),
+(N'Standard Ticket - Sấm Vang', 'Traditional opera', 'Standard', 140000, '2025-06-01 00:00:00', '2025-07-12 12:30:00', 17, 10, 1, '2025-06-17 10:00:00', '2025-06-17 10:00:00'),
+(N'VIP Ticket - Pop Rock Fashion', 'VIP experience', 'VIP', 320000, '2025-06-01 00:00:00', '2025-07-13 12:30:00', 18, 8, 1, '2025-06-18 11:00:00', '2025-06-18 11:00:00'),
+(N'Party Pass - autoFEST', 'Music party admission', 'General Admission', 180000, '2025-06-01 00:00:00', '2025-07-14 01:30:00', 19, 10, 1, '2025-06-19 12:00:00', '2025-06-19 12:00:00'),
+(N'Conference Pass - Automotive', 'Industry conference access', 'Professional', 250000, '2025-06-01 00:00:00', '2025-07-15 02:30:00', 20, 5, 1, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
 
---select * from TicketInfo
 -- Insert into TicketInventory
-INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity)
+INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity, LastUpdated)
 VALUES
-(1, 200, 2, 0), -- Nhà Hát Kịch IDECAF: 12 Bà Mụ
-(2, 200, 1, 0), -- The Island And The Bay
-(3, 200, 1, 0), -- Địa Đạo Củ Chi : Trăng Chiến Khu
-(4, 200, 0, 0), -- SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI
-(5, 200, 1, 0), -- NGÀY AN LÀNH
-(6, 200, 1, 0), -- Hãy Để Anh Đi Concert
-(7, 200, 2, 0), -- ISAAC FANMEETING
-(8, 200, 2, 0), -- LULULOLA SHOW HƯƠNG TRÀM
-(9, 200, 2, 0), -- LỄ HỘI ẨM THỰC ẤN ĐỘ
-(10, 200, 1, 0), -- ANH TRAI VƯỢT NGÀN CHÔNG GAI
-(11, 200, 0, 0), -- Saxophone Festival
-(12, 200, 0, 0), -- Lion Championship
-(13, 200, 0, 0), -- VBA Match
-(14, 200, 0, 0), -- Cải Lương Câu Thơ
-(15, 200, 0, 0), -- Concert Luiza
-(16, 200, 0, 0), -- Lê Hiếu Show
-(17, 200, 0, 0), -- Sấm Vang
-(18, 200, 0, 0), -- Pop Rock Fashion
-(19, 200, 0, 0), -- autoFEST
-(20, 200, 0, 0); -- Automotive Conference
+(1, 200, 2, 0, '2025-06-20 14:00:00'),
+(2, 200, 1, 0, '2025-06-20 14:00:00'),
+(3, 200, 1, 0, '2025-06-20 14:00:00'),
+(4, 200, 0, 0, '2025-06-20 14:00:00'),
+(5, 200, 1, 0, '2025-06-20 14:00:00'),
+(6, 200, 1, 0, '2025-06-20 14:00:00'),
+(7, 200, 2, 0, '2025-06-20 14:00:00'),
+(8, 200, 2, 0, '2025-06-20 14:00:00'),
+(9, 200, 2, 0, '2025-06-20 14:00:00'),
+(10, 200, 1, 0, '2025-06-20 14:00:00'),
+(11, 200, 0, 0, '2025-06-20 14:00:00'),
+(12, 200, 0, 0, '2025-06-20 14:00:00'),
+(13, 200, 0, 0, '2025-06-20 14:00:00'),
+(14, 200, 0, 0, '2025-06-20 14:00:00'),
+(15, 200, 0, 0, '2025-06-20 14:00:00'),
+(16, 200, 0, 0, '2025-06-20 14:00:00'),
+(17, 200, 0, 0, '2025-06-20 14:00:00'),
+(18, 200, 0, 0, '2025-06-20 14:00:00'),
+(19, 200, 0, 0, '2025-06-20 14:00:00'),
+(20, 200, 0, 0, '2025-06-20 14:00:00');
 
---select * from TicketInventory
+
 -- Insert into Ticket
-INSERT INTO Ticket (TicketInfoID, TicketCode, Status, SeatID)
+INSERT INTO Ticket (TicketInfoID, TicketCode, Status, SeatID, CreatedAt, UpdatedAt)
 VALUES
-(1, 'TKT000000012025', 'sold', 1), -- Nhà Hát Kịch IDECAF: 12 Bà Mụ
-(1, 'TKT000000022025', 'sold', 2), -- Nhà Hát Kịch IDECAF: 12 Bà Mụ
-(2, 'TKT000000032025', 'sold', NULL), -- The Island And The Bay
-(3, 'TKT000000042025', 'sold', NULL), -- Địa Đạo Củ Chi : Trăng Chiến Khu
- (4, 'TKT000000142025', 'available', NULL), --SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI
-(4, 'TKT000000152025', 'available', NULL),--SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI
-(5, 'TKT000000052025', 'sold', NULL), -- NGÀY AN LÀNH
-(6, 'TKT000000062025', 'sold', 3), -- Hãy Để Anh Đi Concert
-(7, 'TKT000000072025', 'sold', NULL), -- ISAAC FANMEETING
-(7, 'TKT000000082025', 'sold', NULL), -- ISAAC FANMEETING
-(8, 'TKT000000092025', 'sold', 5), -- LULULOLA SHOW HƯƠNG TRÀM
-(8, 'TKT000000102025', 'sold', 6), -- LULULOLA SHOW HƯƠNG TRÀM
-(9, 'TKT000000112025', 'sold', NULL), -- LỄ HỘI ẨM THỰC ẤN ĐỘ
-(9, 'TKT000000122025', 'sold', NULL), -- LỄ HỘI ẨM THỰC ẤN ĐỘ
-(10, 'TKT000000132025', 'sold', NULL); -- ANH TRAI VƯỢT NGÀN CHÔNG GAI
+(1, 'TKT000000012025', 'sold', 1, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(1, 'TKT000000022025', 'sold', 2, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(2, 'TKT000000032025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(3, 'TKT000000042025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(4, 'TKT000000142025', 'available', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(4, 'TKT000000152025', 'available', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(5, 'TKT000000052025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(6, 'TKT000000062025', 'sold', 3, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(7, 'TKT000000072025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(7, 'TKT000000082025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(8, 'TKT000000092025', 'sold', 5, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(8, 'TKT000000102025', 'sold', 6, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(9, 'TKT000000112025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(9, 'TKT000000122025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(10, 'TKT000000132025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
 --select * from Ticket
 -- Insert into PaymentMethod
@@ -857,74 +857,75 @@ VALUES
 
 --select * from PaymentMethod
 -- Insert into Orders
-INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes)
+INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes, CreatedAt, UpdatedAt)
 VALUES
-('ORD00000001', 5, 2, 300000, 0, 300000, 'paid', 'delivered', 1, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email'),
-('ORD00000002', 5, 2, 450000, 0, 450000, 'paid', 'delivered', 2, '0945678901', 'customer1@ticketbox.vn', NULL),
-('ORD00000003', 5, 2, 200000, 0, 200000, 'pending', 'created', 3, '0945678901', 'customer1@ticketbox.vn', NULL),
-('ORD00000004', 5, 2, 600000, 0, 600000, 'paid', 'delivered', 1, '0945678901', 'customer1@ticketbox.vn', NULL),
-('ORD00000005', 5, 1, 150000, 0, 150000, 'failed', 'cancelled', 2, '0945678901', 'customer1@ticketbox.vn', NULL),
-('ORD00000006', 5, 1, 280000, 0, 280000, 'paid', 'delivered', 3, '0945678901', 'customer1@ticketbox.vn', NULL),
-('ORD00000007', 5, 1, 350000, 0, 350000, 'pending', 'created', 1, '0945678901', 'customer1@ticketbox.vn', NULL);
-
+('ORD00000001', 5, 2, 300000, 0, 300000, 'paid', 'delivered', 1, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000002', 5, 2, 530000, 0, 530000, 'paid', 'delivered', 2, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000003', 5, 2, 220000, 0, 220000, 'pending', 'created', 3, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000004', 5, 2, 600000, 0, 600000, 'paid', 'delivered', 1, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000005', 5, 1, 200000, 0, 200000, 'failed', 'cancelled', 2, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000006', 5, 1, 280000, 0, 280000, 'paid', 'delivered', 3, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000007', 5, 1, 350000, 0, 350000, 'pending', 'created', 1, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 --select * from Orders
 -- Insert into OrderItems
-INSERT INTO OrderItems (OrderID, TicketInfoID, EventID, TicketID, UnitPrice, Quantity, TotalPrice)
+INSERT INTO OrderItems (OrderID, TicketInfoID, EventID, TicketID, UnitPrice, Quantity, TotalPrice, AssignedAt, CreatedAt)
 VALUES
-(1, 1, 1, 1, 150000, 1, 150000),
-(1, 1, 1, 2, 150000, 1, 150000),
-(2, 6, 6, 6, 250000, 1, 250000),
-(2, 8, 8, 9, 280000, 1, 280000),
-(3, 3, 3, 4, 120000, 1, 120000),
-(3, 5, 5, 5, 100000, 1, 100000),
-(4, 7, 7, 7, 300000, 1, 300000),
-(4, 7, 7, 8, 300000, 1, 300000),
-(5, 2, 2, 3, 200000, 1, 200000),
-(6, 8, 8, 10, 280000, 1, 280000),
-(7, 10, 10, 13, 350000, 1, 350000);
+(1, 1, 1, 1, 150000, 1, 150000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(1, 1, 1, 2, 150000, 1, 150000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(2, 6, 6, 6, 250000, 1, 250000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(2, 8, 8, 9, 280000, 1, 280000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(3, 3, 3, 4, 120000, 1, 120000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(3, 5, 5, 5, 100000, 1, 100000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(4, 7, 7, 7, 300000, 1, 300000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(4, 7, 7, 8, 300000, 1, 300000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(5, 2, 2, 3, 200000, 1, 200000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(6, 8, 8, 10, 280000, 1, 280000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(7, 10, 10, 13, 350000, 1, 350000, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
 --select * from OrderItems
 -- Insert into Feedback
-INSERT INTO Feedback (UserID, EventID, OrderID, Rating, Content, IsApproved)
+INSERT INTO Feedback (UserID, EventID, OrderID, Rating, Content, IsApproved, CreatedAt, UpdatedAt)
 VALUES
-(5, 1, 1, 5, 'Absolutely fantastic theater performance! The actors were brilliant and the story was captivating.', 1),
-(5, 6, 2, 4, 'Great concert with amazing vocals. The venue was perfect and the atmosphere was incredible.', 1),
-(5, 3, 3, 4, 'Very educational and moving experience. Well worth the visit to learn about history.', 1),
-(5, 7, 4, 5, 'Isaac was amazing! The fanmeeting was well organized and he was so kind to all fans.', 1),
-(5, 8, 6, 3, 'Good show but the sound system had some issues. Hương Tràm sang beautifully though.', 0);
+(5, 1, 1, 5, 'Absolutely fantastic theater performance! The actors were brilliant and the story was captivating.', 1, '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
+(5, 6, 2, 4, 'Great concert with amazing vocals. The venue was perfect and the atmosphere was incredible.', 1, '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
+(5, 3, 3, 4, 'Very educational and moving experience. Well worth the visit to learn about history.', 1, '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
+(5, 7, 4, 5, 'Isaac was amazing! The fanmeeting was well organized and he was so kind to all fans.', 1, '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
+(5, 8, 6, 3, 'Good show but the sound system had some issues. Hương Tràm sang beautifully though.', 0, '2025-06-20 15:00:00', '2025-06-20 15:00:00');
 
 -- Insert into Report
-INSERT INTO Report (ReporterID, EventID, Description, AdminID, IsResolved, ResolvedAt)
+INSERT INTO Report (ReporterID, EventID, Description, AdminID, IsResolved, ResolvedAt, CreatedAt, UpdatedAt)
 VALUES
-(5, 8, 'Sound system issues during the concert', 1, 0, NULL),
-(5, 6, 'Late start time reported', 1, 1, '2025-06-09 16:00:00');
+(5, 8, 'Sound system issues during the concert', 1, 0, NULL, '2025-06-20 16:00:00', '2025-06-20 16:00:00'),
+(5, 6, 'Late start time reported', 1, 1, '2025-06-20 16:30:00', '2025-06-20 16:00:00', '2025-06-20 16:30:00');
 
 -- Insert into Conversations
-INSERT INTO Conversations (CustomerID, EventOwnerID, EventID, Subject, Status, LastMessageAt, CreatedBy)
+INSERT INTO Conversations (CustomerID, EventOwnerID, EventID, Subject, Status, LastMessageAt, CreatedBy, CreatedAt, UpdatedAt)
 VALUES
-(5, 3, 6, 'Inquiry about concert details', 'active', '2025-05-25 10:00:00', 5),
-(5, 2, 1, 'Question about theater seating', 'closed', '2025-05-20 15:00:00', 5);
+(5, 3, 6, 'Inquiry about concert details', 'active', '2025-06-20 10:00:00', 5, '2025-06-20 10:00:00', '2025-06-20 10:00:00'),
+(5, 2, 1, 'Question about theater seating', 'closed', '2025-06-20 15:00:00', 5, '2025-06-20 15:00:00', '2025-06-20 15:00:00');
 
 -- Insert into Messages
-INSERT INTO Messages (ConversationID, SenderID, MessageContent, MessageType, IsRead, ReadAt)
+INSERT INTO Messages (ConversationID, SenderID, MessageContent, MessageType, IsRead, ReadAt, CreatedAt, UpdatedAt)
 VALUES
-(1, 5, 'Can you provide more details about the concert schedule?', 'text', 1, '2025-05-25 10:05:00'),
-(1, 3, 'The concert starts at 12:30 PM and ends at 2:30 PM.', 'text', 1, '2025-05-25 10:10:00'),
-(2, 5, 'Is there a seating chart for the theater?', 'text', 1, '2025-05-20 15:05:00'),
-(2, 2, 'No seating chart for this event, it’s general admission.', 'text', 1, '2025-05-20 15:10:00');
+(1, 5, 'Can you provide more details about the concert schedule?', 'text', 1, '2025-06-20 10:05:00', '2025-06-20 10:00:00', '2025-06-20 10:00:00'),
+(1, 3, 'The concert starts at 12:30 PM and ends at 2:30 PM.', 'text', 1, '2025-06-20 10:10:00', '2025-06-20 10:05:00', '2025-06-20 10:05:00'),
+(2, 5, 'Is there a seating chart for the theater?', 'text', 1, '2025-06-20 15:05:00', '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
+(2, 2, 'No seating chart for this event, it’s general admission.', 'text', 1, '2025-06-20 15:10:00', '2025-06-20 15:05:00', '2025-06-20 15:05:00');
+
 
 -- Insert into Promotions
-INSERT INTO Promotions (PromotionName, PromotionCode, Description, PromotionType, StartTime, EndTime, EventID, DiscountPercentage, DiscountAmount, MinOrderAmount, MaxDiscountAmount, MaxUsageCount, CurrentUsageCount, IsActive, CreatedBy)
+INSERT INTO Promotions (PromotionName, PromotionCode, Description, PromotionType, StartTime, EndTime, EventID, DiscountPercentage, DiscountAmount, MinOrderAmount, MaxDiscountAmount, MaxUsageCount, CurrentUsageCount, IsActive, CreatedBy, CreatedAt, UpdatedAt)
 VALUES
-('Summer Sale', 'SUMMER25', '25% off all concert tickets', 'percentage', '2025-06-01 00:00:00', '2025-06-08 12:00:00', 6, 25.00, NULL, 200000, 100000, 100, 10, 1, 1),
-('Food Festival Deal', 'FOODFEST', 'Fixed discount for food festival', 'fixed_amount', '2025-06-01 00:00:00', '2025-06-14 10:00:00', 9, NULL, 20000, 50000, 20000, 50, 5, 1, 1);
+('Summer Sale', 'SUMMER25', '25% off all concert tickets', 'percentage', '2025-06-01 00:00:00', '2025-06-30 23:59:00', 6, 25.00, NULL, 200000, 100000, 100, 10, 1, 1, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
+('Food Festival Deal', 'FOODFEST', 'Fixed discount for food festival', 'fixed_amount', '2025-06-01 00:00:00', '2025-07-03 23:59:00', 9, NULL, 20000, 50000, 20000, 50, 5, 1, 1, '2025-06-01 09:00:00', '2025-06-01 09:00:00');
 
 -- Insert into Notifications
-INSERT INTO Notifications (UserID, Title, Content, NotificationType, RelatedID, IsRead, Priority)
+INSERT INTO Notifications (UserID, Title, Content, NotificationType, RelatedID, IsRead, Priority, CreatedAt)
 VALUES
-(5, 'Order Confirmation', 'Your order ORD00000001 has been confirmed!', 'order', 1, 1, 'normal'),
-(5, 'Event Reminder', 'Don’t miss the concert on June 8th!', 'event', 6, 0, 'high'),
-(5, 'New Promotion', 'Use code SUMMER25 for 25% off!', 'promotion', 1, 0, 'normal');
+(5, 'Order Confirmation', 'Your order ORD00000001 has been confirmed!', 'order', 1, 1, 'normal', '2025-06-20 14:00:00'),
+(5, 'Event Reminder', 'Don’t miss the concert on July 1st!', 'event', 6, 0, 'high', '2025-06-20 14:00:00'),
+(5, 'New Promotion', 'Use code SUMMER25 for 25% off!', 'promotion', 1, 0, 'normal', '2025-06-20 14:00:00');
+
 
 -- Insert into AuditLog
 INSERT INTO AuditLog (TableName, RecordID, Action, OldValues, NewValues, ChangedColumns, UserID, UserAgent)
@@ -934,10 +935,10 @@ VALUES
 ('Ticket', 1, 'UPDATE', 'Status: available', 'Status: sold', 'Status', 1, 'Mozilla/5.0');
 
 -- Insert into Refunds
-INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, RefundStatus, PaymentMethodID)
+INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, RefundStatus, PaymentMethodID, RefundRequestDate, CreatedAt, UpdatedAt)
 VALUES
-(1, 1, 5, 150000, 'Change of plans', 'pending', 2),
-(2, NULL, 5, 530000, 'Double booking', 'pending', 1);
+(1, 1, 5, 150000, 'Change of plans', 'pending', 2, '2025-06-20 15:00:00', '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
+(2, NULL, 5, 530000, 'Double booking', 'pending', 1, '2025-06-20 15:00:00', '2025-06-20 15:00:00', '2025-06-20 15:00:00');
 
 
 --delete from Ticket
@@ -1024,25 +1025,78 @@ END
 WHERE Id BETWEEN 1 AND 25;
 
 
--- SELECT Id, CreatedAt, LastLoginAt,
---        CASE WHEN CreatedAt >= '2025-03-15 00:00:00' THEN 'new' ELSE 'old' END as UserType
--- FROM Users
--- WHERE Id BETWEEN 1 AND 25
--- ORDER BY Id;
+SELECT Id, CreatedAt, LastLoginAt,
+       CASE WHEN CreatedAt >= '2025-03-15 00:00:00' THEN 'new' ELSE 'old' END as UserType
+FROM Users
+WHERE Id BETWEEN 1 AND 25
+ORDER BY Id;
 
+SELECT 
+    FORMAT(LastLoginAt, 'yyyy-MM') as LoginMonth,
+    CASE 
+        WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' 
+        ELSE 'old' 
+    END as UserType,
+    COUNT(*) as LoginCount
+FROM Users 
+WHERE LastLoginAt IS NOT NULL 
+    AND Role != 'Admin'
+GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'), 
+         CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END
+ORDER BY LoginMonth;
+
+
+--query to view all revenue
+-- SELECT SUM(TotalAmount) AS TotalRevenue
+-- FROM Orders
+-- WHERE PaymentStatus = 'paid';
+
+--specific revenue
+-- SELECT e.Name AS EventName, COALESCE(SUM(o.TotalAmount), 0) AS EventRevenue
+-- FROM Orders o
+-- JOIN OrderItems oi ON o.OrderID = oi.OrderID
+-- JOIN Events e ON oi.EventID = e.EventID
+-- WHERE o.PaymentStatus = 'paid'
+-- GROUP BY e.Name
+-- ORDER BY EventRevenue DESC;
+
+--danh sách các giao dịch:
 -- SELECT 
---     FORMAT(LastLoginAt, 'yyyy-MM') as LoginMonth,
---     CASE 
---         WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' 
---         ELSE 'old' 
---     END as UserType,
---     COUNT(*) as LoginCount
--- FROM Users 
--- WHERE LastLoginAt IS NOT NULL 
---     AND Role != 'Admin'
--- GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'), 
---          CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END
--- ORDER BY LoginMonth;
+--     o.OrderID,
+--     o.OrderNumber,
+--     o.UserID,
+--     u.Username AS CustomerName,
+--     u.Email AS CustomerEmail,
+--     e.EventID,
+--     e.Name AS EventName,
+--     ti.TicketName,
+--     o.TotalQuantity,
+--     o.SubtotalAmount,
+--     o.DiscountAmount,
+--     o.TotalAmount,
+--     o.PaymentStatus,
+--     o.OrderStatus,
+--     pm.MethodName AS PaymentMethod,
+--     o.ContactPhone,
+--     o.ContactEmail,
+--     o.CreatedAt,
+--     o.UpdatedAt
+-- FROM Orders o
+-- JOIN OrderItems oi ON o.OrderID = oi.OrderID
+-- JOIN Events e ON oi.EventID = e.EventID
+-- JOIN TicketInfo ti ON oi.TicketInfoID = ti.TicketInfoID
+-- JOIN Users u ON o.UserID = u.Id
+-- LEFT JOIN PaymentMethod pm ON o.PaymentMethodID = pm.PaymentMethodID
+-- ORDER BY o.CreatedAt DESC;
 
 
--- select * from users u where u.role != 'admin'; 
+-- Update all qualifying events to 'pending'
+UPDATE e
+SET Status = 'pending',
+    UpdatedAt = GETDATE()
+FROM Events e
+JOIN TicketInfo ti ON e.EventID = ti.EventID
+JOIN TicketInventory tinv ON ti.TicketInfoID = tinv.TicketInfoID
+WHERE e.Status = 'active'
+  AND e.IsDeleted = 0
+  AND tinv.SoldQuantity = 0;

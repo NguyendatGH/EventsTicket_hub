@@ -292,15 +292,6 @@ prefix="c" %>
         background: rgba(40, 167, 69, 0.3);
       }
 
-      .delete-btn {
-        background: rgba(220, 53, 69, 0.2);
-        color: #dc3545;
-      }
-
-      .delete-btn:hover {
-        background: rgba(220, 53, 69, 0.3);
-      }
-
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -750,12 +741,10 @@ prefix="c" %>
             </li>
           </ul>
         </nav>
-        <a href="${pageContext.request.contextPath}/logout" class="logout">
+       <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
-            <path
-              d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
-            />
+            <path d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z" />
           </svg>
           Đăng xuất
         </a>
@@ -828,9 +817,10 @@ prefix="c" %>
                       class="action-btn lock-btn locked"
                       onclick="toggleUserLock(${user.id}, 'unlock', '${user.email}')"
                       title="Unlock user"
-                    >
-                      🔒
-                      <!-- <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt=""> -->
+                    ><img
+                    src="${pageContext.request.contextPath}/asset/image/Lock_doutone_line.svg"
+                    alt="UnLock"
+                  />
                     </button>
                   </c:when>
                   <c:otherwise>
@@ -839,7 +829,10 @@ prefix="c" %>
                       onclick="toggleUserLock(${user.id}, 'lock', ${user.email})"
                       title="Lock user"
                     >
-                      🔒
+                      <img
+                    src="${pageContext.request.contextPath}/asset/image/Lock.svg"
+                    alt="Lock"
+                  />
                     </button>
                   </c:otherwise>
                 </c:choose>
@@ -850,15 +843,6 @@ prefix="c" %>
                   <img
                     src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg"
                     alt="Edit"
-                  />
-                </button>
-                <button
-                  class="action-btn delete-btn"
-                  onclick="deleteUser(${user.id}, '${user.email}')"
-                >
-                  <img
-                    src="${pageContext.request.contextPath}/asset/image/Trash.svg"
-                    alt="Delete"
                   />
                 </button>
               </div>

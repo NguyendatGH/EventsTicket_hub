@@ -14,7 +14,7 @@ import models.Event;
 
 import utils.ForwardJspUtils;
 
-public class DashboardServlet implements AdminSubServlet{
+public class DashboardServlet implements AdminSubServlet {
 
     private static final Logger logger = Logger.getLogger(DashboardServlet.class.getName());
     private static final String ADMIN_DASHBOARD_JSP = "managerPage/AdminDashboard.jsp";
@@ -22,14 +22,14 @@ public class DashboardServlet implements AdminSubServlet{
     private EventDAO eventDAO;
     private ForwardJspUtils forwardUtils;
 
-    public DashboardServlet(){
+    public DashboardServlet() {
         this.userDAO = new UserDAO();
         this.eventDAO = new EventDAO();
         this.forwardUtils = new ForwardJspUtils();
-    }   
+    }
 
     @Override
-     public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             int totalUsers = userDAO.getNumOfUser();
@@ -38,7 +38,6 @@ public class DashboardServlet implements AdminSubServlet{
             List<Event> pendingEvents = eventDAO.getPendingEvents();
 
             logPendingEvents(pendingEvents);
-
             // Set request attributes
             request.setAttribute("totalUser", totalUsers);
             request.setAttribute("eventThisMonth", eventsThisMonth);
@@ -54,12 +53,11 @@ public class DashboardServlet implements AdminSubServlet{
     }
 
     private void logPendingEvents(List<Event> pendingEvents) {
-        if(pendingEvents != null && !pendingEvents.isEmpty()){
+        if (pendingEvents != null && !pendingEvents.isEmpty()) {
             logger.info("Found " + pendingEvents.size() + "pending events");
-        }else{
+        } else {
             logger.info("no pending events found");
         }
     }
-
 
 }
