@@ -1,4 +1,4 @@
-﻿create database EventTicketDB2
+create database EventTicketDB2
 
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
