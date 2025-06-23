@@ -36,7 +36,9 @@ public interface IUserDAO {
 
     User findWithID(int id);
 
-    boolean deleteUser(int id);
+    boolean changeUserAccountStatus(int id, int status);
+
+    boolean updateUserInfo(User u);
 
     List<TopEventOwner> getTopEventOwner();
 

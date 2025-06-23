@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
-@WebServlet(name = "HomePageServlet", urlPatterns = {"/"})
+@WebServlet("/")
 public class HomePageServlet extends HttpServlet {
 
     @Override

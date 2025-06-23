@@ -34,6 +34,14 @@ public class UserManagementServlet implements AdminSubServlet {
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+        String pathInfo = request.getPathInfo() != null ? request.getPathInfo() : "";
+
+        if (pathInfo.endsWith("/lock-user")) {
+           logger.info("hello");
+            handleLock(request, response);
+            return;
+        }
+
         List<User> allUsers = userDAO.getAllUserAccount();
 
         logger.info("all users from databases: " + allUsers.size());
@@ -83,4 +91,47 @@ public class UserManagementServlet implements AdminSubServlet {
         forwardUtils.toJsp(request, response, USER_MANAGEMENT_JSP);
     }
 
+    private void handleLock(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String userIdParam = request.getParameter("userId");
+        String actionParam = request.getParameter("action");
+
+        if (userIdParam == null || actionParam == null) {
+            request.getSession().setAttribute("message", "Missing user ID or action");
+            request.getSession().setAttribute("messageType", "error");
+            response.sendRedirect(request.getContextPath() + "/admin-servlet/user-management");
+            return;
+        }
+
+        try {
+            int userId = Integer.parseInt(userIdParam);
+            System.out.println("[++++++]user to modify: "+userIdParam);
+            boolean success = false;
+
+            if ("lock".equals(actionParam)) {
+                success = userDAO.changeUserAccountStatus(userId, 0);
+                logger.info("Attempting to lock user ID: " + userId);
+            } else if ("unlock".equals(actionParam)) {
+                success = userDAO.changeUserAccountStatus(userId, 1);
+                logger.info("Attempting to unlock user ID: " + userId);
+            }
+
+            if (success) {
+                request.getSession().setAttribute("message", "user status updated success");
+                request.getSession().setAttribute("messageType", "success");
+            } else {
+                request.getSession().setAttribute("message", "Failed to update user status");
+                request.getSession().setAttribute("messageType", "error");
+            }
+        } catch (NumberFormatException e) {
+            logger.severe("invalid user id: " + userIdParam);
+            request.getSession().setAttribute("message", "invalid user id");
+            request.getSession().setAttribute("messageType", "error");
+        } catch (Exception e) {
+            logger.severe("Error updating user status: " + e.getMessage());
+            request.getSession().setAttribute("message", "An error occurred while updating user status");
+            request.getSession().setAttribute("messageType", "error");
+        }
+
+        response.sendRedirect(request.getContextPath() + "/admin-servlet/user-management");
+    }
 }
