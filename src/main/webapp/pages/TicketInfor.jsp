@@ -1,12 +1,7 @@
-<%-- File: src/main/webapp/TicketDetail.jsp --%>
+<%-- File: src/main/webapp/TicketDetail.jsp (Đã sửa) --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ page import="java.util.List" %>
-<%@ page import="models.TicketInfor" %>
-<%@ page import="java.math.BigDecimal" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Map" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -25,6 +20,7 @@
                 --border-color: #30363d;
                 --text-light: #e6edf3;
                 --text-muted: #8b949e;
+                --danger: #ff4444;
             }
 
             * {
@@ -65,7 +61,7 @@
                 font-weight: bold;
                 color: var(--primary);
             }
-
+            
             .actions {
                 display: flex;
                 align-items: center;
@@ -105,12 +101,22 @@
             .back-link:hover {
                 color: var(--text-light);
             }
-            
+
             .page-title {
                 color: var(--text-light);
                 margin-bottom: 30px;
                 font-size: 28px;
                 font-weight: 600;
+            }
+
+            .error-message {
+                color: var(--danger);
+                text-align: center;
+                margin-bottom: 20px;
+                font-weight: 600;
+                padding: 10px;
+                background-color: rgba(255, 68, 68, 0.1);
+                border-radius: 5px;
             }
 
             .ticket-layout-grid {
@@ -134,11 +140,15 @@
                 background-color: var(--card-bg);
                 border-radius: 8px;
                 border: 1px solid var(--border-color);
+                flex-wrap: wrap;
+                gap: 15px;
             }
 
             .ticket-info {
                 display: flex;
                 flex-direction: column;
+                flex-grow: 1;
+                min-width: 180px;
             }
 
             .ticket-name {
@@ -158,7 +168,7 @@
                 font-size: 13px;
                 margin-top: 8px;
             }
-
+            
             .quantity-control {
                 display: flex;
                 align-items: center;
@@ -200,6 +210,22 @@
                 margin: 0;
             }
 
+            .available-quantity-text {
+                color: var(--text-muted);
+                font-size: 0.85em;
+                text-align: right;
+            }
+
+            .quantity-error-message {
+                color: var(--danger);
+                font-size: 0.8em;
+                text-align: right;
+                display: none;
+                /* Cần một container để bao bọc message và control, sẽ thêm sau nếu cần */
+                width: 100%; /* Đảm bảo nó nằm dưới control */
+            }
+
+
             .summary-panel {
                 background-color: var(--card-bg);
                 padding: 25px;
@@ -235,7 +261,7 @@
                 margin-bottom: 15px;
                 font-size: 18px;
             }
-            
+
             #selected-tickets-summary {
                 min-height: 40px;
             }
@@ -250,8 +276,8 @@
             .summary-item span:last-child {
                 color: var(--text-light);
             }
-            
-            .no-tickets-selected{
+
+            .no-tickets-selected {
                 color: var(--text-muted);
                 font-style: italic;
             }
@@ -265,7 +291,7 @@
             #total-price {
                 color: var(--primary);
             }
-            
+
             .continue-button {
                 background-color: var(--primary);
                 color: white;
@@ -283,12 +309,20 @@
             .continue-button:hover:not(:disabled) {
                 background-color: #5566dd;
             }
-            
+
             .continue-button:disabled {
                 background-color: #555;
                 color: #999;
                 cursor: not-allowed;
             }
+            
+            /* CSS cho responsive, bạn có thể điều chỉnh thêm */
+            @media (max-width: 992px) {
+                .ticket-layout-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
         </style>
     </head>
     <body>
@@ -296,8 +330,8 @@
             <header class="header">
                 <div class="logo">MasterTicket</div>
                 <div class="actions">
-                    <a href="#" class="link">Purchased Tickets</a>
-                    <div class="account">Account</div>
+                    <a href="#" class="link">Vé đã mua</a>
+                    <div class="account">Tài khoản</div>
                 </div>
             </header>
         </div>
@@ -306,10 +340,14 @@
             <a href="${pageContext.request.contextPath}/EventServlet?id=${event.eventID}" class="back-link">
                 <i class="fas fa-arrow-left"></i> Trở về trang sự kiện
             </a>
-            
+
             <h1 class="page-title">
                 Chọn vé <c:if test="${not empty event}">cho sự kiện: ${event.name}</c:if>
             </h1>
+
+            <c:if test="${not empty errorMessage}">
+                <p class="error-message">${errorMessage}</p>
+            </c:if>
 
             <div class="ticket-layout-grid">
                 <main class="ticket-selection-area">
@@ -317,33 +355,49 @@
                         <c:if test="${not empty event}">
                             <input type="hidden" name="eventId" value="${event.eventID}">
                         </c:if>
-                        
-                        <c:if test="${not empty listTicket}">
-                            <c:forEach var="ticket" items="${listTicket}">
-                                <div class="ticket-item">
-                                    <div class="ticket-info">
-                                        <span class="ticket-name">${ticket.ticketName}</span>
-                                        <span class="ticket-price"><fmt:formatNumber value="${ticket.price}" type="currency" currencyCode="VND"/></span>
-                                        <c:if test="${not empty ticket.ticketDescription}">
-                                            <small class="ticket-description">${ticket.ticketDescription}</small>
-                                        </c:if>
-                                    </div>
-                                    <div class="quantity-control">
-                                        <button type="button" class="quantity-btn decrease">-</button>
-                                        <input type="text" class="quantity-input" name="quantity_${ticket.ticketInforID}" value="0" readonly 
-                                               data-ticket-id-input="${ticket.ticketInforID}"
-                                               data-ticket-name="${ticket.ticketName}" 
-                                               data-ticket-price="${ticket.price}">
-                                        <input type="hidden" name="ticketId" value="${ticket.ticketInforID}"> 
-                                        <button type="button" class="quantity-btn increase">+</button>
-                                    </div>
-                                </div>
-                            </c:forEach>
-                        </c:if>
 
-                        <c:if test="${empty listTicket}">
-                            <p style="text-align: center; color: var(--text-muted);">Sự kiện này hiện chưa có thông tin vé hoặc đã hết vé.</p>
-                        </c:if>
+                        <c:choose>
+                            <c:when test="${not empty listTicket}">
+                                <c:forEach var="ticket" items="${listTicket}">
+                                    <div class="ticket-item">
+                                        <div class="ticket-info">
+                                            <span class="ticket-name">${ticket.ticketName}</span>
+                                            <span class="ticket-price"><fmt:formatNumber value="${ticket.price}" type="currency" currencyCode="VND"/></span>
+                                            <c:if test="${not empty ticket.ticketDescription}">
+                                                <small class="ticket-description">${ticket.ticketDescription}</small>
+                                            </c:if>
+                                        </div>
+                                        
+                                        <div style="text-align: right;">
+                                             <div class="quantity-control">
+                                                <%-- SỬA Ở ĐÂY --%>
+                                                <button type="button" class="quantity-btn decrease" data-ticket-id="${ticket.ticketInfoID}">-</button>
+                                                <input type="text"
+                                                       class="quantity-input"
+                                                       name="quantity_${ticket.ticketInfoID}"
+                                                       value="0" readonly
+                                                       data-ticket-id-input="${ticket.ticketInfoID}" <%-- SỬA Ở ĐÂY --%>
+                                                       data-ticket-name="${ticket.ticketName}"
+                                                       data-ticket-price="${ticket.price}"
+                                                       data-available-quantity="${ticket.availableQuantity}"
+                                                       data-max-quantity-per-order="${ticket.maxQuantityPerOrder}">
+                                                <%-- SỬA Ở ĐÂY --%>
+                                                <button type="button" class="quantity-btn increase" data-ticket-id="${ticket.ticketInfoID}">+</button>
+                                            </div>
+                                            <div class="available-quantity-text">
+                                                <%-- SỬA Ở ĐÂY --%>
+                                                Còn lại: <span id="available_${ticket.ticketInfoID}">${ticket.availableQuantity}</span>
+                                            </div>
+                                            <%-- SỬA Ở ĐÂY --%>
+                                            <p class="quantity-error-message" id="error_message_${ticket.ticketInfoID}"></p>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <p style="text-align: center; color: var(--text-muted);">Sự kiện này hiện chưa có thông tin vé hoặc đã hết vé.</p>
+                            </c:otherwise>
+                        </c:choose>
                     </form>
                 </main>
 
@@ -368,97 +422,142 @@
                         </div>
                     </div>
 
-                    <button type="submit" form="ticketOrderForm" class="continue-button" disabled>Vui lòng chọn vé</button>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.user}">
+                            <button type="submit" form="ticketOrderForm" class="continue-button" disabled>Tới trang thanh toán</button>
+                        </c:when>
+                        <c:otherwise>
+                            <%-- SỬA Ở ĐÂY: Đồng bộ tên Servlet nếu bạn có đổi tên --%>
+                            <c:url var="loginUrl" value="/login">
+                                <c:param name="redirect" value="TicketInfoServlet?eventId=${event.eventID}" />
+                            </c:url>
+                            <button type="button" class="continue-button" onclick="location.href = '${loginUrl}'">Đăng nhập để mua vé</button>
+                        </c:otherwise>
+                    </c:choose>
                 </aside>
             </div>
-        </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const ticketItems = document.querySelectorAll('.ticket-item');
-                const continueButton = document.querySelector('.continue-button');
-                const summaryContainer = document.getElementById('selected-tickets-summary');
-                const totalPriceElement = document.getElementById('total-price');
-                const selectedTickets = new Map();
+            <div class="suggestions">
+                <%-- Phần gợi ý sự kiện khác có thể được thêm vào đây --%>
+            </div>
 
-                function formatCurrency(amount) {
-                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-                }
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const ticketOrderForm = document.getElementById('ticketOrderForm');
+                    const quantityInputs = document.querySelectorAll('.quantity-input');
+                    const continueButton = document.querySelector('.continue-button');
+                    const summaryContainer = document.getElementById('selected-tickets-summary');
+                    const totalPriceElement = document.getElementById('total-price');
 
-                function updateSummaryAndTotal() {
-                    summaryContainer.innerHTML = ''; 
-                    
-                    let totalAmount = 0;
-                    let totalQuantity = 0;
+                    const selectedTickets = new Map(); // key: ticketId, value: { name, price, quantity, availableQuantity, maxQuantityPerOrder }
 
-                    if (selectedTickets.size === 0) {
-                         summaryContainer.innerHTML = '<p class="no-tickets-selected">Vui lòng chọn vé.</p>';
+                    function formatCurrency(amount) {
+                        return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(amount);
                     }
 
-                    selectedTickets.forEach((ticket) => {
-                        const summaryItem = document.createElement('div');
-                        summaryItem.className = 'summary-item';
-                        
-                        const ticketNameAndQuantity = document.createElement('span');
-                        ticketNameAndQuantity.textContent = `${ticket.quantity} x ${ticket.name}`;
-                        
-                        const ticketSubtotal = document.createElement('span');
-                        const subtotal = ticket.quantity * ticket.price;
-                        ticketSubtotal.textContent = formatCurrency(subtotal);
-                        
-                        summaryItem.appendChild(ticketNameAndQuantity);
-                        summaryItem.appendChild(ticketSubtotal);
-                        summaryContainer.appendChild(summaryItem);
-                        
-                        totalAmount += subtotal;
-                        totalQuantity += ticket.quantity;
-                    });
-                    
-                    totalPriceElement.textContent = formatCurrency(totalAmount);
+                    function updateSummaryAndTotal() {
+                        summaryContainer.innerHTML = '';
+                        let totalAmount = 0;
+                        let totalQuantityOverall = 0;
 
-                    if (totalQuantity > 0) {
-                        continueButton.disabled = false;
-                        continueButton.textContent = 'Tới trang thanh toán';
-                    } else {
-                        continueButton.disabled = true;
-                        continueButton.textContent = 'Vui lòng chọn vé';
-                    }
-                }
+                        if (selectedTickets.size === 0) {
+                            summaryContainer.innerHTML = '<p class="no-tickets-selected">Vui lòng chọn vé.</p>';
+                        }
 
-                ticketItems.forEach(item => {
-                    const decreaseBtn = item.querySelector('.decrease');
-                    const increaseBtn = item.querySelector('.increase');
-                    const quantityInput = item.querySelector('.quantity-input');
-                    const ticketId = quantityInput.dataset.ticketIdInput;
-                    const ticketName = quantityInput.dataset.ticketName;
-                    const ticketPrice = parseFloat(quantityInput.dataset.ticketPrice);
+                        selectedTickets.forEach((ticket) => {
+                            const summaryItem = document.createElement('div');
+                            summaryItem.className = 'summary-item';
 
-                    decreaseBtn.addEventListener('click', () => {
-                        let currentValue = parseInt(quantityInput.value);
-                        if (currentValue > 0) {
-                            currentValue--;
-                            quantityInput.value = currentValue;
+                            const ticketNameAndQuantity = document.createElement('span');
+                            ticketNameAndQuantity.textContent = `${ticket.quantity} x ${ticket.name}`;
                             
-                            if (currentValue === 0) {
-                                selectedTickets.delete(ticketId);
+                            const ticketSubtotal = document.createElement('span');
+                            const subtotal = ticket.quantity * ticket.price;
+                            ticketSubtotal.textContent = formatCurrency(subtotal);
+                            
+                            summaryItem.appendChild(ticketNameAndQuantity);
+                            summaryItem.appendChild(ticketSubtotal);
+                            summaryContainer.appendChild(summaryItem);
+
+                            totalAmount += subtotal;
+                            totalQuantityOverall += ticket.quantity;
+                        });
+
+                        totalPriceElement.textContent = formatCurrency(totalAmount);
+
+                        // Chỉ bật nút khi người dùng đã đăng nhập
+                        if(continueButton.getAttribute('form') === 'ticketOrderForm') {
+                             if (totalQuantityOverall > 0) {
+                                continueButton.disabled = false;
+                                continueButton.textContent = 'Tới trang thanh toán';
                             } else {
-                                selectedTickets.set(ticketId, { name: ticketName, price: ticketPrice, quantity: currentValue });
+                                continueButton.disabled = true;
+                                continueButton.textContent = 'Vui lòng chọn vé';
+                            }
+                        }
+                    }
+
+                    document.querySelectorAll('.ticket-item').forEach(item => {
+                        const decreaseBtn = item.querySelector('.decrease');
+                        const increaseBtn = item.querySelector('.increase');
+                        const quantityInput = item.querySelector('.quantity-input');
+                        const errorMessageSpan = item.querySelector('.quantity-error-message');
+                        
+                        // Lấy ticketId từ thuộc tính data-ticket-id-input đã được sửa
+                        const ticketId = quantityInput.dataset.ticketIdInput;
+                        const ticketName = quantityInput.dataset.ticketName;
+                        const ticketPrice = parseFloat(quantityInput.dataset.ticketPrice);
+                        let availableQuantity = parseInt(quantityInput.dataset.availableQuantity);
+                        let maxQuantityPerOrder = parseInt(quantityInput.dataset.maxQuantityPerOrder);
+
+                        const updateQuantity = (newQuantity) => {
+                            // Xóa thông báo lỗi cũ
+                            errorMessageSpan.style.display = 'none';
+
+                            if (isNaN(newQuantity) || newQuantity < 0) {
+                                newQuantity = 0;
+                            }
+
+                            const effectiveMaxQuantity = Math.min(availableQuantity, maxQuantityPerOrder);
+
+                            if (newQuantity > effectiveMaxQuantity) {
+                                newQuantity = effectiveMaxQuantity;
+                                errorMessageSpan.textContent = `Bạn chỉ có thể mua tối đa ${effectiveMaxQuantity} vé này.`;
+                                errorMessageSpan.style.display = 'block';
+                            }
+                            
+                            quantityInput.value = newQuantity;
+
+                            if (newQuantity > 0) {
+                                selectedTickets.set(ticketId, {
+                                    name: ticketName,
+                                    price: ticketPrice,
+                                    quantity: newQuantity,
+                                    availableQuantity: availableQuantity,
+                                    maxQuantityPerOrder: maxQuantityPerOrder
+                                });
+                            } else {
+                                selectedTickets.delete(ticketId);
                             }
                             updateSummaryAndTotal();
-                        }
-                    });
+                        };
 
-                    increaseBtn.addEventListener('click', () => {
-                        let currentValue = parseInt(quantityInput.value);
-                        currentValue++;
-                        quantityInput.value = currentValue;
-                        selectedTickets.set(ticketId, { name: ticketName, price: ticketPrice, quantity: currentValue });
-                        updateSummaryAndTotal();
+                        decreaseBtn.addEventListener('click', () => {
+                            updateQuantity(parseInt(quantityInput.value) - 1);
+                        });
+
+                        increaseBtn.addEventListener('click', () => {
+                            updateQuantity(parseInt(quantityInput.value) + 1);
+                        });
+
+                        quantityInput.addEventListener('change', () => {
+                            updateQuantity(parseInt(quantityInput.value));
+                        });
                     });
+                    
+                    // Khởi tạo tóm tắt và trạng thái nút khi tải trang
+                    updateSummaryAndTotal();
                 });
-                
-                updateSummaryAndTotal();
-            });
-        </script>
+            </script>
     </body>
 </html>

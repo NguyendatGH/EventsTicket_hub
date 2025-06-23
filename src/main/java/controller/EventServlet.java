@@ -1,60 +1,59 @@
-
-
 package controller;
 
-
 import dao.EventDAO;
+import dao.TicketInfoDAO; // SỬA: Import DAO đúng
 import models.Event;
+import models.TicketInfo;   // SỬA: Import Model đúng
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
-import models.Event;
 
 @WebServlet(name = "EventServlet", urlPatterns = {"/EventServlet"})
 public class EventServlet extends HttpServlet {
 
     private EventDAO eventDAO;
+    private TicketInfoDAO ticketInfoDAO; // SỬA: Tên biến DAO
 
     @Override
     public void init() throws ServletException {
         eventDAO = new EventDAO();
+        ticketInfoDAO = new TicketInfoDAO(); // SỬA: Khởi tạo DAO đúng
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String idParam = request.getParameter("id");
-        if (idParam != null) {
-            try {
-                int eventId = Integer.parseInt(idParam);
-                Event event = eventDAO.getEventById(eventId);
-                request.setAttribute("event", event);
-              
+
+        if (idParam == null || idParam.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Yêu cầu thiếu ID sự kiện.");
+            return;
+        }
+
+        try {
+            int eventId = Integer.parseInt(idParam);
+            Event event = eventDAO.getEventById(eventId);
+
+            if (event != null) {
+                // SỬA: Sử dụng ticketInfoDAO và kiểu List<TicketInfo>
+                List<TicketInfo> ticketList = ticketInfoDAO.getTicketInfosByEventID(eventId);
                 List<Event> suggestedEvents = eventDAO.getSuggestedEvents(eventId);
+
+                request.setAttribute("event", event);
+                request.setAttribute("ticketList", ticketList);
                 request.setAttribute("suggestedEvents", suggestedEvents);
 
                 request.getRequestDispatcher("/pages/EventDetail.jsp").forward(request, response);
-            } catch (NumberFormatException e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid event ID");
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy sự kiện với ID = " + eventId);
             }
-        } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing event ID");
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Định dạng ID sự kiện không hợp lệ.");
         }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
-        doGet(request, response);
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "EventServlet for handling event details and suggestions";
     }
 }
