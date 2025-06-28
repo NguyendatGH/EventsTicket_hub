@@ -9,7 +9,7 @@ public class Ticket {
     private int ticketInfoID;
     private String ticketCode;
     private String status;
-    private Integer seatID; // Có thể null
+    private Integer seatID; 
 
     public Ticket() {
     }

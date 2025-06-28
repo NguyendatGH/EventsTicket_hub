@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <title>Create Event - MasterTicket</title>
     <style>
         * {
@@ -332,9 +333,9 @@
     <div class="sidebar">
         <div class="brand">🎟️ MasterTicket</div>
         <ul class="menu">
-            <li><a href="#" class="active">📅 My event</a></li>
-            <li><a href="#">📊 Manage Report</a></li>
-            <li><a href="#">�  📋 Rules</a></li>
+            <li><a href="#" class="active">📅 Sự kiện của tôi</a></li>
+            <li><a href="#">📊 Quản lí báo cáo</a></li>
+            <li><a href="#"> 📋 Điều khoản</a></li>
         </ul>
     </div>
 
@@ -515,6 +516,16 @@
                         <label for="hasSeat">This event has assigned seating</label>
                     </div>
                 </div>
+                <!-- Seating Plan Upload (show if hasSeat checked) -->
+                <div class="form-group" id="seatingPlanUploadCheckbox" style="display: ${param.hasSeat == 'true' ? 'block' : 'none'};">
+                    <label for="seatingPlanImageCheckbox">Sơ đồ khán phòng (nếu có ghế ngồi)</label>
+                    <div class="image-upload-area" onclick="document.getElementById('seatingPlanImageCheckbox').click()">
+                        <div class="upload-icon">🗺️</div>
+                        <div>(Tải lên ảnh sơ đồ khán phòng)</div>
+                        <div style="margin-top: 10px; font-size: 12px; opacity: 0.7;">Click để upload sơ đồ</div>
+                    </div>
+                    <input type="file" id="seatingPlanImageCheckbox" name="seatingPlanImageCheckbox" accept="image/*" style="display: none;">
+                </div>
 
                 <!-- Total Tickets -->
                 <div class="form-group">
@@ -617,6 +628,15 @@
             });
         });
 
+        // Toggle seating plan upload based on assigned seating checkbox
+        document.getElementById('hasSeat').addEventListener('change', function() {
+            const seatingPlanDiv = document.getElementById('seatingPlanUploadCheckbox');
+            seatingPlanDiv.style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Setup image preview for seating plan (checkbox)
+        setupImagePreview('seatingPlanImageCheckbox');
+
         // Auto-generate full address
         function updateFullAddress() {
             const province = document.getElementById('province').selectedOptions[0]?.text || '';
@@ -677,6 +697,7 @@
         setupImagePreview('logoUpload');
         setupImagePreview('backgroundUpload');
         setupImagePreview('sponsorUpload');
+        setupImagePreview('seatingPlanImage');
 
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {

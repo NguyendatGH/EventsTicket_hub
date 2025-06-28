@@ -1,6 +1,7 @@
 package dao;
 
 import models.Event;
+import utils.ToggleEvent;
 import context.DBConnection;
 
 import java.sql.CallableStatement;
@@ -8,22 +9,23 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class EventDAO {
+
+    private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
 
     public List<Event> getAllApprovedEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1";
-
-
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
-
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
                 list.add(event);
@@ -35,14 +37,41 @@ public class EventDAO {
         return list;
     }
 
+    public List<Event> getActiveEvents() {
+        List<Event> list = new ArrayList<>();
+        String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1 AND Status = 'active'";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapRowToEvent(rs));
+            }
+        } catch (SQLException e) {
+            logger.severe("Error fetching active events: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<Event> getNonActiveEvents() {
+        List<Event> list = new ArrayList<>();
+        String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1 AND Status IN ('pending', 'cancelled', 'completed')";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapRowToEvent(rs));
+            }
+        } catch (SQLException e) {
+            logger.severe("Error fetching non-active events: " + e.getMessage());
+        }
+        return list;
+    }
+
     public Event getEventById(int eventId) {
         Event event = null;
         String sql = "SELECT * FROM Events WHERE EventID = ? AND isDeleted = 0";
-
-
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, eventId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -59,14 +88,12 @@ public class EventDAO {
     public int getAllEventCreatedThisMonthNums() {
         int res = 0;
         String sql = "EXEC GetEventsCountThisMonth";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
 
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 res = rs.getInt("EventCount");
-                System.out.println("[DEBUG] EventCount found: " + res);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -79,10 +106,9 @@ public class EventDAO {
         List<Event> list = new ArrayList<>();
         String sql = "{CALL GetTopHotEvents(?)}";
         int topCount = 5;
-
-
         try (Connection conn = DBConnection.getConnection();
                 CallableStatement stmt = conn.prepareCall(sql)) {
+
             stmt.setInt(1, topCount);
             ResultSet rs = stmt.executeQuery();
 
@@ -100,19 +126,14 @@ public class EventDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return list;
     }
 
     public List<Event> getPendingEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE Status = 'pending'";
-
-
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
@@ -133,8 +154,6 @@ public class EventDAO {
 
         if (currentEvent != null && currentEvent.getGenreID() != null) {
             sql = "SELECT * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC LIMIT 3";
-
-
             try (Connection conn = DBConnection.getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, currentEvent.getGenreID());
@@ -174,9 +193,7 @@ public class EventDAO {
                     + excludeClause.toString()
                     + " ORDER BY StartTime DESC LIMIT ?";
 
-            try (Connection conn = DBConnection.getConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql)) {
-
+            try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 int paramIndex = 1;
                 for (Integer excludeId : excludeIds) {
@@ -225,17 +242,13 @@ public class EventDAO {
         return event;
     }
 
-    public boolean deleteEvent(int event_id) {
-        String sqlString = "Delete from Events e where e.EventID = ?";
-
-        return true;
-    }
-
-
     public List<Event> getUpcomingEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT TOP 4 * FROM Events WHERE StartTime > GETDATE() ORDER BY StartTime ASC";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
             }
         } catch (Exception e) {
@@ -298,51 +311,171 @@ public class EventDAO {
 
         return stats;
     }
+
     public boolean createEvent(Event event) {
-        String sql = "INSERT INTO events (event_name, event_info, event_type, location_name, " +
-                    "province, district, ward, street_number, full_address, start_time, end_time, " +
-                    "has_seat, total_tickets, logo_image, background_image, sponsor_image, " +
-                    "organizer_name, organizer_info, genre_id, user_id, status, created_at) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, event.getEventName());
-            pstmt.setString(2, event.getEventInfo());
-            pstmt.setString(3, event.getEventType());
-            pstmt.setString(4, event.getLocationName());
-            pstmt.setString(5, event.getProvince());
-            pstmt.setString(6, event.getDistrict());
-            pstmt.setString(7, event.getWard());
-            pstmt.setString(8, event.getStreetNumber());
-            pstmt.setString(9, event.getFullAddress());
-            pstmt.setTimestamp(10, event.getStartTime());
-            pstmt.setTimestamp(11, event.getEndTime());
-            pstmt.setBoolean(12, event.isHasSeat());
-            pstmt.setInt(13, event.getTotalTickets());
-            pstmt.setString(14, event.getLogoImage());
-            pstmt.setString(15, event.getBackgroundImage());
-            pstmt.setString(16, event.getSponsorImage());
-            pstmt.setString(17, event.getOrganizerName());
-            pstmt.setString(18, event.getOrganizerInfo());
-            pstmt.setInt(19, event.getGenreID());
-            pstmt.setInt(20, event.getUserID());
-            pstmt.setString(21, event.getStatus());
-            pstmt.setTimestamp(22, event.getCreatedAt());
-            
-            int affectedRows = pstmt.executeUpdate();
-            
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        event.setEventID(generatedKeys.getInt(1));
-                        return true;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         return false;
     }
 
+    public ToggleEvent deleteEvent(int event_id) {
+        Connection conn = null;
+        boolean success = false;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            // Check for sold tickets (for hard delete)
+
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM Ticket t JOIN TicketInfo ti ON t.TicketInfoID = ti.TicketInfoID WHERE ti.EventID = ? AND t.Status = 'sold'")) {
+                ps.setInt(1, event_id);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    logger.warning("Cannot hard delete EventID: " + event_id + " due to sold tickets");
+                    conn.rollback();
+                    return new ToggleEvent(false, "Không thể xóa sự kiện vì đã có vé được bán");
+                }
+            }
+
+            // Delete or update dependent records
+            String[] deleteQueries = {
+                    "DELETE FROM Ticket WHERE TicketInfoID IN (SELECT TicketInfoID FROM TicketInfo WHERE EventID = ?)",
+                    "DELETE FROM TicketInventory WHERE TicketInfoID IN (SELECT TicketInfoID FROM TicketInfo WHERE EventID = ?)",
+                    "DELETE FROM OrderItems WHERE EventID = ?",
+                    "DELETE FROM Refunds WHERE OrderID IN (SELECT OrderID FROM OrderItems WHERE EventID = ?)",
+                    "DELETE FROM TicketInfo WHERE EventID = ?",
+                    "DELETE FROM Seat WHERE EventID = ?",
+                    "DELETE FROM Feedback WHERE EventID = ?",
+                    "DELETE FROM Report WHERE EventID = ?",
+                    "DELETE FROM Conversations WHERE EventID = ?",
+                    "DELETE FROM Promotions WHERE EventID = ?"
+            };
+
+            for (String query : deleteQueries) {
+                try (PreparedStatement ps = conn.prepareStatement(query)) {
+                    ps.setInt(1, event_id);
+                    ps.executeUpdate();
+                }
+            }
+
+            // Delete or update event
+            String eventQuery = "DELETE FROM Events WHERE EventID = ?";
+            try (PreparedStatement ps = conn.prepareStatement(eventQuery)) {
+                ps.setInt(1, event_id);
+                int rows = ps.executeUpdate();
+                if (rows == 0) {
+                    conn.rollback();
+                    return new ToggleEvent(false, "Sự kiện không tồn tại");
+                }
+            }
+
+            // Log to AuditLog
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO AuditLog (TableName, RecordID, Action, UserID, CreatedAt) VALUES (?, ?, ?, ?, ?)")) {
+                ps.setString(1, "Events");
+                ps.setInt(2, event_id);
+                ps.setString(3, "DELETE");
+                ps.setInt(4, 1);
+                ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+            success = true;
+            return new ToggleEvent(true, "Xóa sự kiện thành công");
+        } catch (SQLException e) {
+            logger.severe("Error during " + "hard" + " delete of EventID: " + event_id + " - "
+                    + e.getMessage());
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException re) {
+                    logger.severe("Rollback failed: " + re.getMessage());
+                }
+            }
+            return new ToggleEvent(false, "Lỗi hệ thống khi xóa sự kiện");
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ce) {
+                    logger.severe("Error closing connection: " + ce.getMessage());
+                }
+            }
+        }
+    }
+
+    // Existing updateEvent method remains unchanged
+  
+    public ToggleEvent updateEvent(Event event) {
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+            // Check if event exists
+            String checkSql = "SELECT COUNT(*) FROM Events WHERE EventID = ? AND IsDeleted = 0";
+            try (PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+                checkPs.setInt(1, event.getEventID());
+                ResultSet rs = checkPs.executeQuery();
+                if (rs.next() && rs.getInt(1) == 0) {
+                    conn.rollback();
+                    return new ToggleEvent(false, "Sự kiện không tồn tại");
+                }
+            }
+
+            // Update event
+            String sql = "UPDATE Events SET Name = ?, Description = ?, PhysicalLocation = ?, StartTime = ?, EndTime = ?, TotalTicketCount = ?, Status = ?, ImageURL = ?, UpdatedAt = ? WHERE EventID = ? AND IsDeleted = 0";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, event.getName());
+                ps.setString(2, event.getDescription());
+                ps.setString(3, event.getPhysicalLocation());
+                ps.setTimestamp(4, new Timestamp(event.getStartTime().getTime()));
+                ps.setTimestamp(5, new Timestamp(event.getEndTime().getTime()));
+                ps.setInt(6, event.getTotalTicketCount());
+                ps.setString(7, event.getStatus());
+                ps.setString(8, event.getImageURL());
+                ps.setTimestamp(9, new Timestamp(System.currentTimeMillis()));
+                ps.setInt(10, event.getEventID());
+
+                int affectedRows = ps.executeUpdate();
+                if (affectedRows == 0) {
+                    conn.rollback();
+                    return new ToggleEvent(false, "Không thể cập nhật sự kiện");
+                }
+            }
+
+            // Log to AuditLog
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO AuditLog (TableName, RecordID, Action, UserID, CreatedAt) VALUES (?, ?, ?, ?, ?)")) {
+                ps.setString(1, "Events");
+                ps.setInt(2, event.getEventID());
+                ps.setString(3, "UPDATE");
+                ps.setInt(4, 1); // Assuming admin user ID is 1
+                ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+            return new ToggleEvent(true, "Cập nhật sự kiện thành công");
+        } catch (SQLException e) {
+            logger.severe("Error updating EventID: " + event.getEventID() + " - " + e.getMessage());
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException re) {
+                    logger.severe("Rollback failed: " + re.getMessage());
+                }
+            }
+            return new ToggleEvent(false, "Lỗi hệ thống khi cập nhật sự kiện");
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ce) {
+                    logger.severe("Error closing connection: " + ce.getMessage());
+                }
+            }
+        }
+    }
 }

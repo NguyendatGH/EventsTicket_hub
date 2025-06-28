@@ -1,83 +1,89 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+// [FIX #1] Thêm các import cần thiết cho Jackson và Java 8 Time
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import dao.EventDAO;
+import dao.SeatDAO;
+import models.Event;
+import models.Seat;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-/**
- *
- * @author admin
- */
-@WebServlet(name="BookChairServlet", urlPatterns={"/BookChairServlet"})
+
+@WebServlet(name = "BookChairServlet", urlPatterns = {"/BookChairServlet"})
 public class BookChairServlet extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet BookChairServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet BookChairServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
+    private EventDAO eventDAO;
+    private SeatDAO seatDAO;
+    private ObjectMapper objectMapper;
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+    public void init() {
+        eventDAO = new EventDAO();
+        seatDAO = new SeatDAO();
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
     @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        if (request.getSession().getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        String eventIdStr = request.getParameter("eventId");
+        if (eventIdStr == null || eventIdStr.trim().isEmpty() || eventIdStr.equals("undefined")) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Yêu cầu thiếu tham số 'eventId' hợp lệ.");
+            return;
+        }
 
+        try {
+//            String eventIdStr = request.getParameter("eventId");
+            if (eventIdStr == null || eventIdStr.trim().isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Yêu cầu thiếu tham số 'eventId'.");
+                return;
+            }
+            int eventId = Integer.parseInt(eventIdStr);
+            
+            Event event = eventDAO.getEventById(eventId);
+            if (event == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy sự kiện.");
+                return;
+            }
+
+            List<Seat> allSeats = seatDAO.getSeatsByEventId(eventId);
+            Map<String, List<Seat>> seatsBySection = allSeats.stream()
+                .collect(Collectors.groupingBy(Seat::getSeatSection));
+
+            // [SỬA ĐỔI] Chuyển đổi tất cả dữ liệu cần thiết sang JSON
+            String seatsJson = objectMapper.writeValueAsString(seatsBySection);
+            String eventJson = objectMapper.writeValueAsString(event);
+
+            request.setAttribute("event", event); // Vẫn gửi để JSTL dùng
+            request.setAttribute("seatsJson", seatsJson);
+            request.setAttribute("eventJson", eventJson); // Gửi cho JavaScript
+
+            request.getRequestDispatcher("/pages/BookChair.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Định dạng Event ID không hợp lệ.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Đã có lỗi xảy ra.");
+        }
+    }
 }

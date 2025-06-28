@@ -154,6 +154,9 @@
                 <label>Mật khẩu </label>
                 <input type="password" name="password" placeholder="Nhập mật khẩu" required />
 
+                <c:if test="${not empty param.redirect}">
+                    <input type="hidden" name="redirect" value="${param.redirect}" />
+                </c:if>
                 <div class="checkbox">
                     <input type="checkbox" name="remember" />
                     <label>Remember me</label>
