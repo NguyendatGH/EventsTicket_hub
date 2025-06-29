@@ -1,7 +1,7 @@
 package controller;
 
 import dao.EventDAO;
-import dao.TicketInforDAO;
+import dao.TicketInfoDAO;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -10,10 +10,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import models.Event;
-import models.TicketInfor;
+import models.TicketInfo;
 
-@WebServlet(name = "TicketInforServlet", urlPatterns = {"/TicketInforServlet"})
-public class TicketInforServlet extends HttpServlet {
+@WebServlet(name = "TicketInfoServlet", urlPatterns = {"/TicketInfoServlet"})
+public class TicketInfoServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -30,7 +30,7 @@ public class TicketInforServlet extends HttpServlet {
             int eventId = Integer.parseInt(eventIdParam);
 
             EventDAO eventDAO = new EventDAO();
-            TicketInforDAO ticketDAO = new TicketInforDAO();
+            TicketInfoDAO ticketDAO = new TicketInfoDAO();
 
             Event event = eventDAO.getEventById(eventId);
 
@@ -39,11 +39,13 @@ public class TicketInforServlet extends HttpServlet {
                 return;
             }
 
-            List<TicketInfor> listTicket = ticketDAO.getTicketInfosByEventID(eventId);
+            List<TicketInfo> listTicket = ticketDAO.getTicketInfosByEventID(eventId);
 
             request.setAttribute("event", event);
             request.setAttribute("listTicket", listTicket);
 
+            // >>> SỬA LỖI Ở ĐÂY: Đảm bảo forward đến đúng file JSP hiển thị vé.
+            // Tôi giả định tên file là "TicketDetail.jsp". Nếu bạn đặt tên khác, hãy thay đổi ở đây.
             request.getRequestDispatcher("/pages/TicketInfor.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {

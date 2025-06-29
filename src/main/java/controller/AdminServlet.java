@@ -78,3 +78,4 @@ public class AdminServlet extends HttpServlet {
         return "Admin Servlet for managing admin dashboard, user accounts, events, and support center";
     }
 }
+

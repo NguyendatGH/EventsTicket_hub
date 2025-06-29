@@ -74,17 +74,15 @@ public class TicketOrderHistoryServlet extends HttpServlet {
         }
 
         try {
-            // 1. Lấy lịch sử đơn hàng (như cũ)
+
             OrderDAO orderDAO = new OrderDAO();
             List<Order> orderList = orderDAO.getOrdersByUserId(currentUser.getId());
             request.setAttribute("orderHistory", orderList);
 
-            // 2. LẤY THÊM DANH SÁCH SỰ KIỆN GỢI Ý
             EventDAO eventDAO = new EventDAO();
-            List<Event> suggestedEvents = eventDAO.getUpcomingEvents(); // Giả sử có phương thức này
+            List<Event> suggestedEvents = eventDAO.getUpcomingEvents();
             request.setAttribute("suggestedEvents", suggestedEvents);
 
-            // 3. Chuyển đến trang JSP
             request.getRequestDispatcher("/pages/TicketOrderHistory.jsp").forward(request, response);
 
         } catch (Exception e) {
