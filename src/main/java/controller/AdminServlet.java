@@ -27,6 +27,7 @@ public class AdminServlet extends HttpServlet {
     private EventManagementServlet eventManagementServlet;
     private SupportCenterServlet supportCenterServlet;
     private DashboardServlet dashboardServlet;
+    private TransactionServlet transactionServlet;
 
     @Override
     public void init() throws ServletException {
@@ -35,6 +36,7 @@ public class AdminServlet extends HttpServlet {
         eventManagementServlet = new EventManagementServlet();
         supportCenterServlet = new SupportCenterServlet();
         dashboardServlet = new DashboardServlet();
+        transactionServlet = new TransactionServlet();
     }
 
     @Override
@@ -52,7 +54,9 @@ public class AdminServlet extends HttpServlet {
                 eventManagementServlet.handleRequest(request, response);
             } else if (pathInfo.startsWith("/support-center")) {
                 supportCenterServlet.handleRequest(request, response);
-            } else {
+            }else if(pathInfo.startsWith("/transaction-management")){
+                transactionServlet.handleRequest(request, response);
+            }else {
                 logger.warning("Unknown path: " + pathInfo);
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid admin path");
             }

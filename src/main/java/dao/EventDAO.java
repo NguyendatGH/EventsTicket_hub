@@ -4,6 +4,7 @@ import models.Event;
 import utils.ToggleEvent;
 import context.DBConnection;
 
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -403,10 +404,11 @@ public class EventDAO {
                 }
             }
         }
+        
     }
 
     // Existing updateEvent method remains unchanged
-  
+
     public ToggleEvent updateEvent(Event event) {
         Connection conn = null;
         try {
@@ -477,5 +479,27 @@ public class EventDAO {
                 }
             }
         }
+    }
+
+    public BigDecimal getTotalRevenueOfAllEvent() {
+        String sql = "SELECT SUM(TotalAmount) AS TotalRevenue FROM Orders WHERE PaymentStatus = 'paid'";
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                totalRevenue = rs.getBigDecimal("TotalRevenue");
+                if (rs.wasNull()) {
+                    totalRevenue = BigDecimal.ZERO;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return totalRevenue;
     }
 }

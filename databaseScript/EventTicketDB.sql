@@ -20,9 +20,6 @@ CREATE TABLE Users (
     CONSTRAINT CK_Users_PhoneNumber CHECK (PhoneNumber IS NULL OR PhoneNumber LIKE '[0-9]%'),
     CONSTRAINT CK_Users_Birthday CHECK (Birthday IS NULL OR Birthday <= GETDATE())
 );
-
-
-
 -- Bảng Genre
 CREATE TABLE Genres (
     GenreID INT IDENTITY(1,1) PRIMARY KEY,
@@ -198,13 +195,13 @@ CREATE TABLE Report (
     CONSTRAINT FK_Report_Admin FOREIGN KEY (AdminID) REFERENCES Users(Id)
 );
 
--- Bảng ConversationTable (đổi tên và cải thiện)
+-- Bảng ConversationTable 
 CREATE TABLE Conversations (
     ConversationID INT IDENTITY(1,1) PRIMARY KEY,
     CustomerID INT NOT NULL,
     EventOwnerID INT NOT NULL,
     EventID INT, -- Cuộc trò chuyện về event nào
-    Subject NVARCHAR(255),
+    Subject NVARCHAR(255) DEFAULT 'Event Discussion',
     Status NVARCHAR(20) DEFAULT 'active' CHECK (Status IN ('active', 'closed', 'archived')),
     LastMessageAt DATETIME,
     CreatedBy INT NOT NULL,
@@ -217,14 +214,13 @@ CREATE TABLE Conversations (
     CONSTRAINT UK_Conversations UNIQUE (CustomerID, EventOwnerID, EventID)
 );
 
--- Bảng Message (cải thiện)
+-- Bảng Message 
 CREATE TABLE Messages (
     MessageID INT IDENTITY(1,1) PRIMARY KEY,
     ConversationID INT NOT NULL,
     SenderID INT NOT NULL,
-    MessageContent NVARCHAR(MAX) NOT NULL,
-    MessageType NVARCHAR(20) DEFAULT 'text' CHECK (MessageType IN ('text', 'image', 'file', 'system')),
-    AttachmentURL NVARCHAR(255),
+    MessageContent NVARCHAR(MAX), -- Optional for non-text messages (e.g., file-only messages)
+    MessageType NVARCHAR(20) NOT NULL DEFAULT 'text' CHECK (MessageType IN ('text', 'image', 'file', 'system')),
     IsRead BIT DEFAULT 0,
     ReadAt DATETIME,
     IsEdited BIT DEFAULT 0,
@@ -232,8 +228,25 @@ CREATE TABLE Messages (
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Messages_Conversation FOREIGN KEY (ConversationID) REFERENCES Conversations(ConversationID),
-    CONSTRAINT FK_Messages_Sender FOREIGN KEY (SenderID) REFERENCES Users(Id)
+    CONSTRAINT FK_Messages_Sender FOREIGN KEY (SenderID) REFERENCES Users(Id),
+    CONSTRAINT CK_Messages_Content CHECK (
+        (MessageType = 'text' AND MessageContent IS NOT NULL) OR
+        (MessageType IN ('image', 'file', 'system') AND MessageContent IS NULL OR MessageContent IS NOT NULL)
+    )
 );
+
+CREATE TABLE FileAttachments (
+    AttachmentID INT IDENTITY(1,1) PRIMARY KEY,
+    MessageID INT NOT NULL,
+    OriginalFilename NVARCHAR(255) NOT NULL,
+    StoredFilename NVARCHAR(255) NOT NULL,
+    FilePath NVARCHAR(500) NOT NULL,
+    FileSize BIGINT NOT NULL CHECK (FileSize >= 0),
+    MimeType NVARCHAR(100) NOT NULL,
+    UploadedAt DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_FileAttachments_Message FOREIGN KEY (MessageID) REFERENCES Messages(MessageID)
+);
+
 
 -- Bảng Promotions (cải thiện)
 CREATE TABLE Promotions(
@@ -366,6 +379,7 @@ CREATE INDEX IX_Messages_ConversationID ON Messages(ConversationID);
 CREATE INDEX IX_Messages_SenderID ON Messages(SenderID);
 CREATE INDEX IX_Messages_CreatedAt ON Messages(CreatedAt);
 CREATE INDEX IX_Messages_IsRead ON Messages(IsRead);
+CREATE INDEX IX_FileAttachments_MessageID ON FileAttachments(MessageID);
 
 -- Indexes cho bảng Notifications
 CREATE INDEX IX_Notifications_UserID ON Notifications(UserID);
@@ -382,7 +396,6 @@ CREATE INDEX IX_Refunds_RefundStatus ON Refunds(RefundStatus);
 CREATE INDEX IX_Refunds_CreatedAt ON Refunds(CreatedAt);
 CREATE INDEX IX_Refunds_IsDeleted ON Refunds(IsDeleted);
 GO
-
 
 
 -- =============================================
@@ -459,39 +472,36 @@ BEGIN
     ORDER BY TotalTicketCount DESC, CreatedAt DESC;
 END;
 GO
-exec GetTopHotEvents
+--exec GetTopHotEvents
 go
-select * from Events
-go
---4. get top event owner base on their ticket selling through platform
-CREATE PROCEDURE GetTopEventOrganizers
+
+--4. get top event organizers
+CREATE OR ALTER PROCEDURE GetTopEventOrganizers
+    @TopCount INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    
-    SELECT TOP 5
+
+    SELECT TOP (@TopCount)
         u.Id,
         u.Email AS [Tên tổ chức],
-        COUNT(e.EventID) AS [Số sự kiện],
+        COUNT(DISTINCT e.EventID) AS [Số sự kiện],
         COALESCE(SUM(ti.SoldQuantity), 0) AS [Tổng vé đã bán],
+        COALESCE(SUM(ti.SoldQuantity * tif.Price), 0) AS [Tổng doanh thu],
         u.IsLocked AS [Trạng thái tài khoản],
         u.Avatar
     FROM Users u
     LEFT JOIN Events e ON u.Id = e.OwnerID AND e.IsDeleted = 0
-    LEFT JOIN TicketInventory ti ON e.EventID = ti.TicketInfoID
+    LEFT JOIN TicketInfo tif ON e.EventID = tif.EventID
+    LEFT JOIN TicketInventory ti ON tif.TicketInfoID = ti.TicketInfoID
     WHERE u.Role = 'event_owner'
     GROUP BY u.Id, u.Email, u.IsLocked, u.Avatar
-    ORDER BY [Tổng vé đã bán] DESC;
+    ORDER BY [Tổng doanh thu] DESC, [Số sự kiện] DESC;
 END;
-
-
 
 -- =============================================
 -- TRIGGERS
 -- =============================================
-
-
-
 
 -- Trigger để cập nhật UpdatedAt
 GO
@@ -688,6 +698,31 @@ BEGIN
     END
 END;
 
+Go
+-- New Trigger for Messages to update LastMessageAt in Conversations
+CREATE TRIGGER TR_Messages_UpdateConversation ON Messages
+AFTER INSERT, UPDATE AS
+BEGIN
+    UPDATE Conversations
+    SET LastMessageAt = GETDATE(),
+        UpdatedAt = GETDATE()
+    WHERE ConversationID IN (SELECT DISTINCT ConversationID FROM Inserted)
+END;
+GO
+
+-- New Trigger for FileAttachments to validate file size
+CREATE TRIGGER TR_FileAttachments_ValidateFileSize ON FileAttachments
+AFTER INSERT, UPDATE AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM Inserted WHERE FileSize > 104857600) -- 100MB limit
+    BEGIN
+        ROLLBACK TRANSACTION;
+        THROW 50005, 'File size cannot exceed 100MB.', 1;
+    END
+END;
+GO
+
+
 
 -- Insert into Users (Administrator with Id=1)
 INSERT INTO Users (Username, Email, PasswordHash, Role, Gender, Birthday, PhoneNumber, Address, Avatar, isLocked, LastLoginAt)
@@ -745,6 +780,12 @@ VALUES
 -- Insert into Events
 INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt)
 VALUES
+(N'HỘI THẢO AI VÀ CHUYỂN ĐỔI SỐ', 'A seminar on AI and digital transformation', 'Ho Chi Minh City', '2025-06-12 09:00:00', '2025-06-12 12:00:00', 150, 1, 'completed', 4, 2, 'https://phanmemmkt.vn/wp-content/uploads/2024/07/HOI-THAO-UNG-DUNG-CONG-NGHE-AI-TRONG-QUAN-TRI-DOANH-NGHIEP.jpg', 0, 0, '2025-05-15 08:00:00', '2025-06-12 12:00:00'),
+(N'CHẠY BỘ GÂY QUỸ VÌ TRẺ EM', 'Charity run for children', 'Thao Dien Park', '2025-06-08 06:00:00', '2025-06-08 09:00:00', 300, 1, 'completed', 3, 4, 'https://news.mbbank.com.vn/file-service/uploads/v1/images/20b88c9f-9e37-4f55-83fa-208ec3d1e380-banner_giai_chay_2-04.jpg?width=1812&height=1024', 0, 0, '2025-05-10 06:00:00', '2025-06-08 09:00:00'),
+(N'LỄ HỘI TRÀ VIỆT 2025', 'Vietnamese Tea Cultural Festival', 'Le Van Tam Park', '2025-06-16 10:00:00', '2025-06-16 15:00:00', 250, 1, 'completed', 4, 2, 'https://isaigon.vn/wp-content/uploads/2025/05/sddefault.webp', 0, 0, '2025-05-18 08:30:00', '2025-06-16 15:00:00'),
+(N'Workshop Lather for Health - Bọt xà bông, Bọt sức khoẻ', 'Mental wellness workshop for young people', 'Bach Dang Center', '2025-06-05 13:00:00', '2025-06-05 16:00:00', 80, 1, 'completed', 4, 2, 'https://yhoccongdong.com/wp-content/uploads/2024/07/Workshop-Lather-for-Health-Bot-xa-bong-Bot-suc-khoe.png', 0, 0, '2025-05-08 09:00:00', '2025-06-05 16:00:00'),
+(N'GALA VĂN NGHỆ SINH VIÊN 2025', 'University student music and performance night', 'Hoa Binh Theater', '2025-06-09 18:00:00', '2025-06-09 21:00:00', 200, 1, 'completed', 1, 2, 'https://www.ueh.edu.vn/images/upload/editer/20250401081950_HD%202025%20NEW_1499x600.png', 0, 0, '2025-05-12 10:00:00', '2025-06-09 21:00:00'),
+(N'HỘI NGHỊ CÔNG NGHỆ BLOCKCHAIN VIỆT NAM', 'National blockchain technology summit', 'Riverside Palace', '2025-06-13 09:00:00', '2025-06-13 17:00:00', 180, 1, 'completed', 4, 2, 'https://insider.blockchainwork.net/wp-content/uploads/2022/10/BLOCKCHAIN-SUMMIT-2022-Dien-dan-cap-cao-blockchain-Viet-Nam-Nguon-eventbrite-800x400-c-center.jpg', 0, 0, '2025-05-14 11:00:00', '2025-06-13 17:00:00'),
 (N'Nhà Hát Kịch IDECAF: 12 Bà Mụ', 'A captivating theater performance', 'Ho Chi Minh City', '2025-06-25 12:30:00', '2025-06-25 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7c/18/6f/b32013793b1dbda15606e1cca4ab40ac.jpg', 1, 0, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
 (N'The Island And The Bay', 'A scenic cultural event', 'Ho Chi Minh City', '2025-06-27 07:00:00', '2025-06-27 09:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7d/cd/82/bea62d09033db74784ee82e8f811ff60.png', 0, 0, '2025-06-02 10:00:00', '2025-06-02 10:00:00'),
 (N'Địa Đạo Củ Chi : Trăng Chiến Khu', 'Historical reenactment', 'Ho Chi Minh City', '2025-06-28 11:00:00', '2025-06-28 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/a6/0a/4a/60e9e35f58d00a4df2f987fe5f02803c.jpg', 0, 0, '2025-06-03 11:00:00', '2025-06-03 11:00:00'),
@@ -766,7 +807,7 @@ VALUES
 (N'autoFEST@HCMC [Music Party & Merchandise]', 'Music and automotive merchandise event', 'Ho Chi Minh City', '2025-07-14 02:00:00', '2025-07-14 04:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/87/43/e3/7e239ba463207db6e0e12cee4e433536.jpg', 0, 0, '2025-06-19 12:00:00', '2025-06-19 12:00:00'),
 (N'Automotive Mobility Solutions Conference', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-07-15 03:00:00', '2025-07-15 05:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/4d/8c/8a/4b0586d8a8733d9ed6cc9f5115960529.png', 0, 0, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
 
---select * from Events;
+select * from Events;
 -- Insert into Seat (for events with seating charts, assuming some events have seats)
 INSERT INTO Seat (EventID, SeatNumber, SeatRow, SeatSection, SeatStatus)
 VALUES
@@ -856,17 +897,30 @@ VALUES
 ('E-Wallet', 'EWALLET0', 'Free transaction fee - Pay with mobile apps like Momo', 1);
 
 --select * from PaymentMethod
--- Insert into Orders
+
+--select * from Orders
 INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes, CreatedAt, UpdatedAt)
 VALUES
 ('ORD00000001', 5, 2, 300000, 0, 300000, 'paid', 'delivered', 1, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-('ORD00000002', 5, 2, 530000, 0, 530000, 'paid', 'delivered', 2, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-('ORD00000003', 5, 2, 220000, 0, 220000, 'pending', 'created', 3, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-('ORD00000004', 5, 2, 600000, 0, 600000, 'paid', 'delivered', 1, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-('ORD00000005', 5, 1, 200000, 0, 200000, 'failed', 'cancelled', 2, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-('ORD00000006', 5, 1, 280000, 0, 280000, 'paid', 'delivered', 3, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-('ORD00000007', 5, 1, 350000, 0, 350000, 'pending', 'created', 1, '0945678901', 'customer1@ticketbox.vn', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
---select * from Orders
+('ORD00000002', 5, 2, 530000, 0, 530000, 'paid', 'delivered', 2, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000003', 5, 2, 220000, 0, 220000, 'pending', 'created', 3, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000004', 5, 2, 600000, 0, 600000, 'paid', 'delivered', 1, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000005', 5, 1, 200000, 0, 200000, 'failed', 'cancelled', 2, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000006', 5, 1, 280000, 0, 280000, 'paid', 'delivered', 3, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000007', 5, 1, 350000, 0, 350000, 'pending', 'created', 1, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+('ORD00000008', 14, 2, 2000000, 0, 2000000, 'paid', 'delivered', 1, '0945678903', 'pham.thuy.dung@gmail.com', 'Deliver via email', '2025-06-28 10:00:00', '2025-06-28 10:00:00'),
+('ORD00000009', 17, 5, 5000000, 500000, 450000, 'paid', 'delivered', 1, '0945678923', 'mai.thi.quynh@gmail.com', 'Deliver via email', '2025-06-28 12:00:00', '2025-06-28 12:00:00'),
+('ORD00000010', 18, 3, 3000000, 0, 3000000, 'paid', 'delivered', 1, '0945678912', 'chu.thi.suong@gmail.com', 'Deliver via email', '2025-06-27 15:00:00', '2025-06-27 15:00:00'),
+('ORD00000011', 15, 10, 10000000, 1000000, 9000000, 'paid', 'delivered', 2, '0945678888', 'dang.thi.lan@gmail.com', 'Deliver via email', '2025-06-27 18:00:00', '2025-06-27 18:00:00'),
+('ORD00000012', 11, 1, 1500000, 0, 1500000, 'paid', 'delivered', 1, '123456789', 'chu.thi.suong@gmail.com', 'Deliver via email', '2025-06-26 09:00:00', '2025-06-26 09:00:00'),
+('ORD00000013', 12, 20, 20000000, 2000000, 180000, 'paid', 'delivered', 1, '0945678123', 'trinh.minh.vu@gmail.com', 'Deliver via email', '2025-06-25 14:00:00', '2025-06-25 14:00:00'),
+('ORD00000014', 11, 4, 4000000, 400000, 3600000, 'paid', 'delivered', 1, '0945678122', 'tran.thi.binh@gmail.com', 'Deliver via email', '2025-06-24 11:00:00', '2025-06-24 11:00:00'),
+('ORD00000015', 6, 15, 15000000, 0, 15000000, 'paid', 'cancelled', 2, '09456789312', 'bui.van.minh@gmail.com', 'Deliver via email', '2025-06-23 16:00:00', '2025-06-23 16:00:00'),
+('ORD00000016', 6, 8, 8000000, 800000, 720000, 'paid', 'cancelled', 1, '0945678321', 'mai.thi.quynh@gmail.com', 'Deliver via email', '2025-06-22 13:00:00', '2025-06-22 13:00:00'),
+('ORD00000017', 7, 25, 25000000, 2500000, 22500000, 'paid', 'cancelled', 2, '0945678111', 'trinh.minh.vu@gmail.com', 'Deliver via email', '2025-06-21 17:00:00', '2025-06-21 17:00:00');
+ 
+ select * from orders
+
 -- Insert into OrderItems
 INSERT INTO OrderItems (OrderID, TicketInfoID, EventID, TicketID, UnitPrice, Quantity, TotalPrice, AssignedAt, CreatedAt)
 VALUES
@@ -877,12 +931,20 @@ VALUES
 (3, 3, 3, 4, 120000, 1, 120000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
 (3, 5, 5, 5, 100000, 1, 100000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
 (4, 7, 7, 7, 300000, 1, 300000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-(4, 7, 7, 8, 300000, 1, 300000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-(5, 2, 2, 3, 200000, 1, 200000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(2, 7, 7, 8, 300000, 1, 300000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
 (6, 8, 8, 10, 280000, 1, 280000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
-(7, 10, 10, 13, 350000, 1, 350000, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
+(7, 10, 10, 13, 350000, 1, 350000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(8, 3, 3, 3, 120000, 1, 120000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(9, 9, 9, 11, 80000, 1, 80000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(10, 9, 9, 12, 80000, 1, 80000, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
---select * from OrderItems
+-- Insert into Promotions 
+INSERT INTO Promotions (PromotionName, PromotionCode, Description, PromotionType, StartTime, EndTime, EventID, DiscountPercentage, DiscountAmount, MinOrderAmount, MaxDiscountAmount, MaxUsageCount, CurrentUsageCount, IsActive, CreatedBy, CreatedAt, UpdatedAt)
+VALUES
+('Summer Sale', 'SUMMER25', '25% off for summer events', 'percentage', '2025-07-01 00:00:00', '2025-07-03 11:00:00.000', 15, 25.00, NULL, 500000, 100000, 100, 0, 1, 1, '2025-06-28 09:00:00', '2025-06-29 09:00:00'),
+('Early Bird', 'EARLY10', '10% off for early bookings', 'percentage', '2025-07-01 00:00:00', '2025-07-07 12:30:00.000', 19, 10.00, NULL, 200000, 50000, 50, 0, 1, 2, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
+('Concert Discount', 'CONCERT50K', '50,000 VND off for concerts', 'fixed_amount', '2025-07-01 00:00:00', '2025-07-09 10:00:00.000', 20, NULL, 50000, 300000, 50000, 200, 0, 1, 3, '2025-06-01 09:00:00', '2025-06-01 09:00:00');
+
 -- Insert into Feedback
 INSERT INTO Feedback (UserID, EventID, OrderID, Rating, Content, IsApproved, CreatedAt, UpdatedAt)
 VALUES
@@ -901,58 +963,63 @@ VALUES
 -- Insert into Conversations
 INSERT INTO Conversations (CustomerID, EventOwnerID, EventID, Subject, Status, LastMessageAt, CreatedBy, CreatedAt, UpdatedAt)
 VALUES
-(5, 3, 6, 'Inquiry about concert details', 'active', '2025-06-20 10:00:00', 5, '2025-06-20 10:00:00', '2025-06-20 10:00:00'),
-(5, 2, 1, 'Question about theater seating', 'closed', '2025-06-20 15:00:00', 5, '2025-06-20 15:00:00', '2025-06-20 15:00:00');
+(5, 2, 1, 'Inquiry about 12 Bà Mụ', 'active', '2025-06-20 14:30:00', 5, '2025-06-20 14:00:00', '2025-06-20 14:30:00'),
+(6, 3, 6, 'Question about concert seating', 'active', '2025-06-20 14:45:00', 6, '2025-06-20 14:15:00', '2025-06-20 14:45:00'),
+(7, 2, 3, 'Details about Địa Đạo event', 'closed', '2025-06-20 15:00:00', 7, '2025-06-20 14:30:00', '2025-06-20 15:00:00'),
+(10, 3, 8, 'Hương Tràm concert inquiry', 'active', '2025-06-20 15:15:00', 10, '2025-06-20 14:45:00', '2025-06-20 15:15:00');
 
--- Insert into Messages
-INSERT INTO Messages (ConversationID, SenderID, MessageContent, MessageType, IsRead, ReadAt, CreatedAt, UpdatedAt)
+-- Insert into Messages (improved to support multiple message types)
+INSERT INTO Messages (ConversationID, SenderID, MessageContent, MessageType, IsRead, ReadAt, IsEdited, EditedAt, CreatedAt, UpdatedAt)
 VALUES
-(1, 5, 'Can you provide more details about the concert schedule?', 'text', 1, '2025-06-20 10:05:00', '2025-06-20 10:00:00', '2025-06-20 10:00:00'),
-(1, 3, 'The concert starts at 12:30 PM and ends at 2:30 PM.', 'text', 1, '2025-06-20 10:10:00', '2025-06-20 10:05:00', '2025-06-20 10:05:00'),
-(2, 5, 'Is there a seating chart for the theater?', 'text', 1, '2025-06-20 15:05:00', '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
-(2, 2, 'No seating chart for this event, it’s general admission.', 'text', 1, '2025-06-20 15:10:00', '2025-06-20 15:05:00', '2025-06-20 15:05:00');
+(1, 5, 'Hello, can you provide more details about the 12 Bà Mụ performance?', 'text', 1, '2025-06-20 14:10:00', 0, NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
+(1, 2, 'Certainly! It’s a theater performance with a focus on Vietnamese folklore.', 'text', 1, '2025-06-20 14:20:00', 0, NULL, '2025-06-20 14:10:00', '2025-06-20 14:10:00'),
+(1, 5, 'Is there a seating chart available?', 'text', 1, '2025-06-20 14:30:00', 0, NULL, '2025-06-20 14:20:00', '2025-06-20 14:20:00'),
+(1, 2, NULL, 'image', 0, NULL, 0, NULL, '2025-06-20 14:30:00', '2025-06-20 14:30:00'), -- Image message
+(2, 6, 'Hi, are the seats for the concert assigned or open?', 'text', 1, '2025-06-20 14:25:00', 0, NULL, '2025-06-20 14:15:00', '2025-06-20 14:15:00'),
+(2, 3, 'The seats are assigned. I can send you the seating chart.', 'text', 1, '2025-06-20 14:35:00', 0, NULL, '2025-06-20 14:25:00', '2025-06-20 14:25:00'),
+(2, 3, NULL, 'file', 0, NULL, 0, NULL, '2025-06-20 14:35:00', '2025-06-20 14:35:00'), -- File attachment
+(2, 6, 'Thanks! Please send the chart.', 'text', 1, '2025-06-20 14:45:00', 0, NULL, '2025-06-20 14:35:00', '2025-06-20 14:35:00'),
+(3, 7, 'Can you confirm the start time for the Địa Đạo event?', 'text', 1, '2025-06-20 14:40:00', 0, NULL, '2025-06-20 14:30:00', '2025-06-20 14:30:00'),
+(3, 2, 'It starts at 11:00 AM on June 28, 2025.', 'text', 1, '2025-06-20 14:50:00', 0, NULL, '2025-06-20 14:40:00', '2025-06-20 14:40:00'),
+(3, 7, 'Got it, thanks for the info!', 'text', 1, '2025-06-20 15:00:00', 0, NULL, '2025-06-20 14:50:00', '2025-06-20 14:50:00'),
+(4, 10, 'Hi, is there a meet and greet with Hương Tràm?', 'text', 1, '2025-06-20 15:00:00', 0, NULL, '2025-06-20 14:45:00', '2025-06-20 14:45:00'),
+(4, 3, 'No meet and greet, but premium tickets include front-row seats.', 'text', 1, '2025-06-20 15:10:00', 0, NULL, '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
+(4, 10, 'Can you share the stage setup?', 'text', 1, '2025-06-20 15:15:00', 0, NULL, '2025-06-20 15:10:00', '2025-06-20 15:10:00'),
+(4, 3, NULL, 'image', 0, NULL, 0, NULL, '2025-06-20 15:15:00', '2025-06-20 15:15:00'); -- Image message
 
-
--- Insert into Promotions
-INSERT INTO Promotions (PromotionName, PromotionCode, Description, PromotionType, StartTime, EndTime, EventID, DiscountPercentage, DiscountAmount, MinOrderAmount, MaxDiscountAmount, MaxUsageCount, CurrentUsageCount, IsActive, CreatedBy, CreatedAt, UpdatedAt)
+-- Insert into FileAttachments (improved to support multiple attachments)
+INSERT INTO FileAttachments (MessageID, OriginalFilename, StoredFilename, FilePath, FileSize, MimeType, UploadedAt)
 VALUES
-('Summer Sale', 'SUMMER25', '25% off all concert tickets', 'percentage', '2025-06-01 00:00:00', '2025-06-30 23:59:00', 6, 25.00, NULL, 200000, 100000, 100, 10, 1, 1, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
-('Food Festival Deal', 'FOODFEST', 'Fixed discount for food festival', 'fixed_amount', '2025-06-01 00:00:00', '2025-07-03 23:59:00', 9, NULL, 20000, 50000, 20000, 50, 5, 1, 1, '2025-06-01 09:00:00', '2025-06-01 09:00:00');
+(4, 'seating_chart_12bamu.jpg', 'seating_chart_12bamu_20250620.jpg', '/uploads/seating_chart_12bamu_20250620.jpg', 5242880, 'image/jpeg', '2025-06-20 14:30:00'),
+(7, 'seating_chart_concert.pdf', 'seating_chart_concert_20250620.pdf', '/uploads/seating_chart_concert_20250620.pdf', 10485760, 'application/pdf', '2025-06-20 14:35:00'),
+(15, 'stage_setup_huongtram.jpg', 'stage_setup_huongtram_20250620.jpg', '/uploads/stage_setup_huongtram_20250620.jpg', 6291456, 'image/jpeg', '2025-06-20 15:15:00');
 
--- Insert into Notifications
-INSERT INTO Notifications (UserID, Title, Content, NotificationType, RelatedID, IsRead, Priority, CreatedAt)
+
+
+
+-- Insert into Notifications 
+INSERT INTO Notifications (UserID, Title, Content, NotificationType, RelatedID, IsRead, ReadAt, Priority, CreatedAt, ExpiresAt)
 VALUES
-(5, 'Order Confirmation', 'Your order ORD00000001 has been confirmed!', 'order', 1, 1, 'normal', '2025-06-20 14:00:00'),
-(5, 'Event Reminder', 'Don’t miss the concert on July 1st!', 'event', 6, 0, 'high', '2025-06-20 14:00:00'),
-(5, 'New Promotion', 'Use code SUMMER25 for 25% off!', 'promotion', 1, 0, 'normal', '2025-06-20 14:00:00');
+(5, 'Order Confirmation', 'Your order ORD00000001 has been confirmed.', 'order', 1, 1, '2025-06-20 14:10:00', 'high', '2025-06-20 14:00:00', '2025-07-20 14:00:00'),
+(5, 'New Message', 'You have a new message about 12 Bà Mụ.', 'message', 1, 0, NULL, 'normal', '2025-06-20 14:10:00', '2025-07-20 14:00:00'),
+(6, 'Order Confirmation', 'Your order ORD00000002 has been confirmed.', 'order', 2, 1, '2025-06-20 14:20:00', 'high', '2025-06-20 14:00:00', '2025-07-20 14:00:00'),
+(6, 'New Message', 'You have a new message about concert seating.', 'message', 2, 0, NULL, 'normal', '2025-06-20 14:25:00', '2025-07-20 14:00:00'),
+(7, 'Order Confirmation', 'Your order ORD00000003 has been confirmed.', 'order', 3, 1, '2025-06-20 14:30:00', 'high', '2025-06-20 14:00:00', '2025-07-20 14:00:00'),
+(10, 'Order Confirmation', 'Your order ORD00000004 has been confirmed.', 'order', 4, 1, '2025-06-20 14:40:00', 'high', '2025-06-20 14:00:00', '2025-07-20 14:00:00'),
+(10, 'New Message', 'You have a new message about Hương Tràm concert.', 'message', 4, 0, NULL, 'normal', '2025-06-20 15:00:00', '2025-07-20 15:00:00');
 
-
+select * from Events where status = 'active'
 -- Insert into AuditLog
-INSERT INTO AuditLog (TableName, RecordID, Action, OldValues, NewValues, ChangedColumns, UserID, UserAgent)
+INSERT INTO AuditLog (TableName, RecordID, Action, OldValues, NewValues, ChangedColumns, UserID, UserAgent, CreatedAt)
 VALUES
-('Users', 5, 'INSERT', NULL, 'Email: customer1@ticketbox.vn, Role: customer', 'Email, Role', 1, 'Mozilla/5.0'),
-('Orders', 1, 'INSERT', NULL, 'OrderNumber: ORD00000001, TotalAmount: 300000', 'OrderNumber, TotalAmount', 1, 'Mozilla/5.0'),
-('Ticket', 1, 'UPDATE', 'Status: available', 'Status: sold', 'Status', 1, 'Mozilla/5.0');
+('Users', 5, 'UPDATE', '{"LastLoginAt": null}', '{"LastLoginAt": "2025-06-20 14:00:00"}', 'LastLoginAt', 1, 'Mozilla/5.0', '2025-06-20 14:00:00'),
+('Orders', 1, 'INSERT', NULL, '{"OrderID": 1, "OrderNumber": "ORD00000001", "UserID": 5}', NULL, 5, 'Mozilla/5.0', '2025-06-20 14:00:00'),
+('Messages', 1, 'INSERT', NULL, '{"MessageID": 1, "ConversationID": 1, "SenderID": 5}', NULL, 5, 'Mozilla/5.0', '2025-06-20 14:00:00');
 
 -- Insert into Refunds
 INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, RefundStatus, PaymentMethodID, RefundRequestDate, CreatedAt, UpdatedAt)
 VALUES
-(1, 1, 5, 150000, 'Change of plans', 'pending', 2, '2025-06-20 15:00:00', '2025-06-20 15:00:00', '2025-06-20 15:00:00'),
-(2, NULL, 5, 530000, 'Double booking', 'pending', 1, '2025-06-20 15:00:00', '2025-06-20 15:00:00', '2025-06-20 15:00:00');
-
-
---delete from Ticket
---DBCC CHECKIDENT ('Ticket', RESEED, 0);    
-
-
--- select * from Ticket
-SELECT COUNT(*) FROM Users;
-                    
-
-
-select * from users u where u.role != 'admin'; 
-
-select * from AuditLog
+(8, 8, 14, 150000, 'Change of plans', 'pending', 2, '2025-06-20 15:00:00', '2025-06-20 15:00:00', '2025-06-20 15:00:00');
 
 UPDATE Users
 SET CreatedAt = CASE
@@ -1024,72 +1091,6 @@ SET LastLoginAt = CASE Id
 END
 WHERE Id BETWEEN 1 AND 25;
 
-
-SELECT Id, CreatedAt, LastLoginAt,
-       CASE WHEN CreatedAt >= '2025-03-15 00:00:00' THEN 'new' ELSE 'old' END as UserType
-FROM Users
-WHERE Id BETWEEN 1 AND 25
-ORDER BY Id;
-
-SELECT 
-    FORMAT(LastLoginAt, 'yyyy-MM') as LoginMonth,
-    CASE 
-        WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' 
-        ELSE 'old' 
-    END as UserType,
-    COUNT(*) as LoginCount
-FROM Users 
-WHERE LastLoginAt IS NOT NULL 
-    AND Role != 'Admin'
-GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'), 
-         CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END
-ORDER BY LoginMonth;
-
-
---query to view all revenue
--- SELECT SUM(TotalAmount) AS TotalRevenue
--- FROM Orders
--- WHERE PaymentStatus = 'paid';
-
---specific revenue
--- SELECT e.Name AS EventName, COALESCE(SUM(o.TotalAmount), 0) AS EventRevenue
--- FROM Orders o
--- JOIN OrderItems oi ON o.OrderID = oi.OrderID
--- JOIN Events e ON oi.EventID = e.EventID
--- WHERE o.PaymentStatus = 'paid'
--- GROUP BY e.Name
--- ORDER BY EventRevenue DESC;
-
---danh sách các giao dịch:
--- SELECT 
---     o.OrderID,
---     o.OrderNumber,
---     o.UserID,
---     u.Username AS CustomerName,
---     u.Email AS CustomerEmail,
---     e.EventID,
---     e.Name AS EventName,
---     ti.TicketName,
---     o.TotalQuantity,
---     o.SubtotalAmount,
---     o.DiscountAmount,
---     o.TotalAmount,
---     o.PaymentStatus,
---     o.OrderStatus,
---     pm.MethodName AS PaymentMethod,
---     o.ContactPhone,
---     o.ContactEmail,
---     o.CreatedAt,
---     o.UpdatedAt
--- FROM Orders o
--- JOIN OrderItems oi ON o.OrderID = oi.OrderID
--- JOIN Events e ON oi.EventID = e.EventID
--- JOIN TicketInfo ti ON oi.TicketInfoID = ti.TicketInfoID
--- JOIN Users u ON o.UserID = u.Id
--- LEFT JOIN PaymentMethod pm ON o.PaymentMethodID = pm.PaymentMethodID
--- ORDER BY o.CreatedAt DESC;
-
-
 -- Update all qualifying events to 'pending'
 UPDATE e
 SET Status = 'pending',
@@ -1100,3 +1101,7 @@ JOIN TicketInventory tinv ON ti.TicketInfoID = tinv.TicketInfoID
 WHERE e.Status = 'active'
   AND e.IsDeleted = 0
   AND tinv.SoldQuantity = 0;
+
+  update Events set status = 'active' where Name = N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI'
+
+

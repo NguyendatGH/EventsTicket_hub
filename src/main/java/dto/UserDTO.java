@@ -1,48 +1,40 @@
-package models;
+package dto;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-public class User {
+public class UserDTO {
     private int id;
     private String name;
     private String email;
-    private String passwordHash;
-    private String role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private String gender;
     private Date birthday;
     private String phoneNumber;
     private String address;
     private String avatar;
     private boolean isLocked;
+    private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
-    private String googleId;
 
-    public User() {
+    public UserDTO() {
     }
 
-    public User(int id, String name, String email, String passwordHash, String role, LocalDateTime createdAt,
-            LocalDateTime updatedAt, String gender, Date birthday, String phoneNumber, String address, String avatar,
-            boolean isLocked, LocalDateTime lastLoginAt, String googleId) {
+    public UserDTO(int id, String name, String email, String gender, Date birthday, String phoneNumber, String address,
+            String avatar, boolean isLocked, LocalDateTime createdAt, LocalDateTime lastLoginAt) {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.passwordHash = passwordHash;
-        this.role = role;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
         this.gender = gender;
         this.birthday = birthday;
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.avatar = avatar;
         this.isLocked = isLocked;
+        this.createdAt = createdAt;
         this.lastLoginAt = lastLoginAt;
-        this.googleId = googleId;
     }
 
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -65,38 +57,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public String getGender() {
@@ -147,6 +107,14 @@ public class User {
         this.isLocked = isLocked;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public LocalDateTime getLastLoginAt() {
         return lastLoginAt;
     }
@@ -155,33 +123,20 @@ public class User {
         this.lastLoginAt = lastLoginAt;
     }
 
-    public String getGoogleId() {
-        return googleId;
-    }
-
-    public void setGoogleId(String googleId) {
-        this.googleId = googleId;
-    }
-
     @Override
     public String toString() {
-        return "User {" +
+        return "UserDTO{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
-                ", role='" + role + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
                 ", gender='" + gender + '\'' +
                 ", birthday=" + birthday +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", address='" + address + '\'' +
                 ", avatar='" + avatar + '\'' +
                 ", isLocked=" + isLocked +
+                ", createdAt=" + createdAt +
                 ", lastLoginAt=" + lastLoginAt +
-                ", googleId='" + googleId + '\'' +
                 '}';
     }
-
 }

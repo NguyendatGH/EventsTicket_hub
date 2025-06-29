@@ -5,18 +5,21 @@ public class TopEventOwner {
     private String name;
     private int numsOfEvent;
     private int numsOfTicketSelled;
+    private double totalRevenue;
     private boolean isLocked;
     private String avatarURL;
 
-    public TopEventOwner(){
-        
+    public TopEventOwner() {
+
     }
 
-    public TopEventOwner(int id, String name, int numOfEvent, int numOfTicketSelled, boolean isLocked, String avatarURL) {
+    public TopEventOwner(int id, String name, int numOfEvent, int numOfTicketSelled, double totalRevenue,
+            boolean isLocked, String avatarURL) {
         this.id = id;
         this.name = name;
         this.numsOfEvent = numOfEvent;
-        this.numsOfTicketSelled = numsOfTicketSelled;
+        this.numsOfTicketSelled = numOfTicketSelled;
+        this.totalRevenue = totalRevenue;
         this.isLocked = isLocked;
         this.avatarURL = avatarURL;
     }
@@ -53,6 +56,14 @@ public class TopEventOwner {
         this.numsOfTicketSelled = numsOfTicketSelled;
     }
 
+    public double getTotalRevenue() {
+        return this.totalRevenue;
+    }
+
+    public void setTotalRevenue(double totalRevenue) {
+        this.totalRevenue = totalRevenue;
+    }
+
     public boolean getStatus() {
         return this.isLocked;
     }
@@ -60,7 +71,7 @@ public class TopEventOwner {
     public void setStatus(boolean isLocked) {
         this.isLocked = isLocked;
     }
-    
+
     public String getAvatarURL() {
         return this.avatarURL;
     }
@@ -71,6 +82,7 @@ public class TopEventOwner {
 
     @Override
     public String toString() {
-        return "top event organizer: " + this.id + "/" + this.name + "," + this.isLocked + ", Avatar: " + this.avatarURL;
+        return "top event organizer: " + this.id + "/" + this.name + "," + this.isLocked + ", Avatar: "
+                + this.avatarURL + "revenue: " + this.totalRevenue;
     }
 }
