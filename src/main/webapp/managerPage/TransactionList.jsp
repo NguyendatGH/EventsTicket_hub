@@ -1,12 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
-prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MasterTicket Admin</title>
+    <title>MasterTicket Admin - Danh Sách Giao Dịch</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
       * {
@@ -16,8 +16,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         position: relative;
         background-color: #070a17;
         min-height: 100vh;
@@ -164,49 +163,9 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         backdrop-filter: blur(20px);
       }
 
-      .stats-grid {
-        display: flex;
-        gap: 30px;
-        flex-wrap: wrap;
-      }
-
-      .stat-card {
-        flex: 1;
-        min-width: 200px;
-        background: rgba(255, 255, 255, 0.18);
-        border-radius: 12px;
-        padding: 2rem;
-        backdrop-filter: blur(20px);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .stat-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(255, 255, 255, 0.2);
-      }
-
-      .stat-title {
-        color: #94a3b8;
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .stat-value {
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-
-      .stat-content {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-      }
-
       .content-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 30px;
       }
 
@@ -221,6 +180,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         display: flex;
         flex-direction: column;
       }
+
       .chart-container {
         flex: 1;
         position: relative;
@@ -228,7 +188,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         max-height: 350px;
       }
 
-      #userStatsChart {
+      #revenueChart {
         background: rgba(0, 0, 0, 0.1);
         border-radius: 8px;
         width: 100% !important;
@@ -242,16 +202,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         margin-bottom: 1rem;
       }
 
-      /* .chart-placeholder {
-        height: 200px;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #94a3b8;
-      } */
-
       .table-container {
         height: 350px;
         max-height: 350px;
@@ -263,6 +213,9 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         width: 100%;
         border-collapse: collapse;
         color: white;
+      }
+      .table-header{
+        background-color: #00adff33;
       }
 
       th,
@@ -289,7 +242,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         text-wrap: nowrap;
       }
 
-      .status-active {
+      .status-completed {
         background: rgba(40, 167, 69, 0.2);
         color: #28a745;
       }
@@ -299,9 +252,15 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         color: #ffc107;
       }
 
-      .status-inactive {
+      .status-failed {
         background: rgba(220, 53, 69, 0.2);
         color: #dc3545;
+      }
+
+      .no-data {
+        color: #94a3b8;
+        text-align: center;
+        padding: 2rem;
       }
 
       .hamburger {
@@ -403,11 +362,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .main-content {
           padding: 0 50px;
         }
-
-        .stats-grid {
-          gap: 20px;
-        }
-
         .content-grid {
           gap: 20px;
         }
@@ -417,15 +371,12 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .header {
           margin-top: 30px;
         }
-
         .content-grid {
           grid-template-columns: 1fr;
         }
-
         .sidebar {
           width: 20%;
         }
-
         .main-content {
           padding: 0 30px;
         }
@@ -433,7 +384,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .table-section {
           height: 400px;
         }
-
         .chart-container,
         .table-container {
           height: 300px;
@@ -443,12 +393,10 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           width: 600px;
           height: 600px;
         }
-
         .firstElement {
           top: -150px;
           left: -30px;
         }
-
         .secondElement {
           bottom: -300px;
           right: -150px;
@@ -459,7 +407,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .control-panel {
           display: none;
         }
-
         .sidebar {
           width: 260px;
           position: fixed;
@@ -467,57 +414,38 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           transform: translateX(-100%);
           z-index: 1000;
         }
-
         .sidebar.active {
           transform: translateX(0);
         }
-
         .main-content {
           padding: 0 20px;
         }
-
-        .stats-grid {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .stat-card {
-          min-width: 100%;
-        }
-
         .admin-avatar {
           width: 100px;
           height: 100px;
         }
-
         .admin-avatar svg {
           width: 60px;
           height: 60px;
         }
-
         .admin-name {
           font-size: 20px;
         }
-
         .logo {
           font-size: 1.3rem;
         }
-
         .bg_elips {
           width: 500px;
           height: 500px;
         }
-
         .firstElement {
           top: -120px;
           left: -20px;
         }
-
         .secondElement {
           bottom: -250px;
           right: -120px;
         }
-
         .hamburger {
           display: flex;
         }
@@ -527,11 +455,9 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .main-content {
           padding: 0 15px;
         }
-
         .page-title {
           font-size: 1.5rem;
         }
-
         .control-panel {
           margin-top: 30px;
           padding: 8px 16px;
@@ -541,24 +467,20 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .table-section {
           height: 350px;
         }
-
         .chart-container,
         .table-container {
           height: 250px;
           max-height: 250px;
         }
-
         .bg_elips {
           width: 400px;
           height: 400px;
           opacity: 0.5;
         }
-
         .firstElement {
           top: -100px;
           left: -15px;
         }
-
         .secondElement {
           bottom: -200px;
           right: -100px;
@@ -569,36 +491,26 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .sidebar {
           width: 100%;
         }
-
         .main-content {
           padding: 0 10px;
         }
-
         .header {
           flex-direction: column;
           gap: 1rem;
           align-items: flex-start;
         }
-
-        .stats-grid {
-          gap: 15px;
-        }
-
         .content-grid {
           gap: 15px;
         }
-
         .bg_elips {
           width: 300px;
           height: 300px;
           opacity: 0.4;
         }
-
         .firstElement {
           top: -80px;
           left: -10px;
         }
-
         .secondElement {
           bottom: -150px;
           right: -50px;
@@ -641,7 +553,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     </button>
     <div class="container">
       <div class="overlay"></div>
-        <aside class="sidebar">
+      <aside class="sidebar">
         <div class="logo">MasterTicket</div>
         <div class="admin-section">
           <div class="admin-avatar">
@@ -659,7 +571,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/admin-servlet/dashboard"
-                class="nav-link active"
+                class="nav-link"
                 >Bảng điều khiển</a
               >
             </li>
@@ -680,7 +592,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/admin-servlet/transaction-management"
-                class="nav-link"
+                class="nav-link active"
                 >Danh sách giao dịch</a
               >
             </li>
@@ -703,95 +615,90 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       </aside>
       <main class="main-content">
         <header class="header">
-          <h1 class="page-title">Bảng điều khiển</h1>
-          <div class="control-panel">Tổng quan</div>
+          <h1 class="page-title">Danh Sách Giao Dịch</h1>
+          <div class="control-panel">Tổng quan giao dịch</div>
         </header>
-        <section class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-title">Sự kiện tháng này</div>
-            <div class="stat-content">
-              <img
-                src="${pageContext.request.contextPath}/asset/image/Ticket_duotone.svg"
-                alt=""
-                class="stat-icon"
-              />
-              <div class="stat-value">${eventThisMonth}</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-title">Tổng số người dùng</div>
-            <div class="stat-content">
-              <img
-                src="${pageContext.request.contextPath}/asset/image/Property1=Group_light.svg"
-                alt=""
-                class="stat-icon"
-              />
-              <div class="stat-value">${totalUser}</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-title">Tổng doanh thu:</div>
-            <span class="stat-content">
-              <img
-                src="${pageContext.request.contextPath}/asset/image/Wallet.svg"
-                alt=""
-                class="stat-icon"
-              />
-              <div class="stat-value">
-                ${totalRevenue} vnđ
-              </div>
-            </span>
-          </div>
-        </section>
         <section class="content-grid">
           <div class="chart-section">
-            <h2 class="section-title">Doanh thu từ nhà tổ chức</h2>
+            <h2 class="section-title">Doanh thu theo ngày</h2>
             <div class="chart-container">
-              <canvas id="revenueChart"></canvas>
+              <c:choose>
+                <c:when test="${not empty dailyRevenue}">
+                  <canvas id="revenueChart"></canvas>
+                </c:when>
+                <c:otherwise>
+                  <div class="no-data">Không có dữ liệu doanh thu</div>
+                </c:otherwise>
+              </c:choose>
             </div>
           </div>
           <div class="table-section">
-            <h2 class="section-title">Top sự kiện hot</h2>
+            <h2 class="section-title">Danh sách giao dịch</h2>
             <div class="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Tên sự kiện</th>
-                    <th>Ngày bắt đầu</th>
-                    <th>Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <c:forEach var="event" items="${events}">
-                    <tr onclick="handleEditEvent('${event.eventID}')">
-                      <td>${event.name}</td>
-                      <td>
-                        <fmt:formatDate
-                          value="${event.startTime}"
-                          pattern="dd/MM/yyyy"
-                        />
-                      </td>
-                      <td>
-                        <span class="status-tag status-${event.status}">
-                          ${event.status == 'active' ? 'Đang hoạt động' :
-                          event.status == 'pending' ? 'Đang chờ duyệt' : 'Đã
-                          dừng'}
-                        </span>
-                      </td>
-                    </tr>
-                  </c:forEach>
-                </tbody>
-              </table>
+              <c:choose>
+                <c:when test="${not empty transactions}">
+                  <table>
+                    <thead class="table-header">
+                      <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Khách hàng</th>
+                        <th>Sự kiện</th>
+                        <th>Vé</th>
+                        <th>Số lượng</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <c:forEach var="transaction" items="${transactions}">
+                        <tr>
+                          <td>${transaction.orderNumber}</td>
+                          <td>${transaction.customerName}</td>
+                          <td>${transaction.eventName}</td>
+                          <td>${transaction.ticketName}</td>
+                          <td>${transaction.totalQuantity}</td>
+                          <td>
+                            <fmt:formatNumber value="${transaction.totalAmount}" type="currency" currencyCode="VND" />
+                          </td>
+                          <td>
+                            <span class="status-tag status-${transaction.paymentStatus}">
+                              ${transaction.paymentStatus == 'paid' ? 'Đã thanh toán' :
+                                transaction.paymentStatus == 'pending' ? 'Đang chờ' : 'Thất bại'}
+                            </span>
+                          </td>
+                          <td>
+                            <span class="status-tag status-${transaction.orderStatus}">
+                              ${transaction.orderStatus == 'completed' ? 'Hoàn thành' :
+                                transaction.orderStatus == 'pending' ? 'Đang xử lý' : 'Hủy'}
+                            </span>
+                          </td>
+                          <td>
+                            <c:choose>
+                              <c:when test="${not empty transaction.createdAt}">
+                                <fmt:formatDate value="${transaction.createdAt}" pattern="dd/MM/yyyy HH:mm" />
+                              </c:when>
+                              <c:otherwise>
+                                N/A
+                              </c:otherwise>
+                            </c:choose>
+                          </td>
+                        </tr>
+                      </c:forEach>
+                    </tbody>
+                  </table>
+                </c:when>
+                <c:otherwise>
+                  <div class="no-data">Không có giao dịch nào</div>
+                </c:otherwise>
+              </c:choose>
             </div>
           </div>
         </section>
       </main>
     </div>
     <script>
-
-      function handleEditEvent(eventID) {
-        window.location.href = "${pageContext.request.contextPath}/admin-servlet/event-management?action=edit-event&eventId=" + eventID;
-      }
       const hamburger = document.querySelector(".hamburger");
       const sidebar = document.querySelector(".sidebar");
       const overlay = document.querySelector(".overlay");
@@ -833,101 +740,81 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
       animateEllipses();
 
-            const organizerNames = [
-        <c:forEach var="organizer" items="${topEventOrganizers}" varStatus="loop">
-          "${organizer.name}"${loop.last ? '' : ','}
-        </c:forEach>
-      ];
-      const organizerRevenues = [
-        <c:forEach var="organizer" items="${topEventOrganizers}" varStatus="loop">
-          ${organizer.totalRevenue}${loop.last ? '' : ','}
-        </c:forEach>
-      ];
+      // Data for daily revenue chart
+      <c:if test="${not empty dailyRevenue}">
+        const revenueData = {
+          labels: [
+            <c:forEach var="entry" items="${dailyRevenue}" varStatus="loop">
+              "${entry.key}"${loop.last ? '' : ','}
+            </c:forEach>
+          ],
+          datasets: [
+            {
+              label: "Doanh thu (VNĐ)",
+              data: [
+                <c:forEach var="entry" items="${dailyRevenue}" varStatus="loop">
+                  ${entry.value}${loop.last ? '' : ','}
+                </c:forEach>
+              ],
+              borderColor: "rgba(59, 130, 246, 1)",
+              backgroundColor: "rgba(59, 130, 246, 0.1)",
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4
+            }
+          ]
+        };
 
-      const revenueData = {
-        labels: organizerNames,
-        datasets: [
-          {
-            label: "Doanh thu (VNĐ)",
-            data: organizerRevenues,
-            backgroundColor: [
-              "rgba(59, 130, 246, 0.7)",
-              "rgba(16, 185, 129, 0.7)",
-              "rgba(255, 193, 7, 0.7)",
-              "rgba(220, 53, 69, 0.7)",
-              "rgba(147, 51, 234, 0.7)"
-            ],
-            borderColor: [
-              "rgba(59, 130, 246, 1)",
-              "rgba(16, 185, 129, 1)",
-              "rgba(255, 193, 7, 1)",
-              "rgba(220, 53, 69, 1)",
-              "rgba(147, 51, 234, 1)"
-            ],
-            borderWidth: 1
-          }
-        ]
-      };
-
-      const config = {
-        type: "bar",
-        data: revenueData,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: {
-                color: "#e2e8f0",
-                font: {
-                  size: 12
+        const config = {
+          type: "line",
+          data: revenueData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  color: "#e2e8f0",
+                  font: { size: 12 }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                      label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                    }
+                    return label;
+                  }
                 }
               }
             },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  let label = context.dataset.label || '';
-                  if (label) {
-                    label += ': ';
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                ticks: {
+                  color: "#94a3b8",
+                  callback: function(value) {
+                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', notation: 'compact' }).format(value);
                   }
-                  if (context.parsed.y !== null) {
-                    label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
-                  }
-                  return label;
                 }
-              }
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: {
-                color: "rgba(255, 255, 255, 0.1)"
               },
-              ticks: {
-                color: "#94a3b8",
-                callback: function(value) {
-                  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', notation: 'compact' }).format(value);
-                }
-              }
-            },
-            x: {
-              grid: {
-                color: "rgba(255, 255, 255, 0.1)"
-              },
-              ticks: {
-                color: "#94a3b8",
-                maxRotation: 45,
-                minRotation: 45
+              x: {
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+                ticks: { color: "#94a3b8" }
               }
             }
           }
-        }
-      };
+        };
 
-      const ctx = document.getElementById("revenueChart").getContext("2d");
-      const revenueChart = new Chart(ctx, config);
+        const ctx = document.getElementById("revenueChart").getContext("2d");
+        const revenueChart = new Chart(ctx, config);
+      </c:if>
     </script>
   </body>
 </html>
