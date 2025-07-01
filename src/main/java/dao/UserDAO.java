@@ -5,7 +5,6 @@
 package dao;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +14,7 @@ import Interfaces.IUserDAO;
 import models.TopEventOwner;
 import models.User;
 import context.DBConnection;
+import dto.UserDTO;
 import utils.HashUtil;
 
 public class UserDAO implements IUserDAO {
@@ -75,9 +75,8 @@ public class UserDAO implements IUserDAO {
     @Override
     public boolean insertUser(User user) {
         String sql = "INSERT INTO Users (Email, PasswordHash, Role, CreatedAt, UpdatedAt, Gender, Birthday, PhoneNumber, Address, IsLocked) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getPasswordHash());
             stmt.setString(3, user.getRole());
@@ -109,20 +108,20 @@ public class UserDAO implements IUserDAO {
         }
     }
 
-    // Update profile của "Customer"
     @Override
     public boolean updateProfile(User user) {
-        String sql = "UPDATE Users SET Gender = ?, Birthday = ?, PhoneNumber = ?, Address = ?, Avatar = ?, UpdatedAt = ? WHERE Id = ?";
+        String sql = "UPDATE Users SET Username =?, Email = ?, Gender = ?, Birthday = ?, PhoneNumber = ?, Address = ?, Avatar = ?, UpdatedAt = ? WHERE Id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, user.getGender());
-            stmt.setDate(2, new java.sql.Date(user.getBirthday().getTime()));
-            stmt.setString(3, user.getPhoneNumber());
-            stmt.setString(4, user.getAddress());
-            stmt.setString(5, user.getAvatar()); // Thêm dòng này để cập nhật avatar
-            stmt.setTimestamp(6, Timestamp.valueOf(java.time.LocalDateTime.now()));
-            stmt.setInt(7, user.getId());
+            stmt.setString(1,user.getName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getGender());
+            stmt.setDate(4, new java.sql.Date(user.getBirthday().getTime()));
+            stmt.setString(5, user.getPhoneNumber());
+            stmt.setString(6, user.getAddress());
+            stmt.setString(7, user.getAvatar()); // Thêm dòng này để cập nhật avatar
+            stmt.setTimestamp(8, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            stmt.setInt(9, user.getId());
 
             return stmt.executeUpdate() > 0;
 
@@ -196,6 +195,7 @@ public class UserDAO implements IUserDAO {
                 if (rs.next()) {
                     User user = new User();
                     user.setId(rs.getInt("id"));
+                    user.setName(rs.getString("Username"));
                     user.setEmail(rs.getString("email"));
                     user.setPasswordHash(rs.getString("passwordHash"));
                     user.setRole(rs.getString("role"));
@@ -292,6 +292,7 @@ public class UserDAO implements IUserDAO {
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getInt("Id"));
+                user.setName(rs.getString("Username"));
                 user.setEmail(rs.getString("Email"));
                 user.setPasswordHash(rs.getString("PasswordHash"));
                 user.setRole(rs.getString("Role"));
@@ -329,7 +330,66 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public User findWithID(int id) {
-
+        String sql = "Select * from Users where id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("Id"));
+                user.setName(rs.getString("Username"));
+                user.setEmail(rs.getString("Email"));
+                user.setPasswordHash(rs.getString("PasswordHash"));
+                user.setRole(rs.getString("Role"));
+                user.setGender(rs.getString("Gender"));
+                user.setBirthday(rs.getDate("Birthday"));
+                user.setPhoneNumber(rs.getString("PhoneNumber"));
+                user.setAddress(rs.getString("Address"));
+                user.setAvatar(rs.getString("Avatar"));
+                user.setIsLocked(rs.getBoolean("IsLocked"));
+                Timestamp lastLogin = rs.getTimestamp("LastLoginAt");
+                if (lastLogin != null) {
+                    user.setLastLoginAt(lastLogin.toLocalDateTime());
+                }
+                user.setGoogleId(rs.getString("GoogleId"));
+                System.out.println("find core user: " +user);
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }   
+    
+    @Override
+    public UserDTO findID(int id){
+        String sql = "Select * from Users where id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                UserDTO user = new UserDTO();
+                user.setId(rs.getInt("Id"));
+                user.setName(rs.getString("Username"));
+                user.setEmail(rs.getString("Email"));
+              
+                user.setGender(rs.getString("Gender"));
+                user.setBirthday(rs.getDate("Birthday"));
+                user.setPhoneNumber(rs.getString("PhoneNumber"));
+                user.setAddress(rs.getString("Address"));
+                user.setAvatar(rs.getString("Avatar"));
+                user.setIsLocked(rs.getBoolean("IsLocked"));
+                Timestamp lastLogin = rs.getTimestamp("LastLoginAt");
+                if (lastLogin != null) {
+                    user.setLastLoginAt(lastLogin.toLocalDateTime());
+                }
+            
+                System.out.println("find user dto: " +user);
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -363,7 +423,7 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public List<TopEventOwner> getTopEventOwner() {
+    public List<TopEventOwner> getTopEventOwner(int count) {
         List<TopEventOwner> list = new ArrayList<>();
         Connection conn = null;
         CallableStatement stmt = null;
@@ -371,8 +431,10 @@ public class UserDAO implements IUserDAO {
 
         try {
             conn = DBConnection.getConnection();
-            String sql = "{call GetTopEventOrganizers}";
+            String sql = "{call GetTopEventOrganizers(?)}";
             stmt = conn.prepareCall(sql);
+            stmt.setInt(1, count);
+
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -381,6 +443,7 @@ public class UserDAO implements IUserDAO {
                 owner.setName(rs.getString("Tên tổ chức"));
                 owner.setNumsOfEvent(rs.getInt("Số sự kiện"));
                 owner.setNumsOfTicketSelled(rs.getInt("Tổng vé đã bán"));
+                owner.setTotalRevenue(rs.getDouble("Tổng doanh thu"));
                 owner.setStatus(rs.getBoolean("Trạng thái tài khoản"));
                 owner.setAvatarURL(rs.getString("Avatar"));
                 list.add(owner);

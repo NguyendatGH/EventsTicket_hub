@@ -7,6 +7,7 @@ package Interfaces;
 import java.util.List;
 import java.util.Map;
 
+import dto.UserDTO;
 import models.TopEventOwner;
 import models.User;
 
@@ -36,13 +37,15 @@ public interface IUserDAO {
 
     User findWithID(int id);
 
+    UserDTO findID(int id);
+
     boolean changeUserAccountStatus(int id, int status);
 
     boolean updateUserInfo(User u);
 
-    List<TopEventOwner> getTopEventOwner();
+    List<TopEventOwner> getTopEventOwner(int count);
 
     Map<String, Integer> getUserRoleDistribution();
 
-     Map<String, Map<String, Integer>> getLoginDistributionByMonth();
+    Map<String, Map<String, Integer>> getLoginDistributionByMonth();
 }

@@ -15,8 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import models.TopEventOwner;
+import service.EventService;
 import models.Event;
-import dao.EventDAO;
 import dao.UserDAO;
 import utils.ToggleEvent;
 import utils.ForwardJspUtils;
@@ -26,12 +26,12 @@ public class EventManagementServlet implements AdminSubServlet {
     private static final String EVENT_MANAGEMENT_JSP = "managerPage/AdminEventManagement.jsp";
     private static final String EVENT_DETAIL_JSP = "managerPage/EventOptions.jsp";
     private final ForwardJspUtils forwardUtils;
-    private final EventDAO eventDAO;
+    private final EventService eventServices;
     private final UserDAO userDAO;
 
     public EventManagementServlet() {
         this.forwardUtils = new ForwardJspUtils();
-        this.eventDAO = new EventDAO();
+        this.eventServices = new EventService();
         this.userDAO = new UserDAO();
     }
 
@@ -53,12 +53,12 @@ public class EventManagementServlet implements AdminSubServlet {
     }
 
     private void setEventToJsp(HttpServletRequest request, HttpServletResponse response) {
-        List<Event> activeEvents = eventDAO.getActiveEvents();
-        List<Event> nonActiveEvents = eventDAO.getNonActiveEvents();
-        List<TopEventOwner> topOrganizers = userDAO.getTopEventOwner();
-        Map<String, Integer> statusStats = eventDAO.getEventByStatus();
-        Map<String, Integer> genreStats = eventDAO.getEventStatsByGenre();
-        List<Map<String, Object>> monthlyStats = eventDAO.getMonthlyEventStats();
+        List<Event> activeEvents = eventServices.getActiveEvents();
+        List<Event> nonActiveEvents = eventServices.getNonActiveEvents();
+        List<TopEventOwner> topOrganizers = userDAO.getTopEventOwner(5);
+        Map<String, Integer> statusStats = eventServices.getEventByStatus();
+        Map<String, Integer> genreStats = eventServices.getEventStatsByGenre();
+        List<Map<String, Object>> monthlyStats = eventServices.getMonthlyEventStats();
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -105,7 +105,7 @@ public class EventManagementServlet implements AdminSubServlet {
             return;
         }
 
-        ToggleEvent deleteResult = eventDAO.deleteEvent(eventID);
+        ToggleEvent deleteResult = eventServices.deleteEvent(eventID);
         responseMap.put("success", deleteResult.isSuccess());
         responseMap.put("message", deleteResult.getMessage());
 
@@ -182,10 +182,10 @@ public class EventManagementServlet implements AdminSubServlet {
 
         System.out.println("Event update: " + event);
 
-        ToggleEvent updateResult = eventDAO.updateEvent(event);
+        ToggleEvent updateResult = eventServices.updateEvent(event);
         if (updateResult.isSuccess()) {
             request.setAttribute("success", updateResult.getMessage());
-            request.setAttribute("event", eventDAO.getEventById(eventID)); // Refresh event data
+            request.setAttribute("event", eventServices.getEventById(eventID)); // Refresh event data
             request.setAttribute("editMode", true);
             forwardUtils.toJsp(request, response, EVENT_DETAIL_JSP);
         } else {
@@ -212,7 +212,7 @@ public class EventManagementServlet implements AdminSubServlet {
             return;
         }
 
-        Event event = eventDAO.getEventById(eventID);
+        Event event = eventServices.getEventById(eventID);
         if (event == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy sự kiện");
             return;

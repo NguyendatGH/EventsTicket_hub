@@ -731,41 +731,66 @@
     </button>
     <div class="container">
         <div class="overlay"></div>
-        <aside class="sidebar">
-            <div class="logo">MasterTicket</div>
-            <div class="admin-section">
-                <div class="admin-avatar">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                </div>
-                <div class="admin-name">Quản trị viên</div>
-                <div class="admin-role">Quản lý website MasterTicket</div>
-            </div>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/dashboard" class="nav-link">Bảng điều khiển</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/event-management" class="nav-link active">Danh sách sự kiện</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/user-management" class="nav-link">Danh sách tài khoản</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/support-center" class="nav-link">Hỗ trợ khách hàng</a>
-                    </li>
-                </ul>
-            </nav>
-           <a href="${pageContext.request.contextPath}/logout" class="logout">
+     <aside class="sidebar">
+        <div class="logo">MasterTicket</div>
+        <div class="admin-section">
+          <div class="admin-avatar">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              />
+            </svg>
+          </div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Quản lý website MasterTicket</div>
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
+                class="nav-link"
+                >Bảng điều khiển</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
+                class="nav-link active"
+                >Danh sách sự kiện</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
+                class="nav-link"
+                >Danh sách tài khoản</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/transaction-management"
+                class="nav-link"
+                >Danh sách giao dịch</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
             <path d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z" />
           </svg>
           Đăng xuất
         </a>
-        </aside>
+      </aside>
         <main class="main-content">
             <div class="top-bar">
                 <div class="breadcrumb">
