@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import Interfaces.IUserDAO;
 import models.TopEventOwner;
 import models.User;
@@ -35,6 +36,7 @@ public class UserDAO implements IUserDAO {
             if (rs.next()) {
                 user = new User();
                 user.setId(rs.getInt("Id"));
+                user.setName(rs.getString("Username"));
                 user.setEmail(rs.getString("Email"));
                 user.setPasswordHash(rs.getString("PasswordHash"));
                 user.setRole(rs.getString("Role"));
@@ -113,7 +115,7 @@ public class UserDAO implements IUserDAO {
         String sql = "UPDATE Users SET Username =?, Email = ?, Gender = ?, Birthday = ?, PhoneNumber = ?, Address = ?, Avatar = ?, UpdatedAt = ? WHERE Id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1,user.getName());
+            stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getGender());
             stmt.setDate(4, new java.sql.Date(user.getBirthday().getTime()));
@@ -352,17 +354,17 @@ public class UserDAO implements IUserDAO {
                     user.setLastLoginAt(lastLogin.toLocalDateTime());
                 }
                 user.setGoogleId(rs.getString("GoogleId"));
-                System.out.println("find core user: " +user);
+                System.out.println("find core user: " + user);
                 return user;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
-    }   
-    
+    }
+
     @Override
-    public UserDTO findID(int id){
+    public UserDTO findID(int id) {
         String sql = "Select * from Users where id = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -372,7 +374,7 @@ public class UserDAO implements IUserDAO {
                 user.setId(rs.getInt("Id"));
                 user.setName(rs.getString("Username"));
                 user.setEmail(rs.getString("Email"));
-              
+
                 user.setGender(rs.getString("Gender"));
                 user.setBirthday(rs.getDate("Birthday"));
                 user.setPhoneNumber(rs.getString("PhoneNumber"));
@@ -383,8 +385,8 @@ public class UserDAO implements IUserDAO {
                 if (lastLogin != null) {
                     user.setLastLoginAt(lastLogin.toLocalDateTime());
                 }
-            
-                System.out.println("find user dto: " +user);
+
+                // System.out.println("find user dto: " + user);
                 return user;
             }
         } catch (SQLException e) {
@@ -518,4 +520,5 @@ public class UserDAO implements IUserDAO {
         loginDistribution.put("old", oldUsersLogin);
         return loginDistribution;
     }
+
 }

@@ -5,14 +5,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-import dao.UserDAO;
-import Interfaces.IUserDAO;
-import models.User;
+import dto.UserDTO;
+import service.UserService;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    private final IUserDAO userDAO = new UserDAO();
+    private final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -28,27 +27,19 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        User user = userDAO.login(email, password);
-
+        UserDTO user = userService.login(email, password);
         if (user != null) {
-         
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-
-
-
-            if (user.getId() == 1) { 
+            if (user.getId() == 1) {
                 response.sendRedirect(request.getContextPath() + "/admin-servlet");
-                return; 
+                return;
             }
-
             String redirectURL = request.getParameter("redirect");
-
             if (redirectURL != null && !redirectURL.isEmpty()) {
                 response.sendRedirect(redirectURL);
             } else {
-
-                response.sendRedirect(request.getContextPath() + "/"); 
+                response.sendRedirect(request.getContextPath() + "/");
             }
 
         } else {

@@ -2,7 +2,7 @@ package service;
 
 import dao.UserDAO;
 import dto.UserDTO;
-import dto.AuthUserDTO;
+// import dto.AuthUserDTO;
 import models.TopEventOwner;
 import models.User;
 import java.util.ArrayList;
@@ -16,10 +16,10 @@ public class UserService {
         this.userDAO = new UserDAO();
     }
 
-    public AuthUserDTO login(String email, String password) {
+    public UserDTO login(String email, String password) {
         User user = userDAO.login(email, password);
         if (user != null) {
-            return convertToAuthDTO(user);
+            return convertToDTO(user);
         }
         return null;
     }
@@ -112,15 +112,6 @@ public class UserService {
                 user.getAvatar(),
                 user.getIsLocked(),
                 user.getCreatedAt(),
-                user.getLastLoginAt());
-    }
-
-    private AuthUserDTO convertToAuthDTO(User user) {
-        return new AuthUserDTO(
-                user.getId(),
-                user.getEmail(),
-                user.getPasswordHash(),
-                user.getGoogleId(),
                 user.getLastLoginAt());
     }
 
