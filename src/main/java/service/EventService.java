@@ -1,7 +1,7 @@
 package service;
 
 import dao.EventDAO;
-// import dto.EventDTO;
+import dto.UserDTO;
 import models.Event;
 import utils.ToggleEvent;
 
@@ -16,7 +16,7 @@ public class EventService {
         this.eventDAO = new EventDAO();
     }
 
-    public BigDecimal getTotalRevenue(){
+    public BigDecimal getTotalRevenue() {
         return eventDAO.getTotalRevenueOfAllEvent();
     }
 
@@ -32,7 +32,7 @@ public class EventService {
 
     public List<Event> getNonActiveEvents() {
         List<Event> events = eventDAO.getNonActiveEvents();
-          return events;
+        return events;
     }
 
     public Event getEventById(int eventId) {
@@ -80,6 +80,10 @@ public class EventService {
 
     public List<Map<String, Object>> getMonthlyEventStats() {
         return eventDAO.getMonthlyEventStats();
+    }
+
+    public UserDTO getEventOwnerId(int ownerId) {
+        return eventDAO.getEventOwnerId(ownerId);
     }
 
 }

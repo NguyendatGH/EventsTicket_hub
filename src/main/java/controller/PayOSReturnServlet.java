@@ -3,7 +3,7 @@ package controller;
 import dao.OrderDAO;
 import models.Order;
 import models.User;
-import services.EmailService; // THÊM IMPORT NÀY
+import service.EmailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

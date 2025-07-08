@@ -2,6 +2,7 @@ package controller;
 
 import dao.EventDAO;
 import dao.TicketInfoDAO;
+import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,7 +19,7 @@ import models.Event;
 import models.Order;
 import models.OrderItem;
 import models.TicketInfo;
-import models.User;
+// import models.User;
 
 @WebServlet(name = "PaymentServlet", urlPatterns = {"/PaymentServlet"})
 public class PaymentServlet extends HttpServlet {
@@ -28,7 +29,7 @@ public class PaymentServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        User currentUser = (User) session.getAttribute("user");
+        UserDTO currentUser = (UserDTO) session.getAttribute("user");
 
         if (currentUser == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
