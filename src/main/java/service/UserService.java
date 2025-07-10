@@ -5,6 +5,9 @@ import dto.UserDTO;
 // import dto.AuthUserDTO;
 import models.TopEventOwner;
 import models.User;
+
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -139,5 +142,9 @@ public class UserService {
         // Sensitive fields (role, createdAt, updatedAt, isLocked, passwordHash,
         // googleId) are not set
         return user;
+    }
+
+    public String whoisLoggedin(int userId) throws IOException, SQLException {
+      return userDAO.checkRole(userId);
     }
 }
