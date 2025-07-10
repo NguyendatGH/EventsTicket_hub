@@ -19,7 +19,9 @@
             min-height: 100vh;
             color: #fff;
         }
-
+        
+        
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -85,6 +87,18 @@
             background: rgba(255,255,255,0.2);
             color: rgb(192, 177, 177);
             border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-logout {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
         }
 
         .sidebar {
@@ -351,8 +365,8 @@
                 <a href="#">Hỗ trợ</a>
             </div>
             <div class="user-info">
-                <span>Save</span>
-                <button class="btn btn-primary">Continue</button>
+ 
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">Logout</a>
             </div>
         </nav>
 
@@ -606,10 +620,10 @@
             </div>
 
             <!-- Form Actions -->
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="history.back()">← Previous</button>
-                <button type="submit" class="btn btn-primary">Next Step →</button>
-            </div>
+           <div class="form-actions">
+    <button type="button" class="btn btn-secondary" onclick="history.back()">← Previous</button>
+    <button type="button" class="btn btn-primary" onclick="window.location.href='TimeAndType.jsp'">Next Step →</button>
+</div>
         </form>
     </div>
     

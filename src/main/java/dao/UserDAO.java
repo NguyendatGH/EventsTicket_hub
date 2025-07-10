@@ -4,12 +4,12 @@
  */
 package dao;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 import Interfaces.IUserDAO;
 import models.TopEventOwner;
@@ -521,4 +521,22 @@ public class UserDAO implements IUserDAO {
         return loginDistribution;
     }
 
+    public String checkRole(int userId) throws IOException, SQLException {
+        String res = "";
+        String sql = "SELECT Role FROM Users WHERE Id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    res = rs.getString("Role");
+                }
+            }
+        }
+
+        return res;
+    }
 }
