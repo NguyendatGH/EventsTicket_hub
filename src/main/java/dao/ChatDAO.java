@@ -1,17 +1,21 @@
 package dao;
 
 import context.DBConnection;
+import dto.UserDTO;
 import models.Conversation;
 import models.Message;
 import models.FileAttachment;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class ChatDAO {
@@ -225,9 +229,10 @@ public class ChatDAO {
                     List<FileAttachment> attachments = getAttachmentsByMessageId(message.getMessageID());
                     message.setAttachments(attachments);
                     messages.add(message);
-                    //debug
-                    // LOGGER.info("Fetched message: MessageID=" + message.getMessageID() + " for ConversationID="
-                    //         + conversationId);
+                    // debug
+                    // LOGGER.info("Fetched message: MessageID=" + message.getMessageID() + " for
+                    // ConversationID="
+                    // + conversationId);
                 }
             }
         } catch (SQLException e) {
@@ -313,5 +318,72 @@ public class ChatDAO {
             LOGGER.severe("Error updating LastMessageAt for ConversationID: " + conversationId + ": " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public Map<Integer, Map<String, Object>> getGroupedConversationsForEventOwner(int eventOwnerId) {
+        Map<Integer, Map<String, Object>> groupedConversations = new HashMap<>();
+        String sql = "SELECT c.ConversationID, c.CustomerID, c.EventOwnerID, c.EventID, c.Subject, c.Status, " +
+                "c.LastMessageAt, c.CreatedBy, c.CreatedAt, c.UpdatedAt, e.Name AS EventName, u.Username AS CustomerName "
+                +
+                "FROM Conversations c " +
+                "LEFT JOIN Events e ON c.EventID = e.EventID " +
+                "LEFT JOIN Users u ON c.CustomerID = u.Id " +
+                "WHERE c.EventOwnerID = ? " +
+                "ORDER BY c.CustomerID, c.LastMessageAt DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, eventOwnerId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int customerId = rs.getInt("CustomerID");
+                    Conversation conv = new Conversation(
+                            rs.getInt("ConversationID"),
+                            rs.getInt("CustomerID"),
+                            rs.getInt("EventOwnerID"),
+                            rs.getObject("EventID") != null ? rs.getInt("EventID") : null,
+                            rs.getString("Subject") != null ? rs.getString("Subject")
+                                    : (rs.getString("EventName") != null
+                                            ? "Discussion about " + rs.getString("EventName")
+                                            : "Event Discussion"),
+                            rs.getString("Status"),
+                            rs.getTimestamp("LastMessageAt") != null
+                                    ? rs.getTimestamp("LastMessageAt").toLocalDateTime()
+                                    : null,
+                            rs.getInt("CreatedBy"),
+                            rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                            rs.getTimestamp("UpdatedAt").toLocalDateTime());
+
+                    // Group by CustomerID
+                    Map<String, Object> customerData = groupedConversations.computeIfAbsent(customerId,
+                            k -> new HashMap<>());
+                    if (!customerData.containsKey("customerName")) {
+                        customerData.put("customerName", rs.getString("CustomerName"));
+                        customerData.put("conversations", new ArrayList<Conversation>());
+                    }
+                    ((List<Conversation>) customerData.get("conversations")).add(conv);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.severe(
+                    "Error fetching grouped conversations for EventOwnerID: " + eventOwnerId + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return groupedConversations;
+    }
+
+    public int getCustomerIdFromConversation(int eventId) throws SQLException {
+        String sql = "SELECT customerID FROM Conversations WHERE EventID = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, eventId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("customerID");
+                }
+            }
+        }
+        return -1;
     }
 }

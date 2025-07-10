@@ -1,12 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Chat Room - Modern Chat App</title>
+    <title>Chat Room - Event Owner</title>
     <style>
         :root {
             --primary: #667aff;
@@ -111,6 +110,44 @@
             flex: 1;
             overflow-y: auto;
             padding: 10px 0;
+        }
+
+        .customer-group {
+            margin-bottom: 10px;
+        }
+
+        .customer-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .customer-header:hover {
+            background: var(--hover-bg);
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .toggle-icon {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .threads-list {
+            display: none;
+            padding-left: 20px;
+        }
+
+        .threads-list.active {
+            display: block;
         }
 
         .conversation {
@@ -368,6 +405,12 @@
             background: var(--message-received);
             color: var(--text-light);
             border-bottom-left-radius: 6px;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
         }
 
         .message-content {
@@ -693,33 +736,51 @@
                 <h1>Đoạn chat</h1>
                 <div class="search-container">
                     <div class="search-icon">🔍</div>
-                    <input type="text" class="search-input" placeholder="Tìm kiếm ">
+                    <input type="text" class="search-input" placeholder="Tìm kiếm khách hàng...">
                 </div>
             </div>
-            
             <div class="conversations-list">
-                <c:if test="${empty conversations}">
+                <c:if test="${empty groupedConversations}">
                     <div class="empty-state">
                         <div class="empty-state-icon">💬</div>
-                        <p>Chưa có cuộc trò chuyện nào !.</p>
+                        <p>Chưa có cuộc trò chuyện nào!</p>
                     </div>
                 </c:if>
-                
-                <c:forEach items="${conversations}" var="conv">
-                    <div class="conversation ${conv.conversationID == currentConversationId ? 'active' : ''}"
-                         onclick="window.location.href='${pageContext.request.contextPath}/chat?conversation_id=${conv.conversationID}&eventId=${conv.eventID}'">
-                        <div class="conversation-avatar">
-                            ${conv.subject != null ? conv.subject.substring(0,1).toUpperCase() : 'C'}
+                <c:forEach items="${groupedConversations}" var="customerEntry">
+                    <div class="customer-group">
+                        <div class="customer-header" data-toggle-target="threads-${customerEntry.key}">
+                            <div class="customer-name">${customerEntry.value.customerName}</div>
+                            <div class="toggle-icon">▼</div>
                         </div>
-                        <div class="conversation-info">
-                            <div class="conversation-name">
-                                ${conv.subject != null ? conv.subject : 'Conversation ' + conv.conversationID}
-                            </div>
-                            <div class="conversation-preview">Bấm để xem tin nhắn...</div>
-                        </div>
-                        <div class="conversation-meta">
-                            <div class="conversation-time" data-last-message-at="${conv.lastMessageAt}"></div>
-                            <div class="conversation-badge">2</div>
+                        <div class="threads-list active" id="threads-${customerEntry.key}">
+                            <c:forEach items="${customerEntry.value.conversations}" var="conv">
+                                <div class="conversation ${conv.conversationID == currentConversationId ? 'active' : ''}"
+                                     onclick="window.location.href='${pageContext.request.contextPath}/chat?conversation_id=${conv.conversationID}&eventId=${conv.eventID}'">
+                                    <div class="conversation-avatar">
+                                        ${conv.subject != null ? conv.subject.substring(0,1).toUpperCase() : 'C'}
+                                    </div>
+                                    <div class="conversation-info">
+                                        <div class="conversation-name">
+                                            ${conv.subject != null ? conv.subject : 'Cuộc trò chuyện ' + conv.conversationID}
+                                        </div>
+                                        <div class="conversation-preview">
+                                            <c:set var="lastMessage" value="${customerEntry.value.lastMessages[conv.conversationID]}" />
+                                            <c:choose>
+                                                <c:when test="${not empty lastMessage}">
+                                                    <c:out value="${lastMessage.length() > 30 ? lastMessage.substring(0, 27).concat('...') : lastMessage}" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Bấm để xem tin nhắn
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                    <div class="conversation-meta">
+                                        <div class="conversation-time" data-last-message-at="${conv.lastMessageAt}"></div>
+                                        <div class="conversation-badge">2</div>
+                                    </div>
+                                </div>
+                            </c:forEach>
                         </div>
                     </div>
                 </c:forEach>
@@ -731,234 +792,212 @@
             <div class="chat-header">
                 <div class="chat-header-left">
                     <div class="chat-avatar">
-                        <c:if test="${eventOwner != null}">
-                             <img src="${eventOwner.avatar}" style="width: 100%; height: 100%; object-fit: cover;"/>
+                        <c:if test="${customer != null}">
+                            <img src="${customer.avatar}" style="width: 100%; height: 100%; object-fit: cover;" />
                         </c:if>
                     </div>
                     <div class="chat-user-info">
                         <h3>
-                            <c:if test="${user != null}">
-                                ${eventOwner.name}
+                            <c:if test="${customer != null}">
+                                ${customer.name}
+                            </c:if>
+                            <c:if test="${customer == null}">
+                                Chọn một cuộc trò chuyện
                             </c:if>
                         </h3>
                         <div class="chat-user-status">
                             <div class="status-dot"></div>
-                            Đang hoạt động
+                            <c:if test="${customer != null}">
+                                Đang hoạt động
+                            </c:if>
                         </div>
                     </div>
                 </div>
                 <div class="chat-actions">
-                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    <button class="logout-btn" onclick="exit()">Thoát</button>
                 </div>
             </div>
-
             <div class="messages" id="messagesContainer">
-                <c:if test="${empty messages}">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">💬</div>
-                        <p>Chưa có tin nhắn nào!</p>
-                        <small>Cùng nhau trao đổi thông tin với chủ sự kiện nhé bạn ơi.</small>
-                    </div>
-                </c:if>
-
-                <c:set var="previousTimestamp" value="" />
-                <c:forEach items="${messages}" var="message" varStatus="status">
-                    <c:set var="currentTimestamp" value="${message.updatedAt}" />
-                    <fmt:formatDate var="formattedTime" value="${currentTimestamp}" pattern="HH:mm" />
-                    <fmt:formatDate var="formattedDate" value="${currentTimestamp}" pattern="dd/MM/yyyy" />
-                    
-                    <c:if test="${status.first or empty previousTimestamp}">
-                          <div class="message-timestamp">
-                                <fmt:formatDate value="${currentTimestamp}" pattern="dd/MM/yyyy HH:mm" />
-                          </div>
-                    </c:if>
-
-                    <c:if test="${not status.first and not empty previousTimestamp}">
-                        <jsp:useBean id="dateValue" class="java.util.Date" />
-                        <jsp:setProperty name="dateValue" property="time" value="${currentTimestamp.time - previousTimestamp.time}" />
-                        <c:if test="${dateValue.time > 1800000}"> 
-                            <div class="message-timestamp">
-                                <fmt:formatDate value="${currentTimestamp}" pattern="dd/MM/yyyy HH:mm" />
-                            </div>
-                        </c:if>
-                    </c:if>
-
-                    <div class="message ${message.senderID == user.id ? 'sent' : 'received'}">
-                        <div class="message-bubble">
-                            <div class="message-content">
-                                ${message.messageContent}
-                                <c:if test="${message.hasAttachments()}">
-                                    <div class="attachments">
-                                        <c:forEach items="${message.attachments}" var="attachment">
-                                            <a href="${pageContext.request.contextPath}${attachment.filePath}" 
-                                               target="_blank" class="attachment-link">
-                                                📎 ${attachment.originalFilename} (${attachment.formattedFileSize})
-                                            </a>
-                                        </c:forEach>
-                                    </div>
-                                </c:if>
-                            </div>
-                            <c:if test="${status.last or (not status.last and messages[status.index + 1].senderID != message.senderID)}">
-                                <div class="message-time" style="display: none;">
-                                  <fmt:formatDate value="${message.updatedAt}" pattern="HH:mm" />
+                <c:choose>
+                    <c:when test="${currentConversationId == null}">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💬</div>
+                            <p>Chọn một cuộc trò chuyện để bắt đầu</p>
+                            <small>Chọn một khách hàng từ thanh bên để xem tin nhắn của họ.</small>
+                        </c:when>
+                    <c:when test="${empty messages}">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💬</div>
+                            <p>Chưa có tin nhắn nào!</p>
+                            <small>Bắt đầu trò chuyện với khách hàng.</small>
+                        </c:when>
+                    <c:otherwise>
+                        <c:set var="previousTimestamp" value="" />
+                        <c:forEach items="${messages}" var="message" varStatus="status">
+                            <c:set var="currentTimestamp" value="${message.updatedAt}" />
+                            <fmt:formatDate var="formattedTime" value="${currentTimestamp}" pattern="HH:mm" />
+                            <fmt:formatDate var="formattedDate" value="${currentTimestamp}" pattern="dd/MM/yyyy" />
+                            <c:if test="${status.first or empty previousTimestamp}">
+                                <div class="message-timestamp">
+                                    <fmt:formatDate value="${currentTimestamp}" pattern="dd/MM/yyyy HH:mm" />
                                 </div>
                             </c:if>
-
-                           
-                        </div>
-                    </div>
-
-                    <c:set var="previousTimestamp" value="${currentTimestamp}" />
-                </c:forEach>
+                            <c:if test="${not status.first and not empty previousTimestamp}">
+                                <jsp:useBean id="dateValue" class="java.util.Date" />
+                                <jsp:setProperty name="dateValue" property="time" value="${currentTimestamp.time - previousTimestamp.time}" />
+                                <c:if test="${dateValue.time > 1800000}">
+                                    <div class="message-timestamp">
+                                        <fmt:formatDate value="${currentTimestamp}" pattern="dd/MM/yyyy HH:mm" />
+                                    </div>
+                                </c:if>
+                            </c:if>
+                            <div class="message ${message.senderID == user.id ? 'sent' : 'received'}">
+                                <div class="message-sender">${message.senderID == user.id ? user.name : customer.name}</div>
+                                <div class="message-bubble">
+                                    <div class="message-content">
+                                        <c:out value="${message.messageContent}" />
+                                        <c:if test="${message.hasAttachments()}">
+                                            <div class="attachments">
+                                                <c:forEach items="${message.attachments}" var="attachment">
+                                                    <a href="${pageContext.request.contextPath}${attachment.filePath}"
+                                                       target="_blank" class="attachment-link">
+                                                        📎 ${attachment.originalFilename} (${attachment.formattedFileSize})
+                                                    </a>
+                                                </c:forEach>
+                                            </div>
+                                        </c:if>
+                                    </div>
+                                    <div class="message-time">${formattedTime}</div>
+                                </div>
+                            </div>
+                            <c:set var="previousTimestamp" value="${currentTimestamp}" />
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
             </div>
-
             <div class="input-area">
                 <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileSelect()" />
-                
                 <div class="input-container">
-                    <button type="button" class="file-btn" onclick="document.getElementById('fileInput').click()">
-                        📎
-                    </button>
-                    <input type="text" id="messageInput" placeholder="Type your message here..." autocomplete="off" 
+                    <button type="button" class="file-btn" onclick="document.getElementById('fileInput').click()">📎</button>
+                    <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." autocomplete="off"
                            <c:if test="${currentConversationId == null}">disabled</c:if> />
                 </div>
-                
                 <button id="sendButton" onclick="sendMessage()" <c:if test="${currentConversationId == null}">disabled</c:if>>
-                    Send 
+                    Gửi
                 </button>
             </div>
         </div>
 
-        <!-- Right Sidebar for eventowner profile-->
-        <div class="right-sidebar">
-            <div class="right-sidebar-header">
-                <div class="profile-section">
-                    <div class="profile-avatar">
-                        <c:if test="${user != null}">
-                           <img src="${eventOwner.avatar}" style="width: 100%; height: 100%; object-fit: cover;"/>
-                        </c:if>
-                    </div>
-                    <div class="profile-name">
-                        <c:if test="${user != null}">
-                            ${eventOwner.name}
-                        </c:if>
-                    </div>
-                    <div class="profile-status">${eventOwner.email}</div>
-                </div>
+        <!-- Right Sidebar -->
+       <c:if test="${customer != null}">
+    <div class="right-sidebar">
+</c:if>
+<c:if test="${customer == null}">
+    <div class="right-sidebar" style="display: none;">
+</c:if>
+    <div class="right-sidebar-header">
+        <div class="profile-section">
+            <div class="profile-avatar">
+                <c:if test="${customer != null}">
+                    <img src="${customer.avatar}" style="width: 100%; height: 100%; object-fit: cover;"/>
+                </c:if>
             </div>
-            
-            <div class="section-divider"></div>
-            
-            <div class="section-title">Thông tin về đoạn chat</div>
-            <div class="menu-item">
-                <div class="menu-icon">🔍</div>
-                <span>Tìm tin nhắn</span>
+            <div class="profile-name">
+                <c:if test="${customer != null}">
+                    ${customer.name}
+                </c:if>
+                <c:if test="${customer == null}">
+                    Chọn một cuộc trò chuyện
+                </c:if>
             </div>
-            
-            <div class="section-divider"></div>
-            
-            <div class="section-title">File phương tiện & file</div>
-            <div class="menu-item">
-                <div class="menu-icon">📷</div>
-                <span>File phương tiện</span>
+            <div class="profile-status">
+                <c:if test="${customer != null}">
+                    ${customer.email}
+                </c:if>
             </div>
-            <div class="menu-item">
-                <div class="menu-icon">📄</div>
-                <span>File</span>
-            </div>
-            
-            <div class="section-divider"></div>
         </div>
     </div>
+    
+    <div class="section-divider"></div>
+    
+    <div class="section-title">Thông tin về đoạn chat</div>
+    <div class="menu-item">
+        <div class="menu-icon">🔍</div>
+        <span>Tìm tin nhắn</span>
+    </div>
+    
+    <div class="section-divider"></div>
+    
+    <div class="section-title">File phương tiện & file</div>
+    <div class="menu-item">
+        <div class="menu-icon">📷</div>
+        <span>File phương tiện</span>
+    </div>
+    <div class="menu-item">
+        <div class="menu-icon">📄</div>
+        <span>File</span>
+    </div>
+    
+    <div class="section-divider"></div>
+</div>
+    </div>
+    <script>
+    function initWebSocket(conversationId, userId, currentUserName, otherUserName, isOwner = false) {
+    let socket = null;
+    
+    if (conversationId && conversationId !== 'null' && conversationId !== '') {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = wsProtocol + "//" + window.location.host + "${pageContext.request.contextPath}/websocket/chat?conversation_id=" + conversationId + "&user_id=" + userId;
+        console.log('Connecting to WebSocket:', wsUrl);
 
-  <script>
-    // Debug user info
-    console.log('User ID:', ${user.id});
-    console.log('Username:', '${user.name}');
-    console.log('Conversation ID:', '${currentConversationId}');
+        socket = new WebSocket(wsUrl);
 
-    // WebSocket connection
-    const conversationId = '${currentConversationId}';
-        let socket = null;
+        socket.onopen = function(event) {
+            console.log('WebSocket connection opened for UserID:', userId);
+        };
 
-        if (conversationId && conversationId !== 'null' && conversationId !== '') {
-            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = wsProtocol + "//" + window.location.host + "${pageContext.request.contextPath}/websocket/chat?conversation_id=" + conversationId +"&user_id=${user.id}";
-            console.log('Connecting to WebSocket:', wsUrl);
-
-            socket = new WebSocket(wsUrl);
-
-            socket.onopen = function(event) {
-                console.log('WebSocket connection opened');
-            };
-
-            socket.onmessage = function(event) {
-                console.log('Received message:', event.data);
-                try {
-                    const payload = JSON.parse(event.data);
-                    const message = payload.message;
-                    const username = payload.username;
-                    const isCurrentUser = message.senderID === ${currentUserId};
-                    addMessage(
-                        message.senderID,
-                        username,
-                        message.messageContent,
-                        message.createdAt,
-                        message.conversationID,
-                        isCurrentUser,
-                        message.attachments || []
-                    );
-                } catch (e) {
-                    console.error('Error parsing message:', e);
+        socket.onmessage = function(event) {
+            console.log('Received message:', event.data);
+            try {
+                const message = JSON.parse(event.data);
+                const isCurrentUser = message.senderID == userId;
+                addMessage(
+                    message.senderID,
+                    isCurrentUser ? currentUserName : otherUserName,
+                    message.messageContent,
+                    message.createdAt,
+                    message.conversationID,
+                    isCurrentUser,
+                    message.attachments || []
+                );
+                
+                if (isOwner) {
+                    updateConversationPreview(message.conversationID, message.messageContent, message.createdAt);
                 }
-            };
+            } catch (e) {
+                console.error('Error parsing message:', e);
+            }
+        };
 
-            socket.onerror = function(error) {
-                console.error('WebSocket Error:', error);
-            };
+        socket.onerror = function(error) {
+            console.error('WebSocket Error:', error);
+        };
 
-            socket.onclose = function(event) {
-                console.log('WebSocket connection closed:', event.code, event.reason);
-            };
-        } else {
-            console.log('No conversation ID - WebSocket not connected');
-        }
-        
-    const messagesContainer = document.getElementById('messagesContainer');
-    const messageInput = document.getElementById('messageInput');
+        socket.onclose = function(event) {
+            console.log('WebSocket connection closed:', event.code, event.reason);
+        };
+    }
     
-    function scrollToBottom() {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function formatTimestamp(timestamp) {
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    }
-
-    let selectedFiles = [];
-
-
-    function handleFileSelect() {
-    const fileInput = document.getElementById('fileInput');
-    selectedFiles = Array.from(fileInput.files);
-    
-    if (selectedFiles.length > 0) {
-        const fileNames = selectedFiles.map(f => f.name).join(', ');
-        messageInput.placeholder = `Files selected: ${fileNames}`;
-    } else {
-        messageInput.placeholder = "Type your message here...";
-    }
+    return socket;
 }
-    function sendMessage() {
-        sendMessageWithFiles();
-    }
 
-    function sendMessageWithFiles() {
-    const content = messageInput.value.trim();
+function sendMessageWithFiles(conversationId, userId, userName) {
+    const content = document.getElementById('messageInput').value.trim();
+    const fileInput = document.getElementById('fileInput');
+    const selectedFiles = Array.from(fileInput.files);
     
     if ((!content && selectedFiles.length === 0) || !conversationId) {
-        return;
+        return Promise.resolve(false);
     }
     
     const formData = new FormData();
@@ -969,38 +1008,55 @@
         formData.append('attachment', file);
     });
     
-    fetch('${pageContext.request.contextPath}/chat', {
+    return fetch('${pageContext.request.contextPath}/chat', {
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            messageInput.value = '';
-            selectedFiles = [];
-            document.getElementById('fileInput').value = '';
-            messageInput.placeholder = "Type your message here...";
-
+            document.getElementById('messageInput').value = '';
+            fileInput.value = '';
+            document.getElementById('messageInput').placeholder = "Nhập tin nhắn...";
+            
             if (content) {
-                addMessage(${user.id}, '${user.name}', content, 
-                          new Date().toISOString(), conversationId, true);
+                addMessage(
+                    userId, 
+                    userName, 
+                    content, 
+                    new Date().toISOString(), 
+                    conversationId, 
+                    true
+                );
             }
+            return true;
         }
+        return false;
     })
-   .catch(console.error);
-    }
+    .catch(error => {
+        console.error('Error sending message:', error);
+        return false;
+    });
+}
 
-    // Add a new message to the chat
- function addMessage(userId, username, content, timestamp, msgConversationId, isCurrentUser, attachments = []) {
-    console.log('Adding message:', {userId, username, content, timestamp, msgConversationId, isCurrentUser, attachments});
+function addMessage(userId, username, content, timestamp, msgConversationId, isCurrentUser, attachments = []) {
+    const messagesContainer = document.getElementById('messagesContainer');
+    const currentConversationId = '${currentConversationId}';
     
-    if (parseInt(msgConversationId) !== parseInt(conversationId)) {
-        console.log('Message not for current conversation');
+    if (parseInt(msgConversationId) !== parseInt(currentConversationId)) {
         return;
     }
     
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message ' + (isCurrentUser ? 'sent' : 'received');
+    
+    // Thêm người gửi (chỉ Owner có)
+    if (document.querySelector('.message-sender')) {
+        const messageSender = document.createElement('div');
+        messageSender.className = 'message-sender';
+        messageSender.textContent = username;
+        messageDiv.appendChild(messageSender);
+    }
     
     const messageBubble = document.createElement('div');
     messageBubble.className = 'message-bubble';
@@ -1015,7 +1071,7 @@
         attachments.forEach(attachment => {
             const attachmentLink = document.createElement('a');
             attachmentLink.href = '${pageContext.request.contextPath}' + attachment.filePath;
-            attachmentLink.textContent = attachment.originalFilename + ' (' + attachment.formattedFileSize + ')';
+            attachmentLink.textContent = '📎 ' + attachment.originalFilename + ' (' + attachment.formattedFileSize + ')';
             attachmentLink.target = '_blank';
             attachmentLink.className = 'attachment-link';
             attachmentDiv.appendChild(attachmentLink);
@@ -1025,7 +1081,7 @@
     
     const messageTime = document.createElement('div');
     messageTime.className = 'message-time';
-    messageTime.textContent = formatTimestamp(timestamp);
+    messageTime.textContent = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
     messageBubble.appendChild(messageContent);
     messageBubble.appendChild(messageTime);
@@ -1033,79 +1089,134 @@
     
     messagesContainer.appendChild(messageDiv);
     scrollToBottom();
-    }
+}
 
-  
-    messageInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            sendMessage();
+function scrollToBottom() {
+    const messagesContainer = document.getElementById('messagesContainer');
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function handleFileSelect() {
+    const fileInput = document.getElementById('fileInput');
+    const selectedFiles = Array.from(fileInput.files);
+    const messageInput = document.getElementById('messageInput');
+    
+    if (selectedFiles.length > 0) {
+        const fileNames = selectedFiles.map(f => f.name).join(', ');
+        messageInput.placeholder = `Đã chọn file: ${fileNames}`;
+    } else {
+        messageInput.placeholder = "Nhập tin nhắn...";
+    }
+}
+
+function updateConversationTime() {
+    const timeElements = document.querySelectorAll('.conversation-time');
+    timeElements.forEach(element => {
+        const lastMessageAt = element.getAttribute('data-last-message-at');
+        if (lastMessageAt && lastMessageAt !== 'null' && lastMessageAt !== '') {
+            try {
+                const lastMessageTime = new Date(lastMessageAt);
+                if (!isNaN(lastMessageTime.getTime())) {
+                    const now = new Date();
+                    const diffInMinutes = Math.floor((now - lastMessageTime) / (1000 * 60));
+                    element.textContent = diffInMinutes > 0 ? `${diffInMinutes} phút trước` : 'Vừa xong';
+                } else {
+                    element.textContent = 'Không xác định';
+                }
+            } catch (e) {
+                console.error('Error parsing lastMessageAt:', e);
+                element.textContent = 'Không xác định';
+            }
+        } else {
+            element.textContent = 'Chưa có tin nhắn';
         }
     });
+}
 
-    socket.onmessage = function(event) {
-    try {
-        const message = JSON.parse(event.data);
-            addMessage(
-                message.userId, 
-                message.username, 
-                message.content, 
-                message.timestamp, 
-                message.conversationId, 
-                message.userId === ${user.id},
-                message.attachments || []
-            );
-        } catch (e) {
-            console.error('Error parsing message:', e);
-        }
-    };
-
-    function updateConversationTime() {
-            const timeElements = document.querySelectorAll('.conversation-time');
-            timeElements.forEach(element => {
-                const lastMessageAt = element.getAttribute('data-last-message-at');
-                console.log('Processing lastMessageAt:', lastMessageAt);
-                if (lastMessageAt && lastMessageAt !== 'null' && lastMessageAt !== '') {
-                    try {
-                        const lastMessageTime = new Date(lastMessageAt);
-                        if (isNaN(lastMessageTime.getTime())) {
-                            console.error('Invalid date format for lastMessageAt:', lastMessageAt);
-                            element.textContent = 'Không xác định';
-                            return;
-                        }
-                        const now = new Date();
-                        const diffInMinutes = Math.floor((now - lastMessageTime) / (1000 * 60));
-                        console.log('Calculated diffInMinutes:', diffInMinutes);
-                        if (isNaN(diffInMinutes) || diffInMinutes < 0) {
-                            console.error('Invalid diffInMinutes:', diffInMinutes);
-                            element.textContent = 'Không xác định';
-                        } else {
-                            element.textContent = diffInMinutes > 0 ? `${diffInMinutes} phút trước` : 'Vừa xong';
-                        }
-                    } catch (e) {
-                        console.error('Error parsing lastMessageAt:', e);
-                        element.textContent = 'Không xác định';
-                    }
-                } else {
-                    console.log('No lastMessageAt for element');
-                    element.textContent = 'Chưa có tin nhắn';
-                }
-            });
+function toggleThreads(header) {
+    const threadsListId = header.getAttribute('data-toggle-target');
+    const threadsList = document.getElementById(threadsListId);
+    if (threadsList) {
+        threadsList.classList.toggle('active');
+        const toggleIcon = header.querySelector('.toggle-icon');
+        toggleIcon.textContent = threadsList.classList.contains('active') ? '▼' : '▶';
     }
+}
+
+function updateConversationPreview(conversationId, content, timestamp) {
+    const conversationElements = document.querySelectorAll('.conversation');
+    conversationElements.forEach(element => {
+        const onclick = element.getAttribute('onclick');
+        if (onclick && onclick.includes(`conversation_id=${conversationId}`)) {
+            const preview = element.querySelector('.conversation-preview');
+            if (preview) {
+                preview.textContent = content.length > 30 ? content.substring(0, 27) + '...' : content;
+            }
+            const timeElement = element.querySelector('.conversation-time');
+            if (timeElement) {
+                timeElement.setAttribute('data-last-message-at', timestamp);
+            }
+        }
+    });
+    updateConversationTime();
+}
 
 
-    function logout() {
+function initChatCommon() {
+    document.getElementById('messageInput')?.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            const sendButton = document.getElementById('sendButton');
+            if (sendButton && !sendButton.disabled) {
+                sendButton.click();
+            }
+        }
+    });
+    
+    // Cập nhật thời gian tin nhắn định kỳ
+    setInterval(updateConversationTime, 60000);
+    
+    // Cuộn xuống dưới cùng khi tải trang
+    window.addEventListener('load', function() {
+        scrollToBottom();
+        updateConversationTime();
+    });
+    
+    // Xử lý toggle threads (nếu có)
+    document.querySelectorAll('.customer-header').forEach(header => {
+        header.addEventListener('click', function() {
+            toggleThreads(this);
+        });
+    });
+}
+    const conversationId = '${currentConversationId}';
+    const currentUserId = ${user.id};
+    const currentUserName = '${user.name}';
+    const otherUserName = '${customer != null ? customer.name : "Khách hàng"}';
+    
+    let socket = initWebSocket(conversationId, currentUserId, currentUserName, otherUserName, true);
+    
+    // Hàm gửi tin nhắn
+    function sendMessage() {
+        sendMessageWithFiles(conversationId, currentUserId, currentUserName)
+            .catch(console.error);
+    }
+    
+    // Khởi tạo các sự kiện chung
+    initChatCommon();
+    
+    // Hàm thoát
+    function exit() {
         if (socket) {
             socket.close();
         }
-
-        window.location.href = '${pageContext.request.contextPath}/logout';
+        window.location.href = '${pageContext.request.contextPath}/organizer-servlet';
     }
 
-    setInterval(updateConversationTime, 60000);
-    window.onload = function(){
+      window.onload = function(){
         scrollToBottom();
         updateConversationTime();
     };
 </script>
+  
 </body>
 </html>

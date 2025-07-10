@@ -4,6 +4,7 @@
  */
 package dao;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -520,5 +521,23 @@ public class UserDAO implements IUserDAO {
         loginDistribution.put("old", oldUsersLogin);
         return loginDistribution;
     }
+    
+     public String checkRole(int userId) throws IOException, SQLException {
+        String res = "";
+        String sql = "SELECT Role FROM Users WHERE Id = ?";
 
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    res = rs.getString("Role");
+                }
+            }
+        }
+
+        return res;
+    }
 }

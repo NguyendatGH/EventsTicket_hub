@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import dto.UserDTO;
 import service.UserService;
@@ -16,7 +17,6 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Chỉ cần hiển thị trang login
         request.getRequestDispatcher("authentication/login.jsp").forward(request, response);
     }
 
@@ -31,17 +31,26 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-            if (user.getId() == 1) {
+            String getRole = "";
+            try {
+                getRole = userService.whoisLoggedin(user.getId());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if (getRole.equalsIgnoreCase("admin")) {
                 response.sendRedirect(request.getContextPath() + "/admin-servlet");
                 return;
-            }
-            String redirectURL = request.getParameter("redirect");
-            if (redirectURL != null && !redirectURL.isEmpty()) {
-                response.sendRedirect(redirectURL);
+            } else if (getRole.equalsIgnoreCase("event_owner")) {
+                response.sendRedirect(request.getContextPath() + "/organizer-servlet");
+                return;
             } else {
-                response.sendRedirect(request.getContextPath() + "/");
+                String redirectURL = request.getParameter("redirect");
+                if (redirectURL != null && !redirectURL.isEmpty()) {
+                    response.sendRedirect(redirectURL);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/");
+                }
             }
-
         } else {
 
             request.setAttribute("error", "Email hoặc mật khẩu không đúng!");

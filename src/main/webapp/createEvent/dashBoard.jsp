@@ -507,6 +507,10 @@
                 <a href="#">Shows</a>
                 <a href="#">Offers & Discount</a>
                 <a href="#" class="active">Dashboard</a>
+                 
+                <button class="chat-btn" onclick="window.location.href='${pageContext.request.contextPath}/chat'">
+                    💬 Go to Chat
+                </button>
             </div>
             <div class="user-info">
                 <span>Welcome, Event Manager</span>
