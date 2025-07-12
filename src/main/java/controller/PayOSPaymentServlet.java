@@ -20,9 +20,9 @@ import vn.payos.type.PaymentData;
 @WebServlet(name = "PayOSPaymentServlet", urlPatterns = {"/PayOSPaymentServlet"})
 public class PayOSPaymentServlet extends HttpServlet {
 
-    private static final String CLIENT_ID = "65a9faf3-fe50-481b-82ee-c77679528298"; // Thay key của bạn
-    private static final String API_KEY = "dadd1c71-5c0f-4713-a71f-ba7f3456b26f"; // Thay key của bạn
-    private static final String CHECKSUM_KEY = "e0df2cf1332ff6013e9ba6ed3a6f6a23ca15976a4919e4ebf59725fd8e3eab33"; // Thay key của bạn
+    private static final String CLIENT_ID = "65a9faf3-fe50-481b-82ee-c77679528298"; 
+    private static final String API_KEY = "dadd1c71-5c0f-4713-a71f-ba7f3456b26f"; 
+    private static final String CHECKSUM_KEY = "e0df2cf1332ff6013e9ba6ed3a6f6a23ca15976a4919e4ebf59725fd8e3eab33"; 
 
     private PayOS payOS;
 

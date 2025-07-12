@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime; // SỬA: Import LocalDateTime
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +63,11 @@ public class PaymentServlet extends HttpServlet {
                             OrderItem item = new OrderItem();
                             item.setTicketInfoId(ticket.getTicketInfoID());
                             item.setQuantity(quantity);
-                            // SỬA LỖI: Truyền thẳng đối tượng BigDecimal
                             item.setUnitPrice(ticket.getPrice());
                             item.setEventName(event.getName());
                             item.setTicketTypeName(ticket.getTicketName());
+
+                            item.setEventId(event.getEventID());
 
                             orderItems.add(item);
                             totalAmount = totalAmount.add(ticket.getPrice().multiply(new BigDecimal(quantity)));
@@ -76,7 +77,7 @@ public class PaymentServlet extends HttpServlet {
             }
 
             if (orderItems.isEmpty()) {
-                // Chuyển hướng về trang trước đó với thông báo lỗi
+
                 response.sendRedirect(request.getHeader("Referer"));
                 return;
             }
@@ -88,8 +89,7 @@ public class PaymentServlet extends HttpServlet {
             order.setItems(orderItems);
             order.setTotalAmount(totalAmount);
             order.setOrderStatus("PENDING_PAYMENT");
-            // SỬA LỖI: Dùng LocalDateTime.now()
-            order.setCreatedAt(LocalDateTime.now()); 
+            order.setCreatedAt(LocalDateTime.now());
 
             session.setAttribute("currentOrder", order);
             response.sendRedirect(request.getContextPath() + "/pages/Payment.jsp");
@@ -99,4 +99,19 @@ public class PaymentServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi khi chuẩn bị đơn hàng.");
         }
     }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Order currentOrder = (Order) session.getAttribute("currentOrder");
+
+        if (currentOrder == null) {
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
+
+        request.getRequestDispatcher("/pages/Payment.jsp").forward(request, response);
+    }
+
 }

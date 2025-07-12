@@ -567,7 +567,7 @@
                 </div>
                 <div class="actions">
                     <button class="primary-btn">Create Event</button>
-                    <a href="#" class="link">Purchased Tickets</a>
+                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">Vé đã mua</a>
                     <div class="account">Account</div>
                 </div>
             </header>

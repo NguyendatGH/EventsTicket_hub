@@ -23,9 +23,7 @@ public class EventDAO {
     public List<Event> getAllApprovedEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
                 list.add(event);
@@ -40,9 +38,7 @@ public class EventDAO {
     public List<Event> getActiveEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1 AND Status = 'active'";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(mapRowToEvent(rs));
             }
@@ -55,9 +51,7 @@ public class EventDAO {
     public List<Event> getNonActiveEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1 AND Status IN ('pending', 'cancelled', 'completed')";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(mapRowToEvent(rs));
             }
@@ -70,8 +64,7 @@ public class EventDAO {
     public Event getEventById(int eventId) {
         Event event = null;
         String sql = "SELECT * FROM Events WHERE EventID = ? AND isDeleted = 0";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -106,8 +99,7 @@ public class EventDAO {
         List<Event> list = new ArrayList<>();
         String sql = "{CALL GetTopHotEvents(?)}";
         int topCount = 5;
-        try (Connection conn = DBConnection.getConnection();
-                CallableStatement stmt = conn.prepareCall(sql)) {
+        try (Connection conn = DBConnection.getConnection(); CallableStatement stmt = conn.prepareCall(sql)) {
 
             stmt.setInt(1, topCount);
             ResultSet rs = stmt.executeQuery();
@@ -132,8 +124,7 @@ public class EventDAO {
     public List<Event> getPendingEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE Status = 'pending'";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
@@ -154,8 +145,7 @@ public class EventDAO {
 
         if (currentEvent != null && currentEvent.getGenreID() != null) {
             sql = "SELECT * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC LIMIT 3";
-            try (Connection conn = DBConnection.getConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, currentEvent.getGenreID());
                 ps.setInt(2, currentEventId);
 
@@ -244,12 +234,11 @@ public class EventDAO {
 
     public List<Event> getUpcomingEvents() {
         List<Event> list = new ArrayList<>();
-        String sql = "SELECT TOP 4 * FROM Events WHERE StartTime > GETDATE() ORDER BY StartTime ASC";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+        String sql = "SELECT TOP 4 * FROM Events WHERE StartTime > GETDATE() AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime ASC";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+                list.add(mapRowToEvent(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -261,9 +250,7 @@ public class EventDAO {
         Map<String, Integer> stats = new HashMap<>();
 
         String sql = "Select status, count(*) as count from Events where IsDeleted = 0 group by status";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 stats.put(rs.getString("status"), rs.getInt("count"));
             }
@@ -277,9 +264,7 @@ public class EventDAO {
         Map<String, Integer> stats = new HashMap<>();
         String sql = "SELECT g.GenreName as GenreName, COUNT(e.EventID) as count FROM Genres g  LEFT JOIN Events e ON g.GenreID = e.GenreID AND e.isDeleted = 0  GROUP BY g.GenreID, g.GenreName  ORDER BY count DESC";
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery();) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
             while (rs.next()) {
                 stats.put(rs.getString("GenreName"), rs.getInt("count"));
             }
@@ -294,9 +279,7 @@ public class EventDAO {
         List<Map<String, Object>> stats = new ArrayList<>();
         String sql = "SELECT YEAR(CreatedAt) as year, MONTH(CreatedAt) as month, COUNT(*) as count FROM Events WHERE isDeleted = 0 AND CreatedAt >= DATEADD(MONTH, -6, GETDATE()) GROUP BY YEAR(CreatedAt), MONTH(CreatedAt) ORDER BY year, month";
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Map<String, Object> monthData = new HashMap<>();
@@ -324,7 +307,6 @@ public class EventDAO {
             conn.setAutoCommit(false);
 
             // Check for sold tickets (for hard delete)
-
             try (PreparedStatement ps = conn.prepareStatement(
                     "SELECT COUNT(*) FROM Ticket t JOIN TicketInfo ti ON t.TicketInfoID = ti.TicketInfoID WHERE ti.EventID = ? AND t.Status = 'sold'")) {
                 ps.setInt(1, event_id);
@@ -338,16 +320,16 @@ public class EventDAO {
 
             // Delete or update dependent records
             String[] deleteQueries = {
-                    "DELETE FROM Ticket WHERE TicketInfoID IN (SELECT TicketInfoID FROM TicketInfo WHERE EventID = ?)",
-                    "DELETE FROM TicketInventory WHERE TicketInfoID IN (SELECT TicketInfoID FROM TicketInfo WHERE EventID = ?)",
-                    "DELETE FROM OrderItems WHERE EventID = ?",
-                    "DELETE FROM Refunds WHERE OrderID IN (SELECT OrderID FROM OrderItems WHERE EventID = ?)",
-                    "DELETE FROM TicketInfo WHERE EventID = ?",
-                    "DELETE FROM Seat WHERE EventID = ?",
-                    "DELETE FROM Feedback WHERE EventID = ?",
-                    "DELETE FROM Report WHERE EventID = ?",
-                    "DELETE FROM Conversations WHERE EventID = ?",
-                    "DELETE FROM Promotions WHERE EventID = ?"
+                "DELETE FROM Ticket WHERE TicketInfoID IN (SELECT TicketInfoID FROM TicketInfo WHERE EventID = ?)",
+                "DELETE FROM TicketInventory WHERE TicketInfoID IN (SELECT TicketInfoID FROM TicketInfo WHERE EventID = ?)",
+                "DELETE FROM OrderItems WHERE EventID = ?",
+                "DELETE FROM Refunds WHERE OrderID IN (SELECT OrderID FROM OrderItems WHERE EventID = ?)",
+                "DELETE FROM TicketInfo WHERE EventID = ?",
+                "DELETE FROM Seat WHERE EventID = ?",
+                "DELETE FROM Feedback WHERE EventID = ?",
+                "DELETE FROM Report WHERE EventID = ?",
+                "DELETE FROM Conversations WHERE EventID = ?",
+                "DELETE FROM Promotions WHERE EventID = ?"
             };
 
             for (String query : deleteQueries) {
@@ -406,7 +388,6 @@ public class EventDAO {
     }
 
     // Existing updateEvent method remains unchanged
-  
     public ToggleEvent updateEvent(Event event) {
         Connection conn = null;
         try {
