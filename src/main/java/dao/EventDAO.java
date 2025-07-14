@@ -1,8 +1,10 @@
 package dao;
 
 import models.Event;
+import service.UserService;
 import utils.ToggleEvent;
 import context.DBConnection;
+import dto.UserDTO;
 
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
@@ -23,7 +25,7 @@ public class EventDAO {
 
     public List<Event> getAllApprovedEvents() {
         List<Event> list = new ArrayList<>();
-        String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1";
+        String sql = "SELECT * FROM Events WHERE status != 'completed' AND isApproved = 1";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -404,7 +406,7 @@ public class EventDAO {
                 }
             }
         }
-        
+
     }
 
     // Existing updateEvent method remains unchanged
@@ -502,4 +504,27 @@ public class EventDAO {
 
         return totalRevenue;
     }
+
+    public UserDTO getEventOwnerId(int eventId) {
+        String sql = "SELECT OwnerID FROM Events WHERE EventID = ?;";
+        UserService u = new UserService();
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, eventId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int ownerId = rs.getInt("OwnerID");
+                    return u.findDTOUserID(ownerId);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null; 
+    }
+
 }

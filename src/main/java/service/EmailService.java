@@ -1,4 +1,4 @@
-package services;
+package service;
 
 import models.Order;
 import models.OrderItem;
