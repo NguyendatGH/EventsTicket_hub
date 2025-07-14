@@ -10,6 +10,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>MasterTicket - Vé Sự Kiện</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <style>
             * {
                 margin: 0;
@@ -62,6 +63,7 @@
                 font-size: 1.5rem;
                 font-weight: bold;
                 color: var(--primary);
+                text-decoration: none;
             }
 
             .nav-links {
@@ -75,22 +77,38 @@
                 color: var(--text-light);
                 text-decoration: none;
                 transition: color 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 5px;
             }
 
             .nav-links a:hover {
                 color: var(--primary);
             }
 
-            .search-container {
-                position: relative;
-                flex: 1;
-                max-width: 400px;
-                margin: 0.5rem 1rem;
-                width: 100%;
+            .search-filter-toggle {
+                background: none;
+                border: none;
+                color: var(--text-light);
+                font-size: 1.2rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                display: none; /* Hidden by default, shown on smaller screens */
             }
 
-            .search-box {
+            .search-filter-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                flex: 1;
+                max-width: 600px; /* Adjust as needed */
+                margin: 0.5rem 1rem;
                 width: 100%;
+                align-items: center; /* Align items vertically */
+            }
+
+            .search-box, .filter-input {
+                flex: 1;
                 padding: 0.75rem 1rem;
                 background: var(--card-bg);
                 border: 1px solid var(--border-color);
@@ -100,11 +118,11 @@
                 transition: all 0.3s;
             }
 
-            .search-box::placeholder {
+            .search-box::placeholder, .filter-input::placeholder {
                 color: var(--text-muted);
             }
 
-            .search-box:focus {
+            .search-box:focus, .filter-input:focus {
                 background: rgba(255, 255, 255, 0.1);
                 border-color: var(--primary);
             }
@@ -532,6 +550,17 @@
             }
 
             /* Responsive */
+            @media (max-width: 992px) {
+                .search-filter-container {
+                    max-width: 100%;
+                    margin: 0.5rem 0;
+                    justify-content: center;
+                }
+                .search-box, .filter-input {
+                    min-width: 150px;
+                }
+            }
+
             @media (max-width: 768px) {
                 .nav {
                     flex-direction: column;
@@ -542,16 +571,52 @@
                 .nav-links {
                     gap: 1rem;
                     justify-content: center;
+                    display: none; /* Hide nav links by default on small screens */
+                    width: 100%;
+                    flex-direction: column;
+                    margin-top: 1rem;
                 }
 
-                .search-container {
-                    max-width: 100%;
-                    margin: 0.5rem 0;
+                .nav-links.active {
+                    display: flex; /* Show when active */
+                }
+
+                .search-filter-toggle {
+                    display: block; /* Show toggle button */
+                    order: -1; /* Move toggle button to the left */
+                    align-self: flex-start; /* Align it to the start */
+                }
+                
+                .nav-toggle {
+                    display: block; /* Show hamburger menu toggle */
+                    background: none;
+                    border: none;
+                    color: var(--text-light);
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    align-self: flex-end;
+                }
+
+                .search-filter-container {
+                    flex-direction: column;
+                    gap: 10px;
+                    display: none; /* Hidden by default, toggled by JS */
+                    width: 100%;
+                    margin: 1rem 0;
+                }
+                
+                .search-filter-container.active {
+                    display: flex; /* Show when active */
+                }
+
+                .search-box, .filter-input {
+                    width: 100%;
                 }
 
                 .auth-buttons {
                     justify-content: center;
                     gap: 0.5rem;
+                    width: 100%;
                 }
 
                 .user-greeting {
@@ -632,20 +697,33 @@
         </style>
     </head>
     <body>
-        <!-- Header -->
         <header class="header">
             <nav class="nav">
-                <div class="logo">MasterTicket</div>
-                <div class="search-container">
+                <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
+                
+                <button class="search-filter-toggle" id="searchFilterToggle">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <div class="search-filter-container" id="searchFilterContainer">
                     <input type="text" class="search-box" placeholder="Tìm sự kiện theo tên..." id="searchInput">
+                    <input type="date" class="filter-input" id="startDateInput" title="Ngày bắt đầu">
+                    <input type="date" class="filter-input" id="endDateInput" title="Ngày kết thúc">
+                    <input type="text" class="filter-input" placeholder="Địa điểm..." id="locationInput">
                 </div>
-                <ul class="nav-links">
-                    <li><a href="#events">Trang chủ</a></li>
-                    <li><a href="#venues">Các sự kiện hot</a></li>
-                    <li><a href="#about">Săn voucher giảm giá</a></li>
-                    <li><a href="#contact">Tạo sự kiện</a></li>
-                    <li><a href="#contact">Hỗ trợ</a></li>
+
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#events"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li><a href="#venues"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
+                    <li><a href="#about"><i class="fas fa-tags"></i> Săn voucher</a></li>
+                    <li><a href="#contact"><i class="fas fa-plus-circle"></i> Tạo sự kiện</a></li>
+                    <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
                 </ul>
+
+                <button class="nav-toggle" id="navToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
                 <div class="auth-buttons">
                     <c:choose>
                         <c:when test="${not empty sessionScope.user}">
@@ -661,9 +739,7 @@
             </nav>
         </header>
 
-        <!-- Main Content -->
         <main class="container">
-            <!-- Hero Carousel -->
             <div class="hero-carousel">
                 <div class="carousel-slide active">
                     <div class="carousel-content">
@@ -679,18 +755,17 @@
                 </div>
             </div>
 
-            <% 
+            <%  
             List<Event> events = (List<Event>) request.getAttribute("events");
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd/MM/yyyy HH:mm");
-        
-            if (events == null || events.isEmpty()) { 
+            
+            if (events == null || events.isEmpty()) {  
             %>
             <div class="no-events">
                 <h2>Không có sự kiện nào!</h2>
                 <p>Hiện tại chưa có sự kiện nào được tổ chức. Vui lòng quay lại sau!</p>
             </div>
             <% } else { %>
-            <!-- Featured Events Section -->
             <div class="section-header">
                 <h2 class="section-title" id="events">Sự kiện nổi bật</h2>
                 <a href="#all-events" class="view-all">Xem tất cả</a>
@@ -699,8 +774,11 @@
             <div class="event-grid">
                 <% for (Event event : events) { %>
                 <div class="event-card searchable-event" 
-                     data-event-id="<%= event.getEventID() %>"
-                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
+                    data-event-id="<%= event.getEventID() %>"
+                    data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : "" %>"
+                    data-event-end-time="<%= event.getEndTime() != null ? event.getEndTime().getTime() : "" %>"
+                    data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
+                    onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
                     <div class="event-image">
                         <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) { %>
                         <img src="<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
@@ -727,7 +805,6 @@
                 <% } %>
             </div>
 
-            <!-- All Events Section -->
             <div class="section-header">
                 <h2 class="section-title" id="all-events">Tất cả sự kiện</h2>
                 <span class="view-all">Tổng cộng: <%= events.size() %> sự kiện</span>
@@ -736,8 +813,11 @@
             <div class="event-grid">
                 <% for (Event event : events) { %>
                 <div class="event-card searchable-event" 
-                     data-event-id="<%= event.getEventID() %>"
-                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
+                    data-event-id="<%= event.getEventID() %>"
+                    data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : "" %>"
+                    data-event-end-time="<%= event.getEndTime() != null ? event.getEndTime().getTime() : "" %>"
+                    data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
+                    onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
                     <div class="event-image">
                         <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) { %>
                         <img src="<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
@@ -773,7 +853,6 @@
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-section">
@@ -832,33 +911,66 @@
                 alert(`Bạn đã chọn sự kiện: ${eventName}\n\nChức năng mua vé sẽ được triển khai sau!`);
             }
 
-            // Search functionality
+            // Search and filter functionality
             function setupSearch() {
                 const searchBox = document.getElementById('searchInput');
-                if (searchBox) {
-                    searchBox.addEventListener('input', (e) => {
-                        const query = e.target.value.toLowerCase();
-                        const eventCards = document.querySelectorAll('.searchable-event');
+                const startDateInput = document.getElementById('startDateInput');
+                const endDateInput = document.getElementById('endDateInput');
+                const locationInput = document.getElementById('locationInput');
+                const eventCards = document.querySelectorAll('.searchable-event');
 
-                        eventCards.forEach(card => {
-                            const title = card.querySelector('.event-title');
-                            const description = card.querySelector('.event-description');
-                            const location = card.querySelector('.event-location');
+                const applyFilters = () => {
+                    const query = searchBox.value.toLowerCase();
+                    const startDate = startDateInput.value ? new Date(startDateInput.value).setHours(0,0,0,0) : null;
+                    const endDate = endDateInput.value ? new Date(endDateInput.value).setHours(23,59,59,999) : null;
+                    const locationQuery = locationInput.value.toLowerCase();
 
-                            if (title && description && location) {
-                                const titleText = title.textContent.toLowerCase();
-                                const descText = description.textContent.toLowerCase();
-                                const locText = location.textContent.toLowerCase();
+                    eventCards.forEach(card => {
+                        const title = card.querySelector('.event-title');
+                        const description = card.querySelector('.event-description');
+                        const eventLocation = card.getAttribute('data-event-location');
+                        const eventStartTime = card.getAttribute('data-event-start-time');
+                        const eventEndTime = card.getAttribute('data-event-end-time');
 
-                                if (titleText.includes(query) || descText.includes(query) || locText.includes(query)) {
-                                    card.style.display = 'block';
-                                } else {
-                                    card.style.display = 'none';
-                                }
+                        const titleText = title ? title.textContent.toLowerCase() : '';
+                        const descText = description ? description.textContent.toLowerCase() : '';
+                        
+                        let isVisible = true;
+
+                        // Filter by text query (name, description, location)
+                        if (query) {
+                            if (!titleText.includes(query) && !descText.includes(query) && (eventLocation ? !eventLocation.includes(query) : true)) {
+                                isVisible = false;
                             }
-                        });
+                        }
+                        
+                        // Filter by location input
+                        if (locationQuery && eventLocation && !eventLocation.includes(locationQuery)) {
+                            isVisible = false;
+                        }
+
+                        // Filter by start date
+                        if (startDate && eventStartTime) {
+                            if (parseInt(eventStartTime) < startDate) {
+                                isVisible = false;
+                            }
+                        }
+
+                        // Filter by end date
+                        if (endDate && eventEndTime) {
+                            if (parseInt(eventEndTime) > endDate) {
+                                isVisible = false;
+                            }
+                        }
+
+                        card.style.display = isVisible ? 'block' : 'none';
                     });
-                }
+                };
+
+                searchBox.addEventListener('input', applyFilters);
+                startDateInput.addEventListener('change', applyFilters);
+                endDateInput.addEventListener('change', applyFilters);
+                locationInput.addEventListener('input', applyFilters);
             }
 
             // Carousel functionality
@@ -891,11 +1003,41 @@
                     setInterval(nextSlide, 5000);
                 }
             }
+            
+            // Toggle for navigation links on small screens
+            function setupNavToggle() {
+                const navToggle = document.getElementById('navToggle');
+                const navLinks = document.getElementById('navLinks');
+
+                if (navToggle && navLinks) {
+                    navToggle.addEventListener('click', () => {
+                        navLinks.classList.toggle('active');
+                        // Hide search/filter container when nav links are shown
+                        document.getElementById('searchFilterContainer').classList.remove('active');
+                    });
+                }
+            }
+
+            // Toggle for search and filter inputs on small screens
+            function setupSearchFilterToggle() {
+                const searchFilterToggle = document.getElementById('searchFilterToggle');
+                const searchFilterContainer = document.getElementById('searchFilterContainer');
+
+                if (searchFilterToggle && searchFilterContainer) {
+                    searchFilterToggle.addEventListener('click', () => {
+                        searchFilterContainer.classList.toggle('active');
+                        // Hide nav links when search/filter are shown
+                        document.getElementById('navLinks').classList.remove('active');
+                    });
+                }
+            }
 
             // Initialize page
             document.addEventListener('DOMContentLoaded', () => {
                 setupSearch();
                 setupCarousel();
+                setupNavToggle();
+                setupSearchFilterToggle();
             });
 
             // Smooth scrolling for navigation links
