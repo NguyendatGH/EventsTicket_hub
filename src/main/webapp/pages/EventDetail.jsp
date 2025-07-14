@@ -603,6 +603,7 @@
                                         onclick="handleBuyTickets(${event.eventID}, '${event.hasSeatingChart}')">
                                     Buy Tickets Now
                                 </button>
+                                <button onClick="handleStartChat(${event.eventID})">Chat now</button>
                             </c:when>
                             <c:otherwise>
                                 <c:url var="loginUrl" value="/login">
@@ -680,22 +681,6 @@
                             <p class="ticket-note">* Vé được cập nhật liên tục và có thể thay đổi.</p>
                         </c:if>
                     </div>
-
-                    <!--                    <div class="organizer-section section-card">
-                                            <h2 class="section-title">Organizer</h2>
-                                            <div class="organizer-card">
-                    <c:if test="${not empty organizer}">
-                        <h3 class="organizer-name">${organizer.name}</h3>
-                        <p class="organizer-desc">${organizer.description}</p>
-                        <div class="organizer-links">
-                            <a href="${organizer.website}" class="organizer-link">Learn More</a>
-                        </div>
-                    </c:if>
-                    <c:if test="${empty organizer}">
-                        <p>Organizer information has not been updated.</p>
-                    </c:if>
-                </div>
-            </div>-->
                 </div>
             </c:if>
             <c:if test="${empty event}">
@@ -799,6 +784,11 @@
                     console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
                     window.location.href = '${pageContext.request.contextPath}/TicketInfoServlet?eventId=' + eventId;
                 }
+            }
+
+            function handleStartChat(eventId){
+                console.log("Starting chat for eventId: ", eventId);
+            window.location.href = '${pageContext.request.contextPath}/init-chat?eventId=' + eventId;
             }
         </script>
     </body>
