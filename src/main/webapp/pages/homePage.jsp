@@ -52,11 +52,11 @@
 
             .nav {
                 display: flex;
-                justify-content: space-between;
+                justify-content: space-between; /* Space out items */
                 align-items: center;
                 max-width: 1400px;
                 margin: 0 auto;
-                flex-wrap: wrap;
+                flex-wrap: nowrap; /* Prevent wrapping on desktop */
             }
 
             .logo {
@@ -64,13 +64,24 @@
                 font-weight: bold;
                 color: var(--primary);
                 text-decoration: none;
+                flex-shrink: 0; /* Prevent logo from shrinking */
+            }
+
+            /* New container for middle content */
+            .nav-center-content {
+                display: flex;
+                align-items: center;
+                flex-grow: 1; /* Allow this area to take up remaining space */
+                justify-content: center; /* Center items within this area */
+                gap: 1rem; /* Space between search/filter and nav links */
+                flex-wrap: nowrap; /* Prevent wrapping initially */
             }
 
             .nav-links {
                 display: flex;
                 gap: 1.5rem;
                 list-style: none;
-                flex-wrap: wrap;
+                flex-wrap: nowrap; /* Prevent nav links from wrapping */
             }
 
             .nav-links a {
@@ -80,35 +91,39 @@
                 display: flex;
                 align-items: center;
                 gap: 5px;
+                white-space: nowrap; /* Prevent links from wrapping */
             }
 
             .nav-links a:hover {
                 color: var(--primary);
             }
 
-            .search-filter-toggle {
+            /* Toggle Buttons for Mobile (Hidden by default on larger screens) */
+            .nav-toggle, .search-filter-toggle {
                 background: none;
                 border: none;
                 color: var(--text-light);
-                font-size: 1.2rem;
+                font-size: 1.5rem;
                 cursor: pointer;
                 padding: 0.5rem;
-                display: none; /* Hidden by default, shown on smaller screens */
+                display: none; 
             }
 
+            /* Search and Filter Container - Always horizontal on wider screens */
             .search-filter-container {
-                display: flex;
-                flex-wrap: wrap;
+                display: flex; /* Use flexbox */
+                flex-direction: row; /* Arrange items in a row */
+                flex-wrap: nowrap; /* Prevent wrapping on wider screens */
                 gap: 10px;
-                flex: 1;
-                max-width: 600px; /* Adjust as needed */
-                margin: 0.5rem 1rem;
-                width: 100%;
-                align-items: center; /* Align items vertically */
+                flex-grow: 1; /* Allows it to grow and shrink */
+                max-width: 600px; /* Max width for consistency */
+                min-width: 300px; /* Minimum width to prevent crushing */
+                align-items: center;
             }
 
             .search-box, .filter-input {
-                flex: 1;
+                flex: 1; /* Allows inputs to take equal available space */
+                min-width: 100px; /* Adjusted min-width for better horizontal fit */
                 padding: 0.75rem 1rem;
                 background: var(--card-bg);
                 border: 1px solid var(--border-color);
@@ -131,7 +146,8 @@
                 display: flex;
                 gap: 0.75rem;
                 align-items: center;
-                flex-wrap: wrap;
+                flex-shrink: 0; /* Prevent buttons from shrinking */
+                margin-left: 1rem; /* Space between center content and auth buttons */
             }
 
             .btn {
@@ -549,121 +565,127 @@
                 transform: scale(1.1);
             }
 
-            /* Responsive */
-            @media (max-width: 992px) {
-                .search-filter-container {
-                    max-width: 100%;
-                    margin: 0.5rem 0;
-                    justify-content: center;
+            /* Responsive adjustments */
+            @media (min-width: 993px) { /* For larger screens, ensure everything is in one row */
+                .nav {
+                    flex-wrap: nowrap; /* Prevent wrapping */
+                    justify-content: space-between; /* Distribute items with space */
                 }
-                .search-box, .filter-input {
-                    min-width: 150px;
+                .nav-center-content {
+                    flex-grow: 1; /* Allow it to take available space */
+                    flex-wrap: nowrap; /* Prevent wrapping within this section */
+                    justify-content: center; /* Center search and nav links */
+                }
+                .search-filter-container {
+                    flex-grow: 1;
+                    flex-wrap: nowrap;
+                    max-width: 600px; /* Constrain width for search inputs */
+                }
+                .nav-links {
+                    margin-left: 1rem; /* Add some space if nav links are after search */
+                }
+                .auth-buttons {
+                    margin-left: 1rem; /* Ensure space before auth buttons */
+                }
+                /* Hide toggle buttons on large screens */
+                .nav-toggle, .search-filter-toggle {
+                    display: none;
                 }
             }
 
-            @media (max-width: 768px) {
+
+            @media (max-width: 992px) { /* Adjust for tablet/smaller desktop screens */
+                .nav {
+                    flex-wrap: wrap; /* Allow wrapping */
+                    justify-content: flex-start; /* Start items from the left */
+                }
+                .logo {
+                    margin-right: 1rem; /* Less margin */
+                }
+                .nav-center-content {
+                    flex-basis: 100%; /* Take full width on this breakpoint */
+                    order: 3; /* Push it to the next line */
+                    margin-top: 1rem; /* Space from top elements */
+                    justify-content: flex-start; /* Align search/nav links to start */
+                    gap: 1rem;
+                    flex-wrap: wrap; /* Allow its children to wrap */
+                }
+                .search-filter-container {
+                    flex-basis: 100%; /* Take full width within nav-center-content */
+                    flex-wrap: wrap; /* Allow inputs to wrap if needed */
+                    max-width: unset; /* Remove max-width constraint */
+                }
+                .nav-links {
+                    flex-basis: 100%; /* Take full width within nav-center-content */
+                    margin-left: 0; /* Remove left margin */
+                    margin-top: 1rem; /* Space from search inputs */
+                    justify-content: flex-start; /* Align links to start */
+                    flex-wrap: wrap; /* Allow individual links to wrap */
+                }
+                .auth-buttons {
+                    margin-left: auto; /* Push to right */
+                    order: 2; /* Position after toggles */
+                }
+                /* Show toggle buttons */
+                .search-filter-toggle, .nav-toggle {
+                    display: block;
+                    order: 1; /* Position after logo */
+                    margin-left: 0.5rem; /* Space between toggles */
+                }
+                .nav-toggle {
+                    margin-left: auto; /* Push nav toggle to far right if space allows */
+                }
+                .user-greeting {
+                    margin-right: 0;
+                }
+            }
+
+            @media (max-width: 768px) { /* Mobile specific adjustments */
                 .nav {
                     flex-direction: column;
-                    gap: 1rem;
+                    align-items: flex-start; 
+                }
+                .logo {
+                    width: 100%;
                     text-align: center;
+                    margin-bottom: 1rem;
+                    margin-right: 0;
                 }
-
-                .nav-links {
-                    gap: 1rem;
-                    justify-content: center;
-                    display: none; /* Hide nav links by default on small screens */
+                .nav-center-content {
+                    order: unset; /* Reset order */
+                    flex-direction: column;
                     width: 100%;
-                    flex-direction: column;
-                    margin-top: 1rem;
+                    margin-top: 0;
+                    gap: 0;
                 }
-
-                .nav-links.active {
-                    display: flex; /* Show when active */
-                }
-
-                .search-filter-toggle {
-                    display: block; /* Show toggle button */
-                    order: -1; /* Move toggle button to the left */
-                    align-self: flex-start; /* Align it to the start */
-                }
-                
-                .nav-toggle {
-                    display: block; /* Show hamburger menu toggle */
-                    background: none;
-                    border: none;
-                    color: var(--text-light);
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                    align-self: flex-end;
-                }
-
-                .search-filter-container {
-                    flex-direction: column;
-                    gap: 10px;
+                .nav-links, .search-filter-container {
                     display: none; /* Hidden by default, toggled by JS */
+                    flex-direction: column; /* Always vertical on mobile */
                     width: 100%;
-                    margin: 1rem 0;
+                    padding: 1rem 0; 
+                    border-top: none; 
+                    box-shadow: none; 
+                    background: transparent; 
                 }
                 
-                .search-filter-container.active {
-                    display: flex; /* Show when active */
+                .nav-links.active, .search-filter-container.active {
+                    display: flex;
                 }
 
-                .search-box, .filter-input {
-                    width: 100%;
+                .search-filter-toggle, .nav-toggle {
+                    order: unset; /* Reset order */
+                    margin-left: auto; /* Keep pushing to right */
                 }
+                 /* Ensure toggles are on the same line as logo */
+                .nav > .search-filter-toggle { margin-left: auto; margin-right: 0.5rem; }
+                .nav > .nav-toggle { margin-left: 0; }
 
                 .auth-buttons {
-                    justify-content: center;
-                    gap: 0.5rem;
+                    order: unset; /* Reset order */
                     width: 100%;
-                }
-
-                .user-greeting {
-                    margin: 0.5rem 0;
-                }
-
-                .carousel-content {
-                    max-width: 80%;
-                }
-
-                .carousel-content h2 {
-                    font-size: 1.5rem;
-                }
-
-                .carousel-content p {
-                    font-size: 0.9rem;
-                }
-
-                .event-grid {
-                    grid-template-columns: 1fr;
-                }
-
-                .ticket-section {
-                    padding: 1.5rem;
-                }
-
-                .ticket-title {
-                    font-size: 1.8rem;
-                }
-
-                .footer-content {
-                    grid-template-columns: 1fr;
-                    text-align: center;
-                }
-
-                .subscribe-box {
-                    flex-direction: column;
-                }
-
-                .subscribe-box input,
-                .subscribe-box button {
-                    width: 100%;
-                }
-
-                .language,
-                .social-icons {
                     justify-content: center;
+                    margin-left: 0; /* Remove left margin */
+                    margin-top: 1rem;
                 }
             }
 
@@ -701,28 +723,28 @@
             <nav class="nav">
                 <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
                 
-                <button class="search-filter-toggle" id="searchFilterToggle">
+                <button class="search-filter-toggle" id="searchFilterToggle" aria-label="Toggle search and filters">
                     <i class="fas fa-search"></i>
                 </button>
-                
-                <div class="search-filter-container" id="searchFilterContainer">
-                    <input type="text" class="search-box" placeholder="Tìm sự kiện theo tên..." id="searchInput">
-                    <input type="date" class="filter-input" id="startDateInput" title="Ngày bắt đầu">
-                    <input type="date" class="filter-input" id="endDateInput" title="Ngày kết thúc">
-                    <input type="text" class="filter-input" placeholder="Địa điểm..." id="locationInput">
-                </div>
-
-                <ul class="nav-links" id="navLinks">
-                    <li><a href="#events"><i class="fas fa-home"></i> Trang chủ</a></li>
-                    <li><a href="#venues"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
-                    <li><a href="#about"><i class="fas fa-tags"></i> Săn voucher</a></li>
-                    <li><a href="#contact"><i class="fas fa-plus-circle"></i> Tạo sự kiện</a></li>
-                    <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
-                </ul>
-
-                <button class="nav-toggle" id="navToggle">
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu">
                     <i class="fas fa-bars"></i>
                 </button>
+
+                <div class="nav-center-content">
+                    <div class="search-filter-container" id="searchFilterContainer">
+                        <input type="text" class="search-box" placeholder="Tìm sự kiện..." id="searchInput">
+                        <input type="date" class="filter-input" id="dateInput" title="Tìm theo ngày">
+                        <input type="text" class="filter-input" placeholder="Địa điểm..." id="locationInput">
+                    </div>
+
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="#events"><i class="fas fa-home"></i> Trang chủ</a></li>
+                        <li><a href="#venues"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
+                        <li><a href="#about"><i class="fas fa-tags"></i> Săn voucher</a></li>
+                        <li><a href="#contact"><i class="fas fa-plus-circle"></i> Tạo sự kiện</a></li>
+                        <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
+                    </ul>
+                </div>
                 
                 <div class="auth-buttons">
                     <c:choose>
@@ -914,51 +936,46 @@
             // Search and filter functionality
             function setupSearch() {
                 const searchBox = document.getElementById('searchInput');
-                const startDateInput = document.getElementById('startDateInput');
-                const endDateInput = document.getElementById('endDateInput');
+                const dateInput = document.getElementById('dateInput');
                 const locationInput = document.getElementById('locationInput');
                 const eventCards = document.querySelectorAll('.searchable-event');
 
                 const applyFilters = () => {
                     const query = searchBox.value.toLowerCase();
-                    const startDate = startDateInput.value ? new Date(startDateInput.value).setHours(0,0,0,0) : null;
-                    const endDate = endDateInput.value ? new Date(endDateInput.value).setHours(23,59,59,999) : null;
+                    const selectedDate = dateInput.value ? new Date(dateInput.value) : null;
                     const locationQuery = locationInput.value.toLowerCase();
 
                     eventCards.forEach(card => {
                         const title = card.querySelector('.event-title');
                         const description = card.querySelector('.event-description');
-                        const eventLocation = card.getAttribute('data-event-location');
-                        const eventStartTime = card.getAttribute('data-event-start-time');
-                        const eventEndTime = card.getAttribute('data-event-end-time');
+                        const eventLocation = card.getAttribute('data-event-location'); 
+                        const eventStartTime = card.getAttribute('data-event-start-time'); 
 
                         const titleText = title ? title.textContent.toLowerCase() : '';
                         const descText = description ? description.textContent.toLowerCase() : '';
                         
                         let isVisible = true;
 
-                        // Filter by text query (name, description, location)
+                        // Filter by text query (name, description)
                         if (query) {
-                            if (!titleText.includes(query) && !descText.includes(query) && (eventLocation ? !eventLocation.includes(query) : true)) {
+                            if (!titleText.includes(query) && !descText.includes(query)) {
                                 isVisible = false;
                             }
                         }
                         
                         // Filter by location input
-                        if (locationQuery && eventLocation && !eventLocation.includes(locationQuery)) {
-                            isVisible = false;
-                        }
-
-                        // Filter by start date
-                        if (startDate && eventStartTime) {
-                            if (parseInt(eventStartTime) < startDate) {
+                        if (locationQuery) { 
+                            if (!eventLocation || !eventLocation.includes(locationQuery)) {
                                 isVisible = false;
                             }
                         }
 
-                        // Filter by end date
-                        if (endDate && eventEndTime) {
-                            if (parseInt(eventEndTime) > endDate) {
+                        // Filter by selected date (match year, month, day)
+                        if (selectedDate && eventStartTime) {
+                            const eventDate = new Date(parseInt(eventStartTime));
+                            if (eventDate.getFullYear() !== selectedDate.getFullYear() ||
+                                eventDate.getMonth() !== selectedDate.getMonth() ||
+                                eventDate.getDate() !== selectedDate.getDate()) {
                                 isVisible = false;
                             }
                         }
@@ -968,8 +985,7 @@
                 };
 
                 searchBox.addEventListener('input', applyFilters);
-                startDateInput.addEventListener('change', applyFilters);
-                endDateInput.addEventListener('change', applyFilters);
+                dateInput.addEventListener('change', applyFilters);
                 locationInput.addEventListener('input', applyFilters);
             }
 
@@ -1008,12 +1024,15 @@
             function setupNavToggle() {
                 const navToggle = document.getElementById('navToggle');
                 const navLinks = document.getElementById('navLinks');
+                const searchFilterContainer = document.getElementById('searchFilterContainer');
 
                 if (navToggle && navLinks) {
                     navToggle.addEventListener('click', () => {
                         navLinks.classList.toggle('active');
-                        // Hide search/filter container when nav links are shown
-                        document.getElementById('searchFilterContainer').classList.remove('active');
+                        // Ensure search/filter container is hidden when nav links are shown
+                        if (searchFilterContainer) {
+                            searchFilterContainer.classList.remove('active');
+                        }
                     });
                 }
             }
@@ -1022,12 +1041,15 @@
             function setupSearchFilterToggle() {
                 const searchFilterToggle = document.getElementById('searchFilterToggle');
                 const searchFilterContainer = document.getElementById('searchFilterContainer');
+                const navLinks = document.getElementById('navLinks');
 
                 if (searchFilterToggle && searchFilterContainer) {
                     searchFilterToggle.addEventListener('click', () => {
                         searchFilterContainer.classList.toggle('active');
-                        // Hide nav links when search/filter are shown
-                        document.getElementById('navLinks').classList.remove('active');
+                        // Ensure nav links are hidden when search/filter are shown
+                        if (navLinks) {
+                            navLinks.classList.remove('active');
+                        }
                     });
                 }
             }
