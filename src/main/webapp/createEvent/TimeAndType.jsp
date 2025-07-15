@@ -60,8 +60,15 @@
         .nav-links a:hover {
             opacity: 1;
         }
-
-        .login-btn {
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .Logout-btn {
             background: linear-gradient(45deg, #8b5fbf, #a855f7);
             color: white;
             padding: 0.5rem 1.5rem;
@@ -72,7 +79,7 @@
             transition: all 0.3s ease;
         }
 
-        .login-btn:hover {
+        .Logout-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(139, 95, 191, 0.3);
         }
@@ -432,7 +439,8 @@
                 <a href="#">Offers & Discount</a>
                 <a href="#">Create Event</a>
             </div>
-            <button class="login-btn">Login</button>
+           
+            <a href="${pageContext.request.contextPath}/logout" class="btn Logout-btn">Logout</a>
         </div>
     </div>
 
