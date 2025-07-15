@@ -1,6 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
-prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -17,8 +17,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         position: relative;
         background-color: #070a17;
         overflow-x: hidden;
@@ -325,7 +324,8 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       .data-table {
-        background: #1b1c21;
+        color: white;
+        background:rgba(17, 24, 39, 0.8);
         border-radius: 15px;
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -384,17 +384,16 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
       .table-row {
         display: grid;
-        grid-template-columns: 50px 2fr 1fr 1fr 100px;
-        gap: 20px;
-        padding: 20px;
-        border-bottom: 1px solid #3e3e3e;
-        transition: all 0.3s ease;
+        grid-template-columns: 50px 2fr 1fr 1fr 120px;
+        gap: 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         align-items: center;
-        color: white;
+        transition: background 0.2s ease;
       }
 
       .table-row:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(59, 130, 246, 0.05);
       }
 
       .table-row:last-child {
@@ -619,6 +618,17 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           bottom: -300px;
           right: -150px;
         }
+        .stat-item{
+          display:none
+        }
+        .charts-section{
+          display: flex;
+          flex-direction: column;
+          align-items:center;
+        }
+        .chart-container{
+          width: 100%;
+        }
       }
 
       @media (max-width: 992px) {
@@ -748,8 +758,12 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         }
 
         .table-row {
-          grid-template-columns: 1fr;
-          gap: 10px;
+        grid-template-columns: 1fr;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        background: rgba(31, 41, 55, 0.5);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .bg_elips {
@@ -790,13 +804,12 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           white-space: nowrap;
         }
 
-        /* Hide the "Vé đã bán" column */
+      
         .table-container th:nth-child(3),
         .table-container td:nth-child(3) {
           display: none;
         }
-
-        /* Adjust remaining columns to fit without horizontal scroll */
+        
         .table-container th:nth-child(1),
         .table-container td:nth-child(1) {
           width: 50%;
@@ -809,7 +822,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
         .table-container th:nth-child(4),
         .table-container td:nth-child(4) {
-          width: 25%;
+         width: 40%;
         }
 
         .status-tag {
@@ -819,13 +832,12 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           text-align: center;
         }
         .event-status {
-          width: 100%;
           text-align: center;
           padding: 8px;
         }
 
         .actions {
-          justify-content: center;
+          justify-content: end;
         }
         .charts-section {
           display: flex;
@@ -938,14 +950,8 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     </style>
   </head>
   <body>
-    <img
-      class="bg_elips firstElement"
-      src="${pageContext.request.contextPath}/asset/image/full.svg"
-    />
-    <img
-      class="bg_elips secondElement"
-      src="${pageContext.request.contextPath}/asset/image/full2.svg"
-    />
+    <img class="bg_elips firstElement" src="${pageContext.request.contextPath}/asset/image/full.svg" />
+    <img class="bg_elips secondElement" src="${pageContext.request.contextPath}/asset/image/full2.svg" />
     <button class="hamburger">
       <span></span>
       <span></span>
@@ -953,7 +959,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     </button>
     <div class="container">
       <div class="overlay"></div>
-      <aside class="sidebar">
+       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
         <div class="admin-section">
           <div class="admin-avatar">
@@ -964,9 +970,8 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lí website masterTicket</div>
+          <div class="admin-role">Quản lý website MasterTicket</div>
         </div>
-
         <nav>
           <ul class="nav-menu">
             <li class="nav-item">
@@ -992,6 +997,13 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </li>
             <li class="nav-item">
               <a
+                href="${pageContext.request.contextPath}/admin-servlet/transaction-management"
+                class="nav-link "
+                >Danh sách giao dịch</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
                 href="${pageContext.request.contextPath}/admin-servlet/support-center"
                 class="nav-link"
                 >Hỗ trợ khách hàng</a
@@ -999,13 +1011,10 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </li>
           </ul>
         </nav>
-
         <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
-            <path
-              d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
-            />
+            <path d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z" />
           </svg>
           Đăng xuất
         </a>
@@ -1030,19 +1039,11 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 <tbody>
                   <c:choose>
                     <c:when test="${not empty topOrganizers}">
-                      <c:forEach
-                        var="organizer"
-                        items="${topOrganizers}"
-                        varStatus="status"
-                      >
+                      <c:forEach var="organizer" items="${topOrganizers}" varStatus="status">
                         <tr class="${status.first ? 'active' : ''}">
-                          <td class="td_head">
-                            <c:out value="${organizer.name}" />
-                          </td>
+                          <td class="td_head"><c:out value="${organizer.name}" /></td>
                           <td><c:out value="${organizer.numsOfEvent}" /></td>
-                          <td>
-                            <c:out value="${organizer.numsOfTicketSelled}" />
-                          </td>
+                          <td><c:out value="${organizer.numsOfTicketSelled}" /></td>
                           <td>
                             <button class="status-tag success">
                               <c:choose>
@@ -1069,9 +1070,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   <c:choose>
                     <c:when test="${not empty topOrganizers}">
                       <h1>1st</h1>
-                      <span class="stat-title"
-                        ><c:out value="${topOrganizers[0].name}"
-                      /></span>
+                      <span class="stat-title"><c:out value="${topOrganizers[0].name}" /></span>
                     </c:when>
                     <c:otherwise>
                       <h1>1st</h1>
@@ -1080,16 +1079,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   </c:choose>
                 </div>
                 <span class="stat-content">
-                  <img src="<c:choose
-                    ><c:when
-                      test="${not empty topOrganizers and not empty topOrganizers[0].avatarURL}"
-                      >${pageContext.request.contextPath}/${topOrganizers[0].avatarURL}</c:when
-                    ><c:otherwise
-                      >${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg</c:otherwise
-                    ></c:choose
-                  >" class="Top-EventOwner" alt="Top Organizer"
-                  onerror="this.src='${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg'"
-                  />
+                  <img src="<c:choose><c:when test='${not empty topOrganizers and not empty topOrganizers[0].avatarURL}'>${pageContext.request.contextPath}/${topOrganizers[0].avatarURL}</c:when><c:otherwise>${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg</c:otherwise></c:choose>" class="Top-EventOwner" alt="Top Organizer" onerror="this.src='${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg'" />
                 </span>
               </div>
             </div>
@@ -1118,88 +1108,102 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
         </div>
         <div class="data-table">
-          <div class="table-header-secondary">
-            <div class="page-title">Recent Events</div>
-            <div class="search-container">
-              <input
-                type="text"
-                class="search-box"
-                placeholder="What are you looking for?"
-              />
-              <div class="search-icon">🔍</div>
-            </div>
+        <div class="table-header-secondary">
+          <div class="page-title">Sự kiện gần đây</div>
+          <div class="search-container">
+            <input type="text" class="search-box" placeholder="Tìm kiếm sự kiện..." />
+            <div class="search-icon">🔍</div>
           </div>
-          <c:if test="${empty events}">
-            <p style="color: white; padding: 20px">No events found.</p>
-          </c:if>
-          <c:forEach var="event" items="${events}" varStatus="status">
-            <div class="table-row">
-              <div>${status.count}</div>
-              <div>${event.name}</div>
-              <div class="date">
-                <fmt:formatDate
-                  value="${event.startTime}"
-                  pattern="dd/MM/yyyy"
-                />
-                -
-                <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" />
-              </div>
-              <div>
-                <div
-                  class="event-status ${event.status == 'active' ? 'success' : event.status == 'pending' ? 'warning' : 'error'}"
-                >
-                  ${event.status == 'active' ? 'Đang hoạt động' : event.status
-                  == 'pending' ? 'Đang chờ duyệt' : 'Đã dừng'}
-                </div>
-              </div>
-              <div class="actions">
-                <button
-                  class="action-btn edit-btn"
-                  onclick="handleEditEvent(${event.eventID})"
-                >
-                  <img
-                    src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg"
-                    alt="Edit"
-                  />
-                </button>
-                <button
-                  class="action-btn delete-btn"
-                  onclick="handleDeleteEvent(${event.eventID})"
-                >
-                  <img
-                    src="${pageContext.request.contextPath}/asset/image/Trash.svg"
-                    alt="Delete"
-                  />
-                </button>
-              </div>
-            </div>
-          </c:forEach>
         </div>
+        <!-- Active Events Table -->
+        <div style="padding: 1rem;">
+          <h3 style="color: #fff; margin-bottom: 1rem; font-size: 1.2rem;">Sự kiện đang hoạt động</h3>
+          <c:choose>
+            <c:when test="${not empty activeEvents}">
+              <c:forEach var="event" items="${activeEvents}" varStatus="status">
+                <div class="table-row active-event">
+                  <div>${status.count}</div>
+                  <div><c:out value="${event.name}" /></div>
+                  <div class="date">
+                    <fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy" /> - <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" />
+                  </div>
+                  <div>
+                    <div class="event-status success">Đang hoạt động</div>
+                  </div>
+                  <div class="actions">
+                    <button class="action-btn edit-btn" data-tooltip="Chỉnh sửa" onclick="handleEditEvent(${event.eventID})">
+                      <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt="Edit" />
+                    </button>
+                    <button class="action-btn delete-btn" data-tooltip="Xóa" onclick="handleDeleteEvent(${event.eventID})">
+                      <img src="${pageContext.request.contextPath}/asset/image/Trash.svg" alt="Delete" />
+                    </button>
+                  </div>
+                </div>
+              </c:forEach>
+            </c:when>
+            <c:otherwise>
+              <p style="color: #9ca3af; padding: 1rem;">Không có sự kiện đang hoạt động.</p>
+            </c:otherwise>
+          </c:choose>
+        </div>
+        <!-- Non-Active Events Table -->
+        <div style="padding: 1rem;">
+          <h3 style="color: #fff; margin-bottom: 1rem; font-size: 1.2rem;">Sự kiện chờ duyệt và khác</h3>
+          <c:choose>
+            <c:when test="${not empty nonActiveEvents}">
+              <c:forEach var="event" items="${nonActiveEvents}" varStatus="status">
+                <div class="table-row non-active-event">
+                  <div>${status.count}</div>
+                  <div><c:out value="${event.name}" /></div>
+                  <div class="date">
+                    <fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy" /> - <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" />
+                  </div>
+                  <div>
+                    <div class="event-status ${event.status == 'pending' ? 'warning' : event.status == 'cancelled' ? 'error' : 'error'}">
+                      ${event.status == 'pending' ? 'Đang chờ duyệt' : event.status == 'cancelled' ? 'Đã hủy' : 'Đã hoàn thành'}
+                    </div>
+                  </div>
+                  <div class="actions">
+                    <button class="action-btn edit-btn" data-tooltip="Chỉnh sửa" onclick="handleEditEvent(${event.eventID})">
+                      <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt="Edit" />
+                    </button>
+                    <button class="action-btn delete-btn" data-tooltip="Xóa" onclick="handleDeleteEvent(${event.eventID})">
+                      <img src="${pageContext.request.contextPath}/asset/image/Trash.svg" alt="Delete" />
+                    </button>
+                  </div>
+                </div>
+              </c:forEach>
+            </c:when>
+            <c:otherwise>
+              <p style="color: #9ca3af; padding: 1rem;">Không có sự kiện chờ duyệt hoặc trạng thái khác.</p>
+            </c:otherwise>
+          </c:choose>
+        </div>
+      </div>
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      document
-        .querySelector(".search-box")
-        .addEventListener("input", function () {
-          const searchTerm = this.value.toLowerCase();
-          const rows = document.querySelectorAll(".table-row");
-          rows.forEach((row) => {
-            const eventName = row.children[1].textContent.toLowerCase();
-            const date = row.children[2].textContent.toLowerCase();
-            if (eventName.includes(searchTerm) || date.includes(searchTerm)) {
-              row.style.display = "grid";
-            } else {
-              row.style.display = "none";
-            }
-          });
+      document.querySelector(".search-box").addEventListener("input", function () {
+        const searchTerm = this.value.toLowerCase();
+        const activeRows = document.querySelectorAll(".table-row.active-event");
+        const nonActiveRows = document.querySelectorAll(".table-row.non-active-event");
+
+        activeRows.forEach((row) => {
+          const eventName = row.children[1].textContent.toLowerCase();
+          const date = row.children[2].textContent.toLowerCase();
+          row.style.display = eventName.includes(searchTerm) || date.includes(searchTerm) ? "grid" : "none";
         });
 
+        nonActiveRows.forEach((row) => {
+          const eventName = row.children[1].textContent.toLowerCase();
+          const date = row.children[2].textContent.toLowerCase();
+          row.style.display = eventName.includes(searchTerm) || date.includes(searchTerm) ? "grid" : "none";
+        });
+      });
+
       function handleEditEvent(eventID) {
-        console.log("Redirecting to edit event:", eventID);
-        window.location.href =
-          "${pageContext.request.contextPath}/admin-servlet/event-management/event-detail?actio=?eventID=" +
-          eventID;
+        window.location.href = "${pageContext.request.contextPath}/admin-servlet/event-management?action=edit-event&eventId=" + eventID;
       }
 
       function handleDeleteEvent(eventID) {
@@ -1212,21 +1216,23 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           cancelButtonText: "Hủy",
         }).then((result) => {
           if (result.isConfirmed) {
-            fetch(
-              "${pageContext.request.contextPath}/admin-servlet/event-management?action=delete&eventID=" +
-                eventID,
-              {
-                method: "POST",
-              }
-            ).then((response) => {
-              if (response.ok) {
-                Swal.fire("Xóa thành công!", "", "success").then(() => {
-                  window.location.reload();
-                });
-              } else {
-                Swal.fire("Lỗi!", "Không thể xóa sự kiện.", "error");
-              }
-            });
+            fetch("${pageContext.request.contextPath}/admin-servlet/event-management?action=delete&eventID=" + eventID, {
+              method: "POST",
+            })
+              .then((response) => response.json().then((data) => ({ status: response.status, data })))
+              .then(({ status, data }) => {
+                if (status === 200 && data.success) {
+                  Swal.fire("Xóa thành công!", "", "success").then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  Swal.fire("Lỗi!", data.message || "Không thể xóa sự kiện.", "error");
+                }
+              })
+              .catch((error) => {
+                console.error("Error deleting event:", error);
+                Swal.fire("Lỗi!", "Lỗi hệ thống khi xóa sự kiện.", "error");
+              });
           }
         });
       }
@@ -1252,11 +1258,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       });
 
       document.addEventListener("click", (e) => {
-        if (
-          window.innerWidth <= 992 &&
-          !sidebar.contains(e.target) &&
-          !hamburger.contains(e.target)
-        ) {
+        if (window.innerWidth <= 992 && !sidebar.contains(e.target) && !hamburger.contains(e.target)) {
           hamburger.classList.remove("active");
           sidebar.classList.remove("active");
           overlay.classList.remove("active");
@@ -1292,58 +1294,28 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       let monthlyStats = [];
 
       try {
-        statusStats = JSON.parse(
-          statusStatsData.replace(/&quot;/g, '"').trim() || "{}"
-        );
+        statusStats = JSON.parse(statusStatsData.replace(/&quot;/g, '"').trim() || "{}");
       } catch (e) {
-        console.error(
-          "Failed to parse statusStatsJson:",
-          e,
-          "Raw value:",
-          statusStatsData
-        );
+        console.error("Failed to parse statusStatsJson:", e);
         statusStats = {};
       }
 
       try {
-        genreStats = JSON.parse(
-          genreStatsData.replace(/&quot;/g, '"').trim() || "{}"
-        );
+        genreStats = JSON.parse(genreStatsData.replace(/&quot;/g, '"').trim() || "{}");
       } catch (e) {
-        console.error(
-          "Failed to parse genreStatsJson:",
-          e,
-          "Raw value:",
-          genreStatsData
-        );
+        console.error("Failed to parse genreStatsJson:", e);
         genreStats = {};
       }
 
       try {
-        monthlyStats = JSON.parse(
-          monthlyStatsData.replace(/&quot;/g, '"').trim() || "[]"
-        );
+        monthlyStats = JSON.parse(monthlyStatsData.replace(/&quot;/g, '"').trim() || "[]");
       } catch (e) {
-        console.error(
-          "Failed to parse monthlyStatsJson:",
-          e,
-          "Raw value:",
-          monthlyStatsData
-        );
+        console.error("Failed to parse monthlyStatsJson:", e);
         monthlyStats = [];
       }
 
-  
-      // Debug the parsed results
-      console.log("Parsed statusStats:", statusStats);
-      console.log("Parsed genreStats:", genreStats);
-      console.log("Parsed monthlyStats:", monthlyStats);
-
-      // Chart initialization with data validation
       if (Object.keys(statusStats).length > 0) {
-        const statusCtx = document
-          .getElementById("statusChart")
-          .getContext("2d");
+        const statusCtx = document.getElementById("statusChart").getContext("2d");
         const statusChart = new Chart(statusCtx, {
           type: "doughnut",
           data: {
@@ -1356,35 +1328,23 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               };
               return statusMap[status] || status;
             }),
-            datasets: [
-              {
-                data: Object.values(statusStats),
-                backgroundColor: Object.keys(statusStats).map(
-                  (_, index) =>
-                    [
-                      chartColors.success,
-                      chartColors.warning,
-                      chartColors.danger,
-                      chartColors.info,
-                    ][index % 4]
-                ),
-                borderWidth: 2,
-                borderColor: "rgba(255, 255, 255, 0.1)",
-              },
-            ],
+            datasets: [{
+              data: Object.values(statusStats),
+              backgroundColor: Object.keys(statusStats).map((_, index) => [
+                chartColors.success,
+                chartColors.warning,
+                chartColors.danger,
+                chartColors.info,
+              ][index % 4]),
+              borderWidth: 2,
+              borderColor: "rgba(255, 255, 255, 0.1)",
+            }],
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                position: "bottom",
-                labels: {
-                  color: "white",
-                  padding: 15,
-                  font: { size: 12 },
-                },
-              },
+              legend: { position: "bottom", labels: { color: "white", padding: 15, font: { size: 12 } } },
               tooltip: {
                 backgroundColor: "rgba(0, 0, 0, 0.8)",
                 titleColor: "white",
@@ -1403,24 +1363,19 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           type: "bar",
           data: {
             labels: Object.keys(genreStats),
-            datasets: [
-              {
-                label: "Số lượng sự kiện",
-                data: Object.values(genreStats),
-                backgroundColor: Object.keys(genreStats).map(
-                  (_, index) =>
-                    [
-                      chartColors.primary,
-                      chartColors.success,
-                      chartColors.warning,
-                      chartColors.purple,
-                    ][index % 4]
-                ),
-                borderColor: chartColors.primary,
-                borderWidth: 1,
-                borderRadius: 4,
-              },
-            ],
+            datasets: [{
+              label: "Số lượng sự kiện",
+              data: Object.values(genreStats),
+              backgroundColor: Object.keys(genreStats).map((_, index) => [
+                chartColors.primary,
+                chartColors.success,
+                chartColors.warning,
+                chartColors.purple,
+              ][index % 4]),
+              borderColor: chartColors.primary,
+              borderWidth: 1,
+              borderRadius: 4,
+            }],
           },
           options: {
             responsive: true,
@@ -1436,73 +1391,41 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               },
             },
             scales: {
-              y: {
-                beginAtZero: true,
-                ticks: { color: "white", stepSize: 1 },
-                grid: { color: "rgba(255, 255, 255, 0.1)" },
-              },
-              x: {
-                ticks: { color: "white", maxRotation: 45 },
-                grid: { color: "rgba(255, 255, 255, 0.1)" },
-              },
+              y: { beginAtZero: true, ticks: { color: "white", stepSize: 1 }, grid: { color: "rgba(255, 255, 255, 0.1)" } },
+              x: { ticks: { color: "white", maxRotation: 45 }, grid: { color: "rgba(255, 255, 255, 0.1)" } },
             },
           },
         });
       }
 
       if (monthlyStats.length > 0) {
-        // Handle single data point by adding a default previous month if needed
         if (monthlyStats.length === 1) {
-          monthlyStats = [
-            {
-              month: monthlyStats[0].month - 1,
-              year: monthlyStats[0].year,
-              count: 0,
-            },
-            ...monthlyStats,
-          ];
+          monthlyStats = [{ month: monthlyStats[0].month - 1, year: monthlyStats[0].year, count: 0 }, ...monthlyStats];
         }
         const monthlyLabels = monthlyStats.map((item) => {
-          const months = [
-            "Th1",
-            "Th2",
-            "Th3",
-            "Th4",
-            "Th5",
-            "Th6",
-            "Th7",
-            "Th8",
-            "Th9",
-            "Th10",
-            "Th11",
-            "Th12",
-          ];
+          const months = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12"];
           return months[item.month - 1] + " " + item.year;
         });
 
-        const monthlyCtx = document
-          .getElementById("monthlyChart")
-          .getContext("2d");
+        const monthlyCtx = document.getElementById("monthlyChart").getContext("2d");
         const monthlyChart = new Chart(monthlyCtx, {
           type: "line",
           data: {
             labels: monthlyLabels,
-            datasets: [
-              {
-                label: "Số sự kiện mới",
-                data: monthlyStats.map((item) => item.count),
-                borderColor: chartColors.success,
-                backgroundColor: chartColors.success + "20",
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: chartColors.success,
-                pointBorderColor: "white",
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-              },
-            ],
+            datasets: [{
+              label: "Số sự kiện mới",
+              data: monthlyStats.map((item) => item.count),
+              borderColor: chartColors.success,
+              backgroundColor: chartColors.success + "20",
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: chartColors.success,
+              pointBorderColor: "white",
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+            }],
           },
           options: {
             responsive: true,
@@ -1518,21 +1441,12 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               },
             },
             scales: {
-              y: {
-                beginAtZero: true,
-                ticks: { color: "white", stepSize: 1 },
-                grid: { color: "rgba(255, 255, 255, 0.1)" },
-              },
-              x: {
-                ticks: { color: "white" },
-                grid: { color: "rgba(255, 255, 255, 0.1)" },
-              },
+              y: { beginAtZero: true, ticks: { color: "white", stepSize: 1 }, grid: { color: "rgba(255, 255, 255, 0.1)" } },
+              x: { ticks: { color: "white" }, grid: { color: "rgba(255, 255, 255, 0.1)" } },
             },
           },
         });
       }
-
-   
     </script>
   </body>
 </html>

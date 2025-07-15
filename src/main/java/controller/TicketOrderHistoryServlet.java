@@ -4,7 +4,6 @@
  */
 package controller;
 
-import dao.EventDAO;
 import dao.OrderDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,8 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
-import models.Event;
-import models.Order;
+import java.util.Map;
 import models.User;
 
 /**
@@ -73,24 +71,11 @@ public class TicketOrderHistoryServlet extends HttpServlet {
             return;
         }
 
-        try {
-            // 1. Lấy lịch sử đơn hàng (như cũ)
-            OrderDAO orderDAO = new OrderDAO();
-            List<Order> orderList = orderDAO.getOrdersByUserId(currentUser.getId());
-            request.setAttribute("orderHistory", orderList);
+        OrderDAO orderDAO = new OrderDAO();
+        List<Map<String, Object>> simpleOrders = orderDAO.getSimpleOrdersByUserId(currentUser.getId());
+        request.setAttribute("orderHistory", simpleOrders);
 
-            // 2. LẤY THÊM DANH SÁCH SỰ KIỆN GỢI Ý
-            EventDAO eventDAO = new EventDAO();
-            List<Event> suggestedEvents = eventDAO.getUpcomingEvents(); // Giả sử có phương thức này
-            request.setAttribute("suggestedEvents", suggestedEvents);
-
-            // 3. Chuyển đến trang JSP
-            request.getRequestDispatcher("/pages/TicketOrderHistory.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Không thể tải dữ liệu.");
-        }
+        request.getRequestDispatcher("/pages/TicketOrderHistory.jsp").forward(request, response);
     }
 
     @Override

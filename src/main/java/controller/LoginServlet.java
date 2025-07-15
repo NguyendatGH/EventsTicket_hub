@@ -1,25 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.sql.SQLException;
 
-import dao.UserDAO;
-import Interfaces.IUserDAO;
-import dao.EventDAO;
-import java.util.List;
-import models.Event;
-import models.User;
+import dto.UserDTO;
+import service.UserService;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    private final IUserDAO userDAO = new UserDAO();
+    private final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -34,22 +27,34 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        User user = userDAO.login(email, password);
-
+        UserDTO user = userService.login(email, password);
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-            if (user.getId() == 1) {
+            String getRole = "";
+            try {
+
+                getRole = userService.whoisLoggedin(user.getId());
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if (getRole.equalsIgnoreCase("admin")) {
                 response.sendRedirect(request.getContextPath() + "/admin-servlet");
                 return;
+            } else if (getRole.equalsIgnoreCase("event_owner")) {
+                response.sendRedirect(request.getContextPath() + "/organizer-servlet");
+                return;
+            } else {
+                String redirectURL = request.getParameter("redirect");
+                if (redirectURL != null && !redirectURL.isEmpty()) {
+                    response.sendRedirect(redirectURL);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/");
+                }
             }
-            EventDAO eventDAO = new EventDAO();
-            List<Event> events = eventDAO.getAllApprovedEvents();
-            request.setAttribute("events", events);
-
-            request.getRequestDispatcher("userPage/userHomePage.jsp").forward(request, response);
-
         } else {
+
             request.setAttribute("error", "Email hoặc mật khẩu không đúng!");
             request.getRequestDispatcher("authentication/login.jsp").forward(request, response);
         }

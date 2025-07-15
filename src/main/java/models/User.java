@@ -1,11 +1,11 @@
 package models;
 
-
 import java.time.LocalDateTime;
 import java.util.Date;
 
 public class User {
     private int id;
+    private String name;
     private String email;
     private String passwordHash;
     private String role;
@@ -23,8 +23,11 @@ public class User {
     public User() {
     }
 
-    public User(int id, String email, String passwordHash, String role, LocalDateTime createdAt, LocalDateTime updatedAt, String gender, Date birthday, String phoneNumber, String address, String avatar, boolean isLocked, LocalDateTime lastLoginAt, String googleId) {
+    public User(int id, String name, String email, String passwordHash, String role, LocalDateTime createdAt,
+            LocalDateTime updatedAt, String gender, Date birthday, String phoneNumber, String address, String avatar,
+            boolean isLocked, LocalDateTime lastLoginAt, String googleId) {
         this.id = id;
+        this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
@@ -39,20 +42,27 @@ public class User {
         this.lastLoginAt = lastLoginAt;
         this.googleId = googleId;
     }
-    
-    
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -60,6 +70,7 @@ public class User {
     public String getPasswordHash() {
         return passwordHash;
     }
+
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
@@ -67,6 +78,7 @@ public class User {
     public String getRole() {
         return role;
     }
+
     public void setRole(String role) {
         this.role = role;
     }
@@ -74,6 +86,7 @@ public class User {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
@@ -81,6 +94,7 @@ public class User {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
@@ -88,6 +102,7 @@ public class User {
     public String getGender() {
         return gender;
     }
+
     public void setGender(String gender) {
         this.gender = gender;
     }
@@ -95,6 +110,7 @@ public class User {
     public Date getBirthday() {
         return birthday;
     }
+
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
@@ -102,6 +118,7 @@ public class User {
     public String getPhoneNumber() {
         return phoneNumber;
     }
+
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
@@ -109,6 +126,7 @@ public class User {
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
     }
@@ -116,6 +134,7 @@ public class User {
     public String getAvatar() {
         return avatar;
     }
+
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
@@ -123,6 +142,7 @@ public class User {
     public boolean getIsLocked() {
         return isLocked;
     }
+
     public void setIsLocked(boolean isLocked) {
         this.isLocked = isLocked;
     }
@@ -130,6 +150,7 @@ public class User {
     public LocalDateTime getLastLoginAt() {
         return lastLoginAt;
     }
+
     public void setLastLoginAt(LocalDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
     }
@@ -137,13 +158,30 @@ public class User {
     public String getGoogleId() {
         return googleId;
     }
+
     public void setGoogleId(String googleId) {
         this.googleId = googleId;
     }
-    
+
     @Override
     public String toString() {
-        return this.role + this.email;
+        return "User {" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", role='" + role + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", gender='" + gender + '\'' +
+                ", birthday=" + birthday +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + address + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", isLocked=" + isLocked +
+                ", lastLoginAt=" + lastLoginAt +
+                ", googleId='" + googleId + '\'' +
+                '}';
     }
 
 }

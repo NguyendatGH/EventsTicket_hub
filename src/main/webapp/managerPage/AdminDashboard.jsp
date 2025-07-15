@@ -641,7 +641,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     </button>
     <div class="container">
       <div class="overlay"></div>
-      <aside class="sidebar">
+        <aside class="sidebar">
         <div class="logo">MasterTicket</div>
         <div class="admin-section">
           <div class="admin-avatar">
@@ -679,6 +679,13 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </li>
             <li class="nav-item">
               <a
+                href="${pageContext.request.contextPath}/admin-servlet/transaction-management"
+                class="nav-link"
+                >Danh sách giao dịch</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
                 href="${pageContext.request.contextPath}/admin-servlet/support-center"
                 class="nav-link"
                 >Hỗ trợ khách hàng</a
@@ -689,9 +696,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
-            <path
-              d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
-            />
+            <path d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z" />
           </svg>
           Đăng xuất
         </a>
@@ -725,28 +730,24 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-title">Yêu cầu cần hỗ trợ</div>
+            <div class="stat-title">Tổng doanh thu:</div>
             <span class="stat-content">
               <img
-                src="${pageContext.request.contextPath}/asset/image/Property1=Send_fill.svg"
+                src="${pageContext.request.contextPath}/asset/image/Wallet.svg"
                 alt=""
                 class="stat-icon"
               />
               <div class="stat-value">
-                <fmt:formatNumber
-                  value="${monthlyRevenue}"
-                  type="currency"
-                  currencySymbol="₫"
-                />
+                ${totalRevenue} vnđ
               </div>
             </span>
           </div>
         </section>
         <section class="content-grid">
           <div class="chart-section">
-            <h2 class="section-title">Thống kê nguời dùng</h2>
+            <h2 class="section-title">Doanh thu từ nhà tổ chức</h2>
             <div class="chart-container">
-              <canvas id="userStatsChart"></canvas>
+              <canvas id="revenueChart"></canvas>
             </div>
           </div>
           <div class="table-section">
@@ -762,7 +763,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 </thead>
                 <tbody>
                   <c:forEach var="event" items="${events}">
-                    <tr>
+                    <tr onclick="handleEditEvent('${event.eventID}')">
                       <td>${event.name}</td>
                       <td>
                         <fmt:formatDate
@@ -787,6 +788,10 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       </main>
     </div>
     <script>
+
+      function handleEditEvent(eventID) {
+        window.location.href = "${pageContext.request.contextPath}/admin-servlet/event-management?action=edit-event&eventId=" + eventID;
+      }
       const hamburger = document.querySelector(".hamburger");
       const sidebar = document.querySelector(".sidebar");
       const overlay = document.querySelector(".overlay");
@@ -828,40 +833,45 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
       animateEllipses();
 
-      const userStatsData = {
-        labels: [
-          "Tháng 1",
-          "Tháng 2",
-          "Tháng 3",
-          "Tháng 4",
-          "Tháng 5",
-          "Tháng 6",
-        ],
+            const organizerNames = [
+        <c:forEach var="organizer" items="${topEventOrganizers}" varStatus="loop">
+          "${organizer.name}"${loop.last ? '' : ','}
+        </c:forEach>
+      ];
+      const organizerRevenues = [
+        <c:forEach var="organizer" items="${topEventOrganizers}" varStatus="loop">
+          ${organizer.totalRevenue}${loop.last ? '' : ','}
+        </c:forEach>
+      ];
+
+      const revenueData = {
+        labels: organizerNames,
         datasets: [
           {
-            label: "Người dùng mới",
-            data: [12, 19, 15, 25, 22, 30],
-            borderColor: "rgba(59, 130, 246, 1)",
-            backgroundColor: "rgba(59, 130, 246, 0.1)",
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-          },
-          {
-            label: "Tổng người dùng",
-            data: [50, 69, 84, 109, 131, 161],
-            borderColor: "rgba(16, 185, 129, 1)",
-            backgroundColor: "rgba(16, 185, 129, 0.1)",
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-          },
-        ],
+            label: "Doanh thu (VNĐ)",
+            data: organizerRevenues,
+            backgroundColor: [
+              "rgba(59, 130, 246, 0.7)",
+              "rgba(16, 185, 129, 0.7)",
+              "rgba(255, 193, 7, 0.7)",
+              "rgba(220, 53, 69, 0.7)",
+              "rgba(147, 51, 234, 0.7)"
+            ],
+            borderColor: [
+              "rgba(59, 130, 246, 1)",
+              "rgba(16, 185, 129, 1)",
+              "rgba(255, 193, 7, 1)",
+              "rgba(220, 53, 69, 1)",
+              "rgba(147, 51, 234, 1)"
+            ],
+            borderWidth: 1
+          }
+        ]
       };
 
       const config = {
-        type: "line",
-        data: userStatsData,
+        type: "bar",
+        data: revenueData,
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -870,35 +880,54 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               labels: {
                 color: "#e2e8f0",
                 font: {
-                  size: 12,
-                },
-              },
+                  size: 12
+                }
+              }
             },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                  }
+                  return label;
+                }
+              }
+            }
           },
           scales: {
             y: {
               beginAtZero: true,
               grid: {
-                color: "rgba(255, 255, 255, 0.1)",
+                color: "rgba(255, 255, 255, 0.1)"
               },
               ticks: {
                 color: "#94a3b8",
-              },
+                callback: function(value) {
+                  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', notation: 'compact' }).format(value);
+                }
+              }
             },
             x: {
               grid: {
-                color: "rgba(255, 255, 255, 0.1)",
+                color: "rgba(255, 255, 255, 0.1)"
               },
               ticks: {
                 color: "#94a3b8",
-              },
-            },
-          },
-        },
+                maxRotation: 45,
+                minRotation: 45
+              }
+            }
+          }
+        }
       };
 
-      const ctx = document.getElementById("userStatsChart").getContext("2d");
-      const userChart = new Chart(ctx, config);
+      const ctx = document.getElementById("revenueChart").getContext("2d");
+      const revenueChart = new Chart(ctx, config);
     </script>
   </body>
 </html>

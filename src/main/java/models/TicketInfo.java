@@ -1,47 +1,35 @@
-
-
 package models;
 
-
-import java.math.BigDecimal; 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class TicketInfor {
-    private int ticketInforID;
+public class TicketInfo { 
+
+    private int ticketInfoID;
     private String ticketName;
     private String ticketDescription;
     private String category;
-    private BigDecimal price; 
+    private BigDecimal price;
     private LocalDateTime salesStartTime;
     private LocalDateTime salesEndTime;
     private int eventID;
     private int maxQuantityPerOrder;
     private boolean isActive;
-    
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public TicketInfor() {
+
+    private TicketInventory inventory;
+
+    public TicketInfo() {
     }
 
-    public TicketInfor(int ticketInforID, String ticketName, String ticketDescription, String category, BigDecimal price, // Changed to BigDecimal
-                       LocalDateTime salesStartTime, LocalDateTime salesEndTime, int eventID, int maxQuantityPerOrder, boolean isActive) {
-        this.ticketInforID = ticketInforID;
-        this.ticketName = ticketName;
-        this.ticketDescription = ticketDescription;
-        this.category = category;
-        this.price = price;
-        this.salesStartTime = salesStartTime;
-        this.salesEndTime = salesEndTime;
-        this.eventID = eventID;
-        this.maxQuantityPerOrder = maxQuantityPerOrder;
-        this.isActive = isActive;        
+    public int getTicketInfoID() {
+        return ticketInfoID;
     }
 
-    public int getTicketInforID() {
-        return ticketInforID;
-    }
-
-    public void setTicketInforID(int ticketInfoID) {
-        this.ticketInforID = ticketInfoID;
+    public void setTicketInfoID(int ticketInfoID) {
+        this.ticketInfoID = ticketInfoID;
     }
 
     public String getTicketName() {
@@ -68,11 +56,11 @@ public class TicketInfor {
         this.category = category;
     }
 
-    public BigDecimal getPrice() { // Changed to BigDecimal
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) { // Changed to BigDecimal
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -113,10 +101,9 @@ public class TicketInfor {
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.isActive = active;
     }
 
-    /* Nếu bạn muốn đọc CreatedAt và UpdatedAt từ DB, uncomment các phần này
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -132,21 +119,37 @@ public class TicketInfor {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-    */
+
+    public TicketInventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(TicketInventory inventory) {
+        this.inventory = inventory;
+    }
+
+    public int getAvailableQuantity() {
+        if (this.inventory != null) {
+            return this.inventory.getAvailableQuantity();
+        }
+        return 0;
+    }
 
     @Override
     public String toString() {
-        return "TicketInfor{" +
-                "ticketInfoID=" + ticketInforID +
-                ", ticketName='" + ticketName + '\'' +
-                ", ticketDescription='" + ticketDescription + '\'' +
-                ", category='" + category + '\'' +
-                ", price=" + price +
-                ", salesStartTime=" + salesStartTime +
-                ", salesEndTime=" + salesEndTime +
-                ", eventID=" + eventID +
-                ", maxQuantityPerOrder=" + maxQuantityPerOrder +
-                ", isActive=" + isActive +
-                '}';
+        return "TicketInfo{" 
+                + "ticketInfoID=" + ticketInfoID 
+                + ", ticketName='" + ticketName + '\''
+                + ", ticketDescription='" + ticketDescription + '\''
+                + ", category='" + category + '\''
+                + ", price=" + price
+                + ", salesStartTime=" + salesStartTime
+                + ", salesEndTime=" + salesEndTime
+                + ", eventID=" + eventID
+                + ", maxQuantityPerOrder=" + maxQuantityPerOrder
+                + ", isActive=" + isActive
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + '}';
     }
 }

@@ -10,7 +10,7 @@
 
         <title>MasterTicket - EventDetails</title>
         <style>
-            /* === BẢNG MÀU ĐƯỢC LÀM DỊU HƠN === */
+            
             :root {
                 --primary: #667aff;      /* Màu xanh dương dịu hơn */
                 --secondary: #e06bce;    /* Màu hồng/tím nhẹ nhàng hơn */
@@ -203,13 +203,13 @@
             }
 
             /* === UNIFIED DARK THEME FOR CONTENT SECTIONS === */
-            
+
             .ticket-detail-container {
                 display: flex;
                 flex-direction: column;
                 gap: 40px; /* Thêm khoảng cách giữa các khối thông tin */
             }
-            
+
             .section-card {
                 background-color: var(--card-bg);
                 border: 1px solid var(--border-color);
@@ -226,7 +226,7 @@
                 border-bottom: 2px solid var(--primary); /* Thêm gạch chân để làm nổi bật tiêu đề */
                 display: inline-block; /* Để border-bottom vừa với chữ */
             }
-            
+
             /* Thẻ thông tin chi tiết */
             .event-card-detail .event-name { /* Đổi tên class để tránh xung đột */
                 font-size: 20px;
@@ -234,20 +234,20 @@
                 margin-bottom: 15px;
                 color: var(--text-light); /* Đổi màu chữ */
             }
-            
+
             .event-card-detail .event-description {
-                 font-size: 15px;
+                font-size: 15px;
                 line-height: 1.6;
                 margin-bottom: 20px;
                 color: var(--text-muted); /* Đổi màu chữ */
             }
-            
-             .event-card-detail .event-meta {
+
+            .event-card-detail .event-meta {
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
                 align-items: flex-start;
-             }
+            }
 
             .event-card-detail .meta-item {
                 display: flex;
@@ -282,7 +282,7 @@
                 border-bottom: 1px solid var(--border-color);
                 color: var(--text-muted); /* Màu chữ nội dung */
             }
-             .ticket-table td:last-child {
+            .ticket-table td:last-child {
                 color: var(--text-light);
                 font-weight: 500;
             }
@@ -290,7 +290,7 @@
             .ticket-table tr:last-child td {
                 border-bottom: none;
             }
-            
+
             .ticket-note {
                 margin-top: 15px;
                 font-size: 13px;
@@ -300,8 +300,8 @@
 
             /* === DARK THEME FOR ORGANIZER CARD === */
             .organizer-card {
-                 background-color: transparent;
-                 padding: 0;
+                background-color: transparent;
+                padding: 0;
             }
 
             .organizer-name {
@@ -317,7 +317,7 @@
                 margin-bottom: 15px;
                 line-height: 1.6;
             }
-            
+
             .organizer-link {
                 display: inline-block;
                 padding: 8px 15px;
@@ -380,7 +380,7 @@
                 margin-bottom: 5px;
                 color: var(--text-light);
             }
-            
+
             .event-card p {
                 font-size: 13px;
                 margin-bottom: 10px;
@@ -398,7 +398,7 @@
                 box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
                 border-color: var(--primary);
             }
-            
+
             /* ==== FOOTER SECTION (Unchanged as requested) ==== */
             .footer {
                 padding: 40px 15px;
@@ -509,7 +509,7 @@
             .social-images img:hover {
                 transform: scale(1.2);
             }
-            
+
             /* Responsive */
             @media (max-width: 1024px) {
                 .event-header {
@@ -567,7 +567,7 @@
                 </div>
                 <div class="actions">
                     <button class="primary-btn">Create Event</button>
-                    <a href="#" class="link">Purchased Tickets</a>
+                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">Vé đã mua</a>
                     <div class="account">Account</div>
                 </div>
             </header>
@@ -600,12 +600,16 @@
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">                               
                                 <button class="primary-btn"
-                                        onclick="handleBuyTickets(${event.eventID}, ${event.hasSeatingChart == true ? 'true' : 'false'})">
+                                        onclick="handleBuyTickets(${event.eventID}, '${event.hasSeatingChart}')">
                                     Buy Tickets Now
                                 </button>
+                                <button onClick="handleStartChat(${event.eventID})">Chat now</button>
                             </c:when>
-                            <c:otherwise>                               
-                                <button class="primary-btn" onclick="location.href = '${pageContext.request.contextPath}/login'">
+                            <c:otherwise>
+                                <c:url var="loginUrl" value="/login">
+                                    <c:param name="redirect" value="EventServlet?id=${event.eventID}" />
+                                </c:url>
+                                <button class="primary-btn" onclick="location.href = '${loginUrl}'">
                                     Login to Buy Tickets
                                 </button>
                             </c:otherwise>
@@ -641,45 +645,41 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="ticket-info-section section-card">
                         <h2 class="section-title">Ticket Types and Prices</h2>
-                        <table class="ticket-table">
-                            <thead>
-                                <tr>
-                                    <th>Loại vé</th>
-                                    <th>Giá</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="ticket" items="${ticketList}">
-                                    <tr>
-                                        <td>${ticket.ticketName}</td>
-                                        <td><fmt:formatNumber value="${ticket.price}" type="currency" currencyCode="VND"/></td>
-                                    </tr>
-                                </c:forEach>
-                                <c:if test="${empty ticketList}">
-                                    <tr><td colspan="2">Chưa có vé cho sự kiện này</td></tr>
-                                </c:if>
-                            </tbody>
-                        </table>
-                        <p class="ticket-note">* Vé được cập nhật liên tục theo hệ thống phân phối và có thể thay đổi.</p>
-                    </div>
 
-                    <div class="organizer-section section-card">
-                        <h2 class="section-title">Organizer</h2>
-                        <div class="organizer-card">
-                            <c:if test="${not empty organizer}">
-                                <h3 class="organizer-name">${organizer.name}</h3>
-                                <p class="organizer-desc">${organizer.description}</p>
-                                <div class="organizer-links">
-                                    <a href="${organizer.website}" class="organizer-link">Learn More</a>
-                                </div>
-                            </c:if>
-                            <c:if test="${empty organizer}">
-                                <p>Organizer information has not been updated.</p>
-                            </c:if>
-                        </div>
+                        <c:if test="${empty ticketList}">
+                            <p>Chưa có vé cho sự kiện này hoặc vé đã ngừng bán.</p>
+                        </c:if>
+
+                        <c:if test="${not empty ticketList}">
+                            <table class="ticket-table">
+                                <thead>
+                                    <tr>
+                                        <th>Loại vé</th>
+                                        <th>Giá</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="ticket" items="${ticketList}">
+                                        <tr>
+                                            <td>
+                                                <strong>${ticket.ticketName}</strong>
+                                                <br>
+                                                <span style="font-size: 0.9em; color: #555;">Loại: ${ticket.category}</span>
+                                                <br>
+                                                <small style="font-size: 0.8em; color: #777;">${ticket.ticketDescription}</small>
+                                            </td>
+                                            <td>
+                                                <fmt:formatNumber value="${ticket.price}" type="currency" currencyCode="VND"/>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                            <p class="ticket-note">* Vé được cập nhật liên tục và có thể thay đổi.</p>
+                        </c:if>
                     </div>
                 </div>
             </c:if>
@@ -773,32 +773,22 @@
             console.log("[EventDetail.jsp - Inline JS] Context Path được định nghĩa là: '" + contextPath + "'");
 
             function handleBuyTickets(eventId, hasSeatingChartStr) {
-                var targetUrl;
+                console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
+                console.log("  - eventId nhận được:", eventId, "(kiểu:", typeof eventId, ")");
+                console.log("  - hasSeatingChartStr nhận được:", hasSeatingChartStr, "(kiểu:", typeof hasSeatingChartStr, ")");
 
-
-                var hasSeatingChart = (hasSeatingChartStr === 'true');
-
-                console.log("[EventDetail.jsp - Inline JS] Hàm handleBuyTickets được gọi. Event ID:", eventId, "Has Seating Chart:", hasSeatingChart);
-
-                if (hasSeatingChart) {
-
-                    targetUrl = contextPath + "/BookChairServlet?eventId=" + eventId;
-
-
-                    console.log("[EventDetail.jsp - Inline JS] Điều hướng đến trang chọn ghế: " + targetUrl);
+                if (hasSeatingChartStr === 'true') {
+                    console.log("  - KẾT LUẬN: CÓ sơ đồ ghế. Chuyển hướng tới BookChairServlet.");
+                    window.location.href = '${pageContext.request.contextPath}/BookChairServlet?eventId=' + eventId;
                 } else {
-
-                    targetUrl = contextPath + "/TicketInforServlet?eventId=" + eventId;
-
-                    console.log("[EventDetail.jsp - Inline JS] Điều hướng đến TicketInforServlet: " + targetUrl);
+                    console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
+                    window.location.href = '${pageContext.request.contextPath}/TicketInfoServlet?eventId=' + eventId;
                 }
+            }
 
-                if (targetUrl) {
-                    window.location.href = targetUrl;
-                } else {
-                    console.error("[EventDetail.jsp - Inline JS] Không xác định được URL đích để mua vé.");
-                    alert("Đã có lỗi xảy ra khi cố gắng mua vé. Vui lòng thử lại.");
-                }
+            function handleStartChat(eventId){
+                console.log("Starting chat for eventId: ", eventId);
+            window.location.href = '${pageContext.request.contextPath}/init-chat?eventId=' + eventId;
             }
         </script>
     </body>

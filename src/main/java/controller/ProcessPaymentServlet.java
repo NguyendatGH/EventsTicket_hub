@@ -14,39 +14,31 @@ public class ProcessPaymentServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null || session.getAttribute("order") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
+        // Kiểm tra xem người dùng đã đăng nhập và có đơn hàng trong session chưa
+        if (session == null || session.getAttribute("user") == null || session.getAttribute("currentOrder") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
 
         String paymentMethod = request.getParameter("paymethod");
 
-        if (paymentMethod == null || paymentMethod.trim().isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/pages/Payment.jsp?error=no_method_selected");
-            return;
-        }
-        
-        switch (paymentMethod) {
-            case "VNPAY":
-                response.sendRedirect(request.getContextPath() + "/VNPayPaymentServlet");
-                break;
-                
-            case "MOMO":
-                request.setAttribute("message", "Phương thức thanh toán MoMo hiện chưa được hỗ trợ.");
-                request.getRequestDispatcher("/pages/PaymentResult.jsp").forward(request, response);
-                break;
-
-            default:
-                response.sendRedirect(request.getContextPath() + "/pages/Payment.jsp?error=invalid_method");
-                break;
+        // Kiểm tra xem phương thức thanh toán có phải là PAYOS không
+        if ("PAYOS".equals(paymentMethod)) {
+            // Nếu đúng, chuyển hướng đến servlet xử lý của PayOS
+            response.sendRedirect(request.getContextPath() + "/PayOSPaymentServlet");
+        } else {
+            // Nếu không chọn hoặc chọn phương thức khác (trường hợp sau này thêm vào), báo lỗi
+            request.setAttribute("errorMessage", "Vui lòng chọn phương thức thanh toán hợp lệ.");
+            request.getRequestDispatcher("/pages/Payment.jsp").forward(request, response);
         }
     }
-    
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Chuyển hướng về trang chủ nếu truy cập bằng phương thức GET
         response.sendRedirect(request.getContextPath() + "/");
     }
 }

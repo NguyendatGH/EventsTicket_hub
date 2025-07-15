@@ -1,6 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
-prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -15,8 +14,7 @@ prefix="c" %>
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         position: relative;
         background-color: #070a17;
         overflow-x: hidden;
@@ -290,15 +288,6 @@ prefix="c" %>
 
       .edit-btn:hover {
         background: rgba(40, 167, 69, 0.3);
-      }
-
-      .delete-btn {
-        background: rgba(220, 53, 69, 0.2);
-        color: #dc3545;
-      }
-
-      .delete-btn:hover {
-        background: rgba(220, 53, 69, 0.3);
       }
 
       ::-webkit-scrollbar {
@@ -685,17 +674,14 @@ prefix="c" %>
           transform: translateY(0);
         }
       }
+      .message-success{
+        color: #00ff00;
+      }
     </style>
   </head>
   <body>
-    <img
-      class="bg_elips firstElement"
-      src="${pageContext.request.contextPath}/asset/image/full.svg"
-    />
-    <img
-      class="bg_elips secondElement"
-      src="${pageContext.request.contextPath}/asset/image/full2.svg"
-    />
+    <img class="bg_elips firstElement" src="${pageContext.request.contextPath}/asset/image/full.svg" />
+    <img class="bg_elips secondElement" src="${pageContext.request.contextPath}/asset/image/full2.svg" />
     <button class="hamburger">
       <span></span>
       <span></span>
@@ -705,57 +691,38 @@ prefix="c" %>
       <div class="overlay"></div>
       <aside class="sidebar">
         <div class="logo">MasterTicket</div>
-
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-              />
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lí website masterTicket</div>
+          <div class="admin-role">Quản lý website MasterTicket</div>
         </div>
-
         <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a
-                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
-                class="nav-link"
-                >Bảng điều khiển</a
-              >
+              <a href="${pageContext.request.contextPath}/admin-servlet/dashboard" class="nav-link">Bảng điều khiển</a>
             </li>
             <li class="nav-item">
-              <a
-                href="${pageContext.request.contextPath}/admin-servlet/event-management"
-                class="nav-link"
-                >Danh sách sự kiện</a
-              >
+              <a href="${pageContext.request.contextPath}/admin-servlet/event-management" class="nav-link">Danh sách sự kiện</a>
             </li>
             <li class="nav-item">
-              <a
-                href="${pageContext.request.contextPath}/admin-servlet/user-management"
-                class="nav-link active"
-                >Danh sách tài khoản</a
-              >
+              <a href="${pageContext.request.contextPath}/admin-servlet/user-management" class="nav-link active">Danh sách tài khoản</a>
             </li>
             <li class="nav-item">
-              <a
-                href="${pageContext.request.contextPath}/admin-servlet/support-center"
-                class="nav-link"
-                >Hỗ trợ khách hàng</a
-              >
+              <a href="${pageContext.request.contextPath}/admin-servlet/transaction-management" class="nav-link">Danh sách giao dịch</a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin-servlet/support-center" class="nav-link">Hỗ trợ khách hàng</a>
             </li>
           </ul>
         </nav>
         <a href="${pageContext.request.contextPath}/logout" class="logout">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
             <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
-            <path
-              d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z"
-            />
+            <path d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z" />
           </svg>
           Đăng xuất
         </a>
@@ -786,31 +753,24 @@ prefix="c" %>
           <div class="table-header">
             <div class="page-title">Danh sách người dùng</div>
             <div class="search-container">
-              <input
-                type="text"
-                class="search-box"
-                placeholder="Bạn muốn tìm gì?"
-              />
+              <input type="text" class="search-box" placeholder="Bạn muốn tìm gì?" />
               <div class="search-icon">🔍</div>
             </div>
           </div>
           <div class="table-columns">
             <div>#</div>
-            <div>Vai trò</div>
+            <div>Tên người dùng</div>
             <div>Email</div>
             <div>Số di động</div>
             <div>Ngày tạo tài khoản</div>
             <div>Hành động</div>
           </div>
-
           <c:forEach var="user" items="${users}" varStatus="status">
             <div class="table-row">
               <div>${status.count}</div>
               <div>
-                <span
-                  class="status-indicator ${user.isLocked ? 'status-locked' : 'status-active'}"
-                ></span>
-                <c:out value="${user.role}" />
+                <span class="status-indicator ${user.isLocked ? 'status-locked' : 'status-active'}"></span>
+                <c:out value="${user.name}" />
               </div>
               <div>
                 <a href="mailto:${user.email}" class="email-link">
@@ -824,42 +784,18 @@ prefix="c" %>
               <div class="actions">
                 <c:choose>
                   <c:when test="${user.isLocked}">
-                    <button
-                      class="action-btn lock-btn locked"
-                      onclick="toggleUserLock(${user.id}, 'unlock', '${user.email}')"
-                      title="Unlock user"
-                    >
-                      🔒
-                      <!-- <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt=""> -->
+                    <button class="action-btn lock-btn locked" onclick="toggleUserLock(${user.id}, 'unlock', '${user.email}')" title="Unlock user">
+                      <img src="${pageContext.request.contextPath}/asset/image/UnLock.svg" alt="UnLock" />
                     </button>
                   </c:when>
                   <c:otherwise>
-                    <button
-                      class="action-btn lock-btn unlocked"
-                      onclick="toggleUserLock(${user.id}, 'lock', ${user.email})"
-                      title="Lock user"
-                    >
-                      🔒
+                    <button class="action-btn lock-btn unlocked" onclick="toggleUserLock(${user.id}, 'lock', '${user.email}')" title="Lock user">
+                      <img src="${pageContext.request.contextPath}/asset/image/Lock.svg" alt="Lock" />
                     </button>
                   </c:otherwise>
                 </c:choose>
-                <button
-                  class="action-btn edit-btn"
-                  onclick="editUser(${user.id})"
-                >
-                  <img
-                    src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg"
-                    alt="Edit"
-                  />
-                </button>
-                <button
-                  class="action-btn delete-btn"
-                  onclick="deleteUser(${user.id}, '${user.email}')"
-                >
-                  <img
-                    src="${pageContext.request.contextPath}/asset/image/Trash.svg"
-                    alt="Delete"
-                  />
+                <button class="action-btn edit-btn" onclick="editUser(${user.id})">
+                  <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt="Edit" />
                 </button>
               </div>
             </div>
@@ -867,7 +803,6 @@ prefix="c" %>
         </div>
       </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -883,50 +818,34 @@ prefix="c" %>
       // Navigation active state
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.addEventListener("click", function () {
-          document
-            .querySelectorAll(".nav-item")
-            .forEach((nav) => nav.classList.remove("active"));
+          document.querySelectorAll(".nav-item").forEach((nav) => nav.classList.remove("active"));
           this.classList.add("active");
         });
       });
-
-      //sweetAlert
-
       // Search functionality
-      document
-        .querySelector(".search-box")
-        .addEventListener("input", function () {
-          const searchTerm = this.value.toLowerCase();
-          const rows = document.querySelectorAll(".table-row");
-
-          rows.forEach((row) => {
-            const role = row.children[1].textContent.toLowerCase();
-            const email = row.children[2].textContent.toLowerCase();
-            const phoneNum = row.children[3].textContent.toLowerCase();
-
-            if (
-              role.includes(searchTerm) ||
-              email.includes(searchTerm) ||
-              phoneNum.includes(searchTerm)
-            ) {
-              row.style.display = "grid";
-            } else {
-              row.style.display = "none";
-            }
-          });
+      document.querySelector(".search-box").addEventListener("input", function () {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll(".table-row");
+        rows.forEach((row) => {
+          const name = row.children[1].textContent.toLowerCase();
+          const email = row.children[2].textContent.toLowerCase();
+          const phoneNum = row.children[3].textContent.toLowerCase();
+          if (name.includes(searchTerm) || email.includes(searchTerm) || phoneNum.includes(searchTerm)) {
+            row.style.display = "grid";
+          } else {
+            row.style.display = "none";
+          }
         });
-
+      });
       // Hamburger menu functionality
       const hamburger = document.querySelector(".hamburger");
       const sidebar = document.querySelector(".sidebar");
       const overlay = document.querySelector(".overlay");
-
       hamburger.addEventListener("click", () => {
         hamburger.classList.toggle("active");
         sidebar.classList.toggle("active");
         overlay.classList.toggle("active");
       });
-
       // Close sidebar and overlay when clicking a nav link on mobile
       document.querySelectorAll(".nav-link").forEach((link) => {
         link.addEventListener("click", () => {
@@ -937,42 +856,27 @@ prefix="c" %>
           }
         });
       });
-
       // Close sidebar and overlay when clicking outside
       document.addEventListener("click", (e) => {
-        if (
-          window.innerWidth <= 992 &&
-          !sidebar.contains(e.target) &&
-          !hamburger.contains(e.target)
-        ) {
+        if (window.innerWidth <= 992 && !sidebar.contains(e.target) && !hamburger.contains(e.target)) {
           hamburger.classList.remove("active");
           sidebar.classList.remove("active");
           overlay.classList.remove("active");
         }
       });
-
       // Parse JSON data
-
-      var roleDistributionJson =
-        '<%= request.getAttribute("roleDistributionJson") %>';
-      var loginDistributionByMonthJson =
-        '<%= request.getAttribute("loginDistributionByMonthJson") %>';
-
+      var roleDistributionJson = '<%= request.getAttribute("roleDistributionJson") %>';
+      var loginDistributionByMonthJson = '<%= request.getAttribute("loginDistributionByMonthJson") %>';
       let roleDistribution = {};
       let loginDistributionByMonth = {};
-
       try {
-        roleDistribution = JSON.parse(
-          roleDistributionJson.replace(/&quot;/g, '"').trim() || "{}"
-        );
-        loginDistributionByMonth = JSON.parse(
-          loginDistributionByMonthJson.replace(/"/g, '"').trim() || "{}"
-        );
+        roleDistribution = JSON.parse(roleDistributionJson.replace(/&quot;/g, '"').trim() || "{}");
+        loginDistributionByMonth = JSON.parse(loginDistributionByMonthJson.replace(/&quot;/g, '"').trim() || "{}");
       } catch (e) {
         console.error("Failed to parse JSON data:", e);
         roleDistribution = {};
+        loginDistributionByMonth = {};
       }
-
       console.log("Parsed roleDistribution:", roleDistribution);
       console.log("Parsed loginDistributionByMonth:", loginDistributionByMonth);
       // Chart initialization
@@ -986,28 +890,19 @@ prefix="c" %>
         pink: "#ec4899",
         orange: "#f97316",
       };
-
       if (Object.keys(roleDistribution).length > 0) {
         const roleChart = new Chart(document.getElementById("roleChart"), {
           type: "pie",
           data: {
             labels: Object.keys(roleDistribution),
-            datasets: [
-              {
-                data: Object.values(roleDistribution),
-                backgroundColor: Object.keys(roleDistribution).map(
-                  (_, index) =>
-                    [
-                      chartColors.success,
-                      chartColors.warning,
-                      chartColors.danger,
-                      chartColors.info,
-                    ][index % 4]
-                ),
-                borderColor: "#1b1c21",
-                borderWidth: 2,
-              },
-            ],
+            datasets: [{
+              data: Object.values(roleDistribution),
+              backgroundColor: Object.keys(roleDistribution).map((_, index) =>
+                [chartColors.success, chartColors.warning, chartColors.danger, chartColors.info][index % 4]
+              ),
+              borderColor: "#1b1c21",
+              borderWidth: 2,
+            }],
           },
           options: {
             responsive: true,
@@ -1019,90 +914,71 @@ prefix="c" %>
         });
       }
       if (Object.keys(loginDistributionByMonth).length > 0) {
-        // Tạo danh sách 12 tháng gần nhất
         const currentDate = new Date();
         const months = [];
         const monthLabels = [];
-
         for (let i = 11; i >= 0; i--) {
-          const date = new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth() - i,
-            1
-          );
-          const monthKey = date.toISOString().slice(0, 7); // Format: yyyy-MM
-          const monthLabel = date.toLocaleDateString("vi-VN", {
-            month: "short",
-            year: "numeric",
-          });
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+          const monthKey = date.toISOString().slice(0, 7);
+          const monthLabel = date.toLocaleDateString("vi-VN", { month: "short", year: "numeric" });
           months.push(monthKey);
           monthLabels.push(monthLabel);
         }
-
-        const newData = months.map(
-          (month) => loginDistributionByMonth.new[month] || 0
-        );
-        const oldData = months.map(
-          (month) => loginDistributionByMonth.old[month] || 0
-        );
-
-        const loginMonthChart = new Chart(
-          document.getElementById("loginMonthChart"),
-          {
-            type: "bar",
-            data: {
-              labels: monthLabels, // Sử dụng nhãn tháng thân thiện
-              datasets: [
-                {
-                  label: "Người dùng mới",
-                  data: newData,
-                  backgroundColor: "#8b5cf6",
-                  borderColor: "#1b1c21",
-                  borderWidth: 1,
-                },
-                {
-                  label: "Người dùng cũ",
-                  data: oldData,
-                  backgroundColor: "rgba(255, 255, 255, 0.5)",
-                  borderColor: "#1b1c21",
-                  borderWidth: 1,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: { position: "top", labels: { color: "white" } },
-                title: { display: false },
+        const newData = months.map((month) => loginDistributionByMonth.new[month] || 0);
+        const oldData = months.map((month) => loginDistributionByMonth.old[month] || 0);
+        const loginMonthChart = new Chart(document.getElementById("loginMonthChart"), {
+          type: "bar",
+          data: {
+            labels: monthLabels,
+            datasets: [
+              {
+                label: "Người dùng mới",
+                data: newData,
+                backgroundColor: "#8b5cf6",
+                borderColor: "#1b1c21",
+                borderWidth: 1,
               },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: { color: "white", stepSize: 1 },
-                  grid: { color: "rgba(255, 255, 255, 0.1)" },
-                },
-                x: {
-                  ticks: {
-                    color: "white",
-                    maxRotation: 45,
-                    minRotation: 45,
-                  },
-                  grid: { color: "rgba(255, 255, 255, 0.1)" },
-                },
+              {
+                label: "Người dùng cũ",
+                data: oldData,
+                backgroundColor: "rgba(255, 255, 255, 0.5)",
+                borderColor: "#1b1c21",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: "top", labels: { color: "white" } },
+              title: { display: false },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: "white", stepSize: 1 },
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
+              },
+              x: {
+                ticks: { color: "white", maxRotation: 45, minRotation: 45 },
+                grid: { color: "rgba(255, 255, 255, 0.1)" },
               },
             },
-          }
-        );
+          },
+        });
       }
-
-      //toggle user
+      // Toggle user lock/unlock
       function toggleUserLock(userId, action, email) {
         const actionText = action === "lock" ? "khóa" : "mở khóa";
         const icon = action === "lock" ? "warning" : "question";
-        console.log(actionText);
+        console.log("current action: ", actionText);
+        console.log("email:", email);
+        const title = "Xác nhận " + actionText + " tài khoản";
+        const text = "Bạn có chắc muốn " + actionText + " tài khoản " + (email || "unknown") + "?";
+      //  const escapedEmail = email ? email.replace(/'/g, "\\'").replace(/"/g, '\\"') : "unknown";
         Swal.fire({
-          title: String(`Xác nhận ${actionText} tài khoản`),
-          text: String(`Bạn có chắc muốn ${actionText} tài khoản ${email} ?`),
+          title: title,
+          text: text,
           icon: icon,
           showCancelButton: true,
           confirmButtonText: "Có",
@@ -1110,18 +986,25 @@ prefix="c" %>
           confirmButtonColor: action === "lock" ? "#dc3545" : "#28a745",
         }).then((result) => {
           if (result.isConfirmed) {
-            console.log(`xác nhận ${actionText}`);
-            console.log(userId);
-            console.log(email);
-            setTimeout(3000, console.log("processing"));
-            window.location.href = `${pageContext.request.contextPath}/admin-servlet/user-management/lock-user?userId=${userId}&action=${action}`;
+            const url = "${pageContext.request.contextPath}/admin-servlet/user-management/lock-user?userId=" + userId + "&action=" + action;
+            window.location.href = url;
           }
         });
       }
-      const message =
-        '<%= session.getAttribute("message") != null ? session.getAttribute("message") : "" %>';
+      // Display server message if present
+      const message = '<%= session.getAttribute("message") != null ? session.getAttribute("message") : "" %>';
       if (message) {
-        console.log("Server message:", message);
+        Swal.fire({
+          title: message.includes("success") ? "Thành công" : "Lỗi",
+          text: message,
+          icon: message.includes("success") ? "success" : "error",
+          confirmButtonText: "OK",
+        });
+      }
+
+      function editUser(userId) {
+             const url = "${pageContext.request.contextPath}/admin-servlet/user-management/edit-user?userId=" + userId;
+            window.location.href = url;
       }
     </script>
   </body>

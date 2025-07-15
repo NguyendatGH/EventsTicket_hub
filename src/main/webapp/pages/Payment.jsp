@@ -13,7 +13,7 @@
 
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
-            
+
             :root {
                 --primary: #667aff;
                 --secondary: #e06bce;
@@ -23,17 +23,18 @@
                 --border-color: #30363d;
                 --text-light: #e6edf3;
                 --text-muted: #8b949e;
-                --white: #ffffff; 
-                --danger: #ff4444; 
+                --white: #ffffff;
+                --danger: #ff4444;
+                --success: #28a745; /* Thêm màu cho thông báo thành công */
             }
 
             body {
                 font-family: 'Montserrat', sans-serif;
                 margin: 0;
-                background-color: var(--dark-bg); 
-                color: var(--text-light); 
+                background-color: var(--dark-bg);
+                color: var(--text-light);
             }
-            
+
             .header-container {
                 display: flex;
                 justify-content: center;
@@ -75,7 +76,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                background-color: var(--primary); 
+                background-color: var(--primary);
                 padding: 15px 0;
             }
 
@@ -90,6 +91,7 @@
             .mt-progress-step i {
                 margin-right: 8px;
                 font-size: 18px;
+                text-align: center;
             }
 
             .mt-progress-step-active {
@@ -106,7 +108,7 @@
 
             .mt-main-container {
                 display: grid;
-                grid-template-columns: 2fr 1fr; 
+                grid-template-columns: 2fr 1fr;
                 gap: 40px;
                 align-items: flex-start;
                 max-width: 1300px;
@@ -117,7 +119,7 @@
             .mt-main-left, .mt-main-right {
                 display: flex;
                 flex-direction: column;
-                gap: 25px; 
+                gap: 25px;
             }
 
             .mt-main-right {
@@ -213,7 +215,7 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                color: var(--primary); 
+                color: var(--primary);
                 padding: 10px;
                 width: fit-content;
                 margin: 0 auto;
@@ -252,7 +254,7 @@
             }
 
             .mt-methods-list {
-                background-color: var(--dark-bg); 
+                background-color: var(--dark-bg);
                 border-radius: 8px;
                 padding: 10px;
             }
@@ -273,7 +275,7 @@
 
             .mt-method-item input[type="radio"] {
                 margin-right: 15px;
-                accent-color: var(--primary); 
+                accent-color: var(--primary);
                 transform: scale(1.2);
             }
 
@@ -284,7 +286,7 @@
             }
 
             .mt-btn-pay {
-                background-color: var(--primary); 
+                background-color: var(--primary);
                 color: var(--white);
                 border: none;
                 padding: 15px 25px;
@@ -298,7 +300,7 @@
             }
 
             .mt-btn-pay:hover:not(:disabled) {
-                background-color: #5566dd; 
+                background-color: #5566dd;
             }
 
             .mt-btn-pay:disabled {
@@ -306,132 +308,271 @@
                 color: #999;
                 cursor: not-allowed;
             }
+            /* Thêm CSS cho thông báo lỗi */
+            .error-message, .success-message {
+                padding: 15px;
+                margin-top: 20px;
+                border-radius: 8px;
+                font-weight: 600;
+                text-align: center;
+                border: 1px solid transparent;
+            }
+            .error-message {
+                background-color: rgba(255, 68, 68, 0.2);
+                color: var(--danger);
+                border-color: var(--danger);
+            }
+            .success-message {
+                background-color: rgba(40, 167, 69, 0.2);
+                color: var(--success);
+                border-color: var(--success);
+            }
         </style>
     </head>
-        <body>
-            <div class="header-container">
-                <header class="header">
-                    <div class="logo">MasterTicket</div>
-                    <div class="actions">
-                        <a href="#" class="link">Purchased Tickets</a>
-                        <div class="account">Account</div>
-                    </div>
-                </header>
+    <body>
+        <div class="header-container">
+            <header class="header">
+                <div class="logo">MasterTicket</div>
+                <div class="actions">
+                    <a href="#" class="link">Purchased Tickets</a>
+                    <div class="account">Account</div>
+                </div>
+            </header>
+        </div>
+
+        <div class="mt-progress-bar">
+            <div class="mt-progress-step mt-progress-step-active">
+                <i class="fa fa-check"></i> Chọn vé
             </div>
-
-            <div class="mt-progress-bar">
-                <div class="mt-progress-step mt-progress-step-active">
-                    <i class="fa fa-check"></i> Chọn vé
-                </div>
-                <div class="mt-progress-divider"></div>
-                <div class="mt-progress-step mt-progress-step-active">
-                    <i class="fa fa-credit-card"></i> Thanh toán
-                </div>
+            <div class="mt-progress-divider"></div>
+            <div class="mt-progress-step mt-progress-step-active">
+                <i class="fa fa-credit-card"></i> Thanh toán
             </div>
+        </div>
 
-            <div class="mt-main-container">
-                <div class="mt-main-left">
-                    <div class="mt-card">
-                        <div class="mt-card-title">${sessionScope.order.event.name}</div>
-                        <div class="mt-event-detail">
-                            <div><i class="fa fa-clock"></i> <fmt:formatDate value="${sessionScope.order.event.startTime}" pattern="HH:mm, EEE, dd/MM/yyyy"/></div>
-                            <div><i class="fa fa-location-dot"></i> ${sessionScope.order.event.physicalLocation}</div>
+        <div class="mt-main-container">
+            <div class="mt-main-left">
+                <div class="mt-card">
+                    <div class="mt-card-title">${sessionScope.currentOrder.event.name}</div>
+                    <div class="mt-event-detail">
+                        <div><i class="fa fa-clock"></i>
+                            <fmt:formatDate value="${sessionScope.currentOrder.event.startTime}" pattern="HH:mm, EEE, dd/MM/yyyy"/>
                         </div>
-                    </div>
-
-                    <div class="mt-card">
-                        <div class="mt-card-title">Thanh toán</div>
-                        <div class="mt-payment-desc">
-                            Thông tin nhận vé sẽ được gửi đến thư mục vé của tôi tại tài khoản <span class="mt-email">${sessionScope.user.email}</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-card">
-                        <div class="mt-card-title">Mã khuyến mãi</div>
-                        <div class="mt-coupon-box">
-                            <button class="mt-coupon-select">Chọn khuyến mãi</button>
-                            <input class="mt-coupon-input" type="text" placeholder="+ Thêm khuyến mãi"/>
-                        </div>
+                        <div><i class="fa fa-location-dot"></i> ${sessionScope.currentOrder.event.physicalLocation}</div>
                     </div>
                 </div>
 
-                <div class="mt-main-right">
-                    <form id="paymentForm" action="${pageContext.request.contextPath}/ProcessPaymentServlet" method="POST">
-                        <div class="mt-card">
-                            <div class="mt-timer-label">Hoàn tất đặt vé trong</div>
-                            <div class="mt-timer" id="countdown-timer">
-                                <span class="mt-timer-num" id="timer-min">10</span>
-                                <span class="mt-timer-colon">:</span>
-                                <span class="mt-timer-num" id="timer-sec">00</span>
-                            </div>
-                        </div>
+                <div class="mt-card">
+                    <div class="mt-card-title">Thanh toán</div>
+                    <div class="mt-payment-desc">
+                        Thông tin nhận vé sẽ được gửi đến thư mục vé của tôi tại tài khoản
+                        <span class="mt-email">${sessionScope.user.email}</span>
+                    </div>
+                </div>
 
-                        <div class="mt-card">
-                            <div class="mt-card-title">Thông tin đơn hàng</div>
-
-                            <c:forEach var="item" items="${sessionScope.order.items}">
-                                <div style="padding-bottom: 10px; margin-bottom: 10px;">
-                                    <div class="mt-ticket-info-row">
-                                        <span>${item.ticketTypeName} (x${item.quantity})</span>
-                                        <span><fmt:formatNumber value="${item.unitPrice * item.quantity}" type="currency" currencySymbol="đ" groupingUsed="true" maxFractionDigits="0"/></span>
-                                    </div>
-                                </div>
-                            </c:forEach>
-
-                            <div class="mt-ticket-info-row mt-ticket-info-total">
-                                <span>Tổng tiền</span>
-                                <span><fmt:formatNumber value="${sessionScope.order.totalAmount}" type="currency" currencySymbol="đ" groupingUsed="true" maxFractionDigits="0"/></span>
-                            </div>
-                        </div>
-
-                        <div class="mt-card">
-                            <div class="mt-card-title">Phương thức thanh toán</div>
-                            <div class="mt-methods-list">
-                                <label class="mt-method-item">
-                                    <input type="radio" name="paymethod" value="VNPAY" checked required>
-                                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png" alt="VNPAY logo">
-                                    Ví VNPAY
-                                </label>
-                                <label class="mt-method-item">
-                                    <input type="radio" name="paymethod" value="MOMO">
-                                    <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo logo">
-                                    Ví MoMo
-                                </label>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="mt-btn-pay">Thanh toán</button>
-                    </form>
+                <div class="mt-card">
+                    <div class="mt-card-title">Mã khuyến mãi</div>
+                    <div class="mt-coupon-box">
+                        <input id="promoCodeInput" class="mt-coupon-input" type="text" placeholder="Nhập mã khuyến mãi"/>
+                        <button type="button" id="applyPromoBtn" class="mt-coupon-select">Áp dụng</button>
+                        <div id="promoMessage" style="margin-top: 10px; color: green;"></div>
+                        <input type="hidden" name="appliedPromoCode" id="appliedPromoCode"/>
+                    </div>
                 </div>
             </div>
 
-            <script>
-                dayjs.extend(dayjs_plugin_duration);
-                const totalSeconds = 10 * 60;
-                let remaining = totalSeconds;
-                const minEl = document.getElementById('timer-min');
-                const secEl = document.getElementById('timer-sec');
-                const paymentButton = document.querySelector('.mt-btn-pay');
+            <div class="mt-main-right">
+                <form id="paymentForm" action="${pageContext.request.contextPath}/ProcessPaymentServlet" method="POST">
+                    <div class="mt-card">
+                        <div class="mt-timer-label">Hoàn tất đặt vé trong</div>
+                        <div class="mt-timer" id="countdown-timer">
+                            <span class="mt-timer-num" id="timer-min">10</span>
+                            <span class="mt-timer-colon">:</span>
+                            <span class="mt-timer-num" id="timer-sec">00</span>
+                        </div>
+                    </div>
 
-                function updateTimer() {
-                    const duration = dayjs.duration(remaining, 'seconds');
-                    minEl.textContent = String(duration.minutes()).padStart(2, '0');
-                    secEl.textContent = String(duration.seconds()).padStart(2, '0');
+                    <div class="mt-card">
+                        <div class="mt-card-title">Thông tin đơn hàng</div>
 
-                    if (remaining > 0) {
-                        remaining--;
-                    } else {
-                        minEl.textContent = '00';
-                        secEl.textContent = '00';
-                        clearInterval(timerInterval);
-                        if (paymentButton) {
-                            paymentButton.disabled = true;
-                            paymentButton.textContent = 'Đã hết thời gian';
-                        }
+                        <c:forEach var="item" items="${sessionScope.currentOrder.items}">
+                            <div class="mt-ticket-info-row">
+                                <span>${item.ticketTypeName} (x${item.quantity})</span>
+                                <span>
+                                    <fmt:formatNumber value="${item.unitPrice * item.quantity}" type="currency" currencySymbol="đ" groupingUsed="true" maxFractionDigits="0"/>
+                                </span>
+                            </div>
+                        </c:forEach>
+
+                        <div class="mt-ticket-info-row" id="discount-row" style="display: none;">
+                            <span>Giảm giá (<span id="discount-percent">%</span>)</span>
+                            <span id="discount-amount">-</span>
+                        </div>
+
+                        <div class="mt-ticket-info-row mt-ticket-info-total" 
+                             data-original-amount="${sessionScope.currentOrder.totalAmount}">
+                            <span>Tổng tiền</span>
+                            <span id="totalAmount">
+                                <fmt:formatNumber value="${sessionScope.currentOrder.totalAmount}" type="currency" currencySymbol="đ" groupingUsed="true" maxFractionDigits="0"/>
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-card">
+                        <div class="mt-card-title">Phương thức thanh toán</div>
+                        <label class="mt-method-item">
+                            <input type="radio" name="paymethod" value="PAYOS" checked required>
+                            <img src="../asset/logo/PayOSLogo.png" alt="PayOS logo" style="height: 32px;" />
+                            Thanh toán qua PayOS
+                        </label>
+                    </div>
+
+                    <button type="submit" class="mt-btn-pay">Thanh toán</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            dayjs.extend(dayjs_plugin_duration);
+            const totalSeconds = 10 * 60;
+            let remaining = totalSeconds;
+            const minEl = document.getElementById('timer-min');
+            const secEl = document.getElementById('timer-sec');
+            const paymentButton = document.querySelector('.mt-btn-pay');
+
+            function updateTimer() {
+                const duration = dayjs.duration(remaining, 'seconds');
+                minEl.textContent = String(duration.minutes()).padStart(2, '0');
+                secEl.textContent = String(duration.seconds()).padStart(2, '0');
+                if (remaining > 0) {
+                    remaining--;
+                } else {
+                    clearInterval(timerInterval);
+                    minEl.textContent = '00';
+                    secEl.textContent = '00';
+                    if (paymentButton) {
+                        paymentButton.disabled = true;
+                        paymentButton.textContent = 'Đã hết thời gian';
                     }
                 }
-                updateTimer();
-                const timerInterval = setInterval(updateTimer, 1000);
-            </script>
-        </body>
+            }
+
+            updateTimer();
+            const timerInterval = setInterval(updateTimer, 1000);
+
+            let promoAlreadyApplied = false;
+
+            document.getElementById('applyPromoBtn').addEventListener('click', () => {
+                const codeInput = document.getElementById('promoCodeInput');
+                const msgEl = document.getElementById('promoMessage');
+                const rawCode = codeInput.value;
+
+                if (promoAlreadyApplied) {
+                    msgEl.style.color = 'orange';
+                    msgEl.textContent = '⚠️ Mã đã được áp dụng. Không thể áp dụng lại.';
+                    return;
+                }
+
+                if (!rawCode || rawCode.trim() === "") {
+                    msgEl.style.color = 'red';
+                    msgEl.textContent = '❌ Vui lòng nhập mã khuyến mãi.';
+                    return;
+                }
+
+                const encodedCode = encodeURIComponent(rawCode.trim());
+                console.log("🚀 Gửi mã:", encodedCode);
+
+                fetch('/OnlineSellingTicketEvents/ApplyPromotionServlet?promoCode=' + encodedCode)
+                        .then(response => {
+                            if (!response.ok)
+                                throw new Error("Phản hồi không hợp lệ");
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("✅ Response:", data);
+                            if (data.valid) {
+                                promoAlreadyApplied = true;
+
+                                const original = parseFloat(data.originalTotal);
+                                const discount = parseFloat(data.discountAmount);
+                                const percent = original > 0 ? Math.round(discount / original * 100) : 0;
+
+                                msgEl.style.color = 'green';
+                                msgEl.innerHTML = `✅ Đã áp dụng mã <strong>${rawCode.trim()}</strong><br/>
+                     Giảm: <strong>${data.discountFormatted}</strong> (${percent}%)<br/>
+                     Tổng mới: <strong>${data.newTotalFormatted}</strong>`;
+
+                                document.getElementById('discount-row').style.display = 'flex';
+                                document.getElementById('discount-amount').textContent = `- ${data.discountFormatted}`;
+                                document.getElementById('discount-percent').textContent = `${percent}%`;
+                                document.getElementById('totalAmount').textContent = data.newTotalFormatted;
+
+                                document.getElementById('appliedPromoCode').value = rawCode.trim();
+                            } else {
+                                msgEl.style.color = 'red';
+                                msgEl.textContent = data.message || '❌ Mã khuyến mãi không hợp lệ.';
+                            }
+                        })
+                        .catch(error => {
+                            console.error("❌ Lỗi khi gọi API mã khuyến mãi", error);
+                            msgEl.style.color = 'red';
+                            msgEl.textContent = '❌ Lỗi hệ thống khi áp dụng mã.';
+                        });
+            });
+
+            // 🔁 Auto-load lại trạng thái nếu đã có mã áp dụng
+            window.addEventListener('DOMContentLoaded', () => {
+                const appliedCode = document.getElementById('appliedPromoCode').value;
+                const msgEl = document.getElementById('promoMessage');
+                const totalAmountEl = document.getElementById('totalAmount');
+                const discountRow = document.getElementById('discount-row');
+
+                // Lấy tổng tiền gốc từ data attribute trên thẻ chứa tổng tiền
+                const totalOriginal = parseFloat(totalAmountEl.parentElement.getAttribute('data-original-amount'));
+
+                // Reset tổng tiền và ẩn phần giảm giá lúc reload trang
+                totalAmountEl.textContent = new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND', maximumFractionDigits: 0}).format(totalOriginal);
+                discountRow.style.display = 'none';
+
+                if (appliedCode) {
+                    promoAlreadyApplied = true;
+
+                    fetch('/OnlineSellingTicketEvents/ApplyPromotionServlet?promoCode=' + encodeURIComponent(appliedCode))
+                            .then(response => {
+                                if (!response.ok)
+                                    throw new Error("Phản hồi không hợp lệ");
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.valid) {
+                                    const original = parseFloat(data.originalTotal);
+                                    const discount = parseFloat(data.discountAmount);
+                                    const percent = original > 0 ? Math.round(discount / original * 100) : 0;
+
+                                    msgEl.style.color = 'green';
+                                    msgEl.innerHTML = `✅ Đã áp dụng mã <strong>${appliedCode}</strong><br/>
+                         Giảm: <strong>${data.discountFormatted}</strong> (${percent}%)<br/>
+                         Tổng mới: <strong>${data.newTotalFormatted}</strong>`;
+
+                                    discountRow.style.display = 'flex';
+                                    document.getElementById('discount-amount').textContent = `- ${data.discountFormatted}`;
+                                    document.getElementById('discount-percent').textContent = `${percent}%`;
+
+                                    // Không cập nhật lại tổng tiền ở đây để tránh hiển thị sai khi reload
+                                    // totalAmountEl.textContent = data.newTotalFormatted;
+                                }
+                            })
+                            .catch(err => {
+                                console.error("❌ Không thể hiển thị mã khuyến mãi khi reload", err);
+                            });
+                }
+            });
+        </script>
+
+
+    </body>
+
+
+
 </html>

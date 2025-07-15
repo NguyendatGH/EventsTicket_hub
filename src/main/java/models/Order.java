@@ -1,13 +1,9 @@
 package models;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List; // <-- THÊM IMPORT NÀY
-import models.Event;
-/**
- * Lớp này đại diện cho một đơn hàng trong hệ thống,
- * tương ứng với bảng 'Orders' trong cơ sở dữ liệu.
- */
+import java.time.LocalDateTime; // QUAN TRỌNG: Đã đổi sang LocalDateTime
+import java.util.List;
+
 public class Order {
 
     private int orderId;
@@ -24,25 +20,37 @@ public class Order {
     private String contactPhone;
     private String contactEmail;
     private String notes;
-    private Date createdAt;
-    private Date updatedAt;
+    private String transactionId;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private String promotionCode;
+
     private Event event;
-
     private List<OrderItem> items;
-    // ======================================================
 
+    private boolean refundable;
 
     public Order() {
     }
-    
-    public List<OrderItem> getItems() {
-        return items;
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setItems(List<OrderItem> items) {
-        this.items = items;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
-    
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public int getOrderId() {
         return orderId;
     }
@@ -155,27 +163,43 @@ public class Order {
         this.notes = notes;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public String getTransactionId() {
+        return transactionId;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setEvent(Event event) {
+        this.event = event;
     }
-    
-    public Event getEvent() { 
-    return event;
-}
 
-public void setEvent(Event event) { 
-    this.event = event;
-}
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
+
+    public boolean isRefundable() {
+        return refundable;
+    }
+
+    public void setRefundable(boolean refundable) {
+        this.refundable = refundable;
+    }
+
+    public String getPromotionCode() {
+        return promotionCode;
+    }
+
+    public void setPromotionCode(String promotionCode) {
+        this.promotionCode = promotionCode;
+    }
 }
