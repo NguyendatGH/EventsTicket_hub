@@ -25,6 +25,7 @@ import models.Promotion;
 import models.TicketInfo;
 import models.TicketInventory;
 
+
 @WebServlet("/organizer-servlet")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 16, maxRequestSize = 1024 * 1024 * 50)
 public class EventOwnerServlet extends HttpServlet {
@@ -156,12 +157,12 @@ public class EventOwnerServlet extends HttpServlet {
             ticketInfo.setCreatedAt(LocalDateTime.now());
             ticketInfo.setUpdatedAt(LocalDateTime.now());
 
-            TicketInventory ticketInventory = new TicketInventory();
-            ticketInventory.setTicketInfoID(0); // Will be set by DAO
-            ticketInventory.setTotalQuantity(totalTicketCount);
-            ticketInventory.setSoldQuantity(0);
-            ticketInventory.setReservedQuantity(0);
 
+            // TicketInventory ticketInventory = new TicketInventory();
+            // ticketInventory.setTicketInfoID(0); // Will be set by DAO
+            // ticketInventory.setTotalQuantity(totalTicketCount);
+            // ticketInventory.setSoldQuantity(0);
+            // ticketInventory.setReservedQuantity(0);
             Promotion promotion = null; // Can be extended with promotion form fields if needed
 
             // eventDao.createEvent(event, ticketInfo, ticketInventory, promotion, null);

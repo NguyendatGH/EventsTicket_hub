@@ -144,7 +144,8 @@ public class UserService {
         return user;
     }
 
-    public String isEventOwnerLoggedIn(int userId) throws IOException, SQLException {
+    public String whoisLoggedin(int userId) throws IOException, SQLException {
+
       return userDAO.checkRole(userId);
     }
 }

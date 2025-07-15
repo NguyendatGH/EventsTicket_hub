@@ -520,6 +520,7 @@ public class UserDAO implements IUserDAO {
         loginDistribution.put("old", oldUsersLogin);
         return loginDistribution;
     }
+    
 
     public String checkRole(int userId) throws IOException, SQLException {
         String res = "";
