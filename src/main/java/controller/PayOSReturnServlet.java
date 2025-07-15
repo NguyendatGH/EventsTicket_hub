@@ -2,15 +2,20 @@ package controller;
 
 import dao.OrderDAO;
 import models.Order;
+import models.OrderItem;
 import models.User;
 import service.EmailService;
+
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @WebServlet(name = "PayOSReturnServlet", urlPatterns = {"/PayOSReturnServlet"})
 public class PayOSReturnServlet extends HttpServlet {
@@ -21,54 +26,79 @@ public class PayOSReturnServlet extends HttpServlet {
         String orderCode = request.getParameter("orderCode");
         String transactionId = request.getParameter("id");
 
+        HttpSession session = request.getSession(false);
+
         if ("PAID".equalsIgnoreCase(statusParam)) {
-            HttpSession session = request.getSession(false);
             if (session != null) {
                 Order currentOrder = (Order) session.getAttribute("currentOrder");
                 User currentUser = (User) session.getAttribute("user");
 
                 if (currentOrder != null && currentUser != null) {
                     try {
-                        // Gán các thông tin cần thiết trước khi lưu
                         currentOrder.setUserId(currentUser.getId());
                         currentOrder.setTransactionId(transactionId);
                         currentOrder.setOrderNumber(orderCode);
+                        currentOrder.setPaymentStatus("paid");
+                        currentOrder.setOrderStatus("created");
+                        currentOrder.setPaymentMethodId(1);
+                        currentOrder.setContactEmail(currentUser.getEmail());
 
-                        // Lưu vào CSDL
-                        OrderDAO orderDAO = new OrderDAO();
-                        int generatedOrderId = orderDAO.createOrder(currentOrder); // Giả sử hàm của bạn tên là createOrder
-
-                        if (generatedOrderId != -1) {
-                            currentOrder.setOrderId(generatedOrderId); // Cập nhật ID cho đối tượng để gửi mail chính xác
-                            
-                            // BƯỚC QUAN TRỌNG: GỌI SERVICE ĐỂ GỬI EMAIL
-                            EmailService emailService = new EmailService();
-                            emailService.sendOrderConfirmationEmail(currentUser, currentOrder);
-                            
-                            System.out.println("Đã lưu đơn hàng và gửi email thành công cho đơn #" + generatedOrderId);
-                            request.setAttribute("status", "success");
-                            request.setAttribute("message", "Thanh toán thành công! Vui lòng kiểm tra email để nhận thông tin vé.");
-                        } else {
-                             throw new Exception("Lưu đơn hàng vào CSDL thất bại.");
+                        int totalQuantity = 0;
+                        for (OrderItem item : currentOrder.getItems()) {
+                            totalQuantity += item.getQuantity();
                         }
+                        currentOrder.setTotalQuantity(totalQuantity);
+                        BigDecimal finalTotal = currentOrder.getTotalAmount();
+                        BigDecimal discount = currentOrder.getDiscountAmount() != null ? currentOrder.getDiscountAmount() : BigDecimal.ZERO;
+                        BigDecimal subtotal = finalTotal.add(discount);
+
+                        currentOrder.setSubtotalAmount(subtotal);
+                        currentOrder.setDiscountAmount(discount);
+
+                        OrderDAO orderDAO = new OrderDAO();
+                        int newOrderId = orderDAO.createOrder(currentOrder);
+
+                        if (newOrderId != -1) {
+                            try {
+                                EmailService emailService = new EmailService();
+                                emailService.sendOrderConfirmationEmail(currentUser, currentOrder);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                request.setAttribute("status", "success");
+                                request.setAttribute("message", "Đặt hàng thành công nhưng gửi email thất bại.");
+                            }
+
+                            request.setAttribute("status", "success");
+                            request.setAttribute("message", "Cảm ơn bạn đã đặt vé. Hẹn gặp bạn tại sự kiện!");
+                            request.setAttribute("paymentMethod", "PayOS");
+                            request.setAttribute("orderCode", orderCode);
+                            request.setAttribute("transactionId", transactionId);
+                        } else {
+                            request.setAttribute("status", "error");
+                            request.setAttribute("message", "Thanh toán thành công nhưng không thể lưu đơn hàng.");
+                        }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                         request.setAttribute("status", "error");
-                        // Thông báo cho người dùng rằng đã thanh toán nhưng có lỗi hệ thống
-                        request.setAttribute("message", "Thanh toán đã thành công nhưng hệ thống gặp lỗi khi ghi nhận đơn hàng. Vui lòng liên hệ hỗ trợ.");
+                        request.setAttribute("message", "Hệ thống gặp lỗi khi xử lý đơn hàng.");
+                    } finally {
+                        session.removeAttribute("currentOrder");
                     }
+                } else {
+                    request.setAttribute("status", "error");
+                    request.setAttribute("message", "Không tìm thấy thông tin đơn hàng trong session.");
                 }
+            } else {
+                request.setAttribute("status", "error");
+                request.setAttribute("message", "Phiên làm việc không hợp lệ.");
             }
         } else {
-             request.setAttribute("status", "fail");
-             request.setAttribute("message", "Giao dịch thất bại hoặc đã bị hủy.");
+            request.setAttribute("status", "fail");
+            request.setAttribute("message", "Thanh toán thất bại hoặc đã bị hủy. Vui lòng thử lại.");
         }
-        
-        // Gửi các thuộc tính cần thiết khác cho trang kết quả
-        request.setAttribute("paymentMethod", "PayOS");
-        request.setAttribute("orderCode", orderCode);
-        request.setAttribute("transactionId", transactionId);
-        
+
+        // Dẫn đến trang kết quả
         request.getRequestDispatcher("/pages/PaymentResult.jsp").forward(request, response);
     }
 }

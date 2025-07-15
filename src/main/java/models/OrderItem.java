@@ -22,6 +22,7 @@ public class OrderItem {
     private String seatInfo;
     private TicketInfo ticketInfo; 
 
+    private Seat seat;
     public OrderItem() {
     }
 
@@ -84,4 +85,14 @@ public class OrderItem {
     
     public TicketInfo getTicketInfo() { return ticketInfo; }
     public void setTicketInfo(TicketInfo ticketInfo) { this.ticketInfo = ticketInfo; }
+
+    public Seat getSeat() {
+        return seat;
+    }
+
+    public void setSeat(Seat seat) {
+        this.seat = seat;
+    }
+    
+    
 }
