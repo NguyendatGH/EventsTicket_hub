@@ -44,7 +44,7 @@ public class LoginServlet extends HttpServlet {
                 return;
             } else if (getRole.equalsIgnoreCase("event_owner")) {
                 response.sendRedirect(request.getContextPath() + "/organizer-servlet");
-                return;>>>>>>> main
+                return;
             } else {
                 String redirectURL = request.getParameter("redirect");
                 if (redirectURL != null && !redirectURL.isEmpty()) {

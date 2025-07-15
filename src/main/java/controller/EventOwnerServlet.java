@@ -153,7 +153,7 @@ public class EventOwnerServlet extends HttpServlet {
             ticketInfo.setSalesEndTime(endTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
             ticketInfo.setMaxQuantityPerOrder(10);
             ticketInfo.setActive(true);
-            ticketInfo.setAvailableQuantity(totalTicketCount);
+            // ticketInfo.setAvailableQuantity(totalTicketCount);
             ticketInfo.setCreatedAt(LocalDateTime.now());
             ticketInfo.setUpdatedAt(LocalDateTime.now());
 

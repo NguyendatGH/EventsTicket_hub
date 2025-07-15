@@ -11,7 +11,9 @@
     <name>OnlineSellingTicketEvents-1.0-SNAPSHOT</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source> <maven.compiler.target>11</maven.compiler.target> <jakartaee>10.0.0</jakartaee>
+        <maven.compiler.source>11</maven.compiler.source> 
+        <maven.compiler.target>11</maven.compiler.target> 
+        <jakartaee>10.0.0</jakartaee>
     </properties>
     <dependencies>
         <dependency>
@@ -86,12 +88,14 @@
         <dependency>
             <groupId>vn.payos</groupId>
             <artifactId>payos-java</artifactId>
-            <version>1.0.3</version> </dependency>
+            <version>1.0.3</version> 
+        </dependency>
 
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
-            <version>2.9.4</version> </dependency>
+            <version>2.9.4</version> 
+        </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -104,6 +108,11 @@
             <artifactId>json</artifactId>
             <version>20240303</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.30</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -113,7 +122,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>11</source> <target>11</target> </configuration>
+                    <source>11</source> 
+                    <target>11</target> 
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -168,7 +179,8 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>vn.payos.sample.Server</mainClass> </manifest>
+                            <mainClass>vn.payos.sample.Server</mainClass> 
+                        </manifest>
                     </archive>
                 </configuration>
             </plugin>
