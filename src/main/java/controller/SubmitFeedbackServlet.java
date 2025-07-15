@@ -5,6 +5,7 @@
 package controller;
 
 import dao.FeedbackDAO;
+import dto.UserDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -77,7 +78,7 @@ public class SubmitFeedbackServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             // Kiểm tra session và người dùng đăng nhập
-            User user = (User) request.getSession().getAttribute("user");
+            UserDTO user = (UserDTO) request.getSession().getAttribute("user");
             if (user == null) {
                 response.sendRedirect("login.jsp");
                 return;

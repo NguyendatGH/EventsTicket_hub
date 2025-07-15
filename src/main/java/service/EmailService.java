@@ -1,5 +1,6 @@
 package service;
 
+import dto.UserDTO;
 import models.Order;
 import models.OrderItem;
 import models.User;
@@ -19,7 +20,7 @@ public class EmailService {
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
 
-    public void sendOrderConfirmationEmail(User user, Order order) {
+    public void sendOrderConfirmationEmail(UserDTO userDTO, Order order) {
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -36,15 +37,15 @@ public class EmailService {
         try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(EMAIL_USERNAME));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(userDTO.getEmail()));
             message.setSubject("Xác nhận đơn hàng #" + order.getOrderNumber() + " từ MasterTicket");
 
-            String htmlContent = buildHtmlEmailContent(user, order);
+            String htmlContent = buildHtmlEmailContent(userDTO, order);
             message.setContent(htmlContent, "text/html; charset=utf-8");
 
             Transport.send(message);
 
-            System.out.println("Đã gửi email xác nhận thành công tới " + user.getEmail());
+            System.out.println("Đã gửi email xác nhận thành công tới " + userDTO.getEmail());
 
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -52,7 +53,7 @@ public class EmailService {
         }
     }
 
-    private String buildHtmlEmailContent(User user, Order order) {
+    private String buildHtmlEmailContent(UserDTO user, Order order) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy");
         Locale localeVN = new Locale("vi", "VN");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(localeVN);

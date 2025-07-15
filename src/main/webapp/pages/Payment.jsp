@@ -405,8 +405,11 @@
                         </c:forEach>
 
                         <div class="mt-ticket-info-row" id="discount-row" style="display: none;">
-                            <span>Giảm giá (<span id="discount-percent">%</span>)</span>
-                            <span id="discount-amount">-</span>
+                            <span>Giảm giá:</span>
+                            <span>
+                                <span id="discount-amount">-</span>
+                                (<span id="discount-percent">0</span>%)
+                            </span>
                         </div>
 
                         <div class="mt-ticket-info-row mt-ticket-info-total" 
@@ -470,18 +473,18 @@
 
                 if (promoAlreadyApplied) {
                     msgEl.style.color = 'orange';
-                    msgEl.textContent = '⚠️ Mã đã được áp dụng. Không thể áp dụng lại.';
+                    msgEl.textContent = '️ Mã đã được áp dụng. Không thể áp dụng lại.';
                     return;
                 }
 
                 if (!rawCode || rawCode.trim() === "") {
                     msgEl.style.color = 'red';
-                    msgEl.textContent = '❌ Vui lòng nhập mã khuyến mãi.';
+                    msgEl.textContent = ' Vui lòng nhập mã khuyến mãi.';
                     return;
                 }
 
                 const encodedCode = encodeURIComponent(rawCode.trim());
-                console.log("🚀 Gửi mã:", encodedCode);
+                console.log(" Gửi mã:", encodedCode);
 
                 fetch('/OnlineSellingTicketEvents/ApplyPromotionServlet?promoCode=' + encodedCode)
                         .then(response => {
@@ -490,7 +493,7 @@
                             return response.json();
                         })
                         .then(data => {
-                            console.log("✅ Response:", data);
+                            console.log(" Response:", data);
                             if (data.valid) {
                                 promoAlreadyApplied = true;
 
@@ -499,9 +502,8 @@
                                 const percent = original > 0 ? Math.round(discount / original * 100) : 0;
 
                                 msgEl.style.color = 'green';
-                                msgEl.innerHTML = `✅ Đã áp dụng mã <strong>${rawCode.trim()}</strong><br/>
-                     Giảm: <strong>${data.discountFormatted}</strong> (${percent}%)<br/>
-                     Tổng mới: <strong>${data.newTotalFormatted}</strong>`;
+                                msgEl.innerHTML = `Đã áp dụng mã <strong>${rawCode.trim()}</strong>`;
+
 
                                 document.getElementById('discount-row').style.display = 'flex';
                                 document.getElementById('discount-amount').textContent = `- ${data.discountFormatted}`;
