@@ -460,8 +460,12 @@
             }
 
             @keyframes rotate {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
             }
 
             .ticket-content {
@@ -730,6 +734,69 @@
                     margin-left: 0; /* Remove left margin */
                     margin-top: 1rem;
                 }
+                .flash-message {
+                    padding: 15px;
+                    margin: 0 auto 20px auto;
+                    border-radius: 8px;
+                    max-width: 1200px;
+                    font-weight: 500;
+                    text-align: center;
+                }
+                .flash-success {
+                    background-color: #28a745;
+                    color: white;
+                }
+                .flash-error, .flash-fail {
+                    background-color: #dc3545;
+                    color: white;
+                }
+                .popup-console {
+                    display: none; /* mặc định ẩn */
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background-color: rgba(0,0,0,0.7);
+                    z-index: 9999;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .popup-content {
+                    background: var(--card-bg);
+                    padding: 2rem;
+                    border-radius: 12px;
+                    text-align: center;
+                    box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+                    border: 1px solid var(--primary);
+                    max-width: 400px;
+                    width: 90%;
+                }
+
+                .popup-content h2 {
+                    color: var(--primary);
+                    margin-bottom: 1rem;
+                }
+
+                .popup-content p {
+                    color: var(--text-light);
+                    margin-bottom: 1.5rem;
+                }
+
+                .popup-content button {
+                    padding: 0.5rem 1.5rem;
+                    border: none;
+                    background: var(--primary);
+                    color: white;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    transition: background 0.3s;
+                }
+
+                .popup-content button:hover {
+                    background: #5566dd;
+                }
             }
 
             @media (max-width: 480px) {
@@ -758,6 +825,7 @@
                     max-width: 90%;
                     padding: 1rem;
                 }
+
             }
             /* Add styles for pagination controls */
             .pagination-controls {
@@ -928,29 +996,29 @@
                     data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
                     <div class="event-image">
-                        <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) { %>
-                        <img src="<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
+                        <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) {%>
+                        <img src="<%= event.getImageURL()%>" alt="<%= event.getName()%>" />
                         <% } else { %>
                         <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
-                        <% } %>
+                        <% }%>
                     </div>
                     <div class="event-info">
-                        <div class="event-title"><%= event.getName() %></div>
+                        <div class="event-title"><%= event.getName()%></div>
                         <div class="event-date">
-                            <% if (event.getStartTime() != null && event.getEndTime() != null) { %>
-                            🗓️ <%= dateFormat.format(event.getStartTime()) %> - <%= dateFormat.format(event.getEndTime()) %>
+                            <% if (event.getStartTime() != null && event.getEndTime() != null) {%>
+                            🗓️ <%= dateFormat.format(event.getStartTime())%> - <%= dateFormat.format(event.getEndTime())%>
                             <% } else { %>
                             🗓️ Thời gian không xác định
-                            <% } %>
+                            <% }%>
                         </div>
-                        <div class="event-location">📍 <%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định" %></div>
+                        <div class="event-location">📍 <%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
                         <div class="event-description" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; max-height: 3.6em; line-height: 1.2em;">
-                            <%= event.getDescription() != null ? event.getDescription() : "" %>
+                            <%= event.getDescription() != null ? event.getDescription() : ""%>
                         </div>
                         <div class="event-price">Từ 150,000 VNĐ</div>
                     </div>
                 </div>
-                <% } %>
+                <% }%>
             </div>
 
             <div class="pagination-controls">
@@ -1214,6 +1282,44 @@
                     }
                 });
             });
+
         </script>
+        <% if (session.getAttribute("flashMessage_success") != null) { %>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const popup = document.getElementById("successPopup");
+                if (popup) {
+                    popup.style.display = "flex";
+                    // Tự động ẩn sau 5s
+                    setTimeout(() => {
+                        popup.style.display = "none";
+                    }, 5000);
+                }
+            });
+        </script>
+        <%
+            // Xóa session attribute để không hiển thị lại sau reload
+            session.removeAttribute("flashMessage_success");
+        %>
+        <% }%>
+
+        <% if (session.getAttribute("flashMessage_success") != null) { %>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const popup = document.getElementById("successPopup");
+                if (popup) {
+                    popup.style.display = "flex";
+                    // Tự động ẩn sau 5s
+                    setTimeout(() => {
+                        popup.style.display = "none";
+                    }, 5000);
+                }
+            });
+        </script>
+        <%
+            // ✅ Sau khi hiển thị, xóa flash message để không hiện lại khi reload
+            session.removeAttribute("flashMessage_success");
+        %>
+        <% }%>
     </body>
 </html>

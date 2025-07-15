@@ -4,7 +4,6 @@
  */
 package controller;
 
-import dao.OrderDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -12,17 +11,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Map;
-import models.User;
 
 /**
  *
  * @author admin
  */
-@WebServlet(name = "TicketOrderHistoryServlet", urlPatterns = {"/TicketOrderHistoryServlet"})
-public class TicketOrderHistoryServlet extends HttpServlet {
+@WebServlet(name = "FeedbackServlet", urlPatterns = {"/FeedbackServlet"})
+public class FeedbackServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,10 +36,10 @@ public class TicketOrderHistoryServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet TicketOrderHistoryServlet</title>");
+            out.println("<title>Servlet FeedbackServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet TicketOrderHistoryServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet FeedbackServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -63,21 +58,30 @@ public class TicketOrderHistoryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
+        try {
+            String orderId = request.getParameter("orderId");
+            String eventId = request.getParameter("eventId");
 
-        if (currentUser == null) {
-            response.sendRedirect("login.jsp");
-            return;
+            // Truyền orderId và eventId xuống JSP
+            request.setAttribute("orderId", orderId);
+            request.setAttribute("eventId", eventId);
+
+            request.getRequestDispatcher("/pages/FeedbackForm.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Không thể mở form phản hồi.");
         }
-
-        OrderDAO orderDAO = new OrderDAO();
-        List<Map<String, Object>> simpleOrders = orderDAO.getSimpleOrdersByUserId(currentUser.getId());
-        request.setAttribute("orderHistory", simpleOrders);
-
-        request.getRequestDispatcher("/pages/TicketOrderHistory.jsp").forward(request, response);
     }
 
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

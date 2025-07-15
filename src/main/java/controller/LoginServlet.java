@@ -33,7 +33,9 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
             String getRole = "";
             try {
+
                 getRole = userService.whoisLoggedin(user.getId());
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
