@@ -23,6 +23,7 @@ import models.Event;
 import models.Genre;
 import models.Promotion;
 import models.TicketInfo;
+import models.TicketInventory;
 
 
 @WebServlet("/organizer-servlet")
@@ -156,12 +157,12 @@ public class EventOwnerServlet extends HttpServlet {
             ticketInfo.setCreatedAt(LocalDateTime.now());
             ticketInfo.setUpdatedAt(LocalDateTime.now());
 
+
             // TicketInventory ticketInventory = new TicketInventory();
             // ticketInventory.setTicketInfoID(0); // Will be set by DAO
             // ticketInventory.setTotalQuantity(totalTicketCount);
             // ticketInventory.setSoldQuantity(0);
             // ticketInventory.setReservedQuantity(0);
-
             Promotion promotion = null; // Can be extended with promotion form fields if needed
 
             // eventDao.createEvent(event, ticketInfo, ticketInventory, promotion, null);

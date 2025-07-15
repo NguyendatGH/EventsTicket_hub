@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import Interfaces.IUserDAO;
 import models.TopEventOwner;
 import models.User;
@@ -522,7 +521,8 @@ public class UserDAO implements IUserDAO {
         return loginDistribution;
     }
     
-     public String checkRole(int userId) throws IOException, SQLException {
+
+    public String checkRole(int userId) throws IOException, SQLException {
         String res = "";
         String sql = "SELECT Role FROM Users WHERE Id = ?";
 

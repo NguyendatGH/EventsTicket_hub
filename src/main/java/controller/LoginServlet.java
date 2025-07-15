@@ -33,7 +33,9 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
             String getRole = "";
             try {
+
                 getRole = userService.whoisLoggedin(user.getId());
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -42,7 +44,7 @@ public class LoginServlet extends HttpServlet {
                 return;
             } else if (getRole.equalsIgnoreCase("event_owner")) {
                 response.sendRedirect(request.getContextPath() + "/organizer-servlet");
-                return;
+                return;>>>>>>> main
             } else {
                 String redirectURL = request.getParameter("redirect");
                 if (redirectURL != null && !redirectURL.isEmpty()) {
