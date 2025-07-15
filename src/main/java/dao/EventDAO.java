@@ -22,6 +22,29 @@ import java.util.logging.Logger;
 public class EventDAO {
 
     private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
+    
+
+    /**
+     * Gets the total count of approved and non-deleted events.
+     * Connection is managed via try-with-resources.
+     * @return The total count of events.
+     */
+    public int getTotalApprovedEventsCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM Events WHERE IsApproved = 1 AND IsDeleted = 0"; 
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error getting total approved events count from database.", e);
+        }
+        return count;
+    }
 
     public List<Event> getAllApprovedEvents() {
         List<Event> list = new ArrayList<>();
@@ -525,6 +548,41 @@ public class EventDAO {
         }
 
         return null; 
+    }
+    
+    /**
+     * Lấy danh sách các sự kiện đã được phê duyệt và không bị xóa, có phân trang.
+     * Kết nối được quản lý bằng try-with-resources.
+     * @param offset Vị trí bắt đầu của hàng (0-indexed).
+     * @param limit Số lượng bản ghi tối đa cần trả về.
+     * @return Danh sách các đối tượng Event.
+     */
+   public List<Event> getApprovedEventsPaginated(int offset, int limit) {
+        List<Event> events = new ArrayList<>();
+        // Đảm bảo chỉ chọn các trường CÓ THẬT trong bảng Events của bạn
+        // Đã loại bỏ 'Ranking'
+        String allColumns = "EventID, Name, Description, PhysicalLocation, StartTime, EndTime, " +
+                            "TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, " +
+                            "HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt"; 
+                     
+        String sql = "SELECT " + allColumns + " FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 " +
+                     "ORDER BY StartTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; 
+                     
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, offset);          
+            ps.setInt(2, limit);  
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    events.add(mapRowToEvent(rs)); // Sử dụng phương thức helper mapRowToEvent
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi lấy sự kiện phân trang từ cơ sở dữ liệu.", e);
+        }
+        return events;
     }
 
 }

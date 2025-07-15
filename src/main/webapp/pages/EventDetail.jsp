@@ -8,9 +8,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        <title>MasterTicket - EventDetails</title>
+        <title>MasterTicket - Chi tiết sự kiện</title>
         <style>
-            
+
             :root {
                 --primary: #667aff;      /* Màu xanh dương dịu hơn */
                 --secondary: #e06bce;    /* Màu hồng/tím nhẹ nhàng hơn */
@@ -298,39 +298,102 @@
                 font-style: italic;
             }
 
-            /* === DARK THEME FOR ORGANIZER CARD === */
-            .organizer-card {
-                background-color: transparent;
-                padding: 0;
+            /* --- Feedback Section Styles --- */
+            .feedback-section {
+                margin-top: 40px; /* Khoảng cách phía trên phần feedback */
             }
 
-            .organizer-name {
-                font-size: 18px;
-                font-weight: 600;
-                margin-bottom: 5px;
+            .feedback-form {
+                margin-bottom: 30px;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .feedback-form textarea {
+                width: 100%;
+                padding: 15px;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                background-color: var(--darker-bg); /* Nền tối hơn cho textarea */
                 color: var(--text-light);
+                font-size: 15px;
+                resize: vertical;
+                min-height: 100px;
             }
 
-            .organizer-desc {
-                font-size: 14px;
+            .feedback-form textarea::placeholder {
                 color: var(--text-muted);
+            }
+
+            .feedback-form .rating {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 16px;
+                color: var(--text-muted);
+            }
+
+            .feedback-form .rating .fa-star {
+                cursor: pointer;
+                color: var(--text-muted); /* Màu sao mặc định */
+                transition: color 0.2s;
+            }
+
+            /* Màu sao đã chọn/hover - có thể thêm JS sau để đánh giá động */
+            .feedback-form .rating .fa-star.active,
+            .feedback-form .rating .fa-star:hover {
+                color: var(--warning); /* Màu vàng cho sao đã chọn/hover */
+            }
+
+            .feedback-form .primary-btn {
+                align-self: flex-start; /* Căn nút sang trái */
+                padding: 10px 25px;
+            }
+
+            .feedback-list h3 {
+                font-size: 20px;
+                color: var(--text-light);
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .feedback-item {
+                background-color: var(--darker-bg); /* Nền hơi tối hơn cho từng mục feedback */
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 15px 20px;
                 margin-bottom: 15px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+
+            .feedback-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .feedback-item .feedback-text {
+                font-size: 15px;
                 line-height: 1.6;
+                color: var(--text-light);
+                margin-bottom: 10px;
             }
 
-            .organizer-link {
-                display: inline-block;
-                padding: 8px 15px;
-                background-color: var(--primary);
-                color: white;
-                text-decoration: none;
-                border-radius: 5px;
-                font-size: 14px;
-                transition: background-color 0.2s;
+            .feedback-item .feedback-meta {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 13px;
+                color: var(--text-muted);
             }
 
-            .organizer-link:hover {
-                background-color: #5566dd;
+            .feedback-item .feedback-meta .feedback-author {
+                font-weight: 600;
+                color: var(--primary);
+            }
+
+            .feedback-item .feedback-meta .feedback-stars .fas.fa-star {
+                color: var(--warning); /* Màu vàng cho sao đã điền */
             }
 
             /* === SUGGESTIONS SECTION === */
@@ -399,7 +462,7 @@
                 border-color: var(--primary);
             }
 
-            /* ==== FOOTER SECTION (Unchanged as requested) ==== */
+            /* ==== FOOTER SECTION ==== */
             .footer {
                 padding: 40px 15px;
                 background-color: var(--darker-bg);
@@ -562,13 +625,13 @@
             <header class="header">
                 <div class="logo">MasterTicket</div>
                 <div class="search">
-                    <input type="text" placeholder="What are you looking for today?">
-                    <button>Search</button>
+                    <input type="text" placeholder="Bạn đang tìm kiếm gì hôm nay?">
+                    <button>Tìm kiếm</button>
                 </div>
                 <div class="actions">
-                    <button class="primary-btn">Create Event</button>
-                    <a href="#" class="link">Purchased Tickets</a>
-                    <div class="account">Account</div>
+                    <button class="primary-btn">Tạo sự kiện</button>
+                    <a href="#" class="link">Vé đã mua</a>
+                    <div class="account">Tài khoản</div>
                 </div>
             </header>
         </div>
@@ -579,7 +642,7 @@
             <c:if test="${not empty event}">
                 <div class="event-header">
                     <div class="event-poster">
-                        <img src="${event.imageURL}" alt="${event.name} Poster">
+                        <img src="${event.imageURL}" alt="Poster sự kiện ${event.name}">
                     </div>
                     <div class="event-info">
                         <h1 class="event-title">${event.name}</h1>
@@ -598,19 +661,19 @@
                         </div>
                         <p class="event-description">${event.description}</p>
                         <c:choose>
-                            <c:when test="${not empty sessionScope.user}">                               
+                            <c:when test="${not empty sessionScope.user}">
                                 <button class="primary-btn"
                                         onclick="handleBuyTickets(${event.eventID}, '${event.hasSeatingChart}')">
-                                    Buy Tickets Now
+                                    Mua vé ngay
                                 </button>
-                                <button onClick="handleStartChat(${event.eventID})">Chat now</button>
+                                <button onClick="handleStartChat(${event.eventID})">Chat ngay</button>
                             </c:when>
                             <c:otherwise>
                                 <c:url var="loginUrl" value="/login">
                                     <c:param name="redirect" value="EventServlet?id=${event.eventID}" />
                                 </c:url>
                                 <button class="primary-btn" onclick="location.href = '${loginUrl}'">
-                                    Login to Buy Tickets
+                                    Đăng nhập để mua vé
                                 </button>
                             </c:otherwise>
                         </c:choose>
@@ -619,26 +682,26 @@
 
                 <div class="ticket-detail-container">
                     <div class="event-info-section section-card">
-                        <h2 class="section-title">Detailed Information</h2>
+                        <h2 class="section-title">Thông tin chi tiết</h2>
                         <div class="event-card-detail">
                             <h3 class="event-name">${event.name}</h3>
                             <div class="event-meta">
                                 <div class="meta-item">
-                                    <strong>⏰ Time:</strong>
+                                    <strong>⏰ Thời gian:</strong>
                                     <span><fmt:formatDate value="${event.startTime}" pattern="HH:mm, dd/MM/yyyy"/></span>
                                 </div>
                                 <div class="meta-item">
-                                    <strong>📍 Location:</strong> 
+                                    <strong>📍 Địa điểm:</strong>
                                     <span>${event.physicalLocation}</span>
                                 </div>
                                 <div class="meta-item">
-                                    <strong>💰 Price from:</strong>
+                                    <strong>💰 Giá từ:</strong>
                                     <span>
                                         <c:choose>
                                             <c:when test="${not empty ticketList}">
                                                 <fmt:formatNumber value="${ticketList[0].price}" type="currency" currencyCode="VND"/>
                                             </c:when>
-                                            <c:otherwise>Contact</c:otherwise>
+                                            <c:otherwise>Liên hệ</c:otherwise>
                                         </c:choose>
                                     </span>
                                 </div>
@@ -647,7 +710,7 @@
                     </div>
 
                     <div class="ticket-info-section section-card">
-                        <h2 class="section-title">Ticket Types and Prices</h2>
+                        <h2 class="section-title">Loại vé và giá</h2>
 
                         <c:if test="${empty ticketList}">
                             <p>Chưa có vé cho sự kiện này hoặc vé đã ngừng bán.</p>
@@ -682,7 +745,54 @@
                         </c:if>
                     </div>
                 </div>
-            </c:if>
+
+                <div class="feedback-section section-card">
+                    <h2 class="section-title">Để lại phản hồi của bạn</h2>
+                    <div class="feedback-form">
+                        <textarea placeholder="Chia sẻ cảm nhận của bạn về sự kiện này..." rows="5"></textarea>
+                        <div class="rating">
+                            <span>Đánh giá sự kiện này:</span>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <button class="primary-btn">Gửi phản hồi</button>
+                    </div>
+                    <div class="feedback-list">
+                        <h3>Phản hồi gần đây:</h3>
+                        <div class="feedback-item">
+                            <p class="feedback-text">"Sự kiện tuyệt vời! Rất thích không khí và các màn trình diễn."</p>
+                            <div class="feedback-meta">
+                                <span class="feedback-author">Bởi Nguyễn Văn A</span>
+                                <span class="feedback-date"> vào 10/07/2025</span>
+                                <span class="feedback-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="feedback-item">
+                            <p class="feedback-text">"Sự kiện nhìn chung khá tốt, nhưng chất lượng âm thanh có thể cải thiện hơn."</p>
+                            <div class="feedback-meta">
+                                <span class="feedback-author">Bởi Trần Thị B</span>
+                                <span class="feedback-date"> vào 08/07/2025</span>
+                                <span class="feedback-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </c:if>
             <c:if test="${empty event}">
                 <p style="text-align: center; font-size: 20px; color: var(--danger);">Không tìm thấy sự kiện. Vui lòng thử lại.</p>
             </c:if>
@@ -701,7 +811,7 @@
                                     ${suggestedEvent.physicalLocation}
                                 </p>
                                 <p class="price">Từ
-                                    <c:choose>                                       
+                                    <c:choose>
                                         <c:when test="${not empty suggestedEvent.ticketList}">
                                             <fmt:formatNumber value="${suggestedEvent.ticketList[0].price}" type="currency" currencyCode="VND"/>
                                         </c:when>
@@ -723,40 +833,40 @@
             <div class="footer-content">
                 <div class="footer-container">
                     <div class="footer-section">
-                        <h3>Customer Services</h3>
+                        <h3>Dịch vụ khách hàng</h3>
                         <ul>
-                            <li><a href="#">FAQS</a></li>
-                            <li><a href="#">Contact us</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Câu hỏi thường gặp</a></li>
+                            <li><a href="#">Liên hệ chúng tôi</a></li>
+                            <li><a href="#">Chính sách bảo mật</a></li>
+                            <li><a href="#">Điều khoản dịch vụ</a></li>
                         </ul>
                         <p><i class="fas fa-envelope"></i> <a href="mailto:support@masterTicket.vn">support@masterTicket.vn</a></p>
                     </div>
 
                     <div class="footer-section">
-                        <h3>SiteMap</h3>
+                        <h3>Sitemap</h3>
                         <ul>
-                            <li><a href="#">Create Account</a></li>
-                            <li><a href="#">News</a></li>
-                            <li><a href="#">Top-Rated Event</a></li>
+                            <li><a href="#">Tạo tài khoản</a></li>
+                            <li><a href="#">Tin tức</a></li>
+                            <li><a href="#">Sự kiện nổi bật</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-section">
-                        <h3>Subscribe for event updates.</h3>
+                        <h3>Đăng ký để nhận cập nhật sự kiện.</h3>
                         <form class="subscribe-box">
-                            <input type="email" placeholder="Your email..." required />
+                            <input type="email" placeholder="Email của bạn..." required />
                             <button type="submit"><i class="fas fa-paper-plane"></i></button>
                         </form>
 
                         <div class="language">
-                            <p>Language:</p>
-                            <img src="https://flagcdn.com/w40/vn.png" alt="Vietnamese" />
-                            <img src="https://flagcdn.com/w40/gb.png" alt="English" />
+                            <p>Ngôn ngữ:</p>
+                            <img src="https://flagcdn.com/w40/vn.png" alt="Tiếng Việt" />
+                            <img src="https://flagcdn.com/w40/gb.png" alt="Tiếng Anh" />
                         </div>
 
                         <div class="social-icons">
-                            <p>Follow us:</p>
+                            <p>Theo dõi chúng tôi:</p>
                             <div class="social-images">
                                 <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
                                 <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />

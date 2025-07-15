@@ -16,15 +16,15 @@ public class GenreDAO {
     
     public List<Genre> getAllGenres() {
         List<Genre> genres = new ArrayList<>();
-        String sql = "SELECT * FROM genres ORDER BY genre_name";
+        String sql = "SELECT * FROM genres ORDER BY genreName";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             ResultSet rs = pstmt.executeQuery();
             
             while (rs.next()) {
                 Genre genre = new Genre();
-                genre.setGenreID(rs.getInt("genre_id"));
-                genre.setGenreName(rs.getString("genre_name"));
+                genre.setGenreID(rs.getInt("genreId"));
+                genre.setGenreName(rs.getString("genreName"));
                 genre.setDescription(rs.getString("description"));
                 genres.add(genre);
             }
@@ -35,7 +35,7 @@ public class GenreDAO {
     }
     
     public Genre getGenreById(int genreId) {
-        String sql = "SELECT * FROM genres WHERE genre_id = ?";
+        String sql = "SELECT * FROM genres WHERE genreId = ?";
         
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, genreId);
@@ -43,8 +43,8 @@ public class GenreDAO {
             
             if (rs.next()) {
                 Genre genre = new Genre();
-                genre.setGenreID(rs.getInt("genre_id"));
-                genre.setGenreName(rs.getString("genre_name"));
+                genre.setGenreID(rs.getInt("genreId"));
+                genre.setGenreName(rs.getString("genreName"));
                 genre.setDescription(rs.getString("description"));
                 return genre;
             }

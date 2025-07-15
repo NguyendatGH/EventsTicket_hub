@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="models.Event"%>
+<%@page import="models.User"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
@@ -9,7 +10,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MasterTicket - Vé Sự Kiện</title>
+        <title>MasterTicket - Trang Chủ</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <style>
             * {
@@ -148,6 +149,7 @@
                 align-items: center;
                 flex-shrink: 0; /* Prevent buttons from shrinking */
                 margin-left: 1rem; /* Space between center content and auth buttons */
+                position: relative; /* For dropdown */
             }
 
             .btn {
@@ -191,7 +193,48 @@
                 font-size: 0.9rem;
                 margin-right: 0.75rem;
                 white-space: nowrap;
+                cursor: pointer; /* Make it clickable for dropdown */
             }
+
+            .user-dropdown {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: var(--darker-bg);
+                border-radius: 10px;
+                padding: 1rem;
+                min-width: 200px;
+                border: 1px solid var(--border-color);
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: all 0.3s;
+                z-index: 101; /* Above header */
+            }
+
+            .user-dropdown.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .dropdown-item {
+                display: block;
+                color: var(--text-light);
+                text-decoration: none;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid var(--border-color);
+                transition: color 0.3s;
+            }
+
+            .dropdown-item:last-child {
+                border-bottom: none;
+            }
+
+            .dropdown-item:hover {
+                color: var(--primary);
+            }
+
 
             /* Main Content */
             .container {
@@ -716,9 +759,68 @@
                     padding: 1rem;
                 }
             }
+            /* Add styles for pagination controls */
+            .pagination-controls {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+                margin-top: 3rem;
+                padding-bottom: 2rem;
+            }
+
+            .pagination-controls a,
+            .pagination-controls span {
+                text-decoration: none;
+                color: var(--text-light);
+                background-color: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 0.7rem 1.2rem;
+                transition: all 0.3s ease;
+                min-width: 40px;
+                text-align: center;
+                font-weight: 500;
+            }
+
+            .pagination-controls a:hover {
+                background-color: var(--primary);
+                border-color: var(--primary);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+            .pagination-controls .current-page {
+                background-color: var(--primary);
+                border-color: var(--primary);
+                color: white;
+                font-weight: bold;
+                pointer-events: none; /* Make current page not clickable */
+            }
+
+            .pagination-controls .disabled {
+                opacity: 0.5;
+                pointer-events: none; /* Disable click */
+            }
         </style>
     </head>
     <body>
+        <%  
+            // Retrieve user and events from session/request attributes
+            User user = (User) session.getAttribute("user");
+            List<Event> events = (List<Event>) request.getAttribute("events");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd/MM/yyyy HH:mm");
+
+            // Pagination attributes
+            Integer currentPageObj = (Integer) request.getAttribute("currentPage");
+            Integer noOfPagesObj = (Integer) request.getAttribute("noOfPages");
+            Integer totalEventsObj = (Integer) request.getAttribute("totalEvents");
+
+            int currentPage = (currentPageObj != null) ? currentPageObj : 1;
+            int noOfPages = (noOfPagesObj != null) ? noOfPagesObj : 1;
+            int totalEvents = (totalEventsObj != null) ? totalEventsObj : 0;
+        %>
+
         <header class="header">
             <nav class="nav">
                 <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
@@ -738,10 +840,12 @@
                     </div>
 
                     <ul class="nav-links" id="navLinks">
-                        <li><a href="#events"><i class="fas fa-home"></i> Trang chủ</a></li>
-                        <li><a href="#venues"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
-                        <li><a href="#about"><i class="fas fa-tags"></i> Săn voucher</a></li>
-                        <li><a href="#contact"><i class="fas fa-plus-circle"></i> Tạo sự kiện</a></li>
+                        <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
+                        <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
+                        <li><a href="#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
+                        <c:if test="${not empty sessionScope.user && sessionScope.user.roleID == 2}">
+                             <li><a href="${pageContext.request.contextPath}/createEvent"><i class="fas fa-plus-circle"></i> Tạo sự kiện</a></li>
+                        </c:if>
                         <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
                     </ul>
                 </div>
@@ -749,8 +853,17 @@
                 <div class="auth-buttons">
                     <c:choose>
                         <c:when test="${not empty sessionScope.user}">
-                            <span class="user-greeting">Xin chào, ${sessionScope.user.email}</span>
-                            <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline">Đăng xuất</a>
+                            <span class="user-greeting" onclick="toggleUserDropdown()">
+                                Xin chào, ${sessionScope.user.email} <span style="margin-left: 0.5rem;">▼</span>
+                            </span>
+                            <div class="user-dropdown" id="userDropdown">
+                                <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
+                                <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
+                                <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
+                                <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
+                                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+                                <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
+                            </div>
                         </c:when>
                         <c:otherwise>
                             <a href="${pageContext.request.contextPath}/login" class="btn btn-outline">Đăng nhập</a>
@@ -763,11 +876,25 @@
 
         <main class="container">
             <div class="hero-carousel">
-                <div class="carousel-slide active">
+                <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
                     <div class="carousel-content">
                         <h2>Chào mừng đến với MasterTicket</h2>
                         <p>Khám phá hàng ngàn sự kiện thú vị và đặt vé ngay hôm nay!</p>
                         <a href="#events" class="btn btn-primary">Khám phá ngay</a>
+                    </div>
+                </div>
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1505373877845-8c2aace4d817?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                    <div class="carousel-content">
+                        <h2>Sự kiện âm nhạc đỉnh cao</h2>
+                        <p>Đừng bỏ lỡ những đêm nhạc sống động với các nghệ sĩ hàng đầu!</p>
+                        <a href="#events" class="btn btn-primary">Xem chi tiết</a>
+                    </div>
+                </div>
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1607962837350-ed6062031177?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                    <div class="carousel-content">
+                        <h2>Sự kiện văn hóa và nghệ thuật</h2>
+                        <p>Đắm chìm vào thế giới nghệ thuật với các triển lãm và biểu diễn độc đáo.</p>
+                        <a href="#events" class="btn btn-primary">Tìm hiểu thêm</a>
                     </div>
                 </div>
                 <div class="carousel-indicators">
@@ -777,28 +904,27 @@
                 </div>
             </div>
 
-            <%  
-            List<Event> events = (List<Event>) request.getAttribute("events");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd/MM/yyyy HH:mm");
-            
-            if (events == null || events.isEmpty()) {  
-            %>
+            <%  if (events == null || events.isEmpty()) {  %>
             <div class="no-events">
                 <h2>Không có sự kiện nào!</h2>
                 <p>Hiện tại chưa có sự kiện nào được tổ chức. Vui lòng quay lại sau!</p>
             </div>
             <% } else { %>
+            
             <div class="section-header">
-                <h2 class="section-title" id="events">Sự kiện nổi bật</h2>
-                <a href="#all-events" class="view-all">Xem tất cả</a>
+                <h2 class="section-title" id="hot-events">Sự kiện nổi bật</h2>
+                <a href="${pageContext.request.contextPath}/home?page=1" class="view-all">Xem tất cả</a>
             </div>
 
             <div class="event-grid">
-                <% for (Event event : events) { %>
+                <%  // The 'events' list from the servlet is already paginated for the current page.
+                    for (Event event : events) {
+                %>
                 <div class="event-card searchable-event" 
                     data-event-id="<%= event.getEventID() %>"
+                    data-event-name="<%= event.getName() != null ? event.getName().toLowerCase() : "" %>"
+                    data-event-description="<%= event.getDescription() != null ? event.getDescription().toLowerCase() : "" %>"
                     data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : "" %>"
-                    data-event-end-time="<%= event.getEndTime() != null ? event.getEndTime().getTime() : "" %>"
                     data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
                     <div class="event-image">
@@ -827,45 +953,44 @@
                 <% } %>
             </div>
 
-            <div class="section-header">
-                <h2 class="section-title" id="all-events">Tất cả sự kiện</h2>
-                <span class="view-all">Tổng cộng: <%= events.size() %> sự kiện</span>
+            <div class="pagination-controls">
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage - 1 %>" 
+                   class="<%= (currentPage == 1) ? "disabled" : "" %>">Trước</a>
+                
+                <% 
+                    // Display page numbers
+                    int startPage = Math.max(1, currentPage - 2);
+                    int endPage = Math.min(noOfPages, currentPage + 2);
+
+                    if (startPage > 1) {
+                        %><a href="${pageContext.request.contextPath}/home?page=1">1</a><%
+                        if (startPage > 2) {
+                            %><span>...</span><%
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++) {
+                        if (i == currentPage) {
+                            %><span class="current-page"><%= i %></span><%
+                        } else {
+                            %><a href="${pageContext.request.contextPath}/home?page=<%= i %>"><%= i %></a><%
+                        }
+                    }
+
+                    if (endPage < noOfPages) {
+                        if (endPage < noOfPages - 1) {
+                            %><span>...</span><%
+                        }
+                        %><a href="${pageContext.request.contextPath}/home?page=<%= noOfPages %>"><%= noOfPages %></a><%
+                    }
+                %>
+                
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage + 1 %>" 
+                   class="<%= (currentPage == noOfPages) ? "disabled" : "" %>">Sau</a>
             </div>
 
-            <div class="event-grid">
-                <% for (Event event : events) { %>
-                <div class="event-card searchable-event" 
-                    data-event-id="<%= event.getEventID() %>"
-                    data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : "" %>"
-                    data-event-end-time="<%= event.getEndTime() != null ? event.getEndTime().getTime() : "" %>"
-                    data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
-                    onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
-                    <div class="event-image">
-                        <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) { %>
-                        <img src="<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
-                        <% } else { %>
-                        <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
-                        <% } %>
-                    </div>
-                    <div class="event-info">
-                        <div class="event-title"><%= event.getName() %></div>
-                        <div class="event-date">
-                            <% if (event.getStartTime() != null && event.getEndTime() != null) { %>
-                            🗓️ <%= dateFormat.format(event.getStartTime()) %> - <%= dateFormat.format(event.getEndTime()) %>
-                            <% } else { %>
-                            🗓️ Thời gian không xác định
-                            <% } %>
-                        </div>
-                        <div class="event-location">📍 <%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định" %></div>
-                        <div class="event-description" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; max-height: 3.6em; line-height: 1.2em;">
-                            <%= event.getDescription() != null ? event.getDescription() : "" %>
-                        </div>
-                        <div class="event-price">Từ 150,000 VNĐ</div>
-                    </div>
-                </div>
-                <% } %>
-            </div>
             <% } %>
+
             <div class="ticket-section">
                 <div class="ticket-content">
                     <h2 class="ticket-title">Mua vé của bạn</h2>
@@ -898,7 +1023,7 @@
                 <div class="footer-section">
                     <h3>Đăng ký nhận thông tin</h3>
                     <form class="subscribe-box">
-                        <input type="email" placeholder="Email của bạn..." required />
+                        <input type="email" placeholder="Email của bạn..." required value="<%=(user != null ? user.getEmail() : "")%>"/>
                         <button type="submit">Gửi</button>
                     </form>
                     <div class="language">
@@ -919,6 +1044,24 @@
         </footer>
 
         <script>
+            // Toggle for user dropdown
+            function toggleUserDropdown() {
+                const dropdown = document.getElementById("userDropdown");
+                if (dropdown) {
+                    dropdown.classList.toggle("show");
+                }
+            }
+
+            // Close dropdown if click outside
+            window.addEventListener("click", function (e) {
+                const userGreeting = document.querySelector(".user-greeting");
+                const dropdown = document.getElementById("userDropdown");
+
+                if (userGreeting && dropdown && !userGreeting.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove("show");
+                }
+            });
+
             // Navigate to event detail
             function navigateToEventDetail(eventId) {
                 if (eventId) {
@@ -926,11 +1069,6 @@
                 } else {
                     console.error("Event ID is missing.");
                 }
-            }
-
-            // Function to handle event selection (for fallback or testing)
-            function selectEvent(eventName) {
-                alert(`Bạn đã chọn sự kiện: ${eventName}\n\nChức năng mua vé sẽ được triển khai sau!`);
             }
 
             // Search and filter functionality
@@ -946,24 +1084,21 @@
                     const locationQuery = locationInput.value.toLowerCase();
 
                     eventCards.forEach(card => {
-                        const title = card.querySelector('.event-title');
-                        const description = card.querySelector('.event-description');
+                        const eventName = card.getAttribute('data-event-name');
+                        const eventDescription = card.getAttribute('data-event-description');
                         const eventLocation = card.getAttribute('data-event-location'); 
                         const eventStartTime = card.getAttribute('data-event-start-time'); 
-
-                        const titleText = title ? title.textContent.toLowerCase() : '';
-                        const descText = description ? description.textContent.toLowerCase() : '';
                         
                         let isVisible = true;
 
-                        // Filter by text query (name, description)
+                        // Filter by text query (name, description, location)
                         if (query) {
-                            if (!titleText.includes(query) && !descText.includes(query)) {
+                            if (!eventName.includes(query) && !eventDescription.includes(query) && !eventLocation.includes(query)) {
                                 isVisible = false;
                             }
                         }
                         
-                        // Filter by location input
+                        // Filter by location input (already included in general query, but kept for explicit filter)
                         if (locationQuery) { 
                             if (!eventLocation || !eventLocation.includes(locationQuery)) {
                                 isVisible = false;
@@ -1016,7 +1151,10 @@
                         });
                     });
 
-                    setInterval(nextSlide, 5000);
+                    // Start auto-play only if there are multiple slides
+                    if (slides.length > 1) {
+                         setInterval(nextSlide, 5000);
+                    }
                 }
             }
             
