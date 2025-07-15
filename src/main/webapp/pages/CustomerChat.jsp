@@ -409,6 +409,7 @@
             font-size: 12px;
             color: var(--text-muted);
             margin-bottom: 4px;
+            display: none;
         }
 
         .attachments {
@@ -806,12 +807,10 @@
                                 </c:if>
                             </div>
                             <c:if test="${status.last or (not status.last and messages[status.index + 1].senderID != message.senderID)}">
-                                <div class="message-time" style="display: none;">
+                                <div class="message-time">
                                   <fmt:formatDate value="${message.updatedAt}" pattern="HH:mm" />
                                 </div>
                             </c:if>
-
-                           
                         </div>
                     </div>
 
@@ -898,6 +897,8 @@ function initWebSocket(conversationId, userId, currentUserName, otherUserName, i
             try {
                 const message = JSON.parse(event.data);
                 const isCurrentUser = message.senderID == userId;
+
+                if(!isCurrentUser){
                 addMessage(
                     message.senderID,
                     isCurrentUser ? currentUserName : otherUserName,
@@ -907,7 +908,9 @@ function initWebSocket(conversationId, userId, currentUserName, otherUserName, i
                     isCurrentUser,
                     message.attachments || []
                 );
-                
+                }else{
+                    console.log("skipping render")
+                }
                 if (isOwner) {
                     updateConversationPreview(message.conversationID, message.messageContent, message.createdAt);
                 }
@@ -934,6 +937,7 @@ function sendMessageWithFiles(conversationId, userId, userName) {
     const selectedFiles = Array.from(fileInput.files);
     
     if ((!content && selectedFiles.length === 0) || !conversationId) {
+    console.log("no content to send")
         return Promise.resolve(false);
     }
     
@@ -956,19 +960,22 @@ function sendMessageWithFiles(conversationId, userId, userName) {
             fileInput.value = '';
             document.getElementById('messageInput').placeholder = "Nhập tin nhắn...";
             
-            if (content) {
+            if (content || selectedFiles.length > 0) {
                 addMessage(
                     userId, 
                     userName, 
                     content, 
                     new Date().toISOString(), 
                     conversationId, 
-                    true
+                    true, 
+                    []
                 );
             }
             return true;
+        }else{
+            console.log("error when sending message!", data.message);
+            return false;
         }
-        return false;
     })
     .catch(error => {
         console.error('Error sending message:', error);
@@ -1134,6 +1141,6 @@ const conversationId = '${currentConversationId}';
         updateConversationTime();
     };
 
-    </script>
+</script>
 </body>
 </html>

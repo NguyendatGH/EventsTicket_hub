@@ -411,6 +411,7 @@
             font-size: 12px;
             color: var(--text-muted);
             margin-bottom: 4px;
+            display: none;
         }
 
         .message-content {
@@ -941,8 +942,9 @@
     <div class="section-divider"></div>
 </div>
     </div>
-    <script>
-    function initWebSocket(conversationId, userId, currentUserName, otherUserName, isOwner = false) {
+ 
+<script>
+function initWebSocket(conversationId, userId, currentUserName, otherUserName, isOwner = false) {
     let socket = null;
     
     if (conversationId && conversationId !== 'null' && conversationId !== '') {
@@ -961,6 +963,8 @@
             try {
                 const message = JSON.parse(event.data);
                 const isCurrentUser = message.senderID == userId;
+
+                if(!isCurrentUser){
                 addMessage(
                     message.senderID,
                     isCurrentUser ? currentUserName : otherUserName,
@@ -970,7 +974,9 @@
                     isCurrentUser,
                     message.attachments || []
                 );
-                
+                }else{
+                    console.log("skipping render")
+                }
                 if (isOwner) {
                     updateConversationPreview(message.conversationID, message.messageContent, message.createdAt);
                 }
@@ -997,6 +1003,7 @@ function sendMessageWithFiles(conversationId, userId, userName) {
     const selectedFiles = Array.from(fileInput.files);
     
     if ((!content && selectedFiles.length === 0) || !conversationId) {
+    console.log("no content to send")
         return Promise.resolve(false);
     }
     
@@ -1019,19 +1026,22 @@ function sendMessageWithFiles(conversationId, userId, userName) {
             fileInput.value = '';
             document.getElementById('messageInput').placeholder = "Nhập tin nhắn...";
             
-            if (content) {
+            if (content || selectedFiles.length > 0) {
                 addMessage(
                     userId, 
                     userName, 
                     content, 
                     new Date().toISOString(), 
                     conversationId, 
-                    true
+                    true, 
+                    []
                 );
             }
             return true;
+        }else{
+            console.log("error when sending message!", data.message);
+            return false;
         }
-        return false;
     })
     .catch(error => {
         console.error('Error sending message:', error);
@@ -1050,7 +1060,6 @@ function addMessage(userId, username, content, timestamp, msgConversationId, isC
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message ' + (isCurrentUser ? 'sent' : 'received');
     
-    // Thêm người gửi (chỉ Owner có)
     if (document.querySelector('.message-sender')) {
         const messageSender = document.createElement('div');
         messageSender.className = 'message-sender';
@@ -1133,15 +1142,7 @@ function updateConversationTime() {
     });
 }
 
-function toggleThreads(header) {
-    const threadsListId = header.getAttribute('data-toggle-target');
-    const threadsList = document.getElementById(threadsListId);
-    if (threadsList) {
-        threadsList.classList.toggle('active');
-        const toggleIcon = header.querySelector('.toggle-icon');
-        toggleIcon.textContent = threadsList.classList.contains('active') ? '▼' : '▶';
-    }
-}
+
 
 function updateConversationPreview(conversationId, content, timestamp) {
     const conversationElements = document.querySelectorAll('.conversation');
@@ -1161,7 +1162,6 @@ function updateConversationPreview(conversationId, content, timestamp) {
     updateConversationTime();
 }
 
-
 function initChatCommon() {
     document.getElementById('messageInput')?.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
@@ -1172,51 +1172,42 @@ function initChatCommon() {
         }
     });
     
-    // Cập nhật thời gian tin nhắn định kỳ
     setInterval(updateConversationTime, 60000);
     
-    // Cuộn xuống dưới cùng khi tải trang
     window.addEventListener('load', function() {
         scrollToBottom();
         updateConversationTime();
     });
     
-    // Xử lý toggle threads (nếu có)
-    document.querySelectorAll('.customer-header').forEach(header => {
-        header.addEventListener('click', function() {
-            toggleThreads(this);
-        });
-    });
 }
-    const conversationId = '${currentConversationId}';
+
+const conversationId = '${currentConversationId}';
     const currentUserId = ${user.id};
     const currentUserName = '${user.name}';
-    const otherUserName = '${customer != null ? customer.name : "Khách hàng"}';
+    const otherUserName = '${eventOwner.name}';
     
-    let socket = initWebSocket(conversationId, currentUserId, currentUserName, otherUserName, true);
+    let socket = initWebSocket(conversationId, currentUserId, currentUserName, otherUserName);
     
-    // Hàm gửi tin nhắn
     function sendMessage() {
         sendMessageWithFiles(conversationId, currentUserId, currentUserName)
             .catch(console.error);
     }
     
-    // Khởi tạo các sự kiện chung
     initChatCommon();
     
-    // Hàm thoát
     function exit() {
         if (socket) {
             socket.close();
         }
-        window.location.href = '${pageContext.request.contextPath}/organizer-servlet';
+        window.location.href = '${pageContext.request.contextPath}/';
     }
 
       window.onload = function(){
         scrollToBottom();
         updateConversationTime();
     };
-</script>
+
+    </script>
   
 </body>
 </html>
