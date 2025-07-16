@@ -21,9 +21,9 @@ import vn.payos.type.PaymentData;
 
 public class Server {
 
-    private static final String YOUR_CLIENT_ID = "YOUR_CLIENT_ID"; // Thay thế bằng Client ID thực tế của bạn
-    private static final String YOUR_API_KEY = "YOUR_API_KEY";     // Thay thế bằng API Key thực tế của bạn
-    private static final String YOUR_CHECKSUM_KEY = "YOUR_CHECKSUM_KEY"; // Thay thế bằng Checksum Key thực tế của bạn
+    private static final String YOUR_CLIENT_ID = "65a9faf3-fe50-481b-82ee-c77679528298"; 
+    private static final String YOUR_API_KEY = "dadd1c71-5c0f-4713-a71f-ba7f3456b26f";     
+    private static final String YOUR_CHECKSUM_KEY = "e0df2cf1332ff6013e9ba6ed3a6f6a23ca15976a4919e4ebf59725fd8e3eab33"; 
 
     public static void main(String[] args) {
         port(3000);

@@ -1,32 +1,21 @@
-
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="java.util.Date" %>
+<fmt:setLocale value="vi_VN"/>
+<fmt:setTimeZone value="Asia/Ho_Chi_Minh"/>
+<%
+    request.setAttribute("now", new Date());
+%>
 <!DOCTYPE html>
-<html lang="vi"
-      <head>
+<html lang="vi">
+    <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-        <title>MasterTicket</title>
+        <title>MasterTicket - Vé đã mua</title>
         <style>
-
-
-            :root {
-                --primary: #4a4aff;
-                --secondary: #ff4da6;
-                --dark-bg: #0f0f1a;
-                --darker-bg: #000015;
-                --card-bg: #1a1a2e;
-                --text-light: #ffffff;
-                --text-muted: #aaaaaa;
-                --success: #00cc66;
-                --warning: #ffcc00;
-                --danger: #ff3333;
-            }
             * {
                 margin: 0;
                 padding: 0;
@@ -34,658 +23,918 @@
             }
 
             body {
-                font-family: 'Segoe UI', Arial, sans-serif;
-                background: linear-gradient(to bottom, #000015, #1a1a2e);
-                color: #ffffff;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                color: #1e293b;
+                line-height: 1.6;
                 min-height: 100vh;
             }
 
-
             /* Header Styles */
-            .header-container {
-                display: flex;
-                justify-content: center;
-                background-color: var(--dark-bg);
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            .header {
+                background: white;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                border-bottom: 1px solid #e2e8f0;
+                position: sticky;
+                top: 0;
+                z-index: 100;
             }
 
-            .header {
-                max-width: 1300px;
-                width: 100%;
+            .header-container {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 0 1rem;
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                padding: 15px 40px;
+                justify-content: space-between;
+                height: 4rem;
             }
 
             .logo {
-                font-size: 24px;
-                font-weight: bold;
-                color: #4a4aff;
-            }
-
-            .search {
-                display: flex;
-                align-items: center;
-            }
-
-            .search input {
-                padding: 10px 15px;
-                border-radius: 25px;
-                border: 1px solid #333344;
-                width: 300px;
-                background-color: #1a1a2e;
-                color: white;
-                font-size: 14px;
-            }
-
-            .search button {
-                padding: 10px 15px;
-                margin-left: 10px;
-                background-color: var(--primary);
-                border: none;
-                border-radius: 25px;
-                color: white;
-                cursor: pointer;
-                font-weight: bold;
-                transition: all 0.2s;
-            }
-
-            .search button:hover {
-                background-color: #3a3add;
-            }
-
-            .actions {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-            }
-
-            .primary-btn {
-                background-color: var(--secondary);
-                border: none;
-                padding: 10px 20px;
-                color: white;
-                border-radius: 25px;
-                cursor: pointer;
-                font-weight: bold;
-                transition: all 0.2s;
-            }
-
-            .primary-btn:hover {
-                background-color: #e04496;
-            }
-
-            .link {
-                color: var(--text-light);
-                text-decoration: none;
-                font-weight: 500;
-                padding: 8px 12px;
-                border-radius: 5px;
-                transition: all 0.2s;
-            }
-
-            .link:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-
-            .account {
-                background-color: #333344;
-                padding: 8px 16px;
-                border-radius: 25px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .account:hover {
-                background-color: #444455;
-            }
-
-            /* Main Container */
-            .main-container {
-                max-width: 1400px;
-                margin: 0 auto;
-                display: flex;
-                gap: 30px;
-                padding: 30px;
-            }
-
-            /* Sidebar */
-            .sidebar {
-                width: 280px;
-                flex-shrink: 0;
-            }
-
-            .profile-card {
-                background: rgba(255, 255, 255, 0.05);
-                backdrop-filter: blur(15px);
-                border-radius: 15px;
-                padding: 25px;
-                margin-bottom: 20px;
-            }
-
-            /* Profile Header */
-            .profile-header {
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
-            }
-
-            .profile-avatar {
-                width: 50px;
-                height: 50px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 30px;
-                color: white;
-                border-radius: 50%;
-                background: transparent;
-                margin-right: 10px;
-            }
-
-            .profile-info-box {
-                background-color: #ccc;
-                padding: 5px 10px;
-                border-radius: 8px;
-            }
-
-            .profile-label {
-                font-size: 12px;
-                color: black;
-            }
-
-            .profile-username {
-                font-size: 14px;
-                font-weight: bold;
-                color: black;
-            }
-
-            /* Menu */
-            .profile-menu {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
-
-            .profile-menu li {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 12px 0;
-                cursor: pointer;
-                font-size: 14px;
-                color: white;
-                transition: color 0.3s ease;
-            }
-
-            .profile-menu li i {
-                font-size: 16px;
-            }
-
-            .profile-menu li:hover {
-                color: #40c9ff;
-            }
-
-            .profile-menu li.active {
-                color: #0bc26e;
-                font-weight: 600;
-            }
-
-            /* Main Content */
-            /* Main Content */
-            .main-content {
-                flex: 1;
-                background: radial-gradient(circle at top left, #101e4b, #01010b);
-                padding: 40px 60px;
-                min-height: 100vh;
-                color: white;
-                font-family: 'Segoe UI', sans-serif;
-            }
-
-            /* Filter Tabs */
-            .filter-tabs {
-                display: flex;
-                gap: 16px;
-                margin-bottom: 30px;
-                justify-content: center;
-            }
-
-            .filter-tab {
-                padding: 10px 20px;
-                border-radius: 999px;
-                border: none;
-                cursor: pointer;
-                font-size: 14px;
-                transition: all 0.3s ease;
-                background: rgba(255, 255, 255, 0.1);
-                color: #aaa;
-            }
-
-            .filter-tab.active {
-                background: #0bc26e;
-                color: white;
-            }
-
-            .filter-tab:hover {
-                background: rgba(255, 255, 255, 0.3);
-                color: white;
-            }
-
-            /* Status Buttons */
-            .status-buttons {
-                display: flex;
-                justify-content: space-between;
-                gap: 10px;
-                margin-bottom: 30px;
-            }
-
-            .status-btn {
-                flex: 1;
-                padding: 10px 18px;
-                border-radius: 20px;
-                border: none;
-                font-size: 14px;
-                background: #222;
-                color: #ccc;
-                cursor: pointer;
-                transition: 0.3s ease;
-            }
-
-            .status-btn.upcoming {
-                background: #ffe680;
-                color: #000;
-                font-weight: bold;
-            }
-
-            .status-btn.ended:hover {
-                background: #333;
-                color: white;
-            }
-
-            /* Tickets Section */
-            .tickets-header {
-                background: rgba(255, 255, 255, 0.1);
-                padding: 12px;
-                border-radius: 8px;
-                text-align: center;
-                margin-bottom: 30px;
-            }
-
-            .tickets-title {
-                font-size: 24px;
-                font-weight: 600;
-                color: white;
-            }
-
-            /* Empty State */
-            .empty-state {
-                text-align: center;
-                padding: 60px 20px;
-            }
-
-            .empty-icon {
-                width: 120px;
-                height: 120px;
-                background: linear-gradient(45deg, #ffa500, #ff6b35);
-                border-radius: 50%;
-                margin: 0 auto 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 48px;
-                color: white;
-            }
-
-            .empty-text {
-                font-size: 20px;
-                color: rgba(255, 255, 255, 0.7);
-                margin-bottom: 40px;
-            }
-
-            /* Suggestions Section */
-            .suggestions-section {
-                margin-top: 50px;
-            }
-
-            .suggestions-title {
-                text-align: center;
-                font-size: 22px;
-                margin-bottom: 30px;
-                background: linear-gradient(45deg, #40c9ff, #e81cff);
+                font-size: 1.5rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, #3b82f6, #8b5cf6);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
             }
 
-            .suggestions-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                gap: 20px;
-                margin-bottom: 40px;
+            .search-container {
+                flex: 1;
+                max-width: 28rem;
+                margin: 0 2rem;
+                position: relative;
             }
 
-            .suggestion-card {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 16px;
-                overflow: hidden;
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                cursor: pointer;
-            }
-
-            .suggestion-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
-            }
-
-            .card-image {
+            .search-input {
                 width: 100%;
-                height: 150px;
-                background: linear-gradient(45deg, #3a3a3a, #666);
+                padding: 0.75rem 1rem 0.75rem 2.5rem;
+                border: 1px solid #d1d5db;
+                border-radius: 9999px;
+                background: #f9fafb;
+                font-size: 0.875rem;
+                transition: all 0.2s;
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                background: white;
+            }
+
+            .search-icon {
+                position: absolute;
+                left: 0.75rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #6b7280;
+            }
+
+            .header-actions {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 12px;
-                background-size: cover;
-                background-position: center;
+                gap: 1rem;
             }
 
-            .card-content {
-                padding: 15px;
+            .btn {
+                padding: 0.5rem 1rem;
+                border-radius: 9999px;
+                font-weight: 500;
+                font-size: 0.875rem;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .btn-outline {
+                background: transparent;
+                border: 1px solid #d1d5db;
+                color: #374151;
+            }
+
+            .btn-outline:hover {
+                background: #f3f4f6;
+                border-color: #9ca3af;
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+                border: none;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #2563eb, #7c3aed);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            }
+
+            /* Main Content */
+            .main-container {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 2rem 1rem;
+            }
+
+            .page-header {
+                margin-bottom: 2rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 0.5rem;
+            }
+
+            .page-subtitle {
+                color: #64748b;
+                font-size: 1rem;
+            }
+
+            /* Filter Tabs */
+            .filter-tabs {
+                display: flex;
+                background: #f1f5f9;
+                border-radius: 9999px;
+                padding: 0.25rem;
+                margin-bottom: 1.5rem;
+                max-width: 24rem;
+            }
+
+            .filter-tab {
+                flex: 1;
+                padding: 0.5rem 1rem;
+                border: none;
+                background: transparent;
+                border-radius: 9999px;
+                font-size: 0.875rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+                color: #64748b;
+            }
+
+            .filter-tab.active {
+                background: white;
+                color: #1e293b;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .filter-tab:hover:not(.active) {
+                color: #374151;
+            }
+
+            /* Status Buttons */
+            .status-filters {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .status-btn {
+                padding: 0.75rem 1.5rem;
+                border-radius: 9999px;
+                border: 1px solid #d1d5db;
+                background: white;
+                color: #374151;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .status-btn.active {
+                background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+                color: white;
+                border-color: transparent;
+            }
+
+            .status-btn:hover:not(.active) {
+                background: #f8fafc;
+                border-color: #9ca3af;
+            }
+
+            /* Cards */
+            .card {
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                transition: all 0.3s;
+                margin-bottom: 1.5rem;
+            }
+
+            .card:hover {
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                transform: translateY(-2px);
+            }
+
+            .card-header {
+                background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+                padding: 1.5rem;
+                border-bottom: 1px solid #e2e8f0;
             }
 
             .card-title {
-                font-size: 14px;
+                font-size: 1.25rem;
                 font-weight: 600;
-                color: white;
-                margin-bottom: 6px;
-                line-height: 1.3;
+                color: #1e293b;
+                margin-bottom: 0.5rem;
             }
 
-            .card-date {
-                font-size: 12px;
-                color: rgba(255, 255, 255, 0.6);
+            .card-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                color: #64748b;
+                font-size: 0.875rem;
             }
 
-
-
-
-            /* Footer */
-            .footer-content {
-                max-width: 1300px; /* same as main-content */
-                margin: 0 auto;    /* center alignment */
-                box-sizing: border-box;
+            .card-meta-item {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
             }
 
-            /* Container for footer sections */
-            .footer-container {
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .card-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+
+            @media (max-width: 768px) {
+                .card-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Badge */
+            .badge {
+                padding: 0.25rem 0.75rem;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .badge-success {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #bbf7d0;
+            }
+
+            .badge-warning {
+                background: #fef3c7;
+                color: #92400e;
+                border: 1px solid #fde68a;
+            }
+
+            .badge-danger {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fecaca;
+            }
+
+            /* Ticket Details */
+            .ticket-section {
+                background: #f8fafc;
+                border-radius: 0.75rem;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .ticket-section h4 {
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .ticket-detail {
+                background: white;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                border: 1px solid #e2e8f0;
+            }
+
+            .ticket-detail-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+                font-size: 0.875rem;
+            }
+
+            .ticket-detail-item {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .ticket-detail-label {
+                color: #64748b;
+                font-size: 0.75rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .ticket-detail-value {
+                font-weight: 500;
+                color: #1e293b;
+            }
+
+            .ticket-code {
+                font-family: 'Courier New', monospace;
+                background: #f1f5f9;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.25rem;
+            }
+
+            /* Payment Info */
+            .payment-section {
+                background: #f8fafc;
+                border-radius: 0.75rem;
+                padding: 1rem;
+            }
+
+            .payment-total {
                 display: flex;
                 justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 20px;
-                padding: 0px 15px;
+                align-items: center;
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid #e2e8f0;
             }
 
-            /* Each section in footer */
-            .footer-section {
-                flex: 1;
-                min-width: 250px;
-                margin: 10px;
+            .payment-total-amount {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: #059669;
+            }
+
+            .payment-date {
+                display: flex;
+                justify-content: space-between;
+                color: #64748b;
+                font-size: 0.875rem;
+            }
+
+            /* Action Buttons */
+            .action-buttons {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .btn-sm {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            .btn-refund {
+                background: #fef2f2;
+                color: #dc2626;
+                border: 1px solid #fecaca;
+            }
+
+            .btn-refund:hover {
+                background: #fee2e2;
+            }
+
+            .btn-view {
+                background: #eff6ff;
+                color: #2563eb;
+                border: 1px solid #dbeafe;
+            }
+
+            .btn-view:hover {
+                background: #dbeafe;
+            }
+
+            /* Empty State */
+            .empty-state {
+                text-align: center;
+                padding: 4rem 2rem;
+                background: white;
+                border-radius: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .empty-icon {
+                width: 6rem;
+                height: 6rem;
+                background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1.5rem;
+                font-size: 2rem;
+            }
+
+            .empty-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 0.5rem;
+            }
+
+            .empty-description {
+                color: #64748b;
+                margin-bottom: 1.5rem;
+            }
+
+            /*ticket-history*/
+            .tickets-list-horizontal {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .ticket-horizontal-card {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 1rem;
+                padding: 1.5rem;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                transition: transform 0.2s;
+            }
+
+            .ticket-horizontal-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+            }
+
+            .ticket-info h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                color: #1e293b;
+            }
+
+            .ticket-info p {
+                margin: 0.2rem 0;
+                color: #334155;
+            }
+
+            .refund-form {
+                align-self: flex-start;
+            }
+
+            .btn-refund {
+                background-color: #fee2e2;
+                color: #dc2626;
+                border: 1px solid #fecaca;
+                padding: 0.5rem 1rem;
+                border-radius: 9999px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+
+            .btn-refund:hover {
+                background-color: #fecaca;
+            }
+
+
+            /* Suggestions */
+            .suggestions-section {
+                margin-top: 3rem;
+            }
+
+            .suggestions-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .suggestions-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #1e293b;
+            }
+
+            .suggestions-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .suggestion-card {
+                background: white;
+                border-radius: 1rem;
+                overflow: hidden;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s;
+            }
+
+            .suggestion-card:hover {
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                transform: translateY(-4px);
+            }
+
+            .suggestion-image {
+                width: 100%;
+                height: 12rem;
+                background: linear-gradient(135deg, #f3f4f6, #d1d5db);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #6b7280;
+                font-size: 0.875rem;
+                position: relative;
+            }
+
+            .suggestion-price {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 0.25rem 0.75rem;
+                border-radius: 9999px;
+                font-weight: 600;
+                color: #1e293b;
+                font-size: 0.875rem;
+            }
+
+            .suggestion-content {
+                padding: 1.5rem;
+            }
+
+            .suggestion-name {
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 0.75rem;
+                font-size: 1.125rem;
+                line-height: 1.4;
+            }
+
+            .suggestion-meta {
+                color: #64748b;
+                font-size: 0.875rem;
+                margin-bottom: 1rem;
+            }
+
+            .suggestion-meta-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .suggestion-stats {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+                font-size: 0.875rem;
+                color: #64748b;
+            }
+
+            .suggestion-rating {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+
+            .suggestion-attendees {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+
+            /* Footer */
+            .footer {
+                background: #1e293b;
+                color: white;
+                margin-top: 4rem;
+            }
+
+            .footer-container {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 3rem 1rem;
+            }
+
+            .footer-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 2rem;
             }
 
             .footer-section h3 {
-                color: #ddd;
-                margin-bottom: 15px;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: white;
             }
 
             .footer-section ul {
                 list-style: none;
-                padding: 0;
             }
 
             .footer-section ul li {
-                padding: 10px 0;
+                margin-bottom: 0.5rem;
             }
 
             .footer-section ul li a {
+                color: #94a3b8;
                 text-decoration: none;
-                color: #aaa;
-                transition: 0.3s;
+                transition: color 0.2s;
             }
 
-            .footer-section ul li a:hover,
-            .footer-section a:hover {
-                color: #fff;
+            .footer-section ul li a:hover {
+                color: white;
             }
 
-            .footer-section p, .footer-section a {
-                color: #aaa;
-                margin: 5px 0;
-                text-decoration: underline;
+            .footer-brand {
+                font-size: 1.5rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, #60a5fa, #a78bfa);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 1rem;
             }
 
-            .footer-section li {
-                padding: 5px 0;
+            .footer-description {
+                color: #94a3b8;
+                margin-bottom: 1rem;
             }
 
-            .subscribe-box {
+            .social-links {
+                display: flex;
+                gap: 0.75rem;
+            }
+
+            .social-link {
+                width: 2rem;
+                height: 2rem;
+                background: #334155;
+                border-radius: 50%;
                 display: flex;
                 align-items: center;
-                border: 2px solid #6f42c1;
-                border-radius: 8px;
-                padding: 5px 10px;
-                background: #000;
-                margin-bottom: 15px;
-                gap: 10px;
+                justify-content: center;
+                color: white;
+                text-decoration: none;
+                transition: all 0.2s;
             }
 
-            .fa-envelope:before {
-                content: "\f0e0";
-                color: #15d715;
+            .social-link:hover {
+                background: #3b82f6;
+                transform: translateY(-2px);
             }
 
-            .subscribe-box input {
+            .newsletter-form {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .newsletter-input {
                 flex: 1;
-                border: none;
-                background: transparent;
+                padding: 0.75rem;
+                border: 1px solid #475569;
+                border-radius: 0.5rem;
+                background: #334155;
                 color: white;
-                padding: 8px;
-                outline: none;
-                font-size: 14px;
             }
 
-            .subscribe-box button {
-                background: #6f42c1;
+            .newsletter-input::placeholder {
+                color: #94a3b8;
+            }
+
+            .newsletter-btn {
+                background: linear-gradient(135deg, #3b82f6, #8b5cf6);
                 border: none;
-                border-radius: 5px;
-                padding: 8px 12px;
                 color: white;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
                 cursor: pointer;
-                transition: background 0.3s;
             }
 
-            .subscribe-box button:hover {
-                background: #5a339e;
+            .footer-bottom {
+                border-top: 1px solid #334155;
+                margin-top: 2rem;
+                padding-top: 2rem;
+                text-align: center;
+                color: #94a3b8;
             }
 
-            .language img {
-                width: 30px;
-                margin: 5px 10px 5px 0;
-                cursor: pointer;
-                border-radius: 4px;
-                transition: transform 0.2s;
-            }
+            /* Responsive */
+            @media (max-width: 768px) {
+                .header-container {
+                    flex-direction: column;
+                    height: auto;
+                    padding: 1rem;
+                    gap: 1rem;
+                }
 
-            .language img:hover {
-                transform: scale(1.1);
-            }
+                .search-container {
+                    margin: 0;
+                    max-width: none;
+                }
 
-            .social-icons {
-                margin-top: 15px;
-            }
+                .filter-tabs {
+                    max-width: none;
+                }
 
-            .social-images img {
-                width: 30px;
-                margin-right: 10px;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: transform 0.3s;
-            }
+                .status-filters {
+                    flex-direction: column;
+                }
 
-            .social-images img:hover {
-                transform: scale(1.2);
+                .suggestions-grid {
+                    grid-template-columns: 1fr;
+                }
             }
         </style>
     </head>
     <body>
         <!-- Header -->
-        <div class="header-container">
-            <header class="header">
+        <header class="header">
+            <div class="header-container">
                 <div class="logo">MasterTicket</div>
-                <div class="search">
-                    <input type="text" placeholder="What are you looking for today?">
-                    <button>Search</button>
+
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Tìm kiếm sự kiện...">
                 </div>
-                <div class="actions">
-                    <button class="primary-btn">Create Event</button>
-                    <a href="#" class="link">Purchased Tickets</a>
-                    <div class="account">Account</div>
+
+                <div class="header-actions">
+                    <a href="#" class="btn btn-outline">Tạo sự kiện</a>
+                    <a href="#" class="btn btn-primary">Tài khoản</a>
                 </div>
-            </header>
-        </div>
+            </div>
+        </header>
 
-        <!-- Main Container -->
-        <div class="main-content">
-            <div class="tickets-header">
-                <h2 class="tickets-title">Purchased Tickets</h2>
+        <!-- Main Content -->
+        <main class="main-container">
+            <div class="page-header">
+                <h1 class="page-title">Vé đã mua</h1>
+                <p class="page-subtitle">Quản lý và theo dõi các vé bạn đã mua</p>
             </div>
 
-            <div class="filter-tabs">
-                <button class="filter-tab active">All</button>
-                <button class="filter-tab">Successful</button>
-                <button class="filter-tab">Processing</button>
-                <button class="filter-tab">Cancelled</button>
-            </div>
-
-            <div class="status-buttons">
-                <button class="status-btn upcoming">Upcoming</button>
-                <button class="status-btn ended">Ended</button>
-            </div>
-
-            <%-- =================== HIỂN THỊ DANH SÁCH VÉ ĐÃ MUA =================== --%>
             <c:choose>
                 <c:when test="${not empty orderHistory}">
-                    <div class="order-list">
+                    <div class="tickets-list-horizontal">
                         <c:forEach var="order" items="${orderHistory}">
-                            <div class="order-card">
-                                <div class="order-header">
-                                    <span class="order-event-name">${order.event.name}</span>
-                                    <span class="order-status status-${order.status.toLowerCase()}">${order.status}</span>
+                            <div class="ticket-horizontal-card">
+                                <div class="ticket-info">
+                                    <h3>${order['eventName']}</h3>
+                                    <p><i class="fas fa-map-marker-alt"></i> ${order['physicalLocation']}</p>
+                                    <p><i class="fas fa-calendar-alt"></i> ${order['startTime']}</p>
+                                    <p>Số lượng vé: <strong>${order['totalQuantity']}</strong></p>
+                                    <p>Tổng tiền: <strong>${order['totalAmount']} đ</strong></p>
+                                    <p>Ngày đặt: ${order['createdAt']}</p>
                                 </div>
-                                <div class="order-body">
-                                    <p><strong>Ngày đặt:</strong> <fmt:formatDate value="${order.orderDate}" pattern="HH:mm, dd/MM/yyyy"/></p>
-                                    <p><strong>Tổng tiền:</strong> <fmt:formatNumber value="${order.totalAmount}" type="currency" currencySymbol="đ"/></p>
-                                </div>
-                                <div class="order-footer">
-                                    <c:if test="${order.status == 'PAID' && order.event.startTime > java.util.Calendar.getInstance().getTime()}">
-                                        <form action="refund" method="POST" style="display:inline;">
-                                            <input type="hidden" name="orderId" value="${order.orderId}"/>
-                                            <button type="submit" class="btn-refund">Hoàn vé</button>
+
+                                <div class="ticket-action">
+                                    <c:choose>
+                                        <c:when test="${order['canRefund'] == true}">
+                                            <form method="get" action="${pageContext.request.contextPath}/RefundTicketServlet"
+                                                  onsubmit="return confirm('Bạn có chắc muốn hoàn trả vé này không?');"
+                                                  class="refund-form">
+                                                <input type="hidden" name="orderId" value="${order['orderId']}" />
+                                                <button type="submit" class="btn btn-refund">Hoàn trả vé</button>
+                                            </form>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button class="btn btn-refund" disabled style="opacity: 0.5; cursor: not-allowed;">Không thể hoàn vé</button>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <c:if test="${order['startTime'] lt now}">
+                                        <form method="get" action="${pageContext.request.contextPath}/FeedbackServlet" class="feedback-form" style="margin-top: 10px;">
+                                            <input type="hidden" name="orderId" value="${order['orderId']}" />
+                                            <input type="hidden" name="eventId" value="${order['eventId']}" />
+                                            <button type="submit" class="btn btn-feedback"><i class="fas fa-comment"></i> Gửi phản hồi</button>
                                         </form>
                                     </c:if>
-                                    <a href="#" class="btn-view-details">Xem chi tiết vé</a>
                                 </div>
                             </div>
                         </c:forEach>
                     </div>
                 </c:when>
+
                 <c:otherwise>
                     <div class="empty-state">
-                        <div class="empty-icon">💡</div>
-                        <div class="empty-text">You don't have any tickets yet</div>
+                        <div class="empty-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h3 class="empty-title">Bạn chưa có vé nào</h3>
+                        <p class="empty-description">Khám phá các sự kiện thú vị và đặt vé ngay hôm nay!</p>
+                        <a href="explore.jsp" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            Khám phá sự kiện
+                        </a>
                     </div>
                 </c:otherwise>
             </c:choose>
-
-            <div class="suggestions-section">
-                <h3 class="suggestions-title">Upcoming Events</h3>
-                <div class="suggestions-grid">
-                    <%-- =================== HIỂN THỊ CÁC SỰ KIỆN GỢI Ý =================== --%>
-                    <c:forEach var="event" items="${suggestedEvents}">
-                        <div class="suggestion-card">
-                            <div class="card-image" style="background-image: url('${event.imageUrl}');">
-                                <%-- Nếu không có ảnh, hiển thị chữ --%>
-                                <c:if test="${empty event.imageUrl}">Event Image</c:if>
-                                </div>
-                                <div class="card-content">
-                                    <div class="card-title">${event.name}</div>
-                                <div class="card-date">
-                                    From <fmt:formatDate value="${event.startTime}" pattern="EEEE dd, MM/yyyy"/>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
-                </div>
-            </div>
-        </div>
+        </main>
 
 
         <!-- Footer -->
         <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-container">
-                    <!-- Customer Services -->
-                    <div class="footer-section">
-                        <h3>Customer Services</h3>
-                        <ul>
-                            <li><a href="#">FAQS</a></li>
-                            <li><a href="#">Contact us</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Terms of Service</a></li>
-                        </ul>
-                        <p><i class="fas fa-envelope"></i> <a href="mailto:support@masterTicket.vn">support@masterTicket.vn</a></p>
+            <div class="footer-container">
+                <div class="footer-grid">
+                    <div>
+                        <div class="footer-brand">MasterTicket</div>
+                        <p class="footer-description">Nền tảng đặt vé sự kiện hàng đầu Việt Nam</p>
+                        <div class="social-links">
+                            <a href="#" class="social-link">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-link">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link">
+                                <i class="fab fa-tiktok"></i>
+                            </a>
+                        </div>
                     </div>
 
-                    <!-- Sitemap -->
-                    <div class="footer-section">
-                        <h3>SiteMap</h3>
+                    <div>
+                        <h3>Hỗ trợ khách hàng</h3>
                         <ul>
-                            <li><a href="#">Create Account</a></li>
-                            <li><a href="#">News</a></li>
-                            <li><a href="#">Top-Rated Event</a></li>
+                            <li><a href="#">Câu hỏi thường gặp</a></li>
+                            <li><a href="#">Liên hệ</a></li>
+                            <li><a href="#">Chính sách bảo mật</a></li>
+                            <li><a href="#">Điều khoản dịch vụ</a></li>
+                        </ul>
+                        <p style="color: #94a3b8; margin-top: 1rem;">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:support@masterticket.vn" style="color: #94a3b8;">support@masterticket.vn</a>
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3>Khám phá</h3>
+                        <ul>
+                            <li><a href="#">Tạo tài khoản</a></li>
+                            <li><a href="#">Tin tức</a></li>
+                            <li><a href="#">Sự kiện nổi bật</a></li>
                         </ul>
                     </div>
 
-                    <!-- Subscribe -->
-                    <div class="footer-section">
-                        <h3>Subscribe for event updates.</h3>
-                        <form class="subscribe-box">
-                            <input type="email" placeholder="Your email..." required />                            
-                            <button type="submit"><i class="fas fa-paper-plane"></i></button>                          
+                    <div>
+                        <h3>Nhận thông báo sự kiện</h3>
+                        <form class="newsletter-form">
+                            <input type="email" class="newsletter-input" placeholder="Email của bạn..." required>
+                            <button type="submit" class="newsletter-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </form>
-
-                        <div class="language">
-                            <p>Language:</p>
-                            <img src="https://flagcdn.com/w40/vn.png" alt="Vietnamese" />
-                            <img src="https://flagcdn.com/w40/gb.png" alt="English" />
-                        </div>
-
-                        <div class="social-icons">
-                            <p>Follow us:</p>
-                            <div class="social-images">
-                                <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
-                                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />
-                                <img src="https://cdn-icons-png.flaticon.com/512/3046/3046120.png" alt="TikTok" />
-                            </div>
-                        </div>
+                        <p style="color: #94a3b8; font-size: 0.875rem;">
+                            Ngôn ngữ: 
+                            <img src="https://flagcdn.com/w20/vn.png" alt="Vietnamese" style="width: 20px; margin: 0 5px;">
+                            <img src="https://flagcdn.com/w20/gb.png" alt="English" style="width: 20px; margin: 0 5px;">
+                        </p>
                     </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2024 MasterTicket. Tất cả quyền được bảo lưu.</p>
                 </div>
             </div>
         </footer>
+
+        <script>
+            // Filter tabs functionality
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function () {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Status buttons functionality
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Search functionality
+            document.querySelector('.search-input').addEventListener('input', function () {
+                // Add search logic here
+                console.log('Searching for:', this.value);
+            });
+        </script>
     </body>
 </html>
-
-
