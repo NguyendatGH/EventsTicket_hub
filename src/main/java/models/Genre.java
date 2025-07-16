@@ -1,17 +1,22 @@
 package models;
 
+import java.sql.Timestamp;
+
 public class Genre {
     private int genreID;
     private String genreName;
     private String description;
-    public Genre() {}
-    
+    private Timestamp createdAt;
 
-    public Genre(int genreID, String genreName, String description) {
+    public Genre() {}
+
+    public Genre(int genreID, String genreName, String description, Timestamp createdAt) {
         this.genreID = genreID;
         this.genreName = genreName;
         this.description = description;
+        this.createdAt = createdAt;
     }
+
     public int getGenreID() {
         return genreID;
     }
@@ -36,4 +41,11 @@ public class Genre {
         this.description = description;
     }
 
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
 }

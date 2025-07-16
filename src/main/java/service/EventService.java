@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class EventService {
+
     private final EventDAO eventDAO;
 
     public EventService() {
@@ -84,6 +85,14 @@ public class EventService {
 
     public UserDTO getEventOwnerId(int ownerId) {
         return eventDAO.getEventOwnerId(ownerId);
+    }
+
+    public int getTotalEventsCount() {
+        return eventDAO.getTotalEventsCount();
+    }
+    
+    public List<Event> getAllMyEvent(int userID) {
+        return eventDAO.getAllMyEvent(userID);
     }
 
 }
