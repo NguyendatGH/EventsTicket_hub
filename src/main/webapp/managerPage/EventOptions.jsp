@@ -1011,7 +1011,9 @@
                 return false;
             }
         }
-
+        function editEvent(eventId) {
+    window.location.href = '${pageContext.request.contextPath}/editEvent?eventId=' + eventId;
+}
         animateEllipses();
 
         // ADDED: Display server-side success/error messages as SweetAlert on page load

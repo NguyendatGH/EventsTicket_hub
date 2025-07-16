@@ -1,112 +1,99 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@page import="models.Event"%>
-
-<%
-    Event event = (Event) request.getAttribute("event");
-    // Bạn đã setAttribute("event", ...) ở servlet
-%>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Event - ${event.eventName}</title>
-    <link rel="stylesheet" href="style.css"><!-- dùng lại style hiện tại -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event - Step 1: Information - MasterTicket</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/style.css">
+    <style>
+        * { background-color: black; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #fff; }
+        .form-control { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .form-row { display: flex; gap: 20px; }
+        .form-row .form-group { flex: 1; }
+        .form-actions { margin-top: 20px; display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; text-decoration: none; color: #fff; }
+        .btn-primary { background: #4CAF50; }
+        .btn-primary:hover { background: #45a049; }
+        .btn-secondary { background: #666; }
+        .btn-secondary:hover { background: #555; }
+        .error-message { color: #ff6b6b; margin-bottom: 15px; }
+        .progress-bar { background: rgba(26, 26, 46, 0.9); padding: 1rem 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .progress-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 2rem; }
+        .progress-step { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+        .step-number { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; }
+        .step-number.active { background: #8b5fbf; color: white; }
+        .step-number.inactive { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); }
+        .step-connector { width: 40px; height: 2px; background: rgba(255, 255, 255, 0.1); }
+    </style>
 </head>
 <body>
-<div class="main-content">
-    <h2 style="margin-bottom: 20px; color: #fff;">✏️ Edit Event - ${event.eventName}</h2>
-
-    <form action="${pageContext.request.contextPath}/updateEvent" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="eventId" value="${event.eventId}"/>
-
-        <!-- Event Name -->
-        <div class="form-group">
-            <label for="eventName">Name event *</label>
-            <input type="text" id="eventName" name="eventName" class="form-control" value="${event.eventName}">
-        </div>
-
-        <!-- Event Type -->
-        <div class="form-group">
-            <label>Event address</label>
-            <div class="radio-group">
-                <div class="radio-item">
-                    <input type="radio" id="offline" name="eventType" value="offline"
-                           ${event.eventType == 'offline' ? 'checked' : ''}>
-                    <label for="offline">🏢 Offline</label>
-                </div>
-                <div class="radio-item">
-                    <input type="radio" id="online" name="eventType" value="online"
-                           ${event.eventType == 'online' ? 'checked' : ''}>
-                    <label for="online">🌐 Online</label>
-                </div>
+    <div class="progress-bar">
+        <div class="progress-content">
+            <div class="progress-step">
+                <div class="step-number active">1</div>
+                <span>Information</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="progress-step">
+                <div class="step-number inactive">2</div>
+                <span>Time & Type</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="progress-step">
+                <div class="step-number inactive">3</div>
+                <span>Settings</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="progress-step">
+                <div class="step-number inactive">4</div>
+                <span>Payment</span>
             </div>
         </div>
-
-        <!-- Location -->
-        <div id="locationDetails" style="display: ${event.eventType == 'offline' ? 'block' : 'none'};">
+    </div>
+    <div class="main-content">
+        <h2 style="margin-bottom: 20px; color: #fff;">🎭 Create New Event - Step 1: Information</h2>
+        <c:if test="${not empty errorMessage}">
+            <div class="error-message">${errorMessage}</div>
+        </c:if>
+        <c:if test="${empty genres}">
+            <div class="error-message">Genres are not available. Please contact support.</div>
+        </c:if>
+        <form action="${pageContext.request.contextPath}/organizer-servlet" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="step1"/>
             <div class="form-group">
-                <label for="locationName">Name location</label>
-                <input type="text" id="locationName" name="locationName" class="form-control"
-                       value="${event.locationName}">
-            </div>
-            <!-- Add more inputs for address like province/district if needed -->
-        </div>
-
-        <!-- Genre -->
-        <div class="form-group">
-            <label for="genreId">Event Type</label>
-            <select id="genreId" name="genreId" class="form-control">
-                <c:forEach var="genre" items="${genres}">
-                    <option value="${genre.genreID}"
-                        ${genre.genreID == event.genreId ? 'selected' : ''}>
-                        ${genre.genreName}
-                    </option>
-                </c:forEach>
-            </select>
-        </div>
-
-        <!-- Start and End Time -->
-        <div class="form-row">
-            <div class="form-group">
-                <label for="startTime">Start Time</label>
-                <input type="datetime-local" id="startTime" name="startTime" class="form-control"
-                       value="${event.startTime}">
+                <label for="name">Event Name *</label>
+                <input type="text" id="name" name="name" class="form-control" value="${event.name}" required>
             </div>
             <div class="form-group">
-                <label for="endTime">End Time</label>
-                <input type="datetime-local" id="endTime" name="endTime" class="form-control"
-                       value="${event.endTime}">
+                <label for="physicalLocation">Physical Location</label>
+                <input type="text" id="physicalLocation" name="physicalLocation" class="form-control" value="${event.physicalLocation}">
             </div>
-        </div>
-
-        <!-- Total Tickets -->
-        <div class="form-group">
-            <label for="totalTickets">Total Tickets</label>
-            <input type="number" id="totalTickets" name="totalTickets" class="form-control"
-                   value="${event.totalTickets}">
-        </div>
-
-        <!-- Organizer Name -->
-        <div class="form-group">
-            <label for="organizerName">Organizer Name</label>
-            <input type="text" id="organizerName" name="organizerName" class="form-control"
-                   value="${event.organizerName}">
-        </div>
-
-        <!-- Description -->
-        <div class="form-group">
-            <label for="eventInfo">Event Information</label>
-            <textarea id="eventInfo" name="eventInfo" class="form-control">${event.eventInfo}</textarea>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-            <a href="${pageContext.request.contextPath}/myEvents" class="btn btn-secondary">❌ Cancel</a>
-        </div>
-    </form>
-</div>
+            <div class="form-group">
+                <label for="genreID">Event Genre *</label>
+                <select id="genreID" name="genreID" class="form-control" required>
+                    <option value="">Select a genre</option>
+                    <c:forEach var="genre" items="${genres}">
+                        <option value="${genre.genreID}" ${event.genreID eq genre.genreID ? 'selected' : ''}>${genre.genreName}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="description">Event Description</label>
+                <textarea id="description" name="description" class="form-control">${event.description}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="imageURL">Event Image</label>
+                <input type="file" id="imageURL" name="imageURL" accept="image/*">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Continue →</button>
+                <a href="${pageContext.request.contextPath}/organizer-servlet" class="btn btn-secondary">❌ Cancel</a>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
