@@ -1,3 +1,4 @@
+//create event
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
@@ -8,26 +9,243 @@
     <title>Create Event - Step 1: Information - MasterTicket</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/style.css">
     <style>
-        * { background-color: black; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; color: #fff; }
-        .form-control { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; background: rgba(255, 255, 255, 0.1); color: #fff; }
-        .form-row { display: flex; gap: 20px; }
-        .form-row .form-group { flex: 1; }
-        .form-actions { margin-top: 20px; display: flex; gap: 10px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; text-decoration: none; color: #fff; }
-        .btn-primary { background: #4CAF50; }
-        .btn-primary:hover { background: #45a049; }
-        .btn-secondary { background: #666; }
-        .btn-secondary:hover { background: #555; }
-        .error-message { color: #ff6b6b; margin-bottom: 15px; }
-        .progress-bar { background: rgba(26, 26, 46, 0.9); padding: 1rem 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .progress-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 2rem; }
-        .progress-step { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
-        .step-number { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; }
-        .step-number.active { background: #8b5fbf; color: white; }
-        .step-number.inactive { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); }
-        .step-connector { width: 40px; height: 2px; background: rgba(255, 255, 255, 0.1); }
+      
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #122536 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #fff;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .main-content {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h2 {
+        color: #4CAF50;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        background: linear-gradient(45deg, #4CAF50, #45a049);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .progress-bar {
+        background: rgba(26, 26, 46, 0.9);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .progress-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    .progress-step {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .step-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+
+    .step-number.active {
+        background: #4CAF50;
+        color: white;
+        box-shadow: 0 0 15px rgba(139, 95, 191, 0.5);
+    }
+
+    .step-number.inactive {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .step-connector {
+        width: 60px;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #4CAF50;
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+    }
+
+    input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px dashed rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
+
+    input[type="file"]::file-selector-button {
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        background: #4CAF50;
+        color: white;
+        cursor: pointer;
+        margin-right: 12px;
+        transition: all 0.3s;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+        background: #45a049;
+    }
+
+    .form-actions {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .error-message {
+        color: #ff6b6b;
+        margin-bottom: 20px;
+        padding: 12px;
+        background: rgba(255, 107, 107, 0.1);
+        border-radius: 8px;
+        border: 1px solid #ff6b6b;
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            margin: 20px;
+            padding: 20px;
+        }
+        
+        .progress-content {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .step-connector {
+            display: none;
+        }
+        
+        .form-row {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
     </style>
 </head>
 <body>
