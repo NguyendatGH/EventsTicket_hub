@@ -5,6 +5,7 @@
 package controller;
 
 import dao.OrderDAO;
+import dto.UserDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -64,7 +65,7 @@ public class TicketOrderHistoryServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
+        UserDTO currentUser = (session != null) ? (UserDTO) session.getAttribute("user") : null;
 
         if (currentUser == null) {
             response.sendRedirect("login.jsp");
