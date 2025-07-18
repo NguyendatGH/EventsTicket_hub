@@ -628,7 +628,7 @@
         </div>
         <div class="event-actions">
             <button class="btn-edit" onclick="editEvent(${event.eventID})">Edit</button>
-            <button class="btn-delete" onclick="confirmDelete(${event.eventID})">Delete</button>
+            <button class="btn-delete" onclick="deleteEvent(${event.eventID})">Delete</button>
         </div>
     </div>
 </div>
@@ -669,24 +669,20 @@
             <div class="stats-grid">
                 <div class="stat-card pulse">
                     <div class="icon">🎫</div>
-                    <div class="number">125</div>
+                    <div class="number">20</div>
                     <div class="label">Total Events</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">👥</div>
-                    <div class="number">12,890</div>
+                    <div class="number">356</div>
                     <div class="label">Total Attendees</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon">💰</div>
-                    <div class="number">$89,542</div>
+                    <div class="number">$122</div>
                     <div class="label">Total Revenue</div>
                 </div>
-                <div class="stat-card">
-                    <div class="icon">⭐</div>
-                    <div class="number">4.8</div>
-                    <div class="label">Average Rating</div>
-                </div>
+                
             </div>
 
             <!-- Recent Events Section -->
@@ -887,6 +883,54 @@
                     this.style.transform = 'translateY(-5px) scale(1)';
                 });
             });
+            
+            function deleteEvent(eventId) {
+                console.log("event" , eventId);
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#4CAF50',
+        cancelButtonColor: '#f44336',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Send request to delete the event
+            fetch('${pageContext.request.contextPath}/organizer-servlet?action=delete&eventID=' + eventId, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire(
+                        'Deleted!',
+                        'Your event has been deleted.',
+                        'success'
+                    ).then(() => {
+                        // Reload the page to see changes
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        'Failed to delete the event.',
+                        'error'
+                    );
+                }
+            })
+            .catch(error => {
+                Swal.fire(
+                    'Error!',
+                    'An error occurred while deleting the event.',
+                    'error'
+                );
+                console.error('Error:', error);
+            });
+        }
+    });
+}
+           
             function editEvent(eventId) {
     Swal.fire({
         title: 'Xác nhận',
@@ -897,10 +941,12 @@
         cancelButtonText: 'Không'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = '${pageContext.request.contextPath}/organizer-servlet?action=edit&eventID=' + eventId;
+             window.location.href = '${pageContext.request.contextPath}/organizer-servlet?action=edit&eventID=' + eventId;
         }
     });
 }
+
+
 
             // Animate numbers on load
             window.addEventListener('load', function () {
