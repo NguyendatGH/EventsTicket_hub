@@ -25,6 +25,29 @@ import models.TicketType;
 public class EventDAO {
 
     private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
+    
+
+    /**
+     * Gets the total count of approved and non-deleted events.
+     * Connection is managed via try-with-resources.
+     * @return The total count of events.
+     */
+    public int getTotalApprovedEventsCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM Events WHERE IsApproved = 1 AND IsDeleted = 0"; 
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error getting total approved events count from database.", e);
+        }
+        return count;
+    }
 
     public List<Event> getAllApprovedEvents() {
         List<Event> list = new ArrayList<>();
@@ -758,8 +781,39 @@ public int getTransactionCountByOwner(int ownerId) {
     } catch (SQLException e) {
         logger.severe("Error counting transactions: " + e.getMessage());
     }
+
     return count;
 }
+ 
+   public List<Event> getApprovedEventsPaginated(int offset, int limit) {
+        List<Event> events = new ArrayList<>();
+        // Đảm bảo chỉ chọn các trường CÓ THẬT trong bảng Events của bạn
+        // Đã loại bỏ 'Ranking'
+        String allColumns = "EventID, Name, Description, PhysicalLocation, StartTime, EndTime, " +
+                            "TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, " +
+                            "HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt"; 
+                     
+        String sql = "SELECT " + allColumns + " FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 " +
+                     "ORDER BY StartTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; 
+                     
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, offset);          
+            ps.setInt(2, limit);  
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    events.add(mapRowToEvent(rs)); // Sử dụng phương thức helper mapRowToEvent
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi lấy sự kiện phân trang từ cơ sở dữ liệu.", e);
+        }
+        return events;
+    }
+}
+
     public List<Event> getAllMyEvent(int userID) {
         List<Event> res = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE OwnerID = ? AND IsDeleted = 0"; // Added IsDeleted check

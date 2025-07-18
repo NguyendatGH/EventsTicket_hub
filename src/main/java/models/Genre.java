@@ -19,7 +19,7 @@ public class Genre {
 
     public int getGenreID() {
         return genreID;
-    }
+    }   
 
     public void setGenreID(int genreID) {
         this.genreID = genreID;

@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="models.Event"%>
+<%@page import="models.User"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
@@ -9,7 +10,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MasterTicket - Vé Sự Kiện</title>
+        <title>MasterTicket - Trang Chủ</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <style>
             * {
                 margin: 0;
@@ -51,46 +53,78 @@
 
             .nav {
                 display: flex;
-                justify-content: space-between;
+                justify-content: space-between; /* Space out items */
                 align-items: center;
                 max-width: 1400px;
                 margin: 0 auto;
-                flex-wrap: wrap;
+                flex-wrap: nowrap; /* Prevent wrapping on desktop */
             }
 
             .logo {
                 font-size: 1.5rem;
                 font-weight: bold;
                 color: var(--primary);
+                text-decoration: none;
+                flex-shrink: 0; /* Prevent logo from shrinking */
+            }
+
+            /* New container for middle content */
+            .nav-center-content {
+                display: flex;
+                align-items: center;
+                flex-grow: 1; /* Allow this area to take up remaining space */
+                justify-content: center; /* Center items within this area */
+                gap: 1rem; /* Space between search/filter and nav links */
+                flex-wrap: nowrap; /* Prevent wrapping initially */
             }
 
             .nav-links {
                 display: flex;
                 gap: 1.5rem;
                 list-style: none;
-                flex-wrap: wrap;
+                flex-wrap: nowrap; /* Prevent nav links from wrapping */
             }
 
             .nav-links a {
                 color: var(--text-light);
                 text-decoration: none;
                 transition: color 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                white-space: nowrap; /* Prevent links from wrapping */
             }
 
             .nav-links a:hover {
                 color: var(--primary);
             }
 
-            .search-container {
-                position: relative;
-                flex: 1;
-                max-width: 400px;
-                margin: 0.5rem 1rem;
-                width: 100%;
+            /* Toggle Buttons for Mobile (Hidden by default on larger screens) */
+            .nav-toggle, .search-filter-toggle {
+                background: none;
+                border: none;
+                color: var(--text-light);
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0.5rem;
+                display: none; 
             }
 
-            .search-box {
-                width: 100%;
+            /* Search and Filter Container - Always horizontal on wider screens */
+            .search-filter-container {
+                display: flex; /* Use flexbox */
+                flex-direction: row; /* Arrange items in a row */
+                flex-wrap: nowrap; /* Prevent wrapping on wider screens */
+                gap: 10px;
+                flex-grow: 1; /* Allows it to grow and shrink */
+                max-width: 600px; /* Max width for consistency */
+                min-width: 300px; /* Minimum width to prevent crushing */
+                align-items: center;
+            }
+
+            .search-box, .filter-input {
+                flex: 1; /* Allows inputs to take equal available space */
+                min-width: 100px; /* Adjusted min-width for better horizontal fit */
                 padding: 0.75rem 1rem;
                 background: var(--card-bg);
                 border: 1px solid var(--border-color);
@@ -100,11 +134,11 @@
                 transition: all 0.3s;
             }
 
-            .search-box::placeholder {
+            .search-box::placeholder, .filter-input::placeholder {
                 color: var(--text-muted);
             }
 
-            .search-box:focus {
+            .search-box:focus, .filter-input:focus {
                 background: rgba(255, 255, 255, 0.1);
                 border-color: var(--primary);
             }
@@ -113,7 +147,9 @@
                 display: flex;
                 gap: 0.75rem;
                 align-items: center;
-                flex-wrap: wrap;
+                flex-shrink: 0; /* Prevent buttons from shrinking */
+                margin-left: 1rem; /* Space between center content and auth buttons */
+                position: relative; /* For dropdown */
             }
 
             .btn {
@@ -157,7 +193,48 @@
                 font-size: 0.9rem;
                 margin-right: 0.75rem;
                 white-space: nowrap;
+                cursor: pointer; /* Make it clickable for dropdown */
             }
+
+            .user-dropdown {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: var(--darker-bg);
+                border-radius: 10px;
+                padding: 1rem;
+                min-width: 200px;
+                border: 1px solid var(--border-color);
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: all 0.3s;
+                z-index: 101; /* Above header */
+            }
+
+            .user-dropdown.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .dropdown-item {
+                display: block;
+                color: var(--text-light);
+                text-decoration: none;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid var(--border-color);
+                transition: color 0.3s;
+            }
+
+            .dropdown-item:last-child {
+                border-bottom: none;
+            }
+
+            .dropdown-item:hover {
+                color: var(--primary);
+            }
+
 
             /* Main Content */
             .container {
@@ -535,74 +612,127 @@
                 transform: scale(1.1);
             }
 
-            /* Responsive */
-            @media (max-width: 768px) {
+            /* Responsive adjustments */
+            @media (min-width: 993px) { /* For larger screens, ensure everything is in one row */
+                .nav {
+                    flex-wrap: nowrap; /* Prevent wrapping */
+                    justify-content: space-between; /* Distribute items with space */
+                }
+                .nav-center-content {
+                    flex-grow: 1; /* Allow it to take available space */
+                    flex-wrap: nowrap; /* Prevent wrapping within this section */
+                    justify-content: center; /* Center search and nav links */
+                }
+                .search-filter-container {
+                    flex-grow: 1;
+                    flex-wrap: nowrap;
+                    max-width: 600px; /* Constrain width for search inputs */
+                }
+                .nav-links {
+                    margin-left: 1rem; /* Add some space if nav links are after search */
+                }
+                .auth-buttons {
+                    margin-left: 1rem; /* Ensure space before auth buttons */
+                }
+                /* Hide toggle buttons on large screens */
+                .nav-toggle, .search-filter-toggle {
+                    display: none;
+                }
+            }
+
+
+            @media (max-width: 992px) { /* Adjust for tablet/smaller desktop screens */
+                .nav {
+                    flex-wrap: wrap; /* Allow wrapping */
+                    justify-content: flex-start; /* Start items from the left */
+                }
+                .logo {
+                    margin-right: 1rem; /* Less margin */
+                }
+                .nav-center-content {
+                    flex-basis: 100%; /* Take full width on this breakpoint */
+                    order: 3; /* Push it to the next line */
+                    margin-top: 1rem; /* Space from top elements */
+                    justify-content: flex-start; /* Align search/nav links to start */
+                    gap: 1rem;
+                    flex-wrap: wrap; /* Allow its children to wrap */
+                }
+                .search-filter-container {
+                    flex-basis: 100%; /* Take full width within nav-center-content */
+                    flex-wrap: wrap; /* Allow inputs to wrap if needed */
+                    max-width: unset; /* Remove max-width constraint */
+                }
+                .nav-links {
+                    flex-basis: 100%; /* Take full width within nav-center-content */
+                    margin-left: 0; /* Remove left margin */
+                    margin-top: 1rem; /* Space from search inputs */
+                    justify-content: flex-start; /* Align links to start */
+                    flex-wrap: wrap; /* Allow individual links to wrap */
+                }
+                .auth-buttons {
+                    margin-left: auto; /* Push to right */
+                    order: 2; /* Position after toggles */
+                }
+                /* Show toggle buttons */
+                .search-filter-toggle, .nav-toggle {
+                    display: block;
+                    order: 1; /* Position after logo */
+                    margin-left: 0.5rem; /* Space between toggles */
+                }
+                .nav-toggle {
+                    margin-left: auto; /* Push nav toggle to far right if space allows */
+                }
+                .user-greeting {
+                    margin-right: 0;
+                }
+            }
+
+            @media (max-width: 768px) { /* Mobile specific adjustments */
                 .nav {
                     flex-direction: column;
-                    gap: 1rem;
+                    align-items: flex-start; 
+                }
+                .logo {
+                    width: 100%;
                     text-align: center;
+                    margin-bottom: 1rem;
+                    margin-right: 0;
+                }
+                .nav-center-content {
+                    order: unset; /* Reset order */
+                    flex-direction: column;
+                    width: 100%;
+                    margin-top: 0;
+                    gap: 0;
+                }
+                .nav-links, .search-filter-container {
+                    display: none; /* Hidden by default, toggled by JS */
+                    flex-direction: column; /* Always vertical on mobile */
+                    width: 100%;
+                    padding: 1rem 0; 
+                    border-top: none; 
+                    box-shadow: none; 
+                    background: transparent; 
+                }
+                
+                .nav-links.active, .search-filter-container.active {
+                    display: flex;
                 }
 
-                .nav-links {
-                    gap: 1rem;
-                    justify-content: center;
+                .search-filter-toggle, .nav-toggle {
+                    order: unset; /* Reset order */
+                    margin-left: auto; /* Keep pushing to right */
                 }
-
-                .search-container {
-                    max-width: 100%;
-                    margin: 0.5rem 0;
-                }
+                 /* Ensure toggles are on the same line as logo */
+                .nav > .search-filter-toggle { margin-left: auto; margin-right: 0.5rem; }
+                .nav > .nav-toggle { margin-left: 0; }
 
                 .auth-buttons {
-                    justify-content: center;
-                    gap: 0.5rem;
-                }
-
-                .user-greeting {
-                    margin: 0.5rem 0;
-                }
-
-                .carousel-content {
-                    max-width: 80%;
-                }
-
-                .carousel-content h2 {
-                    font-size: 1.5rem;
-                }
-
-                .carousel-content p {
-                    font-size: 0.9rem;
-                }
-
-                .event-grid {
-                    grid-template-columns: 1fr;
-                }
-
-                .ticket-section {
-                    padding: 1.5rem;
-                }
-
-                .ticket-title {
-                    font-size: 1.8rem;
-                }
-
-                .footer-content {
-                    grid-template-columns: 1fr;
-                    text-align: center;
-                }
-
-                .subscribe-box {
-                    flex-direction: column;
-                }
-
-                .subscribe-box input,
-                .subscribe-box button {
+                    order: unset; /* Reset order */
                     width: 100%;
-                }
-
-                .language,
-                .social-icons {
                     justify-content: center;
+                    margin-left: 0; /* Remove left margin */
+                    margin-top: 1rem;
                 }
                 .flash-message {
                     padding: 15px;
@@ -697,30 +827,111 @@
                 }
 
             }
+            /* Add styles for pagination controls */
+            .pagination-controls {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+                margin-top: 3rem;
+                padding-bottom: 2rem;
+            }
+
+            .pagination-controls a,
+            .pagination-controls span {
+                text-decoration: none;
+                color: var(--text-light);
+                background-color: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 0.7rem 1.2rem;
+                transition: all 0.3s ease;
+                min-width: 40px;
+                text-align: center;
+                font-weight: 500;
+            }
+
+            .pagination-controls a:hover {
+                background-color: var(--primary);
+                border-color: var(--primary);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+            .pagination-controls .current-page {
+                background-color: var(--primary);
+                border-color: var(--primary);
+                color: white;
+                font-weight: bold;
+                pointer-events: none; /* Make current page not clickable */
+            }
+
+            .pagination-controls .disabled {
+                opacity: 0.5;
+                pointer-events: none; /* Disable click */
+            }
         </style>
     </head>
     <body>
-        
+        <%  
+            // Retrieve user and events from session/request attributes
+            User user = (User) session.getAttribute("user");
+            List<Event> events = (List<Event>) request.getAttribute("events");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd/MM/yyyy HH:mm");
 
-        <!-- Header -->
+            // Pagination attributes
+            Integer currentPageObj = (Integer) request.getAttribute("currentPage");
+            Integer noOfPagesObj = (Integer) request.getAttribute("noOfPages");
+            Integer totalEventsObj = (Integer) request.getAttribute("totalEvents");
+
+            int currentPage = (currentPageObj != null) ? currentPageObj : 1;
+            int noOfPages = (noOfPagesObj != null) ? noOfPagesObj : 1;
+            int totalEvents = (totalEventsObj != null) ? totalEventsObj : 0;
+        %>
+
         <header class="header">
             <nav class="nav">
-                <div class="logo">MasterTicket</div>
-                <div class="search-container">
-                    <input type="text" class="search-box" placeholder="Tìm sự kiện theo tên..." id="searchInput">
+                <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
+                
+                <button class="search-filter-toggle" id="searchFilterToggle" aria-label="Toggle search and filters">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="nav-center-content">
+                    <div class="search-filter-container" id="searchFilterContainer">
+                        <input type="text" class="search-box" placeholder="Tìm sự kiện..." id="searchInput">
+                        <input type="date" class="filter-input" id="dateInput" title="Tìm theo ngày">
+                        <input type="text" class="filter-input" placeholder="Địa điểm..." id="locationInput">
+                    </div>
+
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
+                        <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
+                        <li><a href="#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
+                        <c:if test="${not empty sessionScope.user && sessionScope.user.roleID == 2}">
+                             <li><a href="${pageContext.request.contextPath}/createEvent"><i class="fas fa-plus-circle"></i> Tạo sự kiện</a></li>
+                        </c:if>
+                        <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
+                    </ul>
                 </div>
-                <ul class="nav-links">
-                    <li><a href="#events">Trang chủ</a></li>
-                    <li><a href="#venues">Các sự kiện hot</a></li>
-                    <li><a href="#about">Săn voucher giảm giá</a></li>
-                    <li><a href="#contact">Tạo sự kiện</a></li>
-                    <li><a href="#contact">Hỗ trợ</a></li>
-                </ul>
+                
                 <div class="auth-buttons">
                     <c:choose>
                         <c:when test="${not empty sessionScope.user}">
-                            <span class="user-greeting">Xin chào, ${sessionScope.user.email}</span>
-                            <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline">Đăng xuất</a>
+                            <span class="user-greeting" onclick="toggleUserDropdown()">
+                                Xin chào, ${sessionScope.user.email} <span style="margin-left: 0.5rem;">▼</span>
+                            </span>
+                            <div class="user-dropdown" id="userDropdown">
+                                <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
+                                <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
+                                <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
+                                <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
+                                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+                                <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
+                            </div>
                         </c:when>
                         <c:otherwise>
                             <a href="${pageContext.request.contextPath}/login" class="btn btn-outline">Đăng nhập</a>
@@ -731,15 +942,27 @@
             </nav>
         </header>
 
-        <!-- Main Content -->
         <main class="container">
-            <!-- Hero Carousel -->
             <div class="hero-carousel">
-                <div class="carousel-slide active">
+                <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
                     <div class="carousel-content">
                         <h2>Chào mừng đến với MasterTicket</h2>
                         <p>Khám phá hàng ngàn sự kiện thú vị và đặt vé ngay hôm nay!</p>
                         <a href="#events" class="btn btn-primary">Khám phá ngay</a>
+                    </div>
+                </div>
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1505373877845-8c2aace4d817?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                    <div class="carousel-content">
+                        <h2>Sự kiện âm nhạc đỉnh cao</h2>
+                        <p>Đừng bỏ lỡ những đêm nhạc sống động với các nghệ sĩ hàng đầu!</p>
+                        <a href="#events" class="btn btn-primary">Xem chi tiết</a>
+                    </div>
+                </div>
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1607962837350-ed6062031177?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                    <div class="carousel-content">
+                        <h2>Sự kiện văn hóa và nghệ thuật</h2>
+                        <p>Đắm chìm vào thế giới nghệ thuật với các triển lãm và biểu diễn độc đáo.</p>
+                        <a href="#events" class="btn btn-primary">Tìm hiểu thêm</a>
                     </div>
                 </div>
                 <div class="carousel-indicators">
@@ -749,28 +972,29 @@
                 </div>
             </div>
 
-            <%
-                List<Event> events = (List<Event>) request.getAttribute("events");
-                SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd/MM/yyyy HH:mm");
-
-                if (events == null || events.isEmpty()) {
-            %>
+            <%  if (events == null || events.isEmpty()) {  %>
             <div class="no-events">
                 <h2>Không có sự kiện nào!</h2>
                 <p>Hiện tại chưa có sự kiện nào được tổ chức. Vui lòng quay lại sau!</p>
             </div>
             <% } else { %>
-            <!-- Featured Events Section -->
+            
             <div class="section-header">
-                <h2 class="section-title" id="events">Sự kiện nổi bật</h2>
-                <a href="#all-events" class="view-all">Xem tất cả</a>
+                <h2 class="section-title" id="hot-events">Sự kiện nổi bật</h2>
+                <a href="${pageContext.request.contextPath}/home?page=1" class="view-all">Xem tất cả</a>
             </div>
 
             <div class="event-grid">
-                <% for (Event event : events) {%>
+                <%  // The 'events' list from the servlet is already paginated for the current page.
+                    for (Event event : events) {
+                %>
                 <div class="event-card searchable-event" 
-                     data-event-id="<%= event.getEventID()%>"
-                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
+                    data-event-id="<%= event.getEventID() %>"
+                    data-event-name="<%= event.getName() != null ? event.getName().toLowerCase() : "" %>"
+                    data-event-description="<%= event.getDescription() != null ? event.getDescription().toLowerCase() : "" %>"
+                    data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : "" %>"
+                    data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
+                    onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
                     <div class="event-image">
                         <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) {%>
                         <img src="<%= event.getImageURL()%>" alt="<%= event.getName()%>" />
@@ -797,43 +1021,44 @@
                 <% }%>
             </div>
 
-            <!-- All Events Section -->
-            <div class="section-header">
-                <h2 class="section-title" id="all-events">Tất cả sự kiện</h2>
-                <span class="view-all">Tổng cộng: <%= events.size()%> sự kiện</span>
+            <div class="pagination-controls">
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage - 1 %>" 
+                   class="<%= (currentPage == 1) ? "disabled" : "" %>">Trước</a>
+                
+                <% 
+                    // Display page numbers
+                    int startPage = Math.max(1, currentPage - 2);
+                    int endPage = Math.min(noOfPages, currentPage + 2);
+
+                    if (startPage > 1) {
+                        %><a href="${pageContext.request.contextPath}/home?page=1">1</a><%
+                        if (startPage > 2) {
+                            %><span>...</span><%
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++) {
+                        if (i == currentPage) {
+                            %><span class="current-page"><%= i %></span><%
+                        } else {
+                            %><a href="${pageContext.request.contextPath}/home?page=<%= i %>"><%= i %></a><%
+                        }
+                    }
+
+                    if (endPage < noOfPages) {
+                        if (endPage < noOfPages - 1) {
+                            %><span>...</span><%
+                        }
+                        %><a href="${pageContext.request.contextPath}/home?page=<%= noOfPages %>"><%= noOfPages %></a><%
+                    }
+                %>
+                
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage + 1 %>" 
+                   class="<%= (currentPage == noOfPages) ? "disabled" : "" %>">Sau</a>
             </div>
 
-            <div class="event-grid">
-                <% for (Event event : events) {%>
-                <div class="event-card searchable-event" 
-                     data-event-id="<%= event.getEventID()%>"
-                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
-                    <div class="event-image">
-                        <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) {%>
-                        <img src="<%= event.getImageURL()%>" alt="<%= event.getName()%>" />
-                        <% } else { %>
-                        <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
-                        <% }%>
-                    </div>
-                    <div class="event-info">
-                        <div class="event-title"><%= event.getName()%></div>
-                        <div class="event-date">
-                            <% if (event.getStartTime() != null && event.getEndTime() != null) {%>
-                            🗓️ <%= dateFormat.format(event.getStartTime())%> - <%= dateFormat.format(event.getEndTime())%>
-                            <% } else { %>
-                            🗓️ Thời gian không xác định
-                            <% }%>
-                        </div>
-                        <div class="event-location">📍 <%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
-                        <div class="event-description" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; max-height: 3.6em; line-height: 1.2em;">
-                            <%= event.getDescription() != null ? event.getDescription() : ""%>
-                        </div>
-                        <div class="event-price">Từ 150,000 VNĐ</div>
-                    </div>
-                </div>
-                <% } %>
-            </div>
-            <% }%>
+            <% } %>
+
             <div class="ticket-section">
                 <div class="ticket-content">
                     <h2 class="ticket-title">Mua vé của bạn</h2>
@@ -843,7 +1068,6 @@
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-section">
@@ -867,7 +1091,7 @@
                 <div class="footer-section">
                     <h3>Đăng ký nhận thông tin</h3>
                     <form class="subscribe-box">
-                        <input type="email" placeholder="Email của bạn..." required />
+                        <input type="email" placeholder="Email của bạn..." required value="<%=(user != null ? user.getEmail() : "")%>"/>
                         <button type="submit">Gửi</button>
                     </form>
                     <div class="language">
@@ -888,6 +1112,24 @@
         </footer>
 
         <script>
+            // Toggle for user dropdown
+            function toggleUserDropdown() {
+                const dropdown = document.getElementById("userDropdown");
+                if (dropdown) {
+                    dropdown.classList.toggle("show");
+                }
+            }
+
+            // Close dropdown if click outside
+            window.addEventListener("click", function (e) {
+                const userGreeting = document.querySelector(".user-greeting");
+                const dropdown = document.getElementById("userDropdown");
+
+                if (userGreeting && dropdown && !userGreeting.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove("show");
+                }
+            });
+
             // Navigate to event detail
             function navigateToEventDetail(eventId) {
                 if (eventId) {
@@ -897,38 +1139,57 @@
                 }
             }
 
-            // Function to handle event selection (for fallback or testing)
-            function selectEvent(eventName) {
-                alert(`Bạn đã chọn sự kiện: ${eventName}\n\nChức năng mua vé sẽ được triển khai sau!`);
-            }
-
-            // Search functionality
+            // Search and filter functionality
             function setupSearch() {
                 const searchBox = document.getElementById('searchInput');
-                if (searchBox) {
-                    searchBox.addEventListener('input', (e) => {
-                        const query = e.target.value.toLowerCase();
-                        const eventCards = document.querySelectorAll('.searchable-event');
+                const dateInput = document.getElementById('dateInput');
+                const locationInput = document.getElementById('locationInput');
+                const eventCards = document.querySelectorAll('.searchable-event');
 
-                        eventCards.forEach(card => {
-                            const title = card.querySelector('.event-title');
-                            const description = card.querySelector('.event-description');
-                            const location = card.querySelector('.event-location');
+                const applyFilters = () => {
+                    const query = searchBox.value.toLowerCase();
+                    const selectedDate = dateInput.value ? new Date(dateInput.value) : null;
+                    const locationQuery = locationInput.value.toLowerCase();
 
-                            if (title && description && location) {
-                                const titleText = title.textContent.toLowerCase();
-                                const descText = description.textContent.toLowerCase();
-                                const locText = location.textContent.toLowerCase();
+                    eventCards.forEach(card => {
+                        const eventName = card.getAttribute('data-event-name');
+                        const eventDescription = card.getAttribute('data-event-description');
+                        const eventLocation = card.getAttribute('data-event-location'); 
+                        const eventStartTime = card.getAttribute('data-event-start-time'); 
+                        
+                        let isVisible = true;
 
-                                if (titleText.includes(query) || descText.includes(query) || locText.includes(query)) {
-                                    card.style.display = 'block';
-                                } else {
-                                    card.style.display = 'none';
-                                }
+                        // Filter by text query (name, description, location)
+                        if (query) {
+                            if (!eventName.includes(query) && !eventDescription.includes(query) && !eventLocation.includes(query)) {
+                                isVisible = false;
                             }
-                        });
+                        }
+                        
+                        // Filter by location input (already included in general query, but kept for explicit filter)
+                        if (locationQuery) { 
+                            if (!eventLocation || !eventLocation.includes(locationQuery)) {
+                                isVisible = false;
+                            }
+                        }
+
+                        // Filter by selected date (match year, month, day)
+                        if (selectedDate && eventStartTime) {
+                            const eventDate = new Date(parseInt(eventStartTime));
+                            if (eventDate.getFullYear() !== selectedDate.getFullYear() ||
+                                eventDate.getMonth() !== selectedDate.getMonth() ||
+                                eventDate.getDate() !== selectedDate.getDate()) {
+                                isVisible = false;
+                            }
+                        }
+
+                        card.style.display = isVisible ? 'block' : 'none';
                     });
-                }
+                };
+
+                searchBox.addEventListener('input', applyFilters);
+                dateInput.addEventListener('change', applyFilters);
+                locationInput.addEventListener('input', applyFilters);
             }
 
             // Carousel functionality
@@ -958,7 +1219,44 @@
                         });
                     });
 
-                    setInterval(nextSlide, 5000);
+                    // Start auto-play only if there are multiple slides
+                    if (slides.length > 1) {
+                         setInterval(nextSlide, 5000);
+                    }
+                }
+            }
+            
+            // Toggle for navigation links on small screens
+            function setupNavToggle() {
+                const navToggle = document.getElementById('navToggle');
+                const navLinks = document.getElementById('navLinks');
+                const searchFilterContainer = document.getElementById('searchFilterContainer');
+
+                if (navToggle && navLinks) {
+                    navToggle.addEventListener('click', () => {
+                        navLinks.classList.toggle('active');
+                        // Ensure search/filter container is hidden when nav links are shown
+                        if (searchFilterContainer) {
+                            searchFilterContainer.classList.remove('active');
+                        }
+                    });
+                }
+            }
+
+            // Toggle for search and filter inputs on small screens
+            function setupSearchFilterToggle() {
+                const searchFilterToggle = document.getElementById('searchFilterToggle');
+                const searchFilterContainer = document.getElementById('searchFilterContainer');
+                const navLinks = document.getElementById('navLinks');
+
+                if (searchFilterToggle && searchFilterContainer) {
+                    searchFilterToggle.addEventListener('click', () => {
+                        searchFilterContainer.classList.toggle('active');
+                        // Ensure nav links are hidden when search/filter are shown
+                        if (navLinks) {
+                            navLinks.classList.remove('active');
+                        }
+                    });
                 }
             }
 
@@ -966,6 +1264,8 @@
             document.addEventListener('DOMContentLoaded', () => {
                 setupSearch();
                 setupCarousel();
+                setupNavToggle();
+                setupSearchFilterToggle();
             });
 
             // Smooth scrolling for navigation links
