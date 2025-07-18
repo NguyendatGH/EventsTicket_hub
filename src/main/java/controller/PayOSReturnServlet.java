@@ -1,9 +1,9 @@
 package controller;
 
 import dao.OrderDAO;
+import dto.UserDTO;
 import models.Order;
 import models.OrderItem;
-import models.User;
 import service.EmailService;
 
 
@@ -31,7 +31,8 @@ public class PayOSReturnServlet extends HttpServlet {
         if ("PAID".equalsIgnoreCase(statusParam)) {
             if (session != null) {
                 Order currentOrder = (Order) session.getAttribute("currentOrder");
-                User currentUser = (User) session.getAttribute("user");
+                UserDTO currentUser = (UserDTO) session.getAttribute("user");
+
 
                 if (currentOrder != null && currentUser != null) {
                     try {

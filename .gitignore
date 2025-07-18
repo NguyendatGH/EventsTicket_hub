@@ -29,4 +29,8 @@ mvnw.cmd
 #DBConnection
 src/main/java/context/DBConnection.java
 #api key
+<<<<<<< HEAD
+*.properties
+=======
 # .properties
+>>>>>>> 0ec33686ff710dd25c67a289a5e1508f7be7e198
