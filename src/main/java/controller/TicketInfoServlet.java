@@ -44,8 +44,6 @@ public class TicketInfoServlet extends HttpServlet {
             request.setAttribute("event", event);
             request.setAttribute("listTicket", listTicket);
 
-            // >>> SỬA LỖI Ở ĐÂY: Đảm bảo forward đến đúng file JSP hiển thị vé.
-            // Tôi giả định tên file là "TicketDetail.jsp". Nếu bạn đặt tên khác, hãy thay đổi ở đây.
             request.getRequestDispatcher("/pages/TicketInfor.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
