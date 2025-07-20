@@ -25,20 +25,20 @@ import models.TicketType;
 public class EventDAO {
 
     private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
-    
 
     /**
      * Gets the total count of approved and non-deleted events.
      * Connection is managed via try-with-resources.
+     * 
      * @return The total count of events.
      */
     public int getTotalApprovedEventsCount() {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM Events WHERE IsApproved = 1 AND IsDeleted = 0"; 
-        
+        String sql = "SELECT COUNT(*) FROM Events WHERE IsApproved = 1 AND IsDeleted = 0";
+
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 count = rs.getInt(1);
             }
@@ -52,7 +52,9 @@ public class EventDAO {
     public List<Event> getAllApprovedEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE status != 'completed' AND isApproved = 1";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Event event = mapRowToEvent(rs);
                 list.add(event);
@@ -63,6 +65,7 @@ public class EventDAO {
 
         return list;
     }
+
     public ToggleEvent createEvent(Event event, List<TicketType> ticketTypes) {
         Connection conn = null;
         try {
@@ -70,8 +73,9 @@ public class EventDAO {
             conn.setAutoCommit(false);
 
             // Step 1: Insert into Events table
-            String eventSql = "INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt) " +
-                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String eventSql = "INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             int eventId;
             try (PreparedStatement ps = conn.prepareStatement(eventSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, event.getName());
@@ -108,8 +112,9 @@ public class EventDAO {
             }
 
             // Step 2: Insert into TicketInfo table (default ticket type)
-            String ticketInfoSql = "INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive, CreatedAt, UpdatedAt) " +
-                                  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String ticketInfoSql = "INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive, CreatedAt, UpdatedAt) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             int ticketInfoId;
             try (PreparedStatement ps = conn.prepareStatement(ticketInfoSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, "General Admission");
@@ -142,8 +147,9 @@ public class EventDAO {
             }
 
             // Step 3: Insert into TicketInventory table
-            String inventorySql = "INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity, LastUpdated) " +
-                                 "VALUES (?, ?, ?, ?, ?)";
+            String inventorySql = "INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity, LastUpdated) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(inventorySql)) {
                 ps.setInt(1, ticketInfoId);
                 ps.setInt(2, event.getTotalTicketCount());
@@ -185,7 +191,9 @@ public class EventDAO {
     public List<Event> getActiveEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1 AND Status = 'active'";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(mapRowToEvent(rs));
             }
@@ -198,7 +206,9 @@ public class EventDAO {
     public List<Event> getNonActiveEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1 AND Status IN ('pending', 'cancelled', 'completed')";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(mapRowToEvent(rs));
             }
@@ -382,7 +392,9 @@ public class EventDAO {
     public List<Event> getUpcomingEvents() {
         List<Event> list = new ArrayList<>();
         String sql = "SELECT TOP 4 * FROM Events WHERE StartTime > GETDATE() ORDER BY StartTime ASC";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
             }
@@ -396,7 +408,9 @@ public class EventDAO {
         Map<String, Integer> stats = new HashMap<>();
 
         String sql = "Select status, count(*) as count from Events where IsDeleted = 0 group by status";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 stats.put(rs.getString("status"), rs.getInt("count"));
             }
@@ -410,7 +424,9 @@ public class EventDAO {
         Map<String, Integer> stats = new HashMap<>();
         String sql = "SELECT g.GenreName as GenreName, COUNT(e.EventID) as count FROM Genres g  LEFT JOIN Events e ON g.GenreID = e.GenreID AND e.isDeleted = 0  GROUP BY g.GenreID, g.GenreName  ORDER BY count DESC";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery();) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery();) {
             while (rs.next()) {
                 stats.put(rs.getString("GenreName"), rs.getInt("count"));
             }
@@ -425,7 +441,9 @@ public class EventDAO {
         List<Map<String, Object>> stats = new ArrayList<>();
         String sql = "SELECT YEAR(CreatedAt) as year, MONTH(CreatedAt) as month, COUNT(*) as count FROM Events WHERE isDeleted = 0 AND CreatedAt >= DATEADD(MONTH, -6, GETDATE()) GROUP BY YEAR(CreatedAt), MONTH(CreatedAt) ORDER BY year, month";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Map<String, Object> monthData = new HashMap<>();
@@ -448,6 +466,7 @@ public class EventDAO {
     public ToggleEvent deleteEvent(int event_id) {
         Connection conn = null;
         boolean success = false;
+        System.out.println("event id to delete: " + event_id);
         try {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false);
@@ -464,38 +483,16 @@ public class EventDAO {
                 }
             }
 
-            // Delete or update dependent records
-            String[] deleteQueries = {
-                "DELETE FROM Ticket WHERE TicketInfoID IN (SELECT TicketInfoID FROM TicketInfo WHERE EventID = ?)",
-                "DELETE FROM TicketInventory WHERE TicketInfoID IN (SELECT TicketInfoID FROM TicketInfo WHERE EventID = ?)",
-                "DELETE FROM OrderItems WHERE EventID = ?",
-                "DELETE FROM Refunds WHERE OrderID IN (SELECT OrderID FROM OrderItems WHERE EventID = ?)",
-                "DELETE FROM TicketInfo WHERE EventID = ?",
-                "DELETE FROM Seat WHERE EventID = ?",
-                "DELETE FROM Feedback WHERE EventID = ?",
-                "DELETE FROM Report WHERE EventID = ?",
-                "DELETE FROM Conversations WHERE EventID = ?",
-                "DELETE FROM Promotions WHERE EventID = ?"
-            };
-
-            for (String query : deleteQueries) {
-                try (PreparedStatement ps = conn.prepareStatement(query)) {
-                    ps.setInt(1, event_id);
-                    ps.executeUpdate();
-                }
-            }
-
-            // Delete or update event
             String eventQuery = "DELETE FROM Events WHERE EventID = ?";
             try (PreparedStatement ps = conn.prepareStatement(eventQuery)) {
                 ps.setInt(1, event_id);
                 int rows = ps.executeUpdate();
+                System.out.println("fuck");
                 if (rows == 0) {
                     conn.rollback();
                     return new ToggleEvent(false, "Sự kiện không tồn tại");
                 }
             }
-
             // Log to AuditLog
             try (PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO AuditLog (TableName, RecordID, Action, UserID, CreatedAt) VALUES (?, ?, ?, ?, ?)")) {
@@ -513,6 +510,7 @@ public class EventDAO {
         } catch (SQLException e) {
             logger.severe("Error during " + "hard" + " delete of EventID: " + event_id + " - "
                     + e.getMessage());
+            e.printStackTrace();
             if (conn != null) {
                 try {
                     conn.rollback();
@@ -611,7 +609,9 @@ public class EventDAO {
         String sql = "SELECT SUM(TotalAmount) AS TotalRevenue FROM Orders WHERE PaymentStatus = 'paid'";
         BigDecimal totalRevenue = BigDecimal.ZERO;
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             if (rs.next()) {
                 totalRevenue = rs.getBigDecimal("TotalRevenue");
@@ -630,9 +630,11 @@ public class EventDAO {
     public int getTotalEventsCount() {
         int res = 0;
         String sql = "SELECT COUNT(EventID) AS eventCount FROM Events;";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
-                res =  rs.getInt("eventCount");
+                res = rs.getInt("eventCount");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -640,72 +642,74 @@ public class EventDAO {
         System.out.println("total event");
         return 0;
     }
+
     public BigDecimal getTotalRevenueByOwner(int ownerId) {
-    String sql = "SELECT SUM(t.Amount) FROM Transactions t " +
-                 "JOIN Events e ON t.EventID = e.EventID " +
-                 "WHERE e.OwnerID = ? AND t.Status = 'completed'";
-    BigDecimal total = BigDecimal.ZERO;
-    
-    try (Connection conn = DBConnection.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, ownerId);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                total = rs.getBigDecimal(1);
-                if (rs.wasNull()) {
-                    total = BigDecimal.ZERO;
+        String sql = "SELECT SUM(t.Amount) FROM Transactions t " +
+                "JOIN Events e ON t.EventID = e.EventID " +
+                "WHERE e.OwnerID = ? AND t.Status = 'completed'";
+        BigDecimal total = BigDecimal.ZERO;
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getBigDecimal(1);
+                    if (rs.wasNull()) {
+                        total = BigDecimal.ZERO;
+                    }
                 }
             }
+        } catch (SQLException e) {
+            logger.severe("Error getting total revenue: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        logger.severe("Error getting total revenue: " + e.getMessage());
+        return total;
     }
-    return total;
-}
 
-public int getTotalTicketsSoldByOwner(int ownerId) {
-    String sql = "SELECT SUM(t.TicketCount) FROM Transactions t " +
-                 "JOIN Events e ON t.EventID = e.EventID " +
-                 "WHERE e.OwnerID = ? AND t.Status = 'completed'";
-    int count = 0;
-    
-    try (Connection conn = DBConnection.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, ownerId);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                count = rs.getInt(1);
-            }
-        }
-    } catch (SQLException e) {
-        logger.severe("Error getting total tickets sold: " + e.getMessage());
-    }
-    return count;
-}
+    public int getTotalTicketsSoldByOwner(int ownerId) {
+        String sql = "SELECT SUM(t.TicketCount) FROM Transactions t " +
+                "JOIN Events e ON t.EventID = e.EventID " +
+                "WHERE e.OwnerID = ? AND t.Status = 'completed'";
+        int count = 0;
 
-public int getRefundRequestsCountByOwner(int ownerId) {
-    String sql = "SELECT COUNT(*) FROM Refunds r " +
-                 "JOIN Transactions t ON r.TransactionID = t.TransactionID " +
-                 "JOIN Events e ON t.EventID = e.EventID " +
-                 "WHERE e.OwnerID = ? AND r.Status = 'pending'";
-    int count = 0;
-    
-    try (Connection conn = DBConnection.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, ownerId);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                count = rs.getInt(1);
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
             }
+        } catch (SQLException e) {
+            logger.severe("Error getting total tickets sold: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        logger.severe("Error getting refund requests count: " + e.getMessage());
+        return count;
     }
-    return count;
-}
+
+    public int getRefundRequestsCountByOwner(int ownerId) {
+        String sql = "SELECT COUNT(*) FROM Refunds r " +
+                "JOIN Transactions t ON r.TransactionID = t.TransactionID " +
+                "JOIN Events e ON t.EventID = e.EventID " +
+                "WHERE e.OwnerID = ? AND r.Status = 'pending'";
+        int count = 0;
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Error getting refund requests count: " + e.getMessage());
+        }
+        return count;
+    }
+
     public UserDTO getEventOwnerId(int eventId) {
         String sql = "SELECT OwnerID FROM Events WHERE EventID = ?;";
         UserService u = new UserService();
@@ -726,81 +730,81 @@ public int getRefundRequestsCountByOwner(int ownerId) {
 
         return null;
     }
+
     public List<TransactionDTO> getTransactionsByOwner(int ownerId, int page, int pageSize) {
-    List<TransactionDTO> transactions = new ArrayList<>();
-    String sql = "SELECT t.TransactionID, e.Name AS EventName, u.FullName AS EventOwner, u.Email AS OwnerEmail, " +
-                 "t.TransactionDate, t.Amount, t.TicketCount, t.Status " +
-                 "FROM Transactions t " +
-                 "JOIN Events e ON t.EventID = e.EventID " +
-                 "JOIN Users u ON e.OwnerID = u.UserID " +
-                 "WHERE e.OwnerID = ? " +
-                 "ORDER BY t.TransactionDate DESC " +
-                 "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-    
-    try (Connection conn = DBConnection.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, ownerId);
-        ps.setInt(2, (page - 1) * pageSize);
-        ps.setInt(3, pageSize);
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                TransactionDTO transaction = new TransactionDTO(
-                    rs.getInt("TransactionID"),
-                    rs.getString("EventName"),
-                    rs.getString("EventOwner"),
-                    rs.getString("OwnerEmail"),
-                    rs.getTimestamp("TransactionDate"),
-                    rs.getBigDecimal("Amount"),
-                    rs.getInt("TicketCount"),
-                    rs.getString("Status")
-                );
-                transactions.add(transaction);
-            }
-        }
-    } catch (SQLException e) {
-        logger.severe("Error fetching transactions: " + e.getMessage());
-    }
-    return transactions;
-}
+        List<TransactionDTO> transactions = new ArrayList<>();
+        String sql = "SELECT t.TransactionID, e.Name AS EventName, u.FullName AS EventOwner, u.Email AS OwnerEmail, " +
+                "t.TransactionDate, t.Amount, t.TicketCount, t.Status " +
+                "FROM Transactions t " +
+                "JOIN Events e ON t.EventID = e.EventID " +
+                "JOIN Users u ON e.OwnerID = u.UserID " +
+                "WHERE e.OwnerID = ? " +
+                "ORDER BY t.TransactionDate DESC " +
+                "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-public int getTransactionCountByOwner(int ownerId) {
-    int count = 0;
-    String sql = "SELECT COUNT(*) FROM Transactions t JOIN Events e ON t.EventID = e.EventID WHERE e.OwnerID = ?";
-    
-    try (Connection conn = DBConnection.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        
-        ps.setInt(1, ownerId);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                count = rs.getInt(1);
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, ownerId);
+            ps.setInt(2, (page - 1) * pageSize);
+            ps.setInt(3, pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TransactionDTO transaction = new TransactionDTO(
+                            rs.getInt("TransactionID"),
+                            rs.getString("EventName"),
+                            rs.getString("EventOwner"),
+                            rs.getString("OwnerEmail"),
+                            rs.getTimestamp("TransactionDate"),
+                            rs.getBigDecimal("Amount"),
+                            rs.getInt("TicketCount"),
+                            rs.getString("Status"));
+                    transactions.add(transaction);
+                }
             }
+        } catch (SQLException e) {
+            logger.severe("Error fetching transactions: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        logger.severe("Error counting transactions: " + e.getMessage());
+        return transactions;
     }
 
-    return count;
-}
- 
-   public List<Event> getApprovedEventsPaginated(int offset, int limit) {
+    public int getTransactionCountByOwner(int ownerId) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM Transactions t JOIN Events e ON t.EventID = e.EventID WHERE e.OwnerID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Error counting transactions: " + e.getMessage());
+        }
+
+        return count;
+    }
+
+    public List<Event> getApprovedEventsPaginated(int offset, int limit) {
         List<Event> events = new ArrayList<>();
         // Đảm bảo chỉ chọn các trường CÓ THẬT trong bảng Events của bạn
         // Đã loại bỏ 'Ranking'
         String allColumns = "EventID, Name, Description, PhysicalLocation, StartTime, EndTime, " +
-                            "TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, " +
-                            "HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt"; 
-                     
+                "TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, " +
+                "HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt";
+
         String sql = "SELECT " + allColumns + " FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 " +
-                     "ORDER BY StartTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"; 
-                     
+                "ORDER BY StartTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, offset);          
-            ps.setInt(2, limit);  
-            
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, offset);
+            ps.setInt(2, limit);
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     events.add(mapRowToEvent(rs)); // Sử dụng phương thức helper mapRowToEvent
@@ -812,7 +816,6 @@ public int getTransactionCountByOwner(int ownerId) {
         }
         return events;
     }
-}
 
     public List<Event> getAllMyEvent(int userID) {
         List<Event> res = new ArrayList<>();
@@ -841,17 +844,17 @@ public int getTransactionCountByOwner(int ownerId) {
                     event.setIsDeleted(rs.getBoolean("IsDeleted"));
                     event.setCreatedAt(rs.getTimestamp("CreatedAt"));
                     event.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-                    //event.setRanking(rs.getLong("Ranking"));
+                    // event.setRanking(rs.getLong("Ranking"));
 
                     res.add(event);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Consider throwing a custom exception or returning null/empty list based on your error handling strategy
+            // Consider throwing a custom exception or returning null/empty list based on
+            // your error handling strategy
         }
 
         return res;
     }
-
 }
