@@ -3,8 +3,7 @@ package models;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class TicketInfo { 
-
+public class TicketInfo {
     private int ticketInfoID;
     private String ticketName;
     private String ticketDescription;
@@ -17,11 +16,36 @@ public class TicketInfo {
     private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-
     private TicketInventory inventory;
 
     public TicketInfo() {
+    }
+
+    public TicketInfo(int id, String name, String description, String category, BigDecimal price,
+            LocalDateTime salesStartTime, LocalDateTime salesEndTime, int eventId,
+            int maxQuantityPerOrder, boolean isActive) {
+        this.ticketInfoID = id;
+        this.ticketName = name;
+        this.ticketDescription = description;
+        this.category = category;
+        this.price = price;
+        this.salesStartTime = salesStartTime;
+        this.salesEndTime = salesEndTime;
+        this.eventID = eventId;
+        this.maxQuantityPerOrder = maxQuantityPerOrder;
+        this.isActive = isActive;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public TicketInfo(String name, BigDecimal price, int maxQuantityPerOrder) {
+        this.ticketName = name;
+        this.price = price;
+        this.maxQuantityPerOrder = maxQuantityPerOrder;
+        this.category = "General";
+        this.isActive = true;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public int getTicketInfoID() {
@@ -137,8 +161,8 @@ public class TicketInfo {
 
     @Override
     public String toString() {
-        return "TicketInfo{" 
-                + "ticketInfoID=" + ticketInfoID 
+        return "TicketInfo{"
+                + "ticketInfoID=" + ticketInfoID
                 + ", ticketName='" + ticketName + '\''
                 + ", ticketDescription='" + ticketDescription + '\''
                 + ", category='" + category + '\''

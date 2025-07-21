@@ -16,8 +16,7 @@ public class GenreDAO {
 
     public List<Genre> getAllGenres() {
         List<Genre> genres = new ArrayList<>();
-        String sql = "SELECT * FROM genres ORDER BY genreName";
-        
+        String sql = "SELECT GenreID, GenreName, Description, CreatedAt FROM Genres ORDER BY GenreName";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             ResultSet rs = pstmt.executeQuery();
@@ -39,7 +38,8 @@ public class GenreDAO {
     }
 
     public Genre getGenreById(int genreId) {
-        String sql = "SELECT * FROM genres WHERE genreId = ?";
+        String sql = "SELECT GenreID, GenreName, Description, CreatedAt FROM Genres WHERE GenreID = ?";
+
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, genreId);
             ResultSet rs = pstmt.executeQuery();
