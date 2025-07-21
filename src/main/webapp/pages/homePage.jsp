@@ -1,7 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="models.Event"%>
-<%@page import="models.User"%>
+<%@page import="dto.UserDTO"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
@@ -875,7 +875,7 @@
     <body>
         <%  
             // Retrieve user and events from session/request attributes
-            User user = (User) session.getAttribute("user");
+            UserDTO user = (UserDTO) session.getAttribute("user");
             List<Event> events = (List<Event>) request.getAttribute("events");
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd/MM/yyyy HH:mm");
 
@@ -911,9 +911,6 @@
                         <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
                         <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
                         <li><a href="#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
-                        <c:if test="${not empty sessionScope.user && sessionScope.user.roleID == 2}">
-                             <li><a href="${pageContext.request.contextPath}/createEvent"><i class="fas fa-plus-circle"></i> Tạo sự kiện</a></li>
-                        </c:if>
                         <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
                     </ul>
                 </div>
