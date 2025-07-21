@@ -802,7 +802,7 @@
         <h2 style="color: #4CAF50; margin-bottom: 20px;">🎭 Create New Event</h2>
         <p style="margin-bottom: 20px;">Ready to create an amazing event experience?</p>
         <div style="display: flex; gap: 15px; justify-content: center;">
-            <button class="btn btn-primary" onclick="window.location.href='createEvent/NotesWhenPostEvent.jsp'">Start Creating</button>
+            <button class="btn btn-primary" onclick="window.location.href='eventOwner/NotesWhenPostEvent.jsp'">Start Creating</button>
             <button class="btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="closeModal()">Cancel</button>
         </div>
     </div>

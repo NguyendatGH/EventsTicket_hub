@@ -145,7 +145,6 @@ public class UserService {
     }
 
     public String whoisLoggedin(int userId) throws IOException, SQLException {
-
       return userDAO.checkRole(userId);
     }
 }

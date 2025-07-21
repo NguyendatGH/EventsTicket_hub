@@ -66,14 +66,14 @@ public class OrderItemDAO extends DBConnection {
                     item.setEventName(rs.getString("EventName"));
 
                     // Gán seat nếu có
-                    String seatNumber = rs.getString("SeatNumber");
-                    if (seatNumber != null) {
-                        Seat seat = new Seat();
-                        seat.setSeatNumber(seatNumber);
-                        seat.setSeatRow(rs.getString("SeatRow"));
-                        seat.setSeatSection(rs.getString("SeatSection"));
-                        item.setSeat(seat);
-                    }
+                    // String seatNumber = rs.getString("SeatNumber");
+                    // if (seatNumber != null) {
+                    //     Seat seat = new Seat();
+                    //     seat.setSeatNumber(seatNumber);
+                    //     seat.setSeatRow(rs.getString("SeatRow"));
+                    //     seat.setSeatSection(rs.getString("SeatSection"));
+                    //     item.setSeat(seat);
+                    // }
 
                     itemList.add(item);
                 }
