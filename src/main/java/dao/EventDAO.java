@@ -1,6 +1,7 @@
 package dao;
 
 import models.Event;
+import models.TicketInfo;
 import service.UserService;
 import utils.ToggleEvent;
 import context.DBConnection;
@@ -20,6 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import models.TicketType;
 
 public class EventDAO {
@@ -64,128 +69,6 @@ public class EventDAO {
         }
 
         return list;
-    }
-
-    public ToggleEvent createEvent(Event event, List<TicketType> ticketTypes) {
-        Connection conn = null;
-        try {
-            conn = DBConnection.getConnection();
-            conn.setAutoCommit(false);
-
-            // Step 1: Insert into Events table
-            String eventSql = "INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt) "
-                    +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            int eventId;
-            try (PreparedStatement ps = conn.prepareStatement(eventSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, event.getName());
-                ps.setString(2, event.getDescription());
-                ps.setString(3, event.getPhysicalLocation());
-                ps.setTimestamp(4, new Timestamp(event.getStartTime().getTime()));
-                ps.setTimestamp(5, new Timestamp(event.getEndTime().getTime()));
-                ps.setInt(6, event.getTotalTicketCount());
-                ps.setBoolean(7, event.getIsApproved() != null ? event.getIsApproved() : false);
-                ps.setString(8, "pending");
-                ps.setObject(9, event.getGenreID(), Types.INTEGER);
-                ps.setInt(10, event.getOwnerID());
-                ps.setString(11, event.getImageURL());
-                ps.setBoolean(12, event.getHasSeatingChart() != null ? event.getHasSeatingChart() : false);
-                ps.setBoolean(13, event.getIsDeleted() != null ? event.getIsDeleted() : false);
-                ps.setTimestamp(14, new Timestamp(event.getCreatedAt().getTime()));
-                ps.setTimestamp(15, new Timestamp(event.getUpdatedAt().getTime()));
-
-                int affectedRows = ps.executeUpdate();
-                if (affectedRows == 0) {
-                    conn.rollback();
-                    return new ToggleEvent(false, "Failed to create event");
-                }
-
-                // Retrieve the generated EventID
-                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        eventId = generatedKeys.getInt(1);
-                    } else {
-                        conn.rollback();
-                        return new ToggleEvent(false, "Failed to retrieve event ID");
-                    }
-                }
-            }
-
-            // Step 2: Insert into TicketInfo table (default ticket type)
-            String ticketInfoSql = "INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive, CreatedAt, UpdatedAt) "
-                    +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            int ticketInfoId;
-            try (PreparedStatement ps = conn.prepareStatement(ticketInfoSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, "General Admission");
-                ps.setString(2, "Standard ticket for event: " + event.getName());
-                ps.setString(3, "General");
-                ps.setBigDecimal(4, new java.math.BigDecimal("0.00")); // Default price
-                ps.setTimestamp(5, new Timestamp(event.getStartTime().getTime()));
-                ps.setTimestamp(6, new Timestamp(event.getEndTime().getTime()));
-                ps.setInt(7, eventId);
-                ps.setInt(8, 10); // Default max quantity per order
-                ps.setBoolean(9, true);
-                ps.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
-                ps.setTimestamp(11, new Timestamp(System.currentTimeMillis()));
-
-                int affectedRows = ps.executeUpdate();
-                if (affectedRows == 0) {
-                    conn.rollback();
-                    return new ToggleEvent(false, "Failed to create ticket info");
-                }
-
-                // Retrieve the generated TicketInfoID
-                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        ticketInfoId = generatedKeys.getInt(1);
-                    } else {
-                        conn.rollback();
-                        return new ToggleEvent(false, "Failed to retrieve ticket info ID");
-                    }
-                }
-            }
-
-            // Step 3: Insert into TicketInventory table
-            String inventorySql = "INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity, LastUpdated) "
-                    +
-                    "VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement ps = conn.prepareStatement(inventorySql)) {
-                ps.setInt(1, ticketInfoId);
-                ps.setInt(2, event.getTotalTicketCount());
-                ps.setInt(3, 0);
-                ps.setInt(4, 0);
-                ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
-
-                int affectedRows = ps.executeUpdate();
-                if (affectedRows == 0) {
-                    conn.rollback();
-                    return new ToggleEvent(false, "Failed to create ticket inventory");
-                }
-            }
-
-            conn.commit();
-            return new ToggleEvent(true, "Event created successfully");
-        } catch (SQLException e) {
-            logger.severe("Error creating event: " + e.getMessage());
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException re) {
-                    logger.severe("Rollback failed: " + re.getMessage());
-                }
-            }
-            return new ToggleEvent(false, "Error creating event: " + e.getMessage());
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException ce) {
-                    logger.severe("Error closing connection: " + ce.getMessage());
-                }
-            }
-        }
     }
 
     public List<Event> getActiveEvents() {
@@ -459,8 +342,308 @@ public class EventDAO {
         return stats;
     }
 
-    public boolean createEvent(Event event) {
-        return false;
+    public ToggleEvent createEvent(Event event, List<TicketInfo> ticketInfos) {
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+            logger.info("Creating event: " + event.getName());
+
+            // Step 1: Insert into Events table
+            String eventSql = "INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            int eventId;
+            try (PreparedStatement ps = conn.prepareStatement(eventSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, event.getName());
+                ps.setString(2, event.getDescription());
+                ps.setString(3, event.getPhysicalLocation());
+                ps.setTimestamp(4, new Timestamp(event.getStartTime().getTime()));
+                ps.setTimestamp(5, new Timestamp(event.getEndTime().getTime()));
+                ps.setInt(6, event.getTotalTicketCount());
+                ps.setBoolean(7, event.getIsApproved() != null ? event.getIsApproved() : false);
+                ps.setString(8, "pending");
+                ps.setObject(9, event.getGenreID(), Types.INTEGER);
+                ps.setInt(10, event.getOwnerID());
+                ps.setString(11, event.getImageURL());
+                ps.setBoolean(12, event.getHasSeatingChart() != null ? event.getHasSeatingChart() : false);
+                ps.setBoolean(13, event.getIsDeleted() != null ? event.getIsDeleted() : false);
+                ps.setTimestamp(14, new Timestamp(event.getCreatedAt().getTime()));
+                ps.setTimestamp(15, new Timestamp(event.getUpdatedAt().getTime()));
+
+                int affectedRows = ps.executeUpdate();
+                if (affectedRows == 0) {
+                    conn.rollback();
+                    return new ToggleEvent(false, "Failed to create event");
+                }
+
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        eventId = generatedKeys.getInt(1);
+                        logger.info("Created event with EventID: " + eventId);
+                    } else {
+                        conn.rollback();
+                        return new ToggleEvent(false, "Failed to retrieve event ID");
+                    }
+                }
+            }
+
+            // Step 2: Insert into TicketInfo table for each ticket info
+            String ticketInfoSql = "INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive, CreatedAt, UpdatedAt) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            Map<String, Integer> ticketInfoIdMap = new HashMap<>();
+            for (TicketInfo ticketInfo : ticketInfos) {
+                int ticketInfoId;
+                try (PreparedStatement ps = conn.prepareStatement(ticketInfoSql,
+                        PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    ps.setString(1, ticketInfo.getTicketName());
+                    ps.setString(2, ticketInfo.getTicketDescription() != null ? ticketInfo.getTicketDescription()
+                            : "Ticket for " + event.getName());
+                    ps.setString(3, ticketInfo.getCategory() != null ? ticketInfo.getCategory() : "General");
+                    ps.setBigDecimal(4, ticketInfo.getPrice());
+                    ps.setTimestamp(5,
+                            ticketInfo.getSalesStartTime() != null ? Timestamp.valueOf(ticketInfo.getSalesStartTime())
+                                    : new Timestamp(event.getStartTime().getTime()));
+                    ps.setTimestamp(6,
+                            ticketInfo.getSalesEndTime() != null ? Timestamp.valueOf(ticketInfo.getSalesEndTime())
+                                    : new Timestamp(event.getEndTime().getTime()));
+                    ps.setInt(7, eventId);
+                    ps.setInt(8, ticketInfo.getMaxQuantityPerOrder());
+                    ps.setBoolean(9, ticketInfo.isActive());
+                    ps.setTimestamp(10, ticketInfo.getCreatedAt() != null ? Timestamp.valueOf(ticketInfo.getCreatedAt())
+                            : new Timestamp(System.currentTimeMillis()));
+                    ps.setTimestamp(11, ticketInfo.getUpdatedAt() != null ? Timestamp.valueOf(ticketInfo.getUpdatedAt())
+                            : new Timestamp(System.currentTimeMillis()));
+
+                    int affectedRows = ps.executeUpdate();
+                    if (affectedRows == 0) {
+                        conn.rollback();
+                        return new ToggleEvent(false, "Failed to create ticket info for " + ticketInfo.getTicketName());
+                    }
+
+                    try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            ticketInfoId = generatedKeys.getInt(1);
+                            ticketInfoIdMap.put(ticketInfo.getCategory() + "-" + ticketInfo.getTicketName(),
+                                    ticketInfoId);
+                            logger.info("Created TicketInfo: " + ticketInfo.getTicketName() + ", TicketInfoID: "
+                                    + ticketInfoId);
+                        } else {
+                            conn.rollback();
+                            return new ToggleEvent(false,
+                                    "Failed to retrieve ticket info ID for " + ticketInfo.getTicketName());
+                        }
+                    }
+
+                    // Step 3: Insert into TicketInventory table
+                    String inventorySql = "INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity, LastUpdated) "
+                            +
+                            "VALUES (?, ?, ?, ?, ?)";
+                    try (PreparedStatement invPs = conn.prepareStatement(inventorySql)) {
+                        invPs.setInt(1, ticketInfoId);
+                        invPs.setInt(2, ticketInfo.getMaxQuantityPerOrder());
+                        invPs.setInt(3, 0);
+                        invPs.setInt(4, 0);
+                        invPs.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+
+                        int invAffectedRows = invPs.executeUpdate();
+                        if (invAffectedRows == 0) {
+                            conn.rollback();
+                            return new ToggleEvent(false,
+                                    "Failed to create ticket inventory for " + ticketInfo.getTicketName());
+                        }
+                    }
+                }
+            }
+
+            conn.commit();
+            return new ToggleEvent(true, "Event created successfully", eventId, ticketInfoIdMap);
+        } catch (SQLException e) {
+            logger.severe("Error creating event: " + e.getMessage() + ", SQLState: " + e.getSQLState() + ", ErrorCode: "
+                    + e.getErrorCode());
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException re) {
+                    logger.severe("Rollback failed: " + re.getMessage());
+                }
+            }
+            return new ToggleEvent(false, "Error creating event: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ce) {
+                    logger.severe("Error closing connection: " + ce.getMessage());
+                }
+            }
+        }
+    }
+
+    public ToggleEvent saveSeats(int eventId, JSONObject seatMapData, Map<String, Integer> ticketInfoIdMap,
+            JSONArray ticketNames) {
+        logger.info("ticketInfoIdMap contents: in save seat dao " + ticketInfoIdMap.toString());
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+            logger.info("Saving zones and seats for EventID: " + eventId);
+            logger.info("seatMapData: " + seatMapData.toString());
+
+            // Validate seatMapData
+            if (!seatMapData.has("zones") || !seatMapData.has("seats")) {
+                conn.rollback();
+                return new ToggleEvent(false, "Invalid seatMapData: missing zones or seats");
+            }
+
+            JSONArray zones = seatMapData.getJSONArray("zones");
+            JSONArray seats = seatMapData.getJSONArray("seats");
+            if (zones.length() == 0 || seats.length() == 0) {
+                conn.rollback();
+                return new ToggleEvent(false, "No zones or seats provided in seatMapData");
+            }
+
+            // Validate ticketInfoIdMap
+            if (ticketInfoIdMap == null || ticketInfoIdMap.isEmpty()) {
+                conn.rollback();
+                return new ToggleEvent(false, "No TicketInfoID map provided for EventID: " + eventId);
+            }
+
+            // Step 1: Insert into Zones table
+            String zoneSql = "INSERT INTO Zones (event_id, name, shape, color, rows, seats_per_row, total_seats, x, y, rotation, ticket_price, vertices) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            Map<Integer, Integer> zoneIdMap = new HashMap<>();
+            try (PreparedStatement ps = conn.prepareStatement(zoneSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < zones.length(); i++) {
+                    JSONObject zone = zones.getJSONObject(i);
+                    int clientZoneId = zone.getInt("id");
+                    ps.setInt(1, eventId);
+                    ps.setString(2, zone.getString("name"));
+                    ps.setString(3, zone.getString("shape"));
+                    ps.setString(4, zone.getString("color"));
+                    ps.setInt(5, zone.getInt("rows"));
+                    ps.setInt(6, zone.getInt("seatsPerRow"));
+                    ps.setInt(7, zone.getInt("totalSeats"));
+                    ps.setInt(8, zone.getInt("x"));
+                    ps.setInt(9, zone.getInt("y"));
+                    ps.setInt(10, zone.getInt("rotation"));
+                    ps.setDouble(11, zone.getDouble("ticketPrice"));
+                    ps.setString(12, zone.has("vertices") ? zone.getJSONArray("vertices").toString() : "[]");
+
+                    int affectedRows = ps.executeUpdate();
+                    if (affectedRows == 0) {
+                        conn.rollback();
+                        return new ToggleEvent(false, "Failed to insert zone: " + zone.getString("name"));
+                    }
+
+                    try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            int zoneId = generatedKeys.getInt(1);
+                            zoneIdMap.put(clientZoneId, zoneId);
+                            logger.info("Inserted zone: " + zone.getString("name") + ", zoneId: " + zoneId);
+                        } else {
+                            conn.rollback();
+                            return new ToggleEvent(false,
+                                    "Failed to retrieve zoneId for zone: " + zone.getString("name"));
+                        }
+                    }
+                }
+            }
+
+            // Step 2: Insert into Seat table
+            String seatSql = "INSERT INTO Seat (ZoneID, Label, Color, Price, X, Y, Relative_X, Relative_Y, SeatStatus, CreatedAt) "
+                    + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(seatSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < seats.length(); i++) {
+                    JSONObject seat = seats.getJSONObject(i);
+                    int clientZoneId = seat.getInt("zoneId");
+                    Integer zoneId = zoneIdMap.get(clientZoneId);
+                    if (zoneId == null) {
+                        conn.rollback();
+                        return new ToggleEvent(false, "Invalid ZoneID for seat: " + seat.getString("label"));
+                    }
+
+                    // Find TicketInfoID using zone name and ticket name
+                    String zoneName = null;
+                    int zoneIndex = -1;
+                    for (int j = 0; j < zones.length(); j++) {
+                        JSONObject zone = zones.getJSONObject(j);
+                        if (zone.getInt("id") == clientZoneId) {
+                            zoneName = zone.getString("name");
+                            zoneIndex = j;
+                            break;
+                        }
+                    }
+                    if (zoneName == null) {
+                        conn.rollback();
+                        return new ToggleEvent(false, "Zone not found for clientZoneId: " + clientZoneId);
+                    }
+
+                    ps.setInt(1, zoneId);
+                    ps.setString(2, seat.getString("label"));
+                    ps.setString(3, seat.getString("color"));
+                    ps.setDouble(4, seat.getDouble("price"));
+                    ps.setInt(5, seat.getInt("x"));
+                    ps.setInt(6, seat.getInt("y"));
+                    ps.setDouble(7, seat.getDouble("relativeX"));
+                    ps.setDouble(8, seat.getDouble("relativeY"));
+                    ps.setString(9, seat.getString("status"));
+                    ps.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
+
+                    int affectedRows = ps.executeUpdate();
+                    if (affectedRows == 0) {
+                        conn.rollback();
+                        return new ToggleEvent(false, "Failed to insert seat: " + seat.getString("label"));
+                    }
+
+                    try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            logger.info("Inserted seat: " + seat.getString("label") + ", seatId: "
+                                    + generatedKeys.getInt(1));
+                        } else {
+                            conn.rollback();
+                            return new ToggleEvent(false,
+                                    "Failed to retrieve seatId for seat: " + seat.getString("label"));
+                        }
+                    }
+                }
+            }
+
+            conn.commit();
+            return new ToggleEvent(true, "Zones and seats saved successfully");
+        } catch (SQLException e) {
+            logger.severe("Error saving zones and seats for EventID: " + eventId + " - " + e.getMessage()
+                    + ", SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode());
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException re) {
+                    logger.severe("Rollback failed: " + re.getMessage());
+                }
+            }
+            return new ToggleEvent(false, "Error saving zones and seats: " + e.getMessage());
+        } catch (Exception e) {
+            logger.severe("Unexpected error in saveSeats: " + e.getMessage());
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException re) {
+                    logger.severe("Rollback failed: " + re.getMessage());
+                }
+            }
+            return new ToggleEvent(false, "Unexpected error: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ce) {
+                    logger.severe("Error closing connection: " + ce.getMessage());
+                }
+            }
+        }
     }
 
     public ToggleEvent deleteEvent(int event_id) {

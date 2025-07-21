@@ -1,5 +1,4 @@
-create database EventTicketDB2
-
+create database EventTicketDB
 
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -52,50 +51,38 @@ CREATE TABLE Events(
     CONSTRAINT CK_Event_Time CHECK (EndTime > StartTime)
 	);
 
-CREATE TABLE SeatMap (
-    SeatMapID INT IDENTITY(1,1) PRIMARY KEY,
-    EventID INT NOT NULL,
-    BackgroundImage NVARCHAR(255),
-    BackgroundWidth INT,
-    BackgroundHeight INT,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    UpdatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT FK_SeatMap_Event FOREIGN KEY (EventID) REFERENCES Events(EventID) ON DELETE CASCADE
+CREATE TABLE Zones (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    event_id INT,
+    name VARCHAR(50),
+    shape VARCHAR(20),
+    color VARCHAR(7),
+    rows INT,
+    seats_per_row INT,
+    total_seats INT,
+    x INT,
+    y INT,
+    rotation INT,
+    ticket_price FLOAT,
+    vertices NVARCHAR(MAX), -- store JSON as text
+    FOREIGN KEY (event_id) REFERENCES Events(EventID)
 );
 
-CREATE TABLE SeatMapZones (
-    ZoneID INT IDENTITY(1,1) PRIMARY KEY,
-    SeatMapID INT NOT NULL,
-    Name NVARCHAR(100) NOT NULL,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT FK_SeatMapZones_SeatMap FOREIGN KEY (SeatMapID) REFERENCES SeatMap(SeatMapID) ON DELETE CASCADE
-);
 
-CREATE TABLE SeatMapSeats (
-    SeatID INT IDENTITY(1,1) PRIMARY KEY,
-    ZoneID INT NOT NULL,
-    Label NVARCHAR(50) NOT NULL,
-    Price INT NOT NULL DEFAULT 0 CHECK (Price >= 0),
-    Color NVARCHAR(50),
-    X INT,
-    Y INT,
-    RelativeX FLOAT,
-    RelativeY FLOAT,
-    Status NVARCHAR(20) DEFAULT 'available' CHECK (Status IN ('available', 'reserved', 'sold')),
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT FK_SeatMapSeats_Zone FOREIGN KEY (ZoneID) REFERENCES SeatMapZones(ZoneID) ON DELETE CASCADE
-);
 -- Bảng Seat (cải thiện)
 CREATE TABLE Seat (
     SeatID INT IDENTITY(1,1) PRIMARY KEY,
-    EventID INT NOT NULL,
-    SeatNumber NVARCHAR(10) NOT NULL,
-    SeatRow NVARCHAR(10),
-    SeatSection NVARCHAR(20), --vd: khu vuc A, B
+    ZoneID INT,
+    Label VARCHAR(10),
+    color VARCHAR(7),
+    price FLOAT,
+    x INT,
+    y INT,
+    relative_x FLOAT,
+    relative_y FLOAT,
     SeatStatus NVARCHAR(20) DEFAULT 'available' CHECK (SeatStatus IN ('available', 'reserved', 'sold')),
     CreatedAt DATETIME DEFAULT GETDATE(),
-    CONSTRAINT FK_Seat_Event FOREIGN KEY (EventID) REFERENCES Events(EventID),
-    CONSTRAINT UK_Seat_Event_Number UNIQUE (EventID, SeatNumber)
+    CONSTRAINT FK_Seat FOREIGN KEY (ZoneId) REFERENCES Zones(id),
 ); 
 
 -- Bảng TicketInfo (đổi tên và cải thiện)
@@ -760,8 +747,6 @@ END;
 GO
 
 
-INSERT INTO Users (Username, Email, PasswordHash, Role, Gender, Birthday, PhoneNumber, Address, Avatar, isLocked, LastLoginAt)
-VALUES
 -- Insert into Users (Administrator with Id=1)
 INSERT INTO Users (Username, Email, PasswordHash, Role, Gender, Birthday, PhoneNumber, Address, Avatar, isLocked, LastLoginAt)
 VALUES
@@ -791,6 +776,8 @@ VALUES
 (N'Dương Thị Uyên', N'duong.thi.uyen@gmail.com', N'hashedpassword14', N'customer', N'Female', '1998-12-05', N'0956789012', N'369 An Dương Vương, Mỹ Tho', 'https://i.imgflip.com/4/2wifvo.jpg', 0, NULL),
 (N'Trịnh Minh Vũ', N'trinh.minh.vu@gmail.com', N'hashedpassword15', N'customer', N'Male', '1991-05-23', N'0967890123', N'482 Nguyễn Văn Linh, Rạch Giá', 'https://i.imgflip.com/4/40noj6.jpg', 0, NULL),
 (N'Nguyen Tan Dat', 'tandatbtqb@gmail.com', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', 'https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png', 0, GETDATE());
+
+select * from Events
 
 select * from Users
 --select * from users;
@@ -849,6 +836,10 @@ VALUES
 (N'autoFEST@HCMC [Music Party & Merchandise]', 'Music and automotive merchandise event', 'Ho Chi Minh City', '2025-09-14 02:00:00', '2025-09-14 04:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/87/43/e3/7e239ba463207db6e0e12cee4e433536.jpg', 0, 0, '2025-06-19 12:00:00', '2025-06-19 12:00:00'),
 (N'Automotive Mobility Solutions Conference', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-08-15 03:00:00', '2025-08-15 05:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/4d/8c/8a/4b0586d8a8733d9ed6cc9f5115960529.png', 0, 0, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
 
+
+INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt)
+VALUES
+(N'hehe', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-08-15 03:00:00', '2025-08-15 05:00:00', 200, 1, 'active', 4, 2, 'https://cdn-cjhkj.nitrocdn.com/krXSsXVqwzhduXLVuGLToUwHLNnSxUxO/assets/images/optimized/rev-ff94111/spotme.com/wp-content/uploads/2020/07/Hero-1.jpg', 0, 0, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
 
 INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive, CreatedAt, UpdatedAt)
 VALUES
