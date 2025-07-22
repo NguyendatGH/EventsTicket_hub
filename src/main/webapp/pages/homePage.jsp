@@ -982,7 +982,7 @@
             </div>
 
             <div class="event-grid">
-                <%  // The 'events' list from the servlet is already paginated for the current page.
+                <%  
                     for (Event event : events) {
                 %>
                 <div class="event-card searchable-event" 
@@ -993,11 +993,11 @@
                     data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
                     <div class="event-image">
-                        <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) {%>
-                        <img src="<%= event.getImageURL()%>" alt="<%= event.getName()%>" />
-                        <% } else { %>
-                        <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
-                        <% }%>
+     <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) { %>
+    <img src="${pageContext.request.contextPath}/uploads/event_banners/<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
+<% } else { %>
+    <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
+<% } %>
                     </div>
                     <div class="event-info">
                         <div class="event-title"><%= event.getName()%></div>
