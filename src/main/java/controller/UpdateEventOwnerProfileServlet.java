@@ -16,6 +16,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import models.User;
+import dto.UserDTO;
 
 @WebServlet("/updateEventOwnerProfile")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
@@ -31,49 +32,58 @@ public class UpdateEventOwnerProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         // Ensure the user is logged in and has the "event_owner" role before displaying the page
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
-
-        if (user == null || !"event_owner".equals(user.getRole())) { // CORRECTED ROLE CHECK HERE
-            response.sendRedirect("login"); // Redirect to login if not an event_owner or not logged in
+        Object userObj = session.getAttribute("user");
+        User user = null;
+        IUserDAO userDAO = new UserDAO();
+        if (userObj instanceof User) {
+            user = (User) userObj;
+        } else if (userObj instanceof dto.UserDTO) {
+            String email = ((dto.UserDTO) userObj).getEmail();
+            user = userDAO.getUserByEmail(email);
+            session.setAttribute("user", user); 
+        }
+        if (user == null || !"event_owner".equals(user.getRole())) {
+            response.sendRedirect("login");
             return;
         }
-
-        request.getRequestDispatcher("eventOwnerPage/updateEventOwnerProfile.jsp").forward(request, response);
+        // Forward đúng đường dẫn
+        request.getRequestDispatcher("eventOwner/updateEventOwnerProfile.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
-
-        if (user == null || !"event_owner".equals(user.getRole())) { // CORRECTED ROLE CHECK HERE
+        Object userObj = session.getAttribute("user");
+        User user = null;
+        IUserDAO userDAO = new UserDAO();
+        if (userObj instanceof User) {
+            user = (User) userObj;
+        } else if (userObj instanceof dto.UserDTO) {
+            String email = ((dto.UserDTO) userObj).getEmail();
+            user = userDAO.getUserByEmail(email);
+            session.setAttribute("user", user);
+        }
+        if (user == null || !"event_owner".equals(user.getRole())) {
             response.sendRedirect("login");
             return;
         }
-
         try {
             String gender = request.getParameter("gender");
             String birthdayStr = request.getParameter("birthday");
             String phoneNumber = request.getParameter("phoneNumber");
             String address = request.getParameter("address");
-
             user.setGender(gender);
-
             if (birthdayStr != null && !birthdayStr.isEmpty()) {
-                user.setBirthday(Date.valueOf(birthdayStr));
+                user.setBirthday(java.sql.Date.valueOf(birthdayStr));
             } else {
                 user.setBirthday(null);
             }
             user.setPhoneNumber(phoneNumber);
             user.setAddress(address);
-            user.setUpdatedAt(LocalDateTime.now());
-
+            user.setUpdatedAt(java.time.LocalDateTime.now());
             updateAvatarIfProvided(request, user);
-
             boolean updated = userDAO.updateProfile(user);
-
             if (updated) {
                 session.setAttribute("user", user);
                 request.setAttribute("success", "Cập nhật hồ sơ Chủ sự kiện thành công!");
@@ -84,8 +94,7 @@ public class UpdateEventOwnerProfileServlet extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi khi cập nhật hồ sơ Chủ sự kiện: " + e.getMessage());
         }
-
-        request.getRequestDispatcher("eventOwnerPage/updateEventOwnerProfile.jsp").forward(request, response);
+        request.getRequestDispatcher("eventOwner/updateEventOwnerProfile.jsp").forward(request, response);
     }
 
     private void updateAvatarIfProvided(HttpServletRequest request, User user) throws IOException, ServletException {

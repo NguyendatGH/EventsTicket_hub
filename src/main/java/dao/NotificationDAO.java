@@ -97,6 +97,30 @@ public class NotificationDAO {
         }
     }
 
+    // Thêm notification mới vào DB
+    public boolean insertNotification(Notification notification) {
+        String sql = "INSERT INTO Notifications (UserID, Title, Content, NotificationType, RelatedID, IsRead, CreatedAt, Priority) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, notification.getUserID());
+            ps.setString(2, notification.getTitle());
+            ps.setString(3, notification.getContent());
+            ps.setString(4, notification.getNotificationType());
+            if (notification.getRelatedID() != null) {
+                ps.setInt(5, notification.getRelatedID());
+            } else {
+                ps.setNull(5, java.sql.Types.INTEGER);
+            }
+            ps.setBoolean(6, notification.isIsRead());
+            ps.setTimestamp(7, java.sql.Timestamp.valueOf(notification.getCreatedAt()));
+            ps.setString(8, notification.getPriority());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error inserting notification: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // Helper method to map a ResultSet row to a Notification object
     private Notification mapRowToNotification(ResultSet rs) throws SQLException {
         Notification notification = new Notification();
