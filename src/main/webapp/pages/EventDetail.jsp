@@ -642,7 +642,7 @@
             <c:if test="${not empty event}">
                 <div class="event-header">
                     <div class="event-poster">
-                        <img src="${event.imageURL}" alt="Poster sự kiện ${event.name}">
+                        <img src="${pageContext.request.contextPath}/uploads/event_banners/${event.imageURL}" alt="Poster sự kiện ${event.name}">
                     </div>
                     <div class="event-info">
                         <h1 class="event-title">${event.name}</h1>

@@ -6,19 +6,20 @@ package controller;
 
 import Interfaces.IUserDAO;
 import dao.UserDAO;
+import dto.UserDTO;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.UUID; // Import UUID để tạo tên file duy nhất
+import java.util.UUID;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-
-import models.User;
+import service.UserService;
 
 @WebServlet("/updateProfile")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
@@ -26,8 +27,7 @@ import models.User;
         maxRequestSize = 1024 * 1024 * 15 // 15 MB
 )
 public class UpdateProfileServlet extends HttpServlet {
-
-    private final IUserDAO userDAO = new UserDAO();
+    private static final UserService UserService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -40,7 +40,7 @@ public class UpdateProfileServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
+        UserDTO user = (UserDTO) session.getAttribute("user");
 
         if (user == null) {
             response.sendRedirect("login");
@@ -48,7 +48,6 @@ public class UpdateProfileServlet extends HttpServlet {
         }
 
         try {
-
             String gender = request.getParameter("gender");
             String birthdayStr = request.getParameter("birthday");
             String phoneNumber = request.getParameter("phoneNumber");
@@ -63,10 +62,9 @@ public class UpdateProfileServlet extends HttpServlet {
             }
             user.setPhoneNumber(phoneNumber);
             user.setAddress(address);
-            user.setUpdatedAt(LocalDateTime.now());
             updateAvatarIfProvided(request, user);
 
-            boolean updated = userDAO.updateProfile(user);
+            boolean updated = UserService.updateProfile(user);
             if (updated) {
                 session.setAttribute("user", user);
                 request.setAttribute("success", "Cập nhật thành công.");
@@ -74,7 +72,6 @@ public class UpdateProfileServlet extends HttpServlet {
                 request.setAttribute("error", "Cập nhật thất bại.");
             }
         } catch (Exception e) {
-
             e.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi khi cập nhật hồ sơ: " + e.getMessage());
         }
@@ -82,73 +79,29 @@ public class UpdateProfileServlet extends HttpServlet {
         request.getRequestDispatcher("userPage/updateProfile.jsp").forward(request, response);
     }
 
-    private void updateAvatarIfProvided(HttpServletRequest request, User user) throws IOException, ServletException {
+    private void updateAvatarIfProvided(HttpServletRequest request, UserDTO user) throws IOException, ServletException {
         Part filePart = request.getPart("avatar");
 
-        System.out.println("DEBUG: filePart is null? " + (filePart == null));
-        if (filePart == null) {
-            System.out.println(
-                    "DEBUG: No file part found for 'avatar'. This might mean the form enctype is incorrect or no file was selected.");
-            return;
-        }
-
-        System.out.println("DEBUG: filePart size: " + filePart.getSize() + " bytes.");
-        if (filePart.getSize() == 0) {
-            System.out.println("DEBUG: filePart size is 0. No file selected or empty file.");
-            return;
+        if (filePart == null || filePart.getSize() == 0) {
+            return; // No file uploaded, keep existing avatar
         }
 
         String submittedFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-        System.out.println("DEBUG: Submitted file name: " + submittedFileName);
-
-        if (submittedFileName == null || submittedFileName.isEmpty()) {
-            System.out.println("DEBUG: Submitted file name is null or empty.");
-            return;
-        }
-
-        // Tạo tên file duy nhất để tránh trùng lặp
-        String fileExtension = "";
-        int dotIndex = submittedFileName.lastIndexOf('.');
-        if (dotIndex > 0 && dotIndex < submittedFileName.length() - 1) {
-            fileExtension = submittedFileName.substring(dotIndex);
-        }
+        String fileExtension = submittedFileName.substring(submittedFileName.lastIndexOf('.'));
         String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
 
-        String uploadPath = "D:/uploads/avatars/";
-        System.out.println("DEBUG: Calculated upload path: " + uploadPath);
-
+        String uploadPath = request.getServletContext().getAttribute("upload.path") + "/user_avatar/";
         File uploadDir = new File(uploadPath);
 
         if (!uploadDir.exists()) {
-            System.out.println("DEBUG: Upload directory does not exist. Attempting to create: " + uploadPath);
-            boolean created = uploadDir.mkdirs();
-            System.out.println("DEBUG: Directory created successfully? " + created);
-            if (!created) {
-                String errorMessage = "ERROR: Failed to create upload directory: " + uploadPath
-                        + ". Please check server permissions and disk space.";
-                System.err.println(errorMessage);
-
-                throw new IOException(errorMessage);
-            }
-        } else {
-            System.out.println("DEBUG: Upload directory already exists: " + uploadPath);
+            uploadDir.mkdirs();
         }
 
         String filePath = uploadPath + uniqueFileName;
-        System.out.println("DEBUG: Full file path to save: " + filePath);
+        System.out.println("file path: " +filePath);    
+        filePart.write(filePath);
 
-        try {
-            filePart.write(filePath);
-            System.out.println("DEBUG: File successfully written to: " + filePath);
-
-            user.setAvatar(filePath);
-            System.out.println("DEBUG: User avatar path set to: " + user.getAvatar());
-
-        } catch (IOException e) {
-            System.err.println("ERROR: Failed to write file to disk at " + filePath + ": " + e.getMessage());
-            e.printStackTrace();
-
-            throw e;
-        }
+        // Store only the filename in the database (as per sample SQL)
+        user.setAvatar(uniqueFileName);
     }
 }

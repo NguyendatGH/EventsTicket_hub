@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 public class DBConnection {
 
     private static final String DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=EventTicketDB;encrypt=true;trustServerCertificate=true";
+    private static final String DB_URL = "jdbc:sqlserver://192.168.1.26:1433;databaseName=EventTicketDB;encrypt=true;trustServerCertificate=true";
     private static final String USER_DB = "sa"; 
-    private static final String PASS_DB = "123"; 
+    private static final String PASS_DB = "Admin2404!"; 
 
 
 
