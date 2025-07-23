@@ -611,7 +611,7 @@
                     <li><a href="#contact">Vé đã mua</a></li>
                     <li><a href="#contact">Hỗ trợ</a></li>
                 </ul>
-                <div class="user-menu">
+                    <div class="user-menu">
                     <div class="user-info" onclick="toggleUserDropdown()">
                         👤 Xin chào, <%= user.getEmail() %> <span style="margin-left: 0.5rem;">▼</span>
                     </div>

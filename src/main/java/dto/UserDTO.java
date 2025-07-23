@@ -15,12 +15,14 @@ public class UserDTO {
     private boolean isLocked;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
+    private String role; // ADDED: Field to store the user's role (e.g., "user", "event_owner")
+    private LocalDateTime updatedAt; // ADDED: Field to store the last update timestamp
 
     public UserDTO() {
     }
 
     public UserDTO(int id, String name, String email, String gender, Date birthday, String phoneNumber, String address,
-            String avatar, boolean isLocked, LocalDateTime createdAt, LocalDateTime lastLoginAt) {
+                   String avatar, boolean isLocked, LocalDateTime createdAt, LocalDateTime lastLoginAt, String role, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -32,6 +34,8 @@ public class UserDTO {
         this.isLocked = isLocked;
         this.createdAt = createdAt;
         this.lastLoginAt = lastLoginAt;
+        this.role = role; // Assign role in constructor
+        this.updatedAt = updatedAt; // Assign updatedAt in constructor
     }
 
     // Getters and Setters
@@ -123,6 +127,24 @@ public class UserDTO {
         this.lastLoginAt = lastLoginAt;
     }
 
+    // ADDED: Getter and Setter for role
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    // ADDED: Getter and Setter for updatedAt
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public String toString() {
         return "UserDTO{" +
@@ -137,6 +159,8 @@ public class UserDTO {
                 ", isLocked=" + isLocked +
                 ", createdAt=" + createdAt +
                 ", lastLoginAt=" + lastLoginAt +
+                ", role='" + role + '\'' + // Include role in toString
+                ", updatedAt=" + updatedAt + // Include updatedAt in toString
                 '}';
     }
 }

@@ -1,0 +1,134 @@
+// controller/UpdateEventOwnerProfileServlet.java
+package controller;
+
+import Interfaces.IUserDAO; // Still using IUserDAO since updateProfile takes a User object
+import dao.UserDAO; // Still using UserDAO as it contains the updateProfile for the shared 'Users' table
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+import models.User;
+
+@WebServlet("/updateEventOwnerProfile")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+        maxFileSize = 1024 * 1024 * 10, // 10 MB
+        maxRequestSize = 1024 * 1024 * 15 // 15 MB
+)
+public class UpdateEventOwnerProfileServlet extends HttpServlet {
+
+    private final IUserDAO userDAO = new UserDAO();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Ensure the user is logged in and has the "event_owner" role before displaying the page
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute("user");
+
+        if (user == null || !"event_owner".equals(user.getRole())) { // CORRECTED ROLE CHECK HERE
+            response.sendRedirect("login"); // Redirect to login if not an event_owner or not logged in
+            return;
+        }
+
+        request.getRequestDispatcher("eventOwnerPage/updateEventOwnerProfile.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute("user");
+
+        if (user == null || !"event_owner".equals(user.getRole())) { // CORRECTED ROLE CHECK HERE
+            response.sendRedirect("login");
+            return;
+        }
+
+        try {
+            String gender = request.getParameter("gender");
+            String birthdayStr = request.getParameter("birthday");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String address = request.getParameter("address");
+
+            user.setGender(gender);
+
+            if (birthdayStr != null && !birthdayStr.isEmpty()) {
+                user.setBirthday(Date.valueOf(birthdayStr));
+            } else {
+                user.setBirthday(null);
+            }
+            user.setPhoneNumber(phoneNumber);
+            user.setAddress(address);
+            user.setUpdatedAt(LocalDateTime.now());
+
+            updateAvatarIfProvided(request, user);
+
+            boolean updated = userDAO.updateProfile(user);
+
+            if (updated) {
+                session.setAttribute("user", user);
+                request.setAttribute("success", "Cập nhật hồ sơ Chủ sự kiện thành công!");
+            } else {
+                request.setAttribute("error", "Cập nhật hồ sơ Chủ sự kiện thất bại. Vui lòng thử lại.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Đã xảy ra lỗi khi cập nhật hồ sơ Chủ sự kiện: " + e.getMessage());
+        }
+
+        request.getRequestDispatcher("eventOwnerPage/updateEventOwnerProfile.jsp").forward(request, response);
+    }
+
+    private void updateAvatarIfProvided(HttpServletRequest request, User user) throws IOException, ServletException {
+        Part filePart = request.getPart("avatar");
+
+        if (filePart == null || filePart.getSize() == 0) {
+            return;
+        }
+
+        String submittedFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+        if (submittedFileName == null || submittedFileName.isEmpty()) {
+            return;
+        }
+
+        String fileExtension = "";
+        int dotIndex = submittedFileName.lastIndexOf('.');
+        if (dotIndex > 0 && dotIndex < submittedFileName.length() - 1) {
+            fileExtension = submittedFileName.substring(dotIndex);
+        }
+        String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+
+        String uploadPath = "D:/uploads/avatars/";
+
+        File uploadDir = new File(uploadPath);
+
+        if (!uploadDir.exists()) {
+            boolean created = uploadDir.mkdirs();
+            if (!created) {
+                String errorMessage = "ERROR: Failed to create upload directory: " + uploadPath
+                        + ". Please check server permissions and disk space.";
+                System.err.println(errorMessage);
+                throw new IOException(errorMessage);
+            }
+        }
+
+        String filePath = uploadPath + uniqueFileName;
+        try {
+            filePart.write(filePath);
+            user.setAvatar(uniqueFileName);
+        } catch (IOException e) {
+            System.err.println("ERROR: Failed to write avatar file to disk at " + filePath + ": " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+}

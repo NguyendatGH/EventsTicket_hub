@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="models.User" %> <%-- Import the User model as it's the shared entity --%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,11 +110,92 @@
             background: rgba(76, 175, 80, 0.1);
         }
 
-        .navbar .user-info {
+        /* --- START: User Menu Styles for Navbar (Copied from updateProfile.jsp) --- */
+        .user-menu {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 1rem;
+            position: relative; /* Crucial for dropdown positioning */
         }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-avatar {
+            width: 35px; /* Adjust size as needed for navbar */
+            height: 35px;
+            border-radius: 50%;
+            background-size: cover; /* Ensures image fills the container */
+            background-position: center; /* Centers the image */
+            border: 1px solid rgba(255, 255, 255, 0.3); /* Nice border */
+            display: flex; /* For centering initial letter if no image */
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            background: linear-gradient(45deg, #4CAF50, #45a049); /* Default background color for event owner */
+            color: white; /* For initial letter */
+        }
+        .user-avatar img { /* Style for the actual image inside avatar div */
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px); /* Position below user-info with some gap */
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            min-width: 200px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease-in-out;
+            z-index: 101; /* Ensure it appears above other elements */
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 0.5rem; /* Better click area */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(76, 175, 80, 0.2); /* Highlight on hover */
+            color: #4CAF50;
+        }
+        /* --- END: User Menu Styles for Navbar --- */
 
         .btn {
             padding: 10px 20px;
@@ -302,8 +384,8 @@
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 10px;
             justify-content: center;
+            gap: 10px;
         }
 
         .action-btn:hover {
@@ -486,7 +568,16 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
+    <%
+        // Retrieve User object from session
+        User currentUser = (User) session.getAttribute("user");
+        // Redirect if not logged in or if role is not 'event_owner'
+        if (currentUser == null || !"event_owner".equals(currentUser.getRole())) { // Corrected role check
+            response.sendRedirect(request.getContextPath() + "/login"); // Adjust login URL as needed
+            return;
+        }
+    %>
+
     <div class="sidebar">
         <div class="brand">🎟️ MasterTicket</div>
         <ul class="menu">
@@ -498,34 +589,48 @@
         </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
-        <!-- Navigation -->
         <nav class="navbar">
             <div class="nav-links">
-                <a href="#">Home</a>
-                <a href="#">Shows</a>
-                <a href="#">Offers & Discount</a>
-                <a href="#" class="active">Dashboard</a>
-                 
+                <a href="${pageContext.request.contextPath}/eventOwnerPage/eventOwnerHomePage">Home</a>
+                <a href="${pageContext.request.contextPath}/shows">Shows</a>
+                <a href="${pageContext.request.contextPath}/offers">Offers & Discount</a>
+                <a href="${pageContext.request.contextPath}/eventOwnerPage/eventOwnerDashboard" class="active">Dashboard</a>
+                
                 <button class="chat-btn" onclick="window.location.href='${pageContext.request.contextPath}/chat'">
                     💬 Go to Chat
                 </button>
             </div>
-            <div class="user-info">
-                <span>Welcome, Event Manager</span>
+            
+            <div class="user-menu"> <%-- Integrated User Profile and Dropdown --%>
+                <div class="user-info" onclick="toggleUserDropdown()">
+                    <%-- User Avatar --%>
+                    <div class="user-avatar">
+                        <% if (currentUser.getAvatar() != null && !currentUser.getAvatar().isEmpty()) { %>
+                            <img src="${pageContext.request.contextPath}/images/<%= currentUser.getAvatar() %>" alt="User Avatar">
+                        <% } else { %>
+                            <%= currentUser.getEmail().substring(0, 1).toUpperCase() %>
+                        <% } %>
+                    </div>
+                    Xin chào, <%= currentUser.getName() != null && !currentUser.getName().isEmpty() ? currentUser.getName() : currentUser.getEmail() %> <span style="margin-left: 0.5rem;">▼</span>
+                </div>
                 
-                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">Logout</a>
+                <%-- User Dropdown Menu --%>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="${pageContext.request.contextPath}/updateEventOwnerProfile" class="dropdown-item">👤 Thông tin cá nhân Chủ sự kiện</a>
+                    <a href="${pageContext.request.contextPath}/eventOwnerEvents" class="dropdown-item">🎫 Sự kiện của tôi</a>
+                    <a href="${pageContext.request.contextPath}/changePassword" class="dropdown-item">⚙️ Đổi mật khẩu</a> <%-- Common change password servlet --%>
+                    <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 0.5rem 0;">
+                    <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: #ff6b6b;">🚪 Đăng xuất</a> <%-- Common logout servlet --%>
+                </div>
             </div>
         </nav>
 
-        <!-- Dashboard Header -->
         <div class="dashboard-header">
             <h1 class="animate-bounce">🎭 Event Dashboard</h1>
             <p>Manage your events and track performance</p>
         </div>
 
-        <!-- Statistics Grid -->
         <div class="stats-grid">
             <div class="stat-card pulse">
                 <div class="icon">🎫</div>
@@ -549,7 +654,6 @@
             </div>
         </div>
 
-        <!-- Recent Events Section -->
         <div class="content-section">
             <div class="section-header">
                 <h2>🎪 Recent Events</h2>
@@ -591,14 +695,13 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
         <div class="content-section">
             <div class="section-header">
                 <h2>⚡ Quick Actions</h2>
             </div>
             
             <div class="quick-actions">
-                <a href="#" class="action-btn">
+                <a href="${pageContext.request.contextPath}/createEvent" class="action-btn">
                     <span>📝</span>
                     Create Event
                 </a>
@@ -626,20 +729,18 @@
         </div>
     </div>
 
-    <!-- Modal -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()">&times;</button>
             <h2 style="color: #4CAF50; margin-bottom: 20px;">🎭 Create New Event</h2>
             <p style="margin-bottom: 20px;">Ready to create an amazing event experience?</p>
             <div style="display: flex; gap: 15px; justify-content: center;">
-                <button class="btn btn-primary" onclick="window.location.href='createEvent/NotesWhenPostEvent.jsp'">Start Creating</button>
+                <button class="btn btn-primary" onclick="window.location.href='${pageContext.request.contextPath}/createEvent/NotesWhenPostEvent.jsp'">Start Creating</button>
                 <button class="btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="closeModal()">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -703,6 +804,21 @@
                 modal.style.display = 'none';
             }
         }
+
+        // Function to toggle the user dropdown menu
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.addEventListener('click', function(event) {
+            const userInfoArea = document.querySelector('.user-info');
+            const dropdown = document.getElementById('userDropdown');
+            if (!userInfoArea.contains(event.target) && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
 
         // Add some interactive effects
         document.querySelectorAll('.stat-card').forEach(card => {

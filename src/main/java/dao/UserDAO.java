@@ -121,7 +121,7 @@ public class UserDAO implements IUserDAO {
             stmt.setDate(4, new java.sql.Date(user.getBirthday().getTime()));
             stmt.setString(5, user.getPhoneNumber());
             stmt.setString(6, user.getAddress());
-            stmt.setString(7, user.getAvatar()); // Thêm dòng này để cập nhật avatar
+            stmt.setString(7, user.getAvatar()); 
             stmt.setTimestamp(8, Timestamp.valueOf(java.time.LocalDateTime.now()));
             stmt.setInt(9, user.getId());
 
