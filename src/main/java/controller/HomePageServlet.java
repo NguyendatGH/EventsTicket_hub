@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dao.EventDAO;
@@ -12,19 +8,52 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 
+import java.util.List;
+import service.UserService;
 
 @WebServlet("/")
 public class HomePageServlet extends HttpServlet {
 
+    private static final int RECORDS_PER_PAGE = 10;
+   
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-         EventDAO eventDAO = new EventDAO();
-        List<Event> events = eventDAO.getAllApprovedEvents();
-          request.setAttribute("events", events);      
-        request.getRequestDispatcher("/pages/homePage.jsp").forward(request, response);
+    
+        EventDAO eventDAO = new EventDAO();
+
+        try {
+            int currentPage = 1;
+            if (request.getParameter("page") != null) {
+                try {
+                    currentPage = Integer.parseInt(request.getParameter("page"));
+                    if (currentPage < 1)
+                        currentPage = 1;
+                } catch (NumberFormatException e) {
+                    currentPage = 1;
+                }
+            }
+
+            int offset = (currentPage - 1) * RECORDS_PER_PAGE;
+
+            List<Event> events = eventDAO.getApprovedEventsPaginated(offset, RECORDS_PER_PAGE);
+            int totalEvents = eventDAO.getTotalApprovedEventsCount();
+            int noOfPages = (int) Math.ceil(totalEvents * 1.0 / RECORDS_PER_PAGE);
+            
+            request.setAttribute("events", events);
+            request.setAttribute("noOfPages", noOfPages);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalEvents", totalEvents);
+            request.getRequestDispatcher("/pages/homePage.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Có lỗi xảy ra khi tải sự kiện: " + e.getMessage());
+        }
+
     }
 }

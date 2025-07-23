@@ -16,8 +16,7 @@ import vn.payos.PayOS;
 import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.ItemData;
 import vn.payos.type.PaymentData;
-
-@WebServlet(name = "PayOSPaymentServlet", urlPatterns = { "/PayOSPaymentServlet" })
+@WebServlet(name = "PayOSPaymentServlet", urlPatterns = {"/PayOSPaymentServlet"})
 public class PayOSPaymentServlet extends HttpServlet {
 
     private static final String CLIENT_ID = ConfigLoader.get("client.id");
@@ -50,7 +49,7 @@ public class PayOSPaymentServlet extends HttpServlet {
             String description = "MDT " + orderCode;
             String appBaseUrl = request.getScheme() + "://" + request.getServerName()
                     + (request.getServerPort() == 80 || request.getServerPort() == 443 ? ""
-                            : ":" + request.getServerPort())
+                    : ":" + request.getServerPort())
                     + request.getContextPath();
 
             List<ItemData> payosItems = new ArrayList<>();

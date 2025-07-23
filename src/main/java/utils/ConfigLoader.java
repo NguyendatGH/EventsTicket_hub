@@ -1,24 +1,30 @@
 package utils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 public class ConfigLoader {
-    private static final Properties props = new Properties();
+    private static Properties props = new Properties();
 
     static {
-        try (InputStream input = ConfigLoader.class.getClassLoader().getResourceAsStream("config.properties")) {
+        try {
+
+            InputStream input = ConfigLoader.class.getClassLoader().getResourceAsStream("config.properties");
             if (input == null) {
-                throw new RuntimeException("Unable to find config.properties");
+                System.err.println(" Không tìm thấy file config.properties!");
+            } else {
+                props.load(input);
+                System.out.println(" Đã load config.properties!");
             }
-            props.load(input);
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to load properties file", ex);
+        } catch (Exception e) {
+            System.err.println(" Lỗi khi load config.properties: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     public static String get(String key) {
-        return props.getProperty(key);
+        String value = props.getProperty(key);
+        System.out.println("🔎 " + key + " = " + value);
+        return value;
     }
 }

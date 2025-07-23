@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="models.User" %>
+<%@ page import="dto.UserDTO" %>
 <%
-    User user = (User) session.getAttribute("user");
+    UserDTO user = (UserDTO) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect("authentication/login.jsp");
         return;

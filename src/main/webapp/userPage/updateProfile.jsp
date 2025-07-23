@@ -1,14 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="models.User" %>
+<%@ page import="dto.UserDTO" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%
-    User user = (User) session.getAttribute("user");
+    UserDTO user = (UserDTO) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect("login");
         return;
     }
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    // Lấy đường dẫn cơ sở của ứng dụng để hiển thị ảnh avatar
     String contextPath = request.getContextPath();
 %>
 <!DOCTYPE html>
@@ -30,7 +29,6 @@
                 min-height: 100vh;
                 color: #fff;
             }
-
 
             /* Header Styles */
             .header {
@@ -120,15 +118,15 @@
                 width: 35px;
                 height: 35px;
                 border-radius: 50%;
-                background-size: cover; /* Đảm bảo ảnh lấp đầy container */
-                background-position: center; /* Căn giữa ảnh */
-                border: 1px solid rgba(255, 255, 255, 0.3); /* Thêm viền cho đẹp */
-                display: flex; /* Để căn giữa chữ cái đầu nếu không có ảnh */
+                background-size: cover;
+                background-position: center;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                display: flex;
                 align-items: center;
                 justify-content: center;
                 font-weight: bold;
                 font-size: 0.9rem;
-                background: linear-gradient(45deg, #ff6b6b, #4ecdc4); /* Màu nền mặc định */
+                background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             }
 
             .user-dropdown {
@@ -330,10 +328,10 @@
             .avatar-upload-group {
                 display: flex;
                 flex-direction: column;
-                align-items: center; /* Căn giữa avatar và nút upload */
+                align-items: center;
                 gap: 1rem;
                 margin-bottom: 2rem;
-                grid-column: 1 / -1; /* Chiếm toàn bộ chiều rộng */
+                grid-column: 1 / -1;
             }
 
             .current-avatar-preview {
@@ -350,7 +348,7 @@
                 font-size: 3rem;
                 font-weight: bold;
                 color: rgba(255, 255, 255, 0.7);
-                background: linear-gradient(45deg, #ff6b6b, #4ecdc4); /* Màu nền mặc định */
+                background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             }
 
             .avatar-upload-input {
@@ -361,7 +359,7 @@
                 color: #fff;
                 font-size: 1rem;
                 cursor: pointer;
-                width: fit-content; /* Giúp input không quá rộng */
+                width: fit-content;
             }
 
             .avatar-upload-input::-webkit-file-upload-button {
@@ -378,7 +376,6 @@
                 transform: translateY(-2px);
                 box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
             }
-
 
             .button-group {
                 display: flex;
@@ -596,14 +593,18 @@
                 </div>
                 <div class="user-menu">
                     <div class="user-info" onclick="toggleUserDropdown()">
-                        <% if (user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
-                        <%-- Sử dụng ImageServlet để phục vụ ảnh từ đường dẫn tuyệt đối --%>
-                        <div class="user-avatar" style="background-image: url('<%= request.getContextPath() %>/images/<%= user.getAvatar() %>');"></div>
-                        <% } else { %>
-                        <div class="user-avatar"><%= user.getEmail().substring(0, 1).toUpperCase() %></div>
-                        <% } %>
-                        Xin chào, <%= user.getEmail() %> <span style="margin-left: 0.5rem;">▼</span>
-                    </div>
+    <%
+    if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+%>
+    <img class="current-avatar-preview" src="${pageContext.request.contextPath}/uploads/user_avatar/${user.avatar}" alt="Avatar" />
+<%
+    } else {
+%>
+    <div class="current-avatar-preview" id="currentAvatarPreview"><%= user.getEmail().substring(0, 1).toUpperCase() %></div>
+<%
+    } %>
+    Xin chào, ${user.email} <span style="margin-left: 0.5rem;">▼</span>
+</div>
                     <div class="user-dropdown" id="userDropdown">
                         <a href="updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
                         <a href="#tickets" class="dropdown-item">🎫 Vé đã mua</a>
@@ -634,18 +635,23 @@
                 </div>
 
                 <form method="post" action="updateProfile" enctype="multipart/form-data">
-                    <div class="avatar-upload-group">
-                        <label for="avatar">Ảnh đại diện</label>
-                        <div class="current-avatar-preview" id="avatarPreview">
-                            <% if (user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
-                            <%-- Sử dụng ImageServlet để phục vụ ảnh từ đường dẫn tuyệt đối --%>
-                            <img src="<%= request.getContextPath() %>/images/<%= user.getAvatar() %>" alt="Current Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                            <% } else { %>
-                            <%= user.getEmail().substring(0, 1).toUpperCase() %>
-                            <% } %>
-                        </div>
-                        <input type="file" id="avatar" name="avatar" accept="image/*" class="avatar-upload-input">
-                    </div>
+                   <div class="avatar-upload-group">
+    <label for="avatar">Ảnh đại diện</label>
+    <div class="current-avatar-preview" id="currentAvatarPreview">
+        <%
+        if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+        %>
+            <img src="${pageContext.request.contextPath}/uploads/user_avatar/${user.avatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        <%
+        } else {
+        %>
+            <%= user.getEmail().substring(0, 1).toUpperCase() %>
+        <%
+        }
+        %>
+    </div>
+    <input type="file" id="avatar" name="avatar" accept="image/*" class="avatar-upload-input">
+</div>
 
                     <div class="form-grid">
                         <div class="form-group">
@@ -772,12 +778,12 @@
 
         document.getElementById('avatar').addEventListener('change', function (event) {
             const file = event.target.files[0];
-            const avatarPreview = document.getElementById('avatarPreview');
+            const currentAvatarPreview = document.getElementById('currentAvatarPreview');
 
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    avatarPreview.innerHTML = '';
+                    currentAvatarPreview.innerHTML = '';
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.alt = 'New Avatar';
@@ -785,36 +791,20 @@
                     img.style.height = '100%';
                     img.style.objectFit = 'cover';
                     img.style.borderRadius = '50%';
-                    avatarPreview.appendChild(img);
+                    currentAvatarPreview.appendChild(img);
                 };
                 reader.readAsDataURL(file);
             } else {
-
-                const currentAvatarPath = avatarPreview.dataset.currentAvatar;
-                if (currentAvatarPath) {
-                    avatarPreview.innerHTML = ''; // Xóa chữ cái đầu nếu có
-                    const img = document.createElement('img');
-                    img.src = currentAvatarPath;
-                    img.alt = 'Current Avatar';
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'cover';
-                    img.style.borderRadius = '50%';
-                    avatarPreview.appendChild(img);
-                } else {
-                    avatarPreview.innerHTML = '<%= user.getEmail().substring(0, 1).toUpperCase() %>';
-                }
+                <% if (user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
+                    currentAvatarPreview.innerHTML = '<img src="<%= contextPath %>/uploads/user_avatar/<%= user.getAvatar() %>" alt="Current Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">';
+                <% } else { %>
+                    currentAvatarPreview.innerHTML = '<%= user.getEmail().substring(0, 1).toUpperCase() %>';
+                <% } %>
             }
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-            const avatarPreview = document.getElementById('avatarPreview');
-        <% if (user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
-            // Đảm bảo đường dẫn này khớp với cách ImageServlet phục vụ ảnh
-        avatarPreview.dataset.currentAvatar = '<%= request.getContextPath() %>/images/<%= user.getAvatar() %>';
-        <% } else { %>
-                    avatarPreview.dataset.currentAvatar = ''; // Không có avatar hiện tại
-        <% } %>
-                });
+            // Initial setup is handled by JSP, no additional JS needed here
+        });
     </script>
 </html>
