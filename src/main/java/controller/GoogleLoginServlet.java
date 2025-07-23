@@ -6,15 +6,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import models.User;
+import dto.UserDTO;
 import utils.GoogleUtils;
-import utils.HashUtil; // Sử dụng HashUtil của bạn
+import utils.HashUtil;
 
 import com.google.api.services.oauth2.model.Userinfo;
 import dao.EventDAO;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random; // Import lớp Random
+import java.util.Random;
 import models.Event;
 
 @WebServlet("/login-google")
@@ -49,77 +50,81 @@ public class GoogleLoginServlet extends HttpServlet {
             
             System.out.println("DEBUG: Google user info - Email: " + email + ", Name: " + name + ", GoogleId: " + googleId);
 
-            User user = userDAO.getUserByEmail(email);
+            // Tìm user bằng DTO
+            UserDTO userDTO = userDAO.getUserDTOByEmail(email);
 
-            if (user == null) {
+            if (userDTO == null) {
                 System.out.println("DEBUG: Creating new user from Google account");
-                // Người dùng mới
-                user = new User();
-                user.setEmail(email);
-                user.setGoogleId(googleId);
-                user.setName(name != null && !name.isEmpty() ? name : email);
-                user.setAvatar(avatarUrl);
-                user.setRole("customer");
-                user.setCreatedAt(LocalDateTime.now());
-                user.setUpdatedAt(LocalDateTime.now());
-                user.setIsLocked(false);
+                // Người dùng mới - tạo User object để insert
+                User newUser = new User();
+                newUser.setEmail(email);
+                newUser.setGoogleId(googleId);
+                newUser.setName(name != null && !name.isEmpty() ? name : email);
+                newUser.setAvatar(avatarUrl);
+                newUser.setRole("customer");
+                newUser.setCreatedAt(LocalDateTime.now());
+                newUser.setUpdatedAt(LocalDateTime.now());
+                newUser.setIsLocked(false);
 
                 // Tạo mật khẩu ngẫu nhiên
                 String randomPassword = generateRandomPassword(12);
-                user.setPasswordHash(HashUtil.sha256(randomPassword));
+                newUser.setPasswordHash(HashUtil.sha256(randomPassword));
 
-                boolean insertSuccess = userDAO.insertUserFromGoogle(user);
+                boolean insertSuccess = userDAO.insertUserFromGoogleDTO(newUser);
                 System.out.println("DEBUG: Insert new user success: " + insertSuccess);
                 
                 if (!insertSuccess) {
                     throw new Exception("Không thể thêm người dùng Google mới vào cơ sở dữ liệu.");
                 }
                 
-                // Lấy lại user từ DB để có ID
-                user = userDAO.getUserByEmail(email);
-                if (user == null) {
+                // Lấy lại userDTO từ DB sau khi tạo
+                userDTO = userDAO.getUserDTOByEmail(email);
+                if (userDTO == null) {
                     throw new Exception("Không thể lấy lại thông tin người dùng sau khi tạo mới");
                 }
-                System.out.println("DEBUG: Retrieved new user with ID: " + user.getId());
+                System.out.println("DEBUG: Retrieved new user DTO with ID: " + userDTO.getId());
 
             } else {
-                System.out.println("DEBUG: Updating existing user - ID: " + user.getId());
-                // Người dùng đã tồn tại
+                System.out.println("DEBUG: Updating existing user - ID: " + userDTO.getId());
+                // Người dùng đã tồn tại - cập nhật thông tin
                 boolean needUpdate = false;
-                
-                // Cập nhật LastLoginAt
-                user.setLastLoginAt(LocalDateTime.now());
-                needUpdate = true;
-                
-                // Cập nhật GoogleId nếu chưa có
-                if (user.getGoogleId() == null || user.getGoogleId().isEmpty()) {
-                    user.setGoogleId(googleId);
-                    needUpdate = true;
-                }
+                String updatedName = userDTO.getName();
+                String updatedAvatar = userDTO.getAvatar();
+                String updatedGoogleId = userDTO.getRole(); // Assuming we need to check GoogleId
                 
                 // Cập nhật tên nếu cần
-                if ((user.getName() == null || user.getName().isEmpty() || user.getName().equals(user.getEmail())) 
+                if ((userDTO.getName() == null || userDTO.getName().isEmpty() || userDTO.getName().equals(userDTO.getEmail())) 
                     && name != null && !name.isEmpty()) {
-                    user.setName(name);
+                    updatedName = name;
                     needUpdate = true;
                 }
                 
                 // Cập nhật avatar nếu chưa có
-                if (user.getAvatar() == null || user.getAvatar().isEmpty()) {
-                    user.setAvatar(avatarUrl);
+                if (userDTO.getAvatar() == null || userDTO.getAvatar().isEmpty()) {
+                    updatedAvatar = avatarUrl;
                     needUpdate = true;
                 }
                 
+                // Luôn cập nhật LastLoginAt
+                needUpdate = true;
+                
                 if (needUpdate) {
-                    boolean updateSuccess = userDAO.updateUserInfo(user);
+                    boolean updateSuccess = userDAO.updateUserInfoForGoogle(userDTO.getId(), updatedName, updatedAvatar, googleId);
                     System.out.println("DEBUG: Update existing user success: " + updateSuccess);
-                    if (!updateSuccess) {
-                        System.err.println("Cảnh báo: Không thể cập nhật thông tin người dùng " + user.getEmail());
+                    
+                    if (updateSuccess) {
+                        // Cập nhật lại userDTO với thông tin mới
+                        userDTO.setName(updatedName);
+                        userDTO.setAvatar(updatedAvatar);
+                        userDTO.setLastLoginAt(LocalDateTime.now());
+                    } else {
+                        System.err.println("Cảnh báo: Không thể cập nhật thông tin người dùng " + userDTO.getEmail());
                     }
                 }
             }
 
-            if (user.getIsLocked()) {
+            // Kiểm tra trạng thái khóa
+            if (userDTO.getIsLocked()) {
                 System.out.println("DEBUG: User account is locked");
                 response.sendRedirect("authentication/login.jsp?error=Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
                 return;
@@ -127,17 +132,19 @@ public class GoogleLoginServlet extends HttpServlet {
             
             System.out.println("DEBUG: Setting user session and redirecting to home page");
             
-            // Thiết lập session
+            // Thiết lập session với UserDTO
             HttpSession session = request.getSession();
-            session.setAttribute("user", user);
+            session.setAttribute("user", userDTO); // Lưu UserDTO vào session
+            session.setAttribute("userDTO", userDTO); // Thêm cả userDTO attribute nếu cần
 
             // Chuẩn bị dữ liệu cho trang chủ
             EventDAO eventDAO = new EventDAO();
             List<Event> events = eventDAO.getAllApprovedEvents();
             request.setAttribute("events", events);
 
-            // Chuyển hướng về trang chủ
-            request.getRequestDispatcher("userPage/userHomePage.jsp").forward(request, response);
+            // Chuyển hướng về homePage
+            System.out.println("DEBUG: Forwarding to homePage.jsp");
+            request.getRequestDispatcher("pages/homePage.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();

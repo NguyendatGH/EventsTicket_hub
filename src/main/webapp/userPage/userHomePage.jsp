@@ -1,13 +1,11 @@
-<%-- 
-    Document   : userHomePage
-    Created on : Jun 3, 2025, 5:28:06 AM
-    Author     : Huy Nguyen
---%>
-
+<%@page import="java.util.ArrayList"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="models.Event"%>
-<%@page import="models.User"%>
+<%@page import="dto.UserDTO"%>
+<%@page import="models.Notification"%>
+<%@page import="service.NotificationService"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
 <!DOCTYPE html>
@@ -15,7 +13,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MasterTicket - Trang Chủ Người Dùng</title>
+        <title>MasterTicket - Trang Chủ</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <style>
             * {
                 margin: 0;
@@ -592,57 +591,151 @@
         </style>
     </head>
     <body>
-        <%
-            User user = (User) session.getAttribute("user");
-            String userEmail = (user != null) ? user.getEmail() : "";
+        <% 
+            // Retrieve UserDTO object from session
+            UserDTO user = (UserDTO) session.getAttribute("user");
+
+            // --- Notification Logic ---
+            // Initialize notification service and lists
+            NotificationService notificationService = new NotificationService();
+            List<Notification> notifications = new ArrayList<>();
+            int unreadCount = 0;
+
+            // Handle redirection for logged-in users with specific roles
+            if (user != null) {
+                // If 'user' has a getRole() method and the role is 'event_owner', redirect them.
+                if ("event_owner".equals(user.getRole())) {
+                    response.sendRedirect(request.getContextPath() + "/eventOwnerPage/eventOwnerHomePage"); // Or eventOwnerDashboard
+                    return; // VERY IMPORTANT: Stop further processing of THIS JSP
+                }
+                // Fetch notifications ONLY if a user is logged in (and not an owner, after redirection)
+                notifications = notificationService.getUserNotifications(user.getId());
+                unreadCount = notificationService.getUnreadNotificationsCount(user.getId());
+            }
+
+            // Retrieve events and pagination attributes from request
+            List<Event> events = (List<Event>) request.getAttribute("events");
+            Integer currentPageObj = (Integer) request.getAttribute("currentPage");
+            Integer noOfPagesObj = (Integer) request.getAttribute("noOfPages");
+            Integer totalEventsObj = (Integer) request.getAttribute("totalEvents");
+
+            int currentPage = (currentPageObj != null) ? currentPageObj : 1;
+            int noOfPages = (noOfPagesObj != null) ? noOfPagesObj : 1;
+            int totalEvents = (totalEventsObj != null) ? totalEventsObj : 0;
+            
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd/MM/yyyy HH:mm");
         %>
 
-        <!-- Header -->
         <header class="header">
             <nav class="nav">
-                <div class="logo">MasterTicket</div>
-                <div class="search-container">
-                    <input type="text" class="search-box" placeholder="Tìm sự kiện theo tên..." id="searchInput">
+                <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
+                
+                <button class="search-filter-toggle" id="searchFilterToggle" aria-label="Toggle search and filters">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="nav-center-content">
+                    <div class="search-filter-container" id="searchFilterContainer">
+                        <input type="text" class="search-box" placeholder="Tìm sự kiện..." id="searchInput">
+                        <input type="date" class="filter-input" id="dateInput" title="Tìm theo ngày">
+                        <input type="text" class="filter-input" placeholder="Địa điểm..." id="locationInput">
+                    </div>
+
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
+                        <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
+                        <li><a href="#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
+                        <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
+                        <li><a href="${pageContext.request.contextPath}/tickets">🎫 Vé đã mua</a></li>
+                        <li><a href="${pageContext.request.contextPath}/support">Hỗ trợ</a></li>
+                    </ul>
                 </div>
-                <ul class="nav-links">
-                    <li><a href="#events">Trang chủ</a></li>
-                    <li><a href="#venues">Sự kiện hot</a></li>
-                    <li><a href="#about">Voucher giảm giá</a></li>
-                    <li><a href="#contact">Vé đã mua</a></li>
-                    <li><a href="#contact">Hỗ trợ</a></li>
-                </ul>
-                    <div class="user-menu">
-                    <div class="user-info" onclick="toggleUserDropdown()">
-                        👤 Xin chào, <%= user.getEmail() %> <span style="margin-left: 0.5rem;">▼</span>
-                    </div>
-                    <div class="user-dropdown" id="userDropdown">
-                        <a href="updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
-                        <a href="#tickets" class="dropdown-item">🎫 Vé đã mua</a>
-                        <a href="#favorites" class="dropdown-item">❤️ Sự kiện yêu thích</a>
-                        <a href="#settings" class="dropdown-item">⚙️ Cài đặt</a>
-                        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 0.5rem 0;">
-                        <a href="LogoutServlet" class="dropdown-item" style="color: #ff6b6b;">🚪 Đăng xuất</a>
-                    </div>
+                
+                <%-- User Profile and Notifications Section --%>
+                <%-- Conditionally render this section based on whether a user is logged in --%>
+                <div class="auth-buttons">
+                    <c:choose>
+                        <c:when test="${sessionScope.user != null}">
+                            <%-- Notification Icon and Dropdown --%>
+                            <div class="notification-icon-container">
+                                <span class="notification-icon" onclick="toggleNotificationDropdown()">
+                                    🔔
+                                    <span class="notification-badge <%= unreadCount > 0 ? "show" : "" %>" id="notificationBadge">
+                                        <%= unreadCount > 0 ? unreadCount : "" %>
+                                    </span>
+                                </span>
+                                <div class="notification-dropdown" id="notificationDropdown">
+                                    <% if (notifications.isEmpty()) { %>
+                                        <div class="no-notifications">Bạn không có thông báo nào.</div>
+                                    <% } else { %>
+                                        <% for (Notification notification : notifications) { %>
+                                            <div class="notification-item <%= !notification.isIsRead() ? "unread" : "" %>"
+                                                 onclick="handleNotificationClick(<%= notification.getNotificationID() %>, '<%= notification.getNotificationType() %>', <%= notification.getRelatedID() != null ? notification.getRelatedID() : "null" %>)">
+                                                <span class="notification-title"><%= notification.getTitle() %></span>
+                                                <span class="notification-content"><%= notification.getContent() %></span>
+                                                <span class="notification-time"><%= new SimpleDateFormat("HH:mm dd/MM").format(java.sql.Timestamp.valueOf(notification.getCreatedAt())) %></span>
+                                            </div>
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="user-menu">
+                                <div class="user-info" onclick="toggleUserDropdown()">
+                                    <%-- Display User Avatar --%>
+                                    <div class="user-avatar">
+                                        <% if (user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
+                                            <img src="${pageContext.request.contextPath}/images/<%= user.getAvatar() %>" alt="Avatar">
+                                        <% } else { %>
+                                            <%= user.getEmail().substring(0, 1).toUpperCase() %>
+                                        <% } %>
+                                    </div>
+                                    Xin chào, <%= user.getName() != null && !user.getName().isEmpty() ? user.getName() : user.getEmail() %> <span style="margin-left: 0.5rem;">▼</span>
+                                </div>
+                                <div class="user-dropdown" id="userDropdown">
+                                    <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
+                                    <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
+                                    <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
+                                    <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
+                                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+                                    <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <%-- Show Login/Register buttons if user is not logged in --%>
+                            <a href="${pageContext.request.contextPath}/login" class="btn btn-outline">Đăng nhập</a>
+                            <a href="${pageContext.request.contextPath}/register" class="btn btn-primary">Đăng ký</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </nav>
         </header>
 
-        <!-- Main Content -->
         <main class="container">
-            <!-- Welcome Banner -->
-            <div class="welcome-banner">
-                <div class="welcome-content">
-                    <p class="welcome-subtitle">Khám phá những sự kiện thú vị và đặt vé ngay hôm nay</p>
-                </div>
-            </div>
-
-            <!-- Hero Carousel -->
             <div class="hero-carousel">
-                <div class="carousel-slide active">
+                <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
                     <div class="carousel-content">
-                        <h2>Khám phá sự kiện mới</h2>
-                        <p>Tìm kiếm và đặt vé cho những sự kiện thú vị nhất trong tuần!</p>
+                        <h2>Chào mừng đến với MasterTicket</h2>
+                        <p>Khám phá hàng ngàn sự kiện thú vị và đặt vé ngay hôm nay!</p>
                         <a href="#events" class="btn btn-primary">Khám phá ngay</a>
+                    </div>
+                </div>
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1505373877845-8c2aace4d817?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                    <div class="carousel-content">
+                        <h2>Sự kiện âm nhạc đỉnh cao</h2>
+                        <p>Đừng bỏ lỡ những đêm nhạc sôi động với các nghệ sĩ hàng đầu!</p>
+                        <a href="#events" class="btn btn-primary">Xem chi tiết</a>
+                    </div>
+                </div>
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1607962837350-ed6062031177?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                    <div class="carousel-content">
+                        <h2>Sự kiện văn hóa và nghệ thuật</h2>
+                        <p>Đắm chìm vào thế giới nghệ thuật với các triển lãm và biểu diễn độc đáo.</p>
+                        <a href="#events" class="btn btn-primary">Tìm hiểu thêm</a>
                     </div>
                 </div>
                 <div class="carousel-indicators">
@@ -652,119 +745,146 @@
                 </div>
             </div>
 
-            <% 
-            List<Event> events = (List<Event>) request.getAttribute("events");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd/MM/yyyy HH:mm");
-        
-            if (events == null || events.isEmpty()) { 
-            %>
+            <% if (events == null || events.isEmpty()) { %>
             <div class="no-events">
                 <h2>Không có sự kiện nào!</h2>
                 <p>Hiện tại chưa có sự kiện nào được tổ chức. Vui lòng quay lại sau!</p>
             </div>
             <% } else { %>
-            <!-- Featured Events Section -->
+            
             <div class="section-header">
-                <h2 class="section-title" id="events">Sự kiện dành cho bạn</h2>
-                <a href="#all-events" class="view-all">Xem tất cả</a>
+                <h2 class="section-title" id="hot-events">Sự kiện nổi bật</h2>
+                <a href="${pageContext.request.contextPath}/home?page=1" class="view-all">Xem tất cả</a>
             </div>
 
             <div class="event-grid">
-                <% 
-                int featuredCount = 0;
-                for (Event event : events) { 
-                    if (featuredCount >= 3) break;
-                    featuredCount++;
+                <%  
+                    for (Event event : events) {
                 %>
-                <div class="event-card searchable-event" onclick="selectEvent('<%= event.getName().replace("'", "\\'") %>')">
+                <div class="event-card searchable-event" 
+                     data-event-id="<%= event.getEventID() %>"
+                     data-event-name="<%= event.getName() != null ? event.getName().toLowerCase() : "" %>"
+                     data-event-description="<%= event.getDescription() != null ? event.getDescription().toLowerCase() : "" %>"
+                     data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : "" %>"
+                     data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
+                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
                     <div class="event-image">
                         <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) { %>
-                        <img src="<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
+                            <img src="${pageContext.request.contextPath}/uploads/event_banners/<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
                         <% } else { %>
-                        🎫
+                            <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
                         <% } %>
                     </div>
                     <div class="event-info">
-                        <div class="event-title"><%= event.getName() %></div>
+                        <div class="event-title"><%= event.getName()%></div>
                         <div class="event-date">
-                            🗓️ <%= dateFormat.format(event.getStartTime()) %> - <%= dateFormat.format(event.getEndTime()) %>
+                            <% if (event.getStartTime() != null && event.getEndTime() != null) {%>
+                            🗓️ <%= dateFormat.format(event.getStartTime())%> - <%= dateFormat.format(event.getEndTime())%>
+                            <% } else { %>
+                            🗓️ Thời gian không xác định
+                            <% }%>
                         </div>
-                        <div class="event-location">📍 <%= event.getPhysicalLocation() %></div>
-                        <div class="event-description"><%= event.getDescription() %></div>
+                        <div class="event-location">📍 <%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
+                        <div class="event-description" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; max-height: 3.6em; line-height: 1.2em;">
+                            <%= event.getDescription() != null ? event.getDescription() : ""%>
+                        </div>
                         <div class="event-price">Từ 150,000 VNĐ</div>
                     </div>
                 </div>
                 <% } %>
             </div>
 
-            <!-- All Events Section -->
-            <div class="section-header">
-                <h2 class="section-title" id="all-events">Tất cả sự kiện</h2>
-                <span class="view-all">Tổng cộng: <%= events.size() %> sự kiện</span>
+            <div class="pagination-controls">
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage - 1 %>" 
+                   class="<%= (currentPage == 1) ? "disabled" : "" %>">Trước</a>
+                
+                <%  
+                    // Display page numbers
+                    int startPage = Math.max(1, currentPage - 2);
+                    int endPage = Math.min(noOfPages, currentPage + 2);
+
+                    if (startPage > 1) {
+                        %><a href="${pageContext.request.contextPath}/home?page=1">1</a><%
+                        if (startPage > 2) {
+                            %><span>...</span><%
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++) {
+                        if (i == currentPage) {
+                            %><span class="current-page"><%= i %></span><%
+                        } else {
+                            %><a href="${pageContext.request.contextPath}/home?page=<%= i %>"><%= i %></a><%
+                        }
+                    }
+
+                    if (endPage < noOfPages) {
+                        if (endPage < noOfPages - 1) {
+                            %><span>...</span><%
+                        }
+                        %><a href="${pageContext.request.contextPath}/home?page=<%= noOfPages %>"><%= noOfPages %></a><%
+                    }
+                %>
+                
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage + 1 %>" 
+                   class="<%= (currentPage == noOfPages) ? "disabled" : "" %>">Sau</a>
             </div>
 
-            <div class="event-grid">
-                <% for (Event event : events) { %>
-                <div class="event-card searchable-event" onclick="selectEvent('<%= event.getName().replace("'", "\\'") %>')">
-                    <div class="event-image">
-                        <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) { %>
-                        <img src="<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
-                        <% } else { %>
-                        🎫
-                        <% } %>
-                    </div>
-                    <div class="event-info">
-                        <div class="event-title"><%= event.getName() %></div>
-                        <div class="event-date">
-                            🗓️ <%= dateFormat.format(event.getStartTime()) %> - <%= dateFormat.format(event.getEndTime()) %>
-                        </div>
-                        <div class="event-location">📍 <%= event.getPhysicalLocation() %></div>
-                        <div class="event-description"><%= event.getDescription() %></div>
-                        <div class="event-price">Từ 150,000 VNĐ</div>
-                    </div>
-                </div>
-                <% } %>
-            </div>
             <% } %>
+
+            <div class="ticket-section">
+                <div class="ticket-content">
+                    <h2 class="ticket-title">Mua vé của bạn</h2>
+                    <p class="ticket-subtitle">
+                        Đơn giản, nhanh chóng và an toàn
+                    </p>
+                    <a href="${pageContext.request.contextPath}/login" class="btn btn-primary">Bắt đầu mua vé</a>
+                </div>
+            </div>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Tài khoản của bạn</h3>
-                    <ul>
-                        <li><a href="#profile">Thông tin cá nhân</a></li>
-                        <li><a href="#tickets">Vé đã mua</a></li>
-                        <li><a href="#favorites">Sự kiện yêu thích</a></li>
-                        <li><a href="#settings">Cài đặt tài khoản</a></li>
-                    </ul>
-                </div>
                 <div class="footer-section">
                     <h3>Dịch vụ khách hàng</h3>
                     <ul>
                         <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Liên hệ hỗ trợ</a></li>
-                        <li><a href="#">Chính sách hoàn tiền</a></li>
-                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Điều khoản dịch vụ</a></li>
+                    </ul>
+                    <p><a href="mailto:support@masterticket.vn">support@masterticket.vn</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Sơ đồ trang</h3>
+                    <ul>
+                        <li><a href="#">Tạo tài khoản</a></li>
+                        <li><a href="#">Tin tức</a></li>
+                        <li><a href="#">Sự kiện nổi bật</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h3>Nhận thông báo</h3>
-                    <p>Cập nhật về sự kiện mới và ưu đãi đặc biệt</p>
-                    <div class="newsletter">
-                        <input type="email" placeholder="<%= userEmail %>" value="<%= userEmail %>">
-                        <button class="btn btn-primary">Cập nhật</button>
+                    <h3>Đăng ký nhận thông tin</h3>
+                    <form class="subscribe-box">
+                        <input type="email" placeholder="Email của bạn..." required value="<%=(user != null ? user.getEmail() : "")%>"/>
+                        <button type="submit">Gửi</button>
+                    </form>
+                    <div class="language">
+                        <p>Ngôn ngữ:</p>
+                        <img src="https://flagcdn.com/w40/vn.png" alt="Tiếng Việt" />
+                        <img src="https://flagcdn.com/w40/gb.png" alt="English" />
                     </div>
-                    <div class="social-links">
-                        <a href="#" class="social-link">f</a>
-                        <a href="#" class="social-link">t</a>
-                        <a href="#" class="social-link">i</a>
+                    <div class="social-icons">
+                        <p>Theo dõi chúng tôi:</p>
+                        <div class="social-images">
+                            <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
+                            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />
+                            <img src="https://cdn-icons-png.flaticon.com/512/3046/3046120.png" alt="TikTok" />
+                        </div>
                     </div>
                 </div>
             </div>
         </footer>
-    </body>
 
         <script>
             function toggleUserDropdown() {
