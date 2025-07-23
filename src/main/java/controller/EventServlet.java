@@ -16,12 +16,12 @@ import java.util.List;
 public class EventServlet extends HttpServlet {
 
     private EventDAO eventDAO;
-    private TicketInfoDAO ticketInfoDAO; // SỬA: Tên biến DAO
+    private TicketInfoDAO ticketInfoDAO; 
 
     @Override
     public void init() throws ServletException {
         eventDAO = new EventDAO();
-        ticketInfoDAO = new TicketInfoDAO(); // SỬA: Khởi tạo DAO đúng
+        ticketInfoDAO = new TicketInfoDAO(); 
     }
 
     @Override
@@ -40,7 +40,7 @@ public class EventServlet extends HttpServlet {
             Event event = eventDAO.getEventById(eventId);
 
             if (event != null) {
-                // SỬA: Sử dụng ticketInfoDAO và kiểu List<TicketInfo>
+                
                 List<TicketInfo> ticketList = ticketInfoDAO.getTicketInfosByEventID(eventId);
                 List<Event> suggestedEvents = eventDAO.getSuggestedEvents(eventId);
 

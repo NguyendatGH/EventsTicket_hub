@@ -588,26 +588,7 @@
             }
         </style>
     </head>
-    <body>
-        <%-- Ensure the user is logged in and is a standard user, not an event_owner --%>
-        <%
-            User user = (User) session.getAttribute("user");
-            // If user is null (not logged in), redirect to login page.
-            // If user is an 'event_owner', redirect to their specific homepage/dashboard.
-            if (user == null) {
-                response.sendRedirect(request.getContextPath() + "/login");
-                return;
-            }
-            // IMPORTANT: If 'user' has a getRole() method and the role is 'event_owner', redirect them.
-            // This prevents an event_owner from accessing the regular user's homepage.
-            if ("event_owner".equals(user.getRole())) {
-                response.sendRedirect(request.getContextPath() + "/eventOwnerPage/eventOwnerHomePage"); // Or eventOwnerDashboard
-                return;
-            }
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Used for birthday in updateProfile page, but not directly here.
-            String contextPath = request.getContextPath(); // Already retrieved in the previous scriptlet block.
-        %>
+ 
 
         <header class="header">
             <div class="nav-container">

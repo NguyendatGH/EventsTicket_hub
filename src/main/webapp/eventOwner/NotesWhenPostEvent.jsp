@@ -422,10 +422,10 @@
                     <li><a href="${pageContext.request.contextPath}/offers">Hỗ trợ</a></li>
                 </ul>
             </nav>
-            <a href="${pageContext.request.contextPath}/createEvent/CreateEvent.jsp" class="create-event-btn">
-                <i class="fas fa-plus"></i>
-                Tạo sự kiện
-            </a>
+         <a href="${pageContext.request.contextPath}/organizer-servlet?action=createForm" class="create-event-btn">
+            <i class="fas fa-plus"></i>
+            Tạo sự kiện
+        </a>
 
         </header>
 
