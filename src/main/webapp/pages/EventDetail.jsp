@@ -7,22 +7,28 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <title>MasterTicket - Chi tiết sự kiện</title>
         <style>
-
             :root {
-                --primary: #667aff;      /* Màu xanh dương dịu hơn */
-                --secondary: #e06bce;    /* Màu hồng/tím nhẹ nhàng hơn */
-                --dark-bg: #161b22;      /* Nền tối (hơi ngả xanh) */
-                --darker-bg: #0d1117;    /* Nền tối hơn */
-                --card-bg: #21262d;      /* Nền cho các thẻ thông tin */
-                --border-color: #30363d; /* Màu viền tinh tế */
-                --text-light: #e6edf3;   /* Màu chữ trắng ngà, dễ chịu cho mắt */
-                --text-muted: #8b949e;   /* Màu chữ phụ */
-                --success: #00cc66;
-                --warning: #ffcc00;
-                --danger: #ff3333;
+                --primary: #6366f1;
+                --primary-dark: #4f46e5;
+                --secondary: #ec4899;
+                --secondary-dark: #db2777;
+                --accent: #06b6d4;
+                --dark-bg: #0f172a;
+                --darker-bg: #020617;
+                --card-bg: #1e293b;
+                --card-hover: #334155;
+                --border-color: #334155;
+                --text-light: #f1f5f9;
+                --text-muted: #94a3b8;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --glass-bg: rgba(30, 41, 59, 0.8);
+                --gradient-1: linear-gradient(135deg, var(--primary), var(--secondary));
+                --gradient-2: linear-gradient(135deg, var(--accent), var(--primary));
             }
 
             * {
@@ -32,606 +38,744 @@
             }
 
             body {
-                font-family: 'Segoe UI', Arial, sans-serif;
-                background: linear-gradient(to bottom, var(--darker-bg), var(--dark-bg));
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: var(--darker-bg);
                 color: var(--text-light);
-                min-height: 100vh;
+                line-height: 1.6;
+                overflow-x: hidden;
             }
 
+            /* Animated Background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background:
+                    radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+                z-index: -1;
+                animation: backgroundShift 20s ease infinite;
+            }
 
+            @keyframes backgroundShift {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.8;
+                }
+            }
+
+            /* Enhanced Header */
             .header-container {
-                display: flex;
-                justify-content: center;
-                background-color: var(--darker-bg); /* Giữ nguyên nền header */
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                backdrop-filter: blur(20px);
+                background: rgba(2, 6, 23, 0.9);
                 border-bottom: 1px solid var(--border-color);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             }
 
             .header {
-                max-width: 1300px;
-                width: 100%;
+                max-width: 1400px;
+                margin: 0 auto;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 15px 40px;
+                padding: 1rem 2rem;
             }
 
             .logo {
-                font-size: 24px;
-                font-weight: bold;
-                color: var(--primary); /* Sử dụng màu primary mới */
+                font-size: 1.75rem;
+                font-weight: 700;
+                background: var(--gradient-1);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
             .search {
                 display: flex;
                 align-items: center;
+                gap: 0.75rem;
             }
 
             .search input {
-                padding: 10px 15px;
-                border-radius: 25px;
+                padding: 0.75rem 1.25rem;
+                border-radius: 50px;
                 border: 1px solid var(--border-color);
-                width: 300px;
-                background-color: var(--card-bg); /* Nền ô search nhất quán */
+                width: 350px;
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
                 color: var(--text-light);
-                font-size: 14px;
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+            }
+
+            .search input:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
             }
 
             .search button {
-                padding: 10px 15px;
-                margin-left: 10px;
-                background-color: var(--primary);
+                padding: 0.75rem 1.5rem;
+                background: var(--gradient-1);
                 border: none;
-                border-radius: 25px;
+                border-radius: 50px;
                 color: white;
                 cursor: pointer;
-                font-weight: bold;
-                transition: all 0.2s;
+                font-weight: 600;
+                transition: all 0.3s ease;
             }
 
             .search button:hover {
-                background-color: #5566dd; /* Hover tối hơn một chút */
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
             }
 
             .actions {
                 display: flex;
                 align-items: center;
-                gap: 20px;
+                gap: 1.5rem;
             }
 
             .primary-btn {
-                background-color: var(--secondary);
+                background: var(--gradient-1);
                 border: none;
-                padding: 10px 20px;
+                padding: 0.75rem 1.5rem;
                 color: white;
-                border-radius: 25px;
+                border-radius: 50px;
                 cursor: pointer;
-                font-weight: bold;
-                transition: all 0.2s;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .primary-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .primary-btn:hover::before {
+                left: 100%;
             }
 
             .primary-btn:hover {
-                background-color: #c85ab6; /* Hover tối hơn một chút */
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
             }
 
             .link {
                 color: var(--text-light);
                 text-decoration: none;
                 font-weight: 500;
-                padding: 8px 12px;
-                border-radius: 5px;
-                transition: all 0.2s;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                transition: all 0.3s ease;
             }
 
             .link:hover {
-                background-color: rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateY(-1px);
             }
 
             .account {
-                background-color: var(--card-bg);
+                background: var(--card-bg);
                 border: 1px solid var(--border-color);
-                padding: 8px 16px;
-                border-radius: 25px;
+                padding: 0.5rem 1rem;
+                border-radius: 50px;
                 font-weight: 500;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: all 0.3s ease;
             }
 
             .account:hover {
-                background-color: #444455;
+                background: var(--card-hover);
+                transform: translateY(-1px);
             }
 
-
+            /* Main Content */
             .main-content {
-                max-width: 1300px;
-                margin: 40px auto; /* Tăng khoảng cách từ header */
-                padding: 0 30px;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 3rem 2rem;
             }
 
 
-            .event-header {
-                display: flex;
-                gap: 40px; /* Tăng khoảng cách giữa poster và thông tin */
-                margin-bottom: 50px; /* Tăng khoảng cách tới phần dưới */
+            .back-link {
+                color: var(--primary);
+                text-decoration: none;
+                font-size: 1rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 2rem;
+                padding: 0.75rem 1rem;
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
+                border-radius: 50px;
+                border: 1px solid var(--border-color);
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .back-link:hover {
+                background: var(--card-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Hero Section */
+            .event-hero {
+                display: grid;
+                grid-template-columns: 1fr 1.5fr;
+                gap: 4rem;
+                margin-bottom: 4rem;
+                align-items: start;
+            }
+
+            .event-poster-container {
+                position: relative;
             }
 
             .event-poster {
-                width: 300px;
-                height: 400px;
-                border-radius: 10px;
+                width: 100%;
+                max-width: 450px;
+                aspect-ratio: 4/3;
+                border-radius: 24px;
                 overflow: hidden;
-                flex-shrink: 0;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+                position: relative;
+                background: var(--gradient-1);
+                padding: 4px;
+                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow:
+                    0 20px 40px rgba(0,0,0,0.3),
+                    0 0 0 1px rgba(255,255,255,0.1);
+            }
+
+            .event-poster::before {
+                content: '';
+                position: absolute;
+                top: 4px;
+                left: 4px;
+                right: 4px;
+                bottom: 4px;
+                background: var(--card-bg);
+                border-radius: 20px;
+                z-index: 1;
             }
 
             .event-poster img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
+                width: calc(100% - 8px);
+                height: calc(100% - 8px);
+                object-fit: contain;
+                object-position: center;
+                position: relative;
+                z-index: 2;
+                margin: 4px;
+                border-radius: 20px;
+                transition: all 0.5s ease;
             }
 
+            .event-poster:hover {
+                transform: translateY(-12px) scale(1.02);
+                box-shadow:
+                    0 35px 60px rgba(0,0,0,0.4),
+                    0 0 0 1px rgba(255,255,255,0.2),
+                    0 0 50px rgba(99, 102, 241, 0.3);
+            }
+
+            .event-poster:hover img {
+                filter: brightness(1.1) contrast(1.1);
+            }
+
+            /* Event Info */
             .event-info {
-                flex: 1;
+                padding: 2rem 0;
             }
 
             .event-title {
-                font-size: 32px; /* Chữ to, rõ ràng hơn */
-                margin-bottom: 20px;
-                color: var(--text-light);
+                font-size: 3rem;
                 font-weight: 700;
+                margin-bottom: 1.5rem;
+                background: var(--gradient-1);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                line-height: 1.2;
             }
 
             .event-meta {
                 display: flex;
-                flex-direction: column; /* xếp dọc cho rõ */
-                gap: 15px;
-                margin-bottom: 25px;
-                color: var(--text-muted);
-                font-size: 16px;
+                flex-direction: column;
+                gap: 1rem;
+                margin-bottom: 2rem;
             }
 
             .event-meta-item {
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 1rem;
+                padding: 1rem;
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
+                border-radius: 16px;
+                border: 1px solid var(--border-color);
+                transition: all 0.3s ease;
+            }
+
+            .event-meta-item:hover {
+                background: var(--card-hover);
+                transform: translateX(8px);
+            }
+
+            .event-meta-item i {
+                font-size: 1.25rem;
+                color: var(--primary);
+                width: 24px;
+                text-align: center;
             }
 
             .event-description {
-                margin-bottom: 30px;
-                line-height: 1.7; /* Giãn dòng cho dễ đọc */
+                font-size: 1.1rem;
+                line-height: 1.8;
                 color: var(--text-muted);
-            }
-
-            /* === UNIFIED DARK THEME FOR CONTENT SECTIONS === */
-
-            .ticket-detail-container {
-                display: flex;
-                flex-direction: column;
-                gap: 40px; /* Thêm khoảng cách giữa các khối thông tin */
-            }
-
-            .section-card {
-                background-color: var(--card-bg);
+                margin-bottom: 2.5rem;
+                padding: 1.5rem;
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
+                border-radius: 16px;
                 border: 1px solid var(--border-color);
-                border-radius: 10px;
-                padding: 25px 30px;
             }
 
-            .section-title {
-                font-size: 24px;
-                font-weight: 600;
-                margin-bottom: 25px;
-                color: var(--primary);
-                padding-bottom: 10px;
-                border-bottom: 2px solid var(--primary); /* Thêm gạch chân để làm nổi bật tiêu đề */
-                display: inline-block; /* Để border-bottom vừa với chữ */
-            }
-
-            /* Thẻ thông tin chi tiết */
-            .event-card-detail .event-name { /* Đổi tên class để tránh xung đột */
-                font-size: 20px;
-                font-weight: 600;
-                margin-bottom: 15px;
-                color: var(--text-light); /* Đổi màu chữ */
-            }
-
-            .event-card-detail .event-description {
-                font-size: 15px;
-                line-height: 1.6;
-                margin-bottom: 20px;
-                color: var(--text-muted); /* Đổi màu chữ */
-            }
-
-            .event-card-detail .event-meta {
+            .action-buttons {
                 display: flex;
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
+                gap: 1rem;
+                flex-wrap: wrap;
             }
 
-            .event-card-detail .meta-item {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                font-size: 15px;
-                color: var(--text-muted); /* Đổi màu chữ */
-            }
-            .event-card-detail .meta-item span{
-                color: var(--text-light); /* Đổi màu chữ */
-            }
-
-
-            /* === DARK THEME FOR TICKET TABLE === */
-            .ticket-table {
-                width: 100%;
-                border-collapse: collapse;
-                background-color: transparent; /* Bỏ nền cũ */
+            .btn-large {
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+                font-weight: 600;
+                border-radius: 50px;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
                 overflow: hidden;
             }
 
+            .btn-primary {
+                background: var(--gradient-1);
+                color: white;
+            }
+
+            .btn-secondary {
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
+                color: var(--text-light);
+                border: 1px solid var(--border-color);
+            }
+
+            .btn-large:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+            }
+
+            /* Content Sections */
+            .content-grid {
+                display: grid;
+                gap: 2rem;
+                margin-bottom: 4rem;
+            }
+
+            .section-card {
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--border-color);
+                border-radius: 24px;
+                padding: 2.5rem;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .section-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-1);
+            }
+
+            .section-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                border-color: var(--primary);
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+                font-weight: 700;
+                margin-bottom: 2rem;
+                color: var(--text-light);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .section-title i {
+                color: var(--primary);
+            }
+
+            /* Enhanced Table */
+            .ticket-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                background: var(--card-bg);
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            }
+
             .ticket-table th {
-                text-align: left;
-                padding: 15px;
-                background-color: rgba(110, 118, 129, 0.2); /* Nền header bảng */
+                background: var(--gradient-1);
+                color: white;
+                padding: 1.25rem;
                 font-weight: 600;
-                color: var(--text-light); /* Màu chữ header */
+                text-align: left;
             }
 
             .ticket-table td {
-                padding: 15px;
+                padding: 1.25rem;
                 border-bottom: 1px solid var(--border-color);
-                color: var(--text-muted); /* Màu chữ nội dung */
+                transition: all 0.3s ease;
             }
-            .ticket-table td:last-child {
-                color: var(--text-light);
-                font-weight: 500;
+
+            .ticket-table tr:hover td {
+                background: var(--card-hover);
             }
 
             .ticket-table tr:last-child td {
                 border-bottom: none;
             }
 
-            .ticket-note {
-                margin-top: 15px;
-                font-size: 13px;
-                color: var(--text-muted);
-                font-style: italic;
-            }
-
-            /* --- Feedback Section Styles --- */
-            .feedback-section {
-                margin-top: 40px; /* Khoảng cách phía trên phần feedback */
-            }
-
+            /* Feedback Section */
             .feedback-form {
-                margin-bottom: 30px;
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
+                display: grid;
+                gap: 1.5rem;
+                margin-bottom: 3rem;
             }
 
             .feedback-form textarea {
-                width: 100%;
-                padding: 15px;
+                padding: 1.25rem;
                 border: 1px solid var(--border-color);
-                border-radius: 8px;
-                background-color: var(--darker-bg); /* Nền tối hơn cho textarea */
+                border-radius: 16px;
+                background: var(--card-bg);
                 color: var(--text-light);
-                font-size: 15px;
+                font-size: 1rem;
                 resize: vertical;
-                min-height: 100px;
+                min-height: 120px;
+                transition: all 0.3s ease;
             }
 
-            .feedback-form textarea::placeholder {
-                color: var(--text-muted);
+            .feedback-form textarea:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
             }
 
-            .feedback-form .rating {
+            .rating {
                 display: flex;
                 align-items: center;
-                gap: 10px;
-                font-size: 16px;
-                color: var(--text-muted);
+                gap: 1rem;
             }
 
-            .feedback-form .rating .fa-star {
+            .rating .fa-star {
+                font-size: 1.5rem;
                 cursor: pointer;
-                color: var(--text-muted); /* Màu sao mặc định */
-                transition: color 0.2s;
+                color: var(--text-muted);
+                transition: all 0.2s ease;
             }
 
-            /* Màu sao đã chọn/hover - có thể thêm JS sau để đánh giá động */
-            .feedback-form .rating .fa-star.active,
-            .feedback-form .rating .fa-star:hover {
-                color: var(--warning); /* Màu vàng cho sao đã chọn/hover */
-            }
-
-            .feedback-form .primary-btn {
-                align-self: flex-start; /* Căn nút sang trái */
-                padding: 10px 25px;
-            }
-
-            .feedback-list h3 {
-                font-size: 20px;
-                color: var(--text-light);
-                margin-bottom: 20px;
-                padding-bottom: 10px;
-                border-bottom: 1px solid var(--border-color);
+            .rating .fa-star:hover,
+            .rating .fa-star.active {
+                color: var(--warning);
+                transform: scale(1.1);
             }
 
             .feedback-item {
-                background-color: var(--darker-bg); /* Nền hơi tối hơn cho từng mục feedback */
+                background: var(--card-bg);
                 border: 1px solid var(--border-color);
-                border-radius: 8px;
-                padding: 15px 20px;
-                margin-bottom: 15px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                border-radius: 16px;
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                transition: all 0.3s ease;
             }
 
-            .feedback-item:last-child {
-                margin-bottom: 0;
+            .feedback-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
             }
 
-            .feedback-item .feedback-text {
-                font-size: 15px;
-                line-height: 1.6;
-                color: var(--text-light);
-                margin-bottom: 10px;
-            }
-
-            .feedback-item .feedback-meta {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                font-size: 13px;
-                color: var(--text-muted);
-            }
-
-            .feedback-item .feedback-meta .feedback-author {
-                font-weight: 600;
-                color: var(--primary);
-            }
-
-            .feedback-item .feedback-meta .feedback-stars .fas.fa-star {
-                color: var(--warning); /* Màu vàng cho sao đã điền */
-            }
-
-            /* === SUGGESTIONS SECTION === */
-            .suggestions {
-                margin-top: 60px;
-            }
-
-            .suggestions-title {
-                font-size: 24px;
-                margin-bottom: 30px;
-                color: var(--secondary);
-                text-align: center;
-                font-weight: 600;
-            }
-
+            /* Suggestions Grid */
             .suggestions-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 20px;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 2rem;
             }
 
-            /* Styling cho card gợi ý */
             .event-card {
-                background-color: var(--card-bg); /* Nền card nhất quán */
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
                 border: 1px solid var(--border-color);
-                border-radius: 8px;
+                border-radius: 20px;
                 overflow: hidden;
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-                color: inherit;
+                transition: all 0.4s ease;
                 text-decoration: none;
+                color: inherit;
+                position: relative;
+            }
+
+            .event-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--gradient-1);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .event-card:hover::before {
+                opacity: 0.1;
+            }
+
+            .event-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                border-color: var(--primary);
             }
 
             .event-card img {
                 width: 100%;
-                height: 150px;
+                height: 200px;
                 object-fit: cover;
-                display: block;
-                border-bottom: 1px solid var(--border-color);
+                transition: all 0.4s ease;
             }
 
-            .event-card .card-body {
-                padding: 15px;
+            .event-card:hover img {
+                transform: scale(1.05);
             }
 
-            .event-card h4 {
-                font-size: 16px;
-                margin-bottom: 5px;
-                color: var(--text-light);
+            .card-body {
+                padding: 1.5rem;
+                position: relative;
+                z-index: 2;
             }
 
-            .event-card p {
-                font-size: 13px;
-                margin-bottom: 10px;
-                color: var(--text-muted);
-            }
-
-            .event-card .price {
-                font-weight: bold;
-                font-size: 14px;
-                color: var(--secondary);
-            }
-
-            .event-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-                border-color: var(--primary);
-            }
-
-            /* ==== FOOTER SECTION ==== */
+            /* Footer */
             .footer {
-                padding: 40px 15px;
-                background-color: var(--darker-bg);
-                margin-top: 80px;
+                background: var(--darker-bg);
                 border-top: 1px solid var(--border-color);
+                padding: 4rem 2rem 2rem;
+                margin-top: 6rem;
             }
+
             .footer-content {
-                max-width: 1300px;
+                max-width: 1400px;
                 margin: 0 auto;
-                box-sizing: border-box;
             }
+
             .footer-container {
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 20px;
-                padding: 0px 15px;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 3rem;
+                margin-bottom: 2rem;
             }
-            .footer-section {
-                flex: 1;
-                min-width: 250px;
-                margin: 10px;
-            }
+
             .footer-section h3 {
-                color: #ddd;
-                margin-bottom: 15px;
+                color: var(--text-light);
+                margin-bottom: 1.5rem;
+                font-weight: 600;
             }
+
             .footer-section ul {
                 list-style: none;
-                padding: 0;
             }
+
             .footer-section ul li {
-                padding: 10px 0;
+                margin-bottom: 0.75rem;
             }
+
             .footer-section ul li a {
+                color: var(--text-muted);
                 text-decoration: none;
-                color: #aaa;
-                transition: 0.3s;
+                transition: all 0.3s ease;
             }
-            .footer-section ul li a:hover,
-            .footer-section a:hover {
-                color: #fff;
+
+            .footer-section ul li a:hover {
+                color: var(--primary);
+                transform: translateX(4px);
             }
-            .footer-section p, .footer-section a {
-                color: #aaa;
-                margin: 5px 0;
-                text-decoration: underline;
-            }
-            .footer-section li {
-                padding: 5px 0;
-            }
+
             .subscribe-box {
                 display: flex;
-                align-items: center;
-                border: 2px solid #6f42c1;
-                border-radius: 8px;
-                padding: 5px 10px;
-                background: #000;
-                margin-bottom: 15px;
-                gap: 10px;
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 50px;
+                padding: 0.5rem;
+                margin-bottom: 1.5rem;
             }
-            .fa-envelope:before {
-                content: "\f0e0";
-                color: #15d715;
-            }
+
             .subscribe-box input {
                 flex: 1;
                 border: none;
                 background: transparent;
-                color: white;
-                padding: 8px;
+                color: var(--text-light);
+                padding: 0.75rem 1rem;
                 outline: none;
-                font-size: 14px;
-            }
-            .subscribe-box button {
-                background: #6f42c1;
-                border: none;
-                border-radius: 5px;
-                padding: 8px 12px;
-                color: white;
-                cursor: pointer;
-                transition: background 0.3s;
-            }
-            .subscribe-box button:hover {
-                background: #5a339e;
-            }
-            .language img {
-                width: 30px;
-                margin: 5px 10px 5px 0;
-                cursor: pointer;
-                border-radius: 4px;
-                transition: transform 0.2s;
-            }
-            .language img:hover {
-                transform: scale(1.1);
-            }
-            .social-icons {
-                margin-top: 15px;
-            }
-            .social-images img {
-                width: 30px;
-                margin-right: 10px;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: transform 0.3s;
-            }
-            .social-images img:hover {
-                transform: scale(1.2);
             }
 
-            /* Responsive */
+            .subscribe-box button {
+                background: var(--gradient-1);
+                border: none;
+                border-radius: 50px;
+                padding: 0.75rem 1.5rem;
+                color: white;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .language img,
+            .social-images img {
+                width: 32px;
+                height: 32px;
+                margin-right: 0.75rem;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .language img:hover,
+            .social-images img:hover {
+                transform: scale(1.1);
+            }
+
+            /* Responsive Design */
             @media (max-width: 1024px) {
-                .event-header {
-                    flex-direction: column;
+                .event-hero {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                    text-align: center;
                 }
-                .event-poster {
-                    width: 100%;
-                    height: auto;
-                    aspect-ratio: 3/4; /* Giữ tỉ lệ poster */
+
+                .event-title {
+                    font-size: 2.5rem;
                 }
             }
+
             @media (max-width: 768px) {
                 .header {
                     flex-direction: column;
-                    gap: 15px;
-                    padding: 15px 20px;
+                    gap: 1rem;
+                    padding: 1rem;
                 }
+
                 .search input {
                     width: 100%;
                 }
+
                 .main-content {
-                    padding: 0 20px;
-                    margin-top: 20px;
+                    padding: 2rem 1rem;
                 }
-                .footer {
-                    padding: 30px 20px;
+
+                .event-title {
+                    font-size: 2rem;
                 }
-                .footer-content {
-                    padding: 0;
+
+                .action-buttons {
+                    justify-content: center;
                 }
-                .footer-container {
-                    flex-direction: column;
-                    align-items: center;
-                    text-align: center;
+
+                .section-card {
+                    padding: 1.5rem;
                 }
-                .subscribe-box {
-                    flex-direction: column;
-                    align-items: stretch;
+            }
+
+            /* Loading Animation */
+            @keyframes shimmer {
+                0% {
+                    transform: translateX(-100%);
                 }
-                .subscribe-box input,
-                .subscribe-box button {
-                    width: 100%;
-                    box-sizing: border-box;
+                100% {
+                    transform: translateX(100%);
                 }
+            }
+
+            .loading-shimmer {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .loading-shimmer::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+                animation: shimmer 2s infinite;
             }
         </style>
     </head>
+
     <body>
         <div class="header-container">
             <header class="header">
-                <div class="logo">MasterTicket</div>
+                <div class="logo">
+                    <i class="fas fa-ticket-alt"></i>
+                    MasterTicket
+                </div>
                 <div class="search">
-                    <input type="text" placeholder="Bạn đang tìm kiếm gì hôm nay?">
-                    <button>Tìm kiếm</button>
+                    <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm...">
+                    <button><i class="fas fa-search"></i></button>
                 </div>
                 <div class="actions">
-                    <button class="primary-btn">Create Event</button>
-                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">Vé đã mua</a>
-                    <div class="account">Account</div>
+                    <button class="primary-btn">
+                        <i class="fas fa-plus"></i>
+                        Tạo sự kiện
+                    </button>
+                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
+                        <i class="fas fa-history"></i>
+                        Vé đã mua
+                    </a>
+                    <div class="account">
+                        <a href="${pageContext.request.contextPath}/updateProfile" class="link">
+                            <i class="fas fa-user"></i>
+                            Tài khoản
+                        </a>
+                    </div>
                 </div>
             </header>
         </div>
@@ -639,63 +783,104 @@
         <fmt:setLocale value="vi_VN" />
 
         <div class="main-content">
+
+            <a href="${pageContext.request.contextPath}/HomePageServlet" class="back-link">
+                <i class="fas fa-arrow-left"></i> 
+                Trở về trang sự kiện
+            </a>
             <c:if test="${not empty event}">
-                <div class="event-header">
-                    <div class="event-poster">
-                        <img src="${pageContext.request.contextPath}/uploads/event_banners/${event.imageURL}" alt="Poster sự kiện ${event.name}">
+                <div class="event-hero">
+                    <div class="event-poster-container">
+                        <div class="event-poster">
+                            <img src="${pageContext.request.contextPath}/uploads/event_banners/${event.imageURL}"
+                                 alt="Poster sự kiện ${event.name}"
+                                 onerror="this.src='${pageContext.request.contextPath}/images/default-poster.jpg'">
+                        </div>
                     </div>
+
                     <div class="event-info">
                         <h1 class="event-title">${event.name}</h1>
+
                         <div class="event-meta">
                             <div class="event-meta-item">
-                                <span>⏰</span>
-                                <span>
-                                    <fmt:formatDate value="${event.startTime}" pattern="HH:mm"/> -
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <strong>Thời gian</strong><br>
+                                    <fmt:formatDate value="${event.startTime}" pattern="HH:mm"/> - 
                                     <fmt:formatDate value="${event.endTime}" pattern="HH:mm, dd/MM/yyyy"/>
-                                </span>
+                                </div>
                             </div>
                             <div class="event-meta-item">
-                                <span>📍</span>
-                                <span>${event.physicalLocation}</span>
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <strong>Địa điểm</strong><br>
+                                    ${event.physicalLocation}
+                                </div>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-tag"></i>
+                                <div>
+                                    <strong>Giá từ</strong><br>
+                                    <c:choose>
+                                        <c:when test="${not empty ticketList}">
+                                            <fmt:formatNumber value="${ticketList[0].price}" type="currency" currencyCode="VND"/>
+                                        </c:when>
+                                        <c:otherwise>Liên hệ</c:otherwise>
+                                    </c:choose>
+                                </div>
                             </div>
                         </div>
-                        <p class="event-description">${event.description}</p>
-                        <c:choose>
-                            <c:when test="${not empty sessionScope.user}">
-                                <button class="primary-btn"
-                                        onclick="handleBuyTickets(${event.eventID}, '${event.hasSeatingChart}')">
-                                    Mua vé ngay
-                                </button>
-                                <button onClick="handleStartChat(${event.eventID})">Chat ngay</button>
-                            </c:when>
-                            <c:otherwise>
-                                <c:url var="loginUrl" value="/login">
-                                    <c:param name="redirect" value="EventServlet?id=${event.eventID}" />
-                                </c:url>
-                                <button class="primary-btn" onclick="location.href = '${loginUrl}'">
-                                    Đăng nhập để mua vé
-                                </button>
-                            </c:otherwise>
-                        </c:choose>
+
+                        <div class="event-description">
+                            ${event.description}
+                        </div>
+
+                        <div class="action-buttons">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.user}">
+                                    <button class="btn-large btn-primary"
+                                            onclick="handleBuyTickets(${event.eventID}, '${event.hasSeatingChart}')">
+                                        <i class="fas fa-ticket-alt"></i>
+                                        Mua vé ngay
+                                    </button>
+                                    <button class="btn-large btn-secondary" onclick="handleStartChat(${event.eventID})">
+                                        <i class="fas fa-comments"></i>
+                                        Chat hỗ trợ
+                                    </button>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:url var="loginUrl" value="/login">
+                                        <c:param name="redirect" value="EventServlet?id=${event.eventID}" />
+                                    </c:url>
+                                    <button class="btn-large btn-primary" onclick="location.href = '${loginUrl}'">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                        Đăng nhập để mua vé
+                                    </button>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
                 </div>
 
-                <div class="ticket-detail-container">
-                    <div class="event-info-section section-card">
-                        <h2 class="section-title">Thông tin chi tiết</h2>
+                <div class="content-grid">
+                    <div class="section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Thông tin chi tiết
+                        </h2>
                         <div class="event-card-detail">
                             <h3 class="event-name">${event.name}</h3>
                             <div class="event-meta">
                                 <div class="meta-item">
-                                    <strong>⏰ Thời gian:</strong>
+                                    <strong><i class="fas fa-clock"></i> Thời gian:</strong>
                                     <span><fmt:formatDate value="${event.startTime}" pattern="HH:mm, dd/MM/yyyy"/></span>
                                 </div>
                                 <div class="meta-item">
-                                    <strong>📍 Địa điểm:</strong>
+                                    <strong><i class="fas fa-map-marker-alt"></i> Địa điểm:</strong>
                                     <span>${event.physicalLocation}</span>
                                 </div>
                                 <div class="meta-item">
-                                    <strong>💰 Giá từ:</strong>
+                                    <strong><i class="fas fa-money-bill-wave"></i> Giá từ:</strong>
                                     <span>
                                         <c:choose>
                                             <c:when test="${not empty ticketList}">
@@ -709,108 +894,146 @@
                         </div>
                     </div>
 
-                    <div class="ticket-info-section section-card">
-                        <h2 class="section-title">Loại vé và giá</h2>
-
+                    <div class="section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-ticket-alt"></i>
+                            Loại vé và giá
+                        </h2>
                         <c:if test="${empty ticketList}">
-                            <p>Chưa có vé cho sự kiện này hoặc vé đã ngừng bán.</p>
+                            <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                Chưa có vé cho sự kiện này hoặc vé đã ngừng bán.
+                            </p>
                         </c:if>
-
                         <c:if test="${not empty ticketList}">
                             <table class="ticket-table">
                                 <thead>
                                     <tr>
-                                        <th>Loại vé</th>
-                                        <th>Giá</th>
+                                        <th><i class="fas fa-tag"></i> Loại vé</th>
+                                        <th><i class="fas fa-money-bill-wave"></i> Giá</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:forEach var="ticket" items="${ticketList}">
                                         <tr>
                                             <td>
-                                                <strong>${ticket.ticketName}</strong>
-                                                <br>
-                                                <span style="font-size: 0.9em; color: #555;">Loại: ${ticket.category}</span>
-                                                <br>
-                                                <small style="font-size: 0.8em; color: #777;">${ticket.ticketDescription}</small>
+                                                <div>
+                                                    <strong style="font-size: 1.1rem;">${ticket.ticketName}</strong><br>
+                                                    <span style="color: var(--primary); font-weight: 500;">Loại: ${ticket.category}</span><br>
+                                                    <small style="color: var(--text-muted);">${ticket.ticketDescription}</small>
+                                                </div>
                                             </td>
                                             <td>
-                                                <fmt:formatNumber value="${ticket.price}" type="currency" currencyCode="VND"/>
+                                                <strong style="font-size: 1.2rem; color: var(--success);">
+                                                    <fmt:formatNumber value="${ticket.price}" type="currency" currencyCode="VND"/>
+                                                </strong>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
                             </table>
-                            <p class="ticket-note">* Vé được cập nhật liên tục và có thể thay đổi.</p>
+                            <p class="ticket-note" style="margin-top: 1rem; font-style: italic; color: var(--text-muted);">
+                                <i class="fas fa-info-circle"></i>
+                                Vé được cập nhật liên tục và có thể thay đổi.
+                            </p>
                         </c:if>
                     </div>
-                </div>
 
-                <div class="feedback-section section-card">
-                    <h2 class="section-title">Để lại phản hồi của bạn</h2>
-                    <div class="feedback-form">
-                        <textarea placeholder="Chia sẻ cảm nhận của bạn về sự kiện này..." rows="5"></textarea>
-                        <div class="rating">
-                            <span>Đánh giá sự kiện này:</span>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                        <button class="primary-btn">Gửi phản hồi</button>
-                    </div>
-                    <div class="feedback-list">
-                        <h3>Phản hồi gần đây:</h3>
-                        <div class="feedback-item">
-                            <p class="feedback-text">"Sự kiện tuyệt vời! Rất thích không khí và các màn trình diễn."</p>
-                            <div class="feedback-meta">
-                                <span class="feedback-author">Bởi Nguyễn Văn A</span>
-                                <span class="feedback-date"> vào 10/07/2025</span>
-                                <span class="feedback-stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
+                    <div class="section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-comment-dots"></i>
+                            Để lại phản hồi của bạn
+                        </h2>
+                        <div class="feedback-form">
+                            <textarea placeholder="Chia sẻ cảm nhận của bạn về sự kiện này..." rows="5"></textarea>
+                            <div class="rating">
+                                <span>Đánh giá sự kiện này:</span>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <i class="far fa-star"></i>
                             </div>
+                            <button class="primary-btn">
+                                <i class="fas fa-paper-plane"></i>
+                                Gửi phản hồi
+                            </button>
                         </div>
-                        <div class="feedback-item">
-                            <p class="feedback-text">"Sự kiện nhìn chung khá tốt, nhưng chất lượng âm thanh có thể cải thiện hơn."</p>
-                            <div class="feedback-meta">
-                                <span class="feedback-author">Bởi Trần Thị B</span>
-                                <span class="feedback-date"> vào 08/07/2025</span>
-                                <span class="feedback-stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
+
+                        <div class="feedback-list">
+                            <h3 style="margin-bottom: 1.5rem; color: var(--text-light);">
+                                <i class="fas fa-comments"></i>
+                                Phản hồi gần đây
+                            </h3>
+                            <div class="feedback-item">
+                                <p class="feedback-text">"Sự kiện tuyệt vời! Rất thích không khí và các màn trình diễn."</p>
+                                <div class="feedback-meta">
+                                    <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
+                                        <i class="fas fa-user-circle"></i>
+                                        Nguyễn Văn A
+                                    </span>
+                                    <span class="feedback-date" style="color: var(--text-muted);"> • 10/07/2025</span>
+                                    <span class="feedback-stars">
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="feedback-item">
+                                <p class="feedback-text">"Sự kiện nhìn chung khá tốt, nhưng chất lượng âm thanh có thể cải thiện hơn."</p>
+                                <div class="feedback-meta">
+                                    <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
+                                        <i class="fas fa-user-circle"></i>
+                                        Trần Thị B
+                                    </span>
+                                    <span class="feedback-date" style="color: var(--text-muted);"> • 08/07/2025</span>
+                                    <span class="feedback-stars">
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        <i class="far fa-star" style="color: var(--text-muted);"></i>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                </c:if>
-            <c:if test="${empty event}">
-                <p style="text-align: center; font-size: 20px; color: var(--danger);">Không tìm thấy sự kiện. Vui lòng thử lại.</p>
             </c:if>
 
+            <c:if test="${empty event}">
+                <div style="text-align: center; padding: 4rem; color: var(--danger);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; margin-bottom: 2rem; display: block;"></i>
+                    <h2 style="font-size: 2rem; margin-bottom: 1rem;">Không tìm thấy sự kiện</h2>
+                    <p style="font-size: 1.1rem;">Vui lòng kiểm tra lại đường dẫn hoặc thử tìm kiếm sự kiện khác.</p>
+                </div>
+            </c:if>
 
             <div class="suggestions">
-                <h2 class="suggestions-title">Có Thể Bạn Cũng Thích</h2>
+                <h2 class="suggestions-title" style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    <i class="fas fa-heart"></i>
+                    Có Thể Bạn Cũng Thích
+                </h2>
                 <div class="suggestions-grid">
                     <c:forEach var="suggestedEvent" items="${suggestedEvents}">
                         <a href="EventServlet?id=${suggestedEvent.eventID}" class="event-card">
                             <img src="${suggestedEvent.imageURL}" alt="${suggestedEvent.name}">
                             <div class="card-body">
-                                <h4>${suggestedEvent.name}</h4>
-                                <p>
-                                    <fmt:formatDate value="${suggestedEvent.startTime}" pattern="dd/MM/yyyy"/> •
+                                <h4 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: var(--text-light);">
+                                    ${suggestedEvent.name}
+                                </h4>
+                                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                                    <i class="fas fa-calendar"></i>
+                                    <fmt:formatDate value="${suggestedEvent.startTime}" pattern="dd/MM/yyyy"/> • 
+                                    <i class="fas fa-map-marker-alt"></i>
                                     ${suggestedEvent.physicalLocation}
                                 </p>
-                                <p class="price">Từ
+                                <p class="price" style="font-weight: 600; font-size: 1.1rem; color: var(--success);">
+                                    <i class="fas fa-tag"></i>
+                                    Từ 
                                     <c:choose>
                                         <c:when test="${not empty suggestedEvent.ticketList}">
                                             <fmt:formatNumber value="${suggestedEvent.ticketList[0].price}" type="currency" currencyCode="VND"/>
@@ -822,51 +1045,58 @@
                         </a>
                     </c:forEach>
                     <c:if test="${empty suggestedEvents}">
-                        <p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Không có sự kiện gợi ý nào vào lúc này.</p>
+                        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">
+                            <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+                            <p style="font-size: 1.1rem;">Không có sự kiện gợi ý nào vào lúc này.</p>
+                        </div>
                     </c:if>
                 </div>
             </div>
         </div>
 
-
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-container">
                     <div class="footer-section">
-                        <h3>Dịch vụ khách hàng</h3>
+                        <h3><i class="fas fa-headset"></i> Dịch vụ khách hàng</h3>
                         <ul>
-                            <li><a href="#">Câu hỏi thường gặp</a></li>
-                            <li><a href="#">Liên hệ chúng tôi</a></li>
-                            <li><a href="#">Chính sách bảo mật</a></li>
-                            <li><a href="#">Điều khoản dịch vụ</a></li>
+                            <li><a href="#"><i class="fas fa-question-circle"></i> Câu hỏi thường gặp</a></li>
+                            <li><a href="#"><i class="fas fa-phone"></i> Liên hệ chúng tôi</a></li>
+                            <li><a href="#"><i class="fas fa-shield-alt"></i> Chính sách bảo mật</a></li>
+                            <li><a href="#"><i class="fas fa-file-contract"></i> Điều khoản dịch vụ</a></li>
                         </ul>
-                        <p><i class="fas fa-envelope"></i> <a href="mailto:support@masterTicket.vn">support@masterTicket.vn</a></p>
+                        <p style="margin-top: 1rem;">
+                            <i class="fas fa-envelope" style="color: var(--success);"></i>
+                            <a href="mailto:support@masterTicket.vn" style="color: var(--text-muted);">support@masterTicket.vn</a>
+                        </p>
                     </div>
 
                     <div class="footer-section">
-                        <h3>Sitemap</h3>
+                        <h3><i class="fas fa-sitemap"></i> Sitemap</h3>
                         <ul>
-                            <li><a href="#">Tạo tài khoản</a></li>
-                            <li><a href="#">Tin tức</a></li>
-                            <li><a href="#">Sự kiện nổi bật</a></li>
+                            <li><a href="#"><i class="fas fa-user-plus"></i> Tạo tài khoản</a></li>
+                            <li><a href="#"><i class="fas fa-newspaper"></i> Tin tức</a></li>
+                            <li><a href="#"><i class="fas fa-star"></i> Sự kiện nổi bật</a></li>
                         </ul>
                     </div>
 
                     <div class="footer-section">
-                        <h3>Đăng ký để nhận cập nhật sự kiện.</h3>
+                        <h3><i class="fas fa-bell"></i> Đăng ký nhận thông báo</h3>
                         <form class="subscribe-box">
                             <input type="email" placeholder="Email của bạn..." required />
-                            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </form>
 
                         <div class="language">
-                            <p>Ngôn ngữ:</p>
+                            <p><i class="fas fa-globe"></i> Ngôn ngữ:</p>
                             <img src="https://flagcdn.com/w40/vn.png" alt="Tiếng Việt" />
                             <img src="https://flagcdn.com/w40/gb.png" alt="Tiếng Anh" />
                         </div>
 
                         <div class="social-icons">
-                            <p>Theo dõi chúng tôi:</p>
+                            <p><i class="fas fa-share-alt"></i> Theo dõi chúng tôi:</p>
                             <div class="social-images">
                                 <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
                                 <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />
@@ -875,12 +1105,15 @@
                         </div>
                     </div>
                 </div>
+
+                <div style="text-align: center; padding-top: 2rem; border-top: 1px solid var(--border-color); color: var(--text-muted);">
+                    <p>&copy; 2025 MasterTicket. Tất cả quyền được bảo lưu.</p>
+                </div>
             </div>
         </footer>
 
         <script type="text/javascript">
             var contextPath = '${pageContext.request.contextPath}';
-            console.log("[EventDetail.jsp - Inline JS] Context Path được định nghĩa là: '" + contextPath + "'");
 
             function handleBuyTickets(eventId, hasSeatingChartStr) {
                 console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
@@ -889,17 +1122,53 @@
 
                 if (hasSeatingChartStr === 'true') {
                     console.log("  - KẾT LUẬN: CÓ sơ đồ ghế. Chuyển hướng tới BookChairServlet.");
-                    window.location.href = '${pageContext.request.contextPath}/BookChairServlet?eventId=' + eventId;
+                    window.location.href = contextPath + '/BookChairServlet?eventId=' + eventId;
                 } else {
                     console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
-                    window.location.href = '${pageContext.request.contextPath}/TicketInfoServlet?eventId=' + eventId;
+                    window.location.href = contextPath + '/TicketInfoServlet?eventId=' + eventId;
                 }
             }
 
-            function handleStartChat(eventId){
+            function handleStartChat(eventId) {
                 console.log("Starting chat for eventId: ", eventId);
-            window.location.href = '${pageContext.request.contextPath}/init-chat?eventId=' + eventId;
+                window.location.href = contextPath + '/init-chat?eventId=' + eventId;
             }
+
+            // Star rating functionality
+            document.addEventListener('DOMContentLoaded', function () {
+                const stars = document.querySelectorAll('.rating .fa-star');
+                stars.forEach((star, index) => {
+                    star.addEventListener('click', function () {
+                        stars.forEach((s, i) => {
+                            if (i <= index) {
+                                s.classList.remove('far');
+                                s.classList.add('fas', 'active');
+                            } else {
+                                s.classList.remove('fas', 'active');
+                                s.classList.add('far');
+                            }
+                        });
+                    });
+
+                    star.addEventListener('mouseenter', function () {
+                        stars.forEach((s, i) => {
+                            if (i <= index) {
+                                s.style.color = 'var(--warning)';
+                            } else {
+                                s.style.color = 'var(--text-muted)';
+                            }
+                        });
+                    });
+                });
+
+                document.querySelector('.rating').addEventListener('mouseleave', function () {
+                    stars.forEach(star => {
+                        if (!star.classList.contains('active')) {
+                            star.style.color = 'var(--text-muted)';
+                        }
+                    });
+                });
+            });
         </script>
     </body>
 </html>
