@@ -26,10 +26,17 @@ public class HomePageServlet extends HttpServlet {
 
         try {
             String search = request.getParameter("search");
-            if (search != null && !search.trim().isEmpty()) {
-                List<Event> events = eventDAO.searchEvents(search.trim());
+            String location = request.getParameter("location");
+            
+            // Lấy danh sách địa chỉ cho filter dropdown
+            List<String> locations = eventDAO.getAvailableLocations();
+            request.setAttribute("locations", locations);
+            
+            if ((search != null && !search.trim().isEmpty()) || (location != null && !location.trim().isEmpty())) {
+                List<Event> events = eventDAO.searchEvents(search, location);
                 request.setAttribute("events", events);
                 request.setAttribute("search", search);
+                request.setAttribute("location", location);
                 request.setAttribute("noOfPages", 1);
                 request.setAttribute("currentPage", 1);
                 request.setAttribute("totalEvents", events.size());

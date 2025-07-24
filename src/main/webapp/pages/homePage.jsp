@@ -144,6 +144,23 @@
                 border-color: var(--primary);
             }
 
+            /* Style for select dropdown */
+            select.filter-input {
+                cursor: pointer;
+                appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                background-size: 16px;
+                padding-right: 40px;
+            }
+
+            select.filter-input option {
+                background: var(--card-bg);
+                color: var(--text-light);
+                padding: 8px;
+            }
+
             .auth-buttons {
                 display: flex;
                 gap: 0.75rem;
@@ -904,6 +921,12 @@
                 <div class="nav-center-content">
                     <form action="${pageContext.request.contextPath}/home" method="get" style="display: flex; align-items: center; gap: 10px; width: 100%; max-width: 600px;">
                         <input type="text" name="search" class="search-box" placeholder="Tìm sự kiện..." value="${fn:escapeXml(param.search)}" style="flex: 1;" />
+                        <select name="location" class="filter-input" style="flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color);">
+                            <option value="">Tất cả địa điểm</option>
+                            <c:forEach var="loc" items="${locations}">
+                                <option value="${loc}" <c:if test="${param.location == loc}">selected</c:if>>${loc}</option>
+                            </c:forEach>
+                        </select>
                         <button type="submit" class="btn btn-primary">Tìm kiếm</button>
                     </form>
                     <ul class="nav-links" id="navLinks">
