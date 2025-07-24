@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="dto.UserDTO"%>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -32,12 +33,219 @@
             }
 
             body {
-                font-family: 'Segoe UI', Arial, sans-serif;
-                background: linear-gradient(to bottom, var(--darker-bg), var(--dark-bg));
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(to bottom, #161b22, #0d1117);
                 color: var(--text-light);
                 min-height: 100vh;
             }
 
+            .header {
+                width: 100vw;
+                min-width: 100vw;
+                background: var(--darker-bg);
+                padding: 1rem 2rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                border-bottom: 1px solid var(--border-color);
+                box-sizing: border-box;
+            }
+
+            .nav {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: var(--primary);
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: 1.5rem;
+                list-style: none;
+                flex-wrap: nowrap;
+            }
+
+            .nav-links a {
+                color: var(--text-light);
+                text-decoration: none;
+                transition: color 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                white-space: nowrap;
+            }
+
+            .nav-links a:hover {
+                color: var(--primary);
+            }
+
+            .auth-buttons {
+                display: flex;
+                gap: 0.75rem;
+                align-items: center;
+                flex-shrink: 0;
+                margin-left: 1rem;
+                position: relative;
+            }
+
+            .btn {
+                padding: 0.6rem 1.8rem;
+                border: none;
+                border-radius: 25px;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 0.9rem;
+                transition: all 0.3s;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 100px;
+                color: var(--text-light);
+            }
+
+            .btn-outline {
+                background: transparent;
+                border: 1px solid var(--border-color);
+            }
+
+            .btn-outline:hover {
+                background: rgba(102, 122, 255, 0.2);
+                color: var(--primary);
+                border-color: var(--primary);
+            }
+
+            .btn-primary {
+                background: var(--primary);
+            }
+
+            .btn-primary:hover {
+                background: #5566dd;
+                transform: translateY(-2px);
+            }
+
+            .user-greeting {
+                color: var(--text-light);
+                font-size: 0.9rem;
+                margin-right: 0.75rem;
+                white-space: nowrap;
+                cursor: pointer;
+            }
+
+            .user-dropdown {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: var(--darker-bg);
+                border-radius: 10px;
+                padding: 1rem;
+                min-width: 200px;
+                border: 1px solid var(--border-color);
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: all 0.3s;
+                z-index: 101;
+            }
+
+            .user-dropdown.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .dropdown-item {
+                display: block;
+                color: var(--text-light);
+                text-decoration: none;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid var(--border-color);
+                transition: color 0.3s;
+            }
+
+            .dropdown-item:last-child {
+                border-bottom: none;
+            }
+
+            .dropdown-item:hover {
+                color: var(--primary);
+            }
+
+            @media (min-width: 993px) {
+                .nav {
+                    flex-wrap: nowrap;
+                    justify-content: space-between;
+                }
+                .nav-links {
+                    margin-left: 1rem;
+                }
+                .auth-buttons {
+                    margin-left: 1rem;
+                }
+            }
+
+            @media (max-width: 992px) {
+                .nav {
+                    flex-wrap: wrap;
+                    justify-content: flex-start;
+                }
+                .logo {
+                    margin-right: 1rem;
+                }
+                .nav-links {
+                    flex-basis: 100%;
+                    margin-left: 0;
+                    margin-top: 1rem;
+                    justify-content: flex-start;
+                    flex-wrap: wrap;
+                }
+                .auth-buttons {
+                    margin-left: auto;
+                    order: 2;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .nav {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+                .logo {
+                    width: 100%;
+                    text-align: center;
+                    margin-bottom: 1rem;
+                    margin-right: 0;
+                }
+                .nav-links {
+                    display: none;
+                    flex-direction: column;
+                    width: 100%;
+                    padding: 1rem 0;
+                    border-top: none;
+                    box-shadow: none;
+                    background: transparent;
+                }
+                .nav-links.active {
+                    display: flex;
+                }
+                .auth-buttons {
+                    order: unset;
+                    width: 100%;
+                    justify-content: center;
+                    margin-left: 0;
+                    margin-top: 1rem;
+                }
+            }
 
             .header-container {
                 display: flex;
@@ -65,6 +273,8 @@
             .search {
                 display: flex;
                 align-items: center;
+                margin: 0 1.5rem;
+                flex: 1;
             }
 
             .search input {
@@ -621,20 +831,26 @@
         </style>
     </head>
     <body>
-        <div class="header-container">
-            <header class="header">
-                <div class="logo">MasterTicket</div>
-                <div class="search">
-                    <input type="text" placeholder="Bạn đang tìm kiếm gì hôm nay?">
-                    <button>Tìm kiếm</button>
-                </div>
-                <div class="actions">
-                    <button class="primary-btn">Create Event</button>
-                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">Vé đã mua</a>
-                    <div class="account">Account</div>
-                </div>
-            </header>
-        </div>
+        <header class="header">
+            <div class="logo">MasterTicket</div>
+            <div class="search">
+                <input type="text" placeholder="Bạn đang tìm kiếm gì hôm nay?">
+                <button>Tìm kiếm</button>
+            </div>
+            <div class="actions">
+                <button class="primary-btn">Create Event</button>
+                <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">Vé đã mua</a>
+                <c:choose>
+                    <c:when test="${not empty sessionScope.user}">
+                        <span class="user-greeting">Xin chào, ${sessionScope.user.email}</span>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="${pageContext.request.contextPath}/login" class="btn btn-outline">Đăng nhập</a>
+                        <a href="${pageContext.request.contextPath}/register" class="btn btn-primary">Đăng ký</a>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </header>
 
         <fmt:setLocale value="vi_VN" />
 
@@ -663,10 +879,10 @@
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
                                 <button class="primary-btn"
-                                        onclick="handleBuyTickets(${event.eventID}, '${event.hasSeatingChart}')">
+                                        onclick="handleBuyTickets('${event.eventID}', '${event.hasSeatingChart}')">
                                     Mua vé ngay
                                 </button>
-                                <button onClick="handleStartChat(${event.eventID})">Chat ngay</button>
+                                <button onClick="handleStartChat('${event.eventID}')">Chat ngay</button>
                             </c:when>
                             <c:otherwise>
                                 <c:url var="loginUrl" value="/login">
@@ -747,50 +963,30 @@
                 </div>
 
                 <div class="feedback-section section-card">
-                    <h2 class="section-title">Để lại phản hồi của bạn</h2>
-                    <div class="feedback-form">
-                        <textarea placeholder="Chia sẻ cảm nhận của bạn về sự kiện này..." rows="5"></textarea>
-                        <div class="rating">
-                            <span>Đánh giá sự kiện này:</span>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                        <button class="primary-btn">Gửi phản hồi</button>
-                    </div>
-                    <div class="feedback-list">
-                        <h3>Phản hồi gần đây:</h3>
-                        <div class="feedback-item">
-                            <p class="feedback-text">"Sự kiện tuyệt vời! Rất thích không khí và các màn trình diễn."</p>
-                            <div class="feedback-meta">
-                                <span class="feedback-author">Bởi Nguyễn Văn A</span>
-                                <span class="feedback-date"> vào 10/07/2025</span>
-                                <span class="feedback-stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
+                    <h2 class="section-title">Đánh giá & Phản hồi từ người tham dự</h2>
+                    <c:choose>
+                        <c:when test="${not empty feedbackList}">
+                            <c:forEach var="fb" items="${feedbackList}">
+                                <div class="feedback-item">
+                                    <div class="feedback-meta">
+                                        <span class="feedback-author">Người dùng #${fb.userID}</span>
+                                        <span class="feedback-date">
+                                            <fmt:formatDate value="${fb.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                        </span>
+                                        <span class="feedback-stars">
+                                            <c:forEach begin="1" end="${fb.rating}" var="i">★</c:forEach>
+                                        </span>
+                                    </div>
+                                    <div class="feedback-text">${fb.content}</div>
+                                </div>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="feedback-item">
+                                <div class="feedback-text">Chưa có phản hồi nào cho sự kiện này.</div>
                             </div>
-                        </div>
-                        <div class="feedback-item">
-                            <p class="feedback-text">"Sự kiện nhìn chung khá tốt, nhưng chất lượng âm thanh có thể cải thiện hơn."</p>
-                            <div class="feedback-meta">
-                                <span class="feedback-author">Bởi Trần Thị B</span>
-                                <span class="feedback-date"> vào 08/07/2025</span>
-                                <span class="feedback-stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 </c:if>
             <c:if test="${empty event}">
@@ -900,6 +1096,25 @@
                 console.log("Starting chat for eventId: ", eventId);
             window.location.href = '${pageContext.request.contextPath}/init-chat?eventId=' + eventId;
             }
+        </script>
+        <script>
+            // Toggle for user dropdown
+            function toggleUserDropdown() {
+                const dropdown = document.getElementById("userDropdown");
+                if (dropdown) {
+                    dropdown.classList.toggle("show");
+                }
+            }
+
+            // Close dropdown if click outside
+            window.addEventListener("click", function (e) {
+                const userGreeting = document.querySelector(".user-greeting");
+                const dropdown = document.getElementById("userDropdown");
+
+                if (userGreeting && dropdown && !userGreeting.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove("show");
+                }
+            });
         </script>
     </body>
 </html>

@@ -21,10 +21,22 @@ public class HomePageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    
+
         EventDAO eventDAO = new EventDAO();
 
         try {
+            String search = request.getParameter("search");
+            if (search != null && !search.trim().isEmpty()) {
+                List<Event> events = eventDAO.searchEvents(search.trim());
+                request.setAttribute("events", events);
+                request.setAttribute("search", search);
+                request.setAttribute("noOfPages", 1);
+                request.setAttribute("currentPage", 1);
+                request.setAttribute("totalEvents", events.size());
+                request.getRequestDispatcher("/pages/homePage.jsp").forward(request, response);
+                return;
+            }
+
             int currentPage = 1;
             if (request.getParameter("page") != null) {
                 try {

@@ -2,8 +2,10 @@ package controller;
 
 import dao.EventDAO;
 import dao.TicketInfoDAO; // SỬA: Import DAO đúng
+import dao.FeedbackDAO;
 import models.Event;
 import models.TicketInfo;   // SỬA: Import Model đúng
+import models.Feedback;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,11 +19,13 @@ public class EventServlet extends HttpServlet {
 
     private EventDAO eventDAO;
     private TicketInfoDAO ticketInfoDAO; 
+    private FeedbackDAO feedbackDAO;
 
     @Override
     public void init() throws ServletException {
         eventDAO = new EventDAO();
-        ticketInfoDAO = new TicketInfoDAO(); 
+        ticketInfoDAO = new TicketInfoDAO();
+        feedbackDAO = new FeedbackDAO();
     }
 
     @Override
@@ -43,10 +47,12 @@ public class EventServlet extends HttpServlet {
                 
                 List<TicketInfo> ticketList = ticketInfoDAO.getTicketInfosByEventID(eventId);
                 List<Event> suggestedEvents = eventDAO.getSuggestedEvents(eventId);
+                List<Feedback> feedbackList = feedbackDAO.getFeedbackByEventId(eventId);
 
                 request.setAttribute("event", event);
                 request.setAttribute("ticketList", ticketList);
                 request.setAttribute("suggestedEvents", suggestedEvents);
+                request.setAttribute("feedbackList", feedbackList);
 
                 request.getRequestDispatcher("/pages/EventDetail.jsp").forward(request, response);
             } else {

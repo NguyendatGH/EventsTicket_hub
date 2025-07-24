@@ -83,5 +83,32 @@ public class FeedbackDAO {
         return list;
     }
 
+    public List<Feedback> getFeedbackByEventId(int eventId) {
+        List<Feedback> list = new ArrayList<>();
+        String sql = "SELECT * FROM Feedback WHERE EventID = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, eventId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Feedback fb = new Feedback(
+                    rs.getInt("FeedbackID"),
+                    rs.getInt("UserID"),
+                    rs.getInt("EventID"),
+                    rs.getInt("OrderID"),
+                    rs.getInt("Rating"),
+                    rs.getString("Content"),
+                    rs.getBoolean("IsApprove"),
+                    rs.getString("AdminResponse"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                );
+                list.add(fb);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     // Bạn có thể viết thêm: getFeedbackByOrderID, approveFeedback, respondToFeedback,...
 }

@@ -5,6 +5,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -901,12 +902,10 @@
                 </button>
 
                 <div class="nav-center-content">
-                    <div class="search-filter-container" id="searchFilterContainer">
-                        <input type="text" class="search-box" placeholder="Tìm sự kiện..." id="searchInput">
-                        <input type="date" class="filter-input" id="dateInput" title="Tìm theo ngày">
-                        <input type="text" class="filter-input" placeholder="Địa điểm..." id="locationInput">
-                    </div>
-
+                    <form action="${pageContext.request.contextPath}/home" method="get" style="display: flex; align-items: center; gap: 10px; width: 100%; max-width: 600px;">
+                        <input type="text" name="search" class="search-box" placeholder="Tìm sự kiện..." value="${fn:escapeXml(param.search)}" style="flex: 1;" />
+                        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    </form>
                     <ul class="nav-links" id="navLinks">
                         <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
                         <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
