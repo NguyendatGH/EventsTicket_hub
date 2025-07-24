@@ -70,7 +70,8 @@ public class AdminServlet extends HttpServlet {
             } else if (pathInfo.startsWith("/event-management")) {
                 eventManagementServlet.handleRequest(request, response);
             } else if (pathInfo.startsWith("/support-center")) {
-                supportCenterServlet.handleRequest(request, response);
+                // Chuyển tiếp request đến AdminSupportServlet
+                request.getRequestDispatcher("/admin/support").forward(request, response);
             } else if (pathInfo.startsWith("/transaction-management")) {
                 transactionServlet.handleRequest(request, response);
             } else {

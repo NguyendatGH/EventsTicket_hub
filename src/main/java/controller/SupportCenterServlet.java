@@ -1,59 +1,102 @@
 package controller;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import models.IssueItem;
+import jakarta.servlet.http.HttpSession;
+import models.SupportItem;
+import service.SupportService;
+import dto.UserDTO;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 
-public class SupportCenterServlet implements AdminSubServlet {
-
-    private static final Logger logger = Logger.getLogger(SupportCenterServlet.class.getName());
-    private static final String SUPPORT_CENTER_JSP = "supportCenter/supportCenter_admin.jsp";
+@WebServlet("/support")
+public class SupportCenterServlet extends HttpServlet {
+    private SupportService supportService;
 
     @Override
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+    public void init() throws ServletException {
+        supportService = new SupportService();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        try {
-            List<IssueItem> issueList = createMockIssueList();
-            logIssueItems(issueList);
-            request.setAttribute("issueList", issueList);
-            forwardToJsp(request, response, SUPPORT_CENTER_JSP);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error loading support center data", e);
-            throw new ServletException("Failed to load support center data", e);
-        }
-    }
-
-    private List<IssueItem> createMockIssueList() {
-        List<IssueItem> issueList = new ArrayList<>();
-        return issueList;
-    }
-
-    private void logIssueItems(List<IssueItem> issueList) {
-        if (issueList != null && !issueList.isEmpty()) {
-            logger.info("Found " + issueList.size() + " issue items");
-            for (IssueItem item : issueList) {
-                logger.fine("Issue item: " + item.toString());
-            }
-        }
-    }
-
-    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, String targetJsp)
-            throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/" + targetJsp);
-        if (dispatcher == null) {
-            String errorMsg = "JSP file not found: " + targetJsp;
-            logger.severe(errorMsg);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
+        
+        HttpSession session = request.getSession();
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        logger.info("Forwarding to JSP: " + targetJsp);
-        dispatcher.forward(request, response);
+
+        String action = request.getParameter("action");
+        
+        if ("view-my-requests".equals(action)) {
+            List<SupportItem> userRequests = supportService.getSupportRequestsByUserEmail(user.getEmail());
+            request.setAttribute("supportRequests", userRequests);
+            request.getRequestDispatcher("/supportCenter/supportCenter.jsp").forward(request, response);
+        } else {
+            // Hiển thị form gửi yêu cầu hỗ trợ
+            request.getRequestDispatcher("/supportCenter/supportCenter.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        
+        if ("submit-request".equals(action)) {
+            submitSupportRequest(request, response, user);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/support");
+        }
+    }
+
+    private void submitSupportRequest(HttpServletRequest request, HttpServletResponse response, UserDTO user) 
+            throws ServletException, IOException {
+        
+        String subject = request.getParameter("subject");
+        String content = request.getParameter("content");
+        String category = request.getParameter("category");
+        String priority = request.getParameter("priority");
+
+        // Validate input
+        if (subject == null || subject.trim().isEmpty() || 
+            content == null || content.trim().isEmpty()) {
+            request.setAttribute("error", "Vui lòng điền đầy đủ thông tin!");
+            request.getRequestDispatcher("/supportCenter/supportCenter.jsp").forward(request, response);
+            return;
+        }
+
+        // Create support request
+        SupportItem supportItem = new SupportItem(user.getEmail(), subject, content);
+        supportItem.setCategory(category != null ? category : "GENERAL");
+        supportItem.setPriority(priority != null ? priority : "MEDIUM");
+        supportItem.setToEmail("admin@masterticket.com");
+
+        boolean success = supportService.createSupportRequest(supportItem);
+
+        if (success) {
+            request.setAttribute("success", "Yêu cầu hỗ trợ đã được gửi thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.");
+        } else {
+            request.setAttribute("error", "Có lỗi xảy ra khi gửi yêu cầu hỗ trợ. Vui lòng thử lại!");
+        }
+
+        request.getRequestDispatcher("/supportCenter/supportCenter.jsp").forward(request, response);
     }
 }

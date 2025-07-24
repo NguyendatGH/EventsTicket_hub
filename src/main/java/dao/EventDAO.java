@@ -1103,4 +1103,42 @@ public class EventDAO {
         }
         return locations;
     }
+
+    public List<Event> searchEventsForAdmin(String keyword, String location, boolean activeOnly) {
+        List<Event> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Events WHERE IsDeleted = 0");
+        List<Object> params = new ArrayList<>();
+
+        // Thêm điều kiện active/non-active
+        if (activeOnly) {
+            sql.append(" AND IsApproved = 1 AND EndTime > GETDATE()");
+        } else {
+            sql.append(" AND (IsApproved = 0 OR EndTime <= GETDATE())");
+        }
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (Name LIKE ? OR Description LIKE ?)");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+        }
+        if (location != null && !location.trim().isEmpty()) {
+            sql.append(" AND PhysicalLocation LIKE ?");
+            params.add("%" + location.trim() + "%");
+        }
+        sql.append(" ORDER BY StartTime DESC");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToEvent(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
