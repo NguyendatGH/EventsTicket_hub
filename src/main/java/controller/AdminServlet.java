@@ -52,7 +52,11 @@ public class AdminServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String pathInfo = request.getPathInfo();
         logger.info("Processing admin request for path: " + pathInfo);
-        UserDTO u = (UserDTO) request.getAttribute("user");
+        UserDTO u = (UserDTO) session.getAttribute("user");
+        if (u == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
         try {
             if (!userService.whoisLoggedin(u.getId()).equalsIgnoreCase("admin")) {
