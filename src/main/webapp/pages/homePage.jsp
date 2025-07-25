@@ -927,6 +927,12 @@
                                 <option value="${loc}" <c:if test="${param.location == loc}">selected</c:if>>${loc}</option>
                             </c:forEach>
                         </select>
+                        <select name="category" class="filter-input" style="flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color);">
+                            <option value="">Tất cả thể loại</option>
+                            <c:forEach var="genre" items="${genres}">
+                                <option value="${genre.genreID}" <c:if test="${param.category == genre.genreID}">selected</c:if>>${genre.genreName}</option>
+                            </c:forEach>
+                        </select>
                         <button type="submit" class="btn btn-primary">Tìm kiếm</button>
                     </form>
                     <ul class="nav-links" id="navLinks">

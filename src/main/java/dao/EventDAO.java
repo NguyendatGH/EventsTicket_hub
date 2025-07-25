@@ -1087,6 +1087,41 @@ public class EventDAO {
         return list;
     }
 
+    public List<Event> searchEvents(String keyword, String location, Integer genreId) {
+        List<Event> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE()");
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (Name LIKE ? OR Description LIKE ?)");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+        }
+        if (location != null && !location.trim().isEmpty()) {
+            sql.append(" AND PhysicalLocation LIKE ?");
+            params.add("%" + location.trim() + "%");
+        }
+        if (genreId != null && genreId > 0) {
+            sql.append(" AND GenreID = ?");
+            params.add(genreId);
+        }
+        sql.append(" ORDER BY StartTime DESC");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToEvent(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public List<String> getAvailableLocations() {
         List<String> locations = new ArrayList<>();
         String sql = "SELECT DISTINCT PhysicalLocation FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE() ORDER BY PhysicalLocation";
