@@ -13,14 +13,14 @@
         <style>
 
             :root {
-                --primary: #667aff;      /* Màu xanh dương dịu hơn */
-                --secondary: #e06bce;    /* Màu hồng/tím nhẹ nhàng hơn */
-                --dark-bg: #161b22;      /* Nền tối (hơi ngả xanh) */
-                --darker-bg: #0d1117;    /* Nền tối hơn */
-                --card-bg: #21262d;      /* Nền cho các thẻ thông tin */
-                --border-color: #30363d; /* Màu viền tinh tế */
-                --text-light: #e6edf3;   /* Màu chữ trắng ngà, dễ chịu cho mắt */
-                --text-muted: #8b949e;   /* Màu chữ phụ */
+                --primary: #667aff;    
+                --secondary: #e06bce;    
+                --dark-bg: #161b22;    
+                --darker-bg: #0d1117;    
+                --card-bg: #21262d;     
+                --border-color: #30363d; 
+                --text-light: #e6edf3;   
+                --text-muted: #8b949e;
                 --success: #00cc66;
                 --warning: #ffcc00;
                 --danger: #ff3333;
@@ -606,6 +606,32 @@
                 color: var(--warning); /* Màu vàng cho sao đã điền */
             }
 
+            .feedback-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .btn-like, .btn-reply {
+                padding: 5px 10px;
+                border: 1px solid var(--border-color);
+                border-radius: 5px;
+                background-color: var(--darker-bg);
+                color: var(--text-light);
+                font-size: 0.9rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                transition: all 0.2s;
+            }
+
+            .btn-like:hover, .btn-reply:hover {
+                background-color: rgba(102, 122, 255, 0.2);
+                color: var(--primary);
+                border-color: var(--primary);
+            }
+
             /* === SUGGESTIONS SECTION === */
             .suggestions {
                 margin-top: 60px;
@@ -969,15 +995,19 @@
                             <c:forEach var="fb" items="${feedbackList}">
                                 <div class="feedback-item">
                                     <div class="feedback-meta">
-                                        <span class="feedback-author">Người dùng #${fb.userID}</span>
+                                        <span class="feedback-author">${fb.userName}</span>
                                         <span class="feedback-date">
-                                            <fmt:formatDate value="${fb.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                            <fmt:formatDate value="${fb.createdAtDate}" pattern="dd/MM/yyyy HH:mm"/>
                                         </span>
                                         <span class="feedback-stars">
                                             <c:forEach begin="1" end="${fb.rating}" var="i">★</c:forEach>
                                         </span>
                                     </div>
                                     <div class="feedback-text">${fb.content}</div>
+                                    <div class="feedback-actions">
+                                        <button class="btn-like" title="Thích"><i class="fa fa-thumbs-up"></i> Thích</button>
+                                        <button class="btn-reply" title="Phản hồi"><i class="fa fa-reply"></i> Phản hồi</button>
+                                    </div>
                                 </div>
                             </c:forEach>
                         </c:when>

@@ -43,11 +43,17 @@ public class EventServlet extends HttpServlet {
             int eventId = Integer.parseInt(idParam);
             Event event = eventDAO.getEventById(eventId);
 
+            System.out.println("eventId: " + eventId);
+            System.out.println("event: " + event);
+
             if (event != null) {
-                
                 List<TicketInfo> ticketList = ticketInfoDAO.getTicketInfosByEventID(eventId);
                 List<Event> suggestedEvents = eventDAO.getSuggestedEvents(eventId);
                 List<Feedback> feedbackList = feedbackDAO.getFeedbackByEventId(eventId);
+
+                System.out.println("ticketList size: " + (ticketList != null ? ticketList.size() : "null"));
+                System.out.println("suggestedEvents size: " + (suggestedEvents != null ? suggestedEvents.size() : "null"));
+                System.out.println("feedbackList size: " + (feedbackList != null ? feedbackList.size() : "null"));
 
                 request.setAttribute("event", event);
                 request.setAttribute("ticketList", ticketList);
@@ -58,8 +64,10 @@ public class EventServlet extends HttpServlet {
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy sự kiện với ID = " + eventId);
             }
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Định dạng ID sự kiện không hợp lệ.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().println("Error: " + e.getMessage());
         }
     }
 }

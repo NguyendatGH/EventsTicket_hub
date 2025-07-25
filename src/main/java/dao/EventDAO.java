@@ -184,7 +184,7 @@ public class EventDAO {
         String sql;
 
         if (currentEvent != null && currentEvent.getGenreID() != null) {
-            sql = "SELECT * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC LIMIT 3";
+            sql = "SELECT TOP 3 * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC";
             try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, currentEvent.getGenreID());
                 ps.setInt(2, currentEventId);
@@ -221,7 +221,7 @@ public class EventDAO {
 
             sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1"
                     + excludeClause.toString()
-                    + " ORDER BY StartTime DESC LIMIT ?";
+                    + " ORDER BY StartTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
             try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
