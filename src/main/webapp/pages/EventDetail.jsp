@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="dto.UserDTO"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -1029,7 +1030,7 @@
                 <div class="suggestions-grid">
                     <c:forEach var="suggestedEvent" items="${suggestedEvents}">
                         <a href="EventServlet?id=${suggestedEvent.eventID}" class="event-card">
-                            <img src="${suggestedEvent.imageURL}" alt="${suggestedEvent.name}">
+                            <img src="<c:choose><c:when test='${not empty suggestedEvent.imageURL && fn:startsWith(suggestedEvent.imageURL, "http") }'>${suggestedEvent.imageURL}</c:when><c:otherwise>${pageContext.request.contextPath}/uploads/event_banners/${suggestedEvent.imageURL}</c:otherwise></c:choose>" alt="${suggestedEvent.name}">
                             <div class="card-body">
                                 <h4>${suggestedEvent.name}</h4>
                                 <p>
