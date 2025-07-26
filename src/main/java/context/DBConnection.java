@@ -19,6 +19,7 @@ public class DBConnection {
 
 
 
+
     private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
     public static Connection getConnection() {

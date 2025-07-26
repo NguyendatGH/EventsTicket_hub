@@ -5,6 +5,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -141,6 +142,23 @@
             .search-box:focus, .filter-input:focus {
                 background: rgba(255, 255, 255, 0.1);
                 border-color: var(--primary);
+            }
+
+            /* Style for select dropdown */
+            select.filter-input {
+                cursor: pointer;
+                appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                background-size: 16px;
+                padding-right: 40px;
+            }
+
+            select.filter-input option {
+                background: var(--card-bg);
+                color: var(--text-light);
+                padding: 8px;
             }
 
             .auth-buttons {
@@ -901,17 +919,27 @@
                 </button>
 
                 <div class="nav-center-content">
-                    <div class="search-filter-container" id="searchFilterContainer">
-                        <input type="text" class="search-box" placeholder="Tìm sự kiện..." id="searchInput">
-                        <input type="date" class="filter-input" id="dateInput" title="Tìm theo ngày">
-                        <input type="text" class="filter-input" placeholder="Địa điểm..." id="locationInput">
-                    </div>
-
+                    <form action="${pageContext.request.contextPath}/home" method="get" style="display: flex; align-items: center; gap: 10px; width: 100%; max-width: 600px;">
+                        <input type="text" name="search" class="search-box" placeholder="Tìm sự kiện..." value="${fn:escapeXml(param.search)}" style="flex: 1;" />
+                        <select name="location" class="filter-input" style="flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color);">
+                            <option value="">Tất cả địa điểm</option>
+                            <c:forEach var="loc" items="${locations}">
+                                <option value="${loc}" <c:if test="${param.location == loc}">selected</c:if>>${loc}</option>
+                            </c:forEach>
+                        </select>
+                        <select name="category" class="filter-input" style="flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color);">
+                            <option value="">Tất cả thể loại</option>
+                            <c:forEach var="genre" items="${genres}">
+                                <option value="${genre.genreID}" <c:if test="${param.category == genre.genreID}">selected</c:if>>${genre.genreName}</option>
+                            </c:forEach>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    </form>
                     <ul class="nav-links" id="navLinks">
                         <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
                         <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
                         <li><a href="#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
-                        <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
+                        <li><a href="${pageContext.request.contextPath}/support"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
                     </ul>
                 </div>
                 

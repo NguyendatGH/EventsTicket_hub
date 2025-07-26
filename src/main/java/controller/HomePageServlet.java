@@ -11,8 +11,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import service.UserService;
+import dao.GenreDAO;
+import models.Genre;
 
-@WebServlet("/")
+@WebServlet({"/", "/home"})
 public class HomePageServlet extends HttpServlet {
 
     private static final int RECORDS_PER_PAGE = 10;
@@ -21,10 +23,43 @@ public class HomePageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    
+
         EventDAO eventDAO = new EventDAO();
 
         try {
+            String search = request.getParameter("search");
+            String location = request.getParameter("location");
+            String categoryParam = request.getParameter("category");
+            Integer genreId = null;
+            if (categoryParam != null && !categoryParam.isEmpty()) {
+                try {
+                    genreId = Integer.parseInt(categoryParam);
+                } catch (NumberFormatException e) {
+                    genreId = null;
+                }
+            }
+
+            // Lấy danh sách địa chỉ cho filter dropdown
+            List<String> locations = eventDAO.getAvailableLocations();
+            request.setAttribute("locations", locations);
+            // Lấy danh sách category (genre)
+            GenreDAO genreDAO = new GenreDAO();
+            List<Genre> genres = genreDAO.getAllGenres();
+            request.setAttribute("genres", genres);
+
+            if ((search != null && !search.trim().isEmpty()) || (location != null && !location.trim().isEmpty()) || (genreId != null && genreId > 0)) {
+                List<Event> events = eventDAO.searchEvents(search, location, genreId);
+                request.setAttribute("events", events);
+                request.setAttribute("search", search);
+                request.setAttribute("location", location);
+                request.setAttribute("category", genreId);
+                request.setAttribute("noOfPages", 1);
+                request.setAttribute("currentPage", 1);
+                request.setAttribute("totalEvents", events.size());
+                request.getRequestDispatcher("/pages/homePage.jsp").forward(request, response);
+                return;
+            }
+
             int currentPage = 1;
             if (request.getParameter("page") != null) {
                 try {

@@ -52,7 +52,11 @@ public class AdminServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String pathInfo = request.getPathInfo();
         logger.info("Processing admin request for path: " + pathInfo);
-        UserDTO u = (UserDTO) request.getAttribute("user");
+        UserDTO u = (UserDTO) session.getAttribute("user");
+        if (u == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
         try {
             if (!userService.whoisLoggedin(u.getId()).equalsIgnoreCase("admin")) {
@@ -70,7 +74,8 @@ public class AdminServlet extends HttpServlet {
             } else if (pathInfo.startsWith("/event-management")) {
                 eventManagementServlet.handleRequest(request, response);
             } else if (pathInfo.startsWith("/support-center")) {
-                supportCenterServlet.handleRequest(request, response);
+                // Chuyển tiếp request đến AdminSupportServlet
+                request.getRequestDispatcher("/admin/support").forward(request, response);
             } else if (pathInfo.startsWith("/transaction-management")) {
                 transactionServlet.handleRequest(request, response);
             } else {

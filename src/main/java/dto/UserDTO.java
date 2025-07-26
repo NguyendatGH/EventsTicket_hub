@@ -15,6 +15,7 @@ public class UserDTO {
     private boolean isLocked;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
+    private String role;
 
     public UserDTO() {
     }
@@ -121,6 +122,14 @@ public class UserDTO {
 
     public void setLastLoginAt(LocalDateTime lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override

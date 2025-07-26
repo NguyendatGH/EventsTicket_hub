@@ -358,6 +358,23 @@ CREATE TABLE Refunds (
     CONSTRAINT FK_Refunds_PaymentMethod FOREIGN KEY (PaymentMethodID) REFERENCES PaymentMethod(PaymentMethodID),
  
 );
+-- Bảng supportItems
+CREATE TABLE SupportItems (
+    SupportID INT IDENTITY(1,1) PRIMARY KEY,
+    FromEmail NVARCHAR(255) NOT NULL,
+    ToEmail NVARCHAR(255) NOT NULL,
+    Subject NVARCHAR(255) NOT NULL,
+    SendDate DATE NOT NULL,
+    SendTimestamp DATETIME NOT NULL,
+    Content NVARCHAR(MAX) NOT NULL,
+    Status NVARCHAR(50) NOT NULL,
+    Priority NVARCHAR(50) NOT NULL,
+    Category NVARCHAR(100) NOT NULL,
+    CreatedDate DATE NOT NULL,
+    LastModified DATE NOT NULL,
+    AdminResponse NVARCHAR(MAX) NULL,
+    AssignedAdmin NVARCHAR(255) NULL
+);
 Go
 
 

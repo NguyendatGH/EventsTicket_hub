@@ -70,7 +70,7 @@ public class FeedbackDAO {
                         rs.getInt("OrderID"),
                         rs.getInt("Rating"),
                         rs.getString("Content"),
-                        rs.getBoolean("IsApprove"),
+                        rs.getBoolean("IsApproved"),
                         rs.getString("AdminResponse"),
                         rs.getTimestamp("CreatedAt").toLocalDateTime(),
                         rs.getTimestamp("UpdatedAt").toLocalDateTime()
@@ -81,6 +81,52 @@ public class FeedbackDAO {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public List<Feedback> getFeedbackByEventId(int eventId) {
+        List<Feedback> list = new ArrayList<>();
+        String sql = "SELECT f.*, u.Username FROM Feedback f JOIN Users u ON f.UserID = u.Id WHERE f.EventID = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, eventId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Feedback fb = new Feedback(
+                    rs.getInt("FeedbackID"),
+                    rs.getInt("UserID"),
+                    rs.getInt("EventID"),
+                    rs.getInt("OrderID"),
+                    rs.getInt("Rating"),
+                    rs.getString("Content"),
+                    rs.getBoolean("IsApproved"),
+                    rs.getString("AdminResponse"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                );
+                fb.setUserName(rs.getString("Username"));
+                list.add(fb);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public static void main(String[] args) {
+        FeedbackDAO dao = new FeedbackDAO();
+        int testEventId = 1; // Thay bằng EventID bạn muốn test
+        System.out.println("--- Test getFeedbackByEventId(" + testEventId + ") ---");
+        List<Feedback> feedbacks = dao.getFeedbackByEventId(testEventId);
+        for (Feedback fb : feedbacks) {
+            System.out.println("FeedbackID: " + fb.getFeedbackID()
+                + ", UserID: " + fb.getUserID()
+                + ", EventID: " + fb.getEventID()
+                + ", Rating: " + fb.getRating()
+                + ", Content: " + fb.getContent()
+                + ", CreatedAt: " + fb.getCreatedAt());
+        }
+        if (feedbacks.isEmpty()) {
+            System.out.println("Không có feedback nào cho event này.");
+        }
     }
 
     // Bạn có thể viết thêm: getFeedbackByOrderID, approveFeedback, respondToFeedback,...
