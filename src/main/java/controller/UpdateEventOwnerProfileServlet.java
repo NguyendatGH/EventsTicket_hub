@@ -69,30 +69,62 @@ public class UpdateEventOwnerProfileServlet extends HttpServlet {
             return;
         }
         try {
+            // Lấy thông tin từ form
+            String name = request.getParameter("name");
             String gender = request.getParameter("gender");
             String birthdayStr = request.getParameter("birthday");
             String phoneNumber = request.getParameter("phoneNumber");
             String address = request.getParameter("address");
+            
+            // Validate required fields
+            if (name == null || name.trim().isEmpty()) {
+                request.setAttribute("error", "Tên không được để trống!");
+                request.getRequestDispatcher("eventOwner/updateEventOwnerProfile.jsp").forward(request, response);
+                return;
+            }
+            
+            if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+                request.setAttribute("error", "Số điện thoại không được để trống!");
+                request.getRequestDispatcher("eventOwner/updateEventOwnerProfile.jsp").forward(request, response);
+                return;
+            }
+            
+            if (address == null || address.trim().isEmpty()) {
+                request.setAttribute("error", "Địa chỉ không được để trống!");
+                request.getRequestDispatcher("eventOwner/updateEventOwnerProfile.jsp").forward(request, response);
+                return;
+            }
+            
+            // Cập nhật thông tin user
+            user.setName(name.trim());
             user.setGender(gender);
             if (birthdayStr != null && !birthdayStr.isEmpty()) {
                 user.setBirthday(java.sql.Date.valueOf(birthdayStr));
             } else {
                 user.setBirthday(null);
             }
-            user.setPhoneNumber(phoneNumber);
-            user.setAddress(address);
+            user.setPhoneNumber(phoneNumber.trim());
+            user.setAddress(address.trim());
             user.setUpdatedAt(java.time.LocalDateTime.now());
+            
+            // Cập nhật avatar nếu có
             updateAvatarIfProvided(request, user);
+            
+            // Lưu vào database
             boolean updated = userDAO.updateProfile(user);
             if (updated) {
+                // Cập nhật session với thông tin mới
                 session.setAttribute("user", user);
-                request.setAttribute("success", "Cập nhật hồ sơ Chủ sự kiện thành công!");
+                session.setAttribute("userName", user.getName());
+                session.setAttribute("userEmail", user.getEmail());
+                
+                request.setAttribute("success", "Cập nhật thông tin cá nhân thành công!");
             } else {
-                request.setAttribute("error", "Cập nhật hồ sơ Chủ sự kiện thất bại. Vui lòng thử lại.");
+                request.setAttribute("error", "Cập nhật thông tin cá nhân thất bại. Vui lòng thử lại.");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Đã xảy ra lỗi khi cập nhật hồ sơ Chủ sự kiện: " + e.getMessage());
+            request.setAttribute("error", "Đã xảy ra lỗi khi cập nhật thông tin cá nhân: " + e.getMessage());
         }
         request.getRequestDispatcher("eventOwner/updateEventOwnerProfile.jsp").forward(request, response);
     }
