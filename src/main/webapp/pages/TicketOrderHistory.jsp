@@ -16,6 +16,27 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <title>MasterTicket - Vé đã mua</title>
         <style>
+            :root {
+                --primary: #6366f1;
+                --primary-dark: #4f46e5;
+                --secondary: #ec4899;
+                --secondary-dark: #db2777;
+                --accent: #06b6d4;
+                --dark-bg: #0f172a;
+                --darker-bg: #020617;
+                --card-bg: #1e293b;
+                --card-hover: #334155;
+                --border-color: #334155;
+                --text-light: #f1f5f9;
+                --text-muted: #94a3b8;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --glass-bg: rgba(30, 41, 59, 0.8);
+                --gradient-1: linear-gradient(135deg, var(--primary), var(--secondary));
+                --gradient-2: linear-gradient(135deg, var(--accent), var(--primary));
+            }
+
             * {
                 margin: 0;
                 padding: 0;
@@ -24,71 +45,106 @@
 
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-                color: #1e293b;
+                background: var(--darker-bg);
+                color: var(--text-light);
                 line-height: 1.6;
                 min-height: 100vh;
+                overflow-x: hidden;
             }
 
-            /* Header Styles */
+            /* Animated Background */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background:
+                    radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+                z-index: -1;
+                animation: backgroundShift 20s ease infinite;
+            }
+
+            @keyframes backgroundShift {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.8;
+                }
+            }
+
+            /* Enhanced Header */
             .header {
-                background: white;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                border-bottom: 1px solid #e2e8f0;
                 position: sticky;
                 top: 0;
                 z-index: 100;
+                backdrop-filter: blur(20px);
+                background: rgba(2, 6, 23, 0.9);
+                border-bottom: 1px solid var(--border-color);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             }
 
             .header-container {
-                max-width: 1280px;
+                max-width: 1400px;
                 margin: 0 auto;
-                padding: 0 1rem;
+                padding: 1rem 2rem;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                height: 4rem;
             }
 
             .logo {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
                 font-weight: 700;
-                background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+                background: var(--gradient-1);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
             }
 
             .search-container {
                 flex: 1;
-                max-width: 28rem;
+                max-width: 400px;
                 margin: 0 2rem;
                 position: relative;
             }
 
             .search-input {
                 width: 100%;
-                padding: 0.75rem 1rem 0.75rem 2.5rem;
-                border: 1px solid #d1d5db;
-                border-radius: 9999px;
-                background: #f9fafb;
-                font-size: 0.875rem;
-                transition: all 0.2s;
+                padding: 0.75rem 1rem 0.75rem 3rem;
+                border: 1px solid var(--border-color);
+                border-radius: 50px;
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
+                color: var(--text-light);
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
             }
 
             .search-input:focus {
                 outline: none;
-                border-color: #3b82f6;
-                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-                background: white;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            }
+
+            .search-input::placeholder {
+                color: var(--text-muted);
             }
 
             .search-icon {
                 position: absolute;
-                left: 0.75rem;
+                left: 1rem;
                 top: 50%;
                 transform: translateY(-50%);
-                color: #6b7280;
+                color: var(--text-muted);
+                font-size: 1rem;
             }
 
             .header-actions {
@@ -98,551 +154,491 @@
             }
 
             .btn {
-                padding: 0.5rem 1rem;
-                border-radius: 9999px;
-                font-weight: 500;
-                font-size: 0.875rem;
+                padding: 0.75rem 1.5rem;
+                border-radius: 50px;
+                font-weight: 600;
+                font-size: 0.9rem;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: all 0.3s ease;
                 text-decoration: none;
                 display: inline-flex;
                 align-items: center;
                 gap: 0.5rem;
+                border: none;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn:hover::before {
+                left: 100%;
             }
 
             .btn-outline {
-                background: transparent;
-                border: 1px solid #d1d5db;
-                color: #374151;
+                background: var(--glass-bg);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--border-color);
+                color: var(--text-light);
             }
 
             .btn-outline:hover {
-                background: #f3f4f6;
-                border-color: #9ca3af;
+                background: var(--card-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
             }
 
             .btn-primary {
-                background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-                border: none;
+                background: var(--gradient-1);
                 color: white;
             }
 
             .btn-primary:hover {
-                background: linear-gradient(135deg, #2563eb, #7c3aed);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            }
+
+
+            .account {
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                padding: 0.5rem 1rem;
+                border-radius: 50px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .account:hover {
+                background: var(--card-hover);
                 transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            }
+
+            a.link {
+                color: white;
+                text-decoration: none;
+            }
+
+
+            /* Enhanced Back Button */
+            .back-button-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 2rem 2rem 0;
+                position: relative;
+            }
+
+            .back-button {
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--border-color);
+                color: var(--text-light);
+                text-decoration: none;
+                padding: 0.75rem 1.5rem;
+                border-radius: 50px;
+                font-size: 0.95rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.75rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                animation: backButtonSlideIn 0.6s ease 0.3s both;
+                position: relative;
+                overflow: hidden;
+            }
+
+            @keyframes backButtonSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(-30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            .back-button::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .back-button:hover::before {
+                left: 100%;
+            }
+
+            .back-button:hover {
+                background: var(--card-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+                color: var(--text-light);
+                text-decoration: none;
+            }
+
+            .back-button i {
+                color: var(--primary);
+                transition: all 0.3s ease;
+            }
+
+            .back-button:hover i {
+                transform: translateX(-3px);
+                color: var(--accent);
             }
 
             /* Main Content */
             .main-container {
-                max-width: 1280px;
+                max-width: 1400px;
                 margin: 0 auto;
-                padding: 2rem 1rem;
+                padding: 2rem 2rem 3rem;
             }
 
             .page-header {
-                margin-bottom: 2rem;
+                margin-bottom: 3rem;
+                text-align: center;
             }
 
             .page-title {
-                font-size: 2rem;
+                font-size: 3rem;
                 font-weight: 700;
-                color: #1e293b;
-                margin-bottom: 0.5rem;
+                background: var(--gradient-1);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 1rem;
+                line-height: 1.2;
             }
 
             .page-subtitle {
-                color: #64748b;
-                font-size: 1rem;
+                color: var(--text-muted);
+                font-size: 1.2rem;
+                max-width: 600px;
+                margin: 0 auto;
             }
 
-            /* Filter Tabs */
-            .filter-tabs {
-                display: flex;
-                background: #f1f5f9;
-                border-radius: 9999px;
-                padding: 0.25rem;
-                margin-bottom: 1.5rem;
-                max-width: 24rem;
-            }
-
-            .filter-tab {
-                flex: 1;
-                padding: 0.5rem 1rem;
-                border: none;
-                background: transparent;
-                border-radius: 9999px;
-                font-size: 0.875rem;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s;
-                color: #64748b;
-            }
-
-            .filter-tab.active {
-                background: white;
-                color: #1e293b;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-
-            .filter-tab:hover:not(.active) {
-                color: #374151;
-            }
-
-            /* Status Buttons */
-            .status-filters {
-                display: flex;
-                gap: 1rem;
-                margin-bottom: 2rem;
-            }
-
-            .status-btn {
-                padding: 0.75rem 1.5rem;
-                border-radius: 9999px;
-                border: 1px solid #d1d5db;
-                background: white;
-                color: #374151;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .status-btn.active {
-                background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-                color: white;
-                border-color: transparent;
-            }
-
-            .status-btn:hover:not(.active) {
-                background: #f8fafc;
-                border-color: #9ca3af;
-            }
-
-            /* Cards */
-            .card {
-                background: white;
-                border-radius: 1rem;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                overflow: hidden;
-                transition: all 0.3s;
-                margin-bottom: 1.5rem;
-            }
-
-            .card:hover {
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-                transform: translateY(-2px);
-            }
-
-            .card-header {
-                background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-                padding: 1.5rem;
-                border-bottom: 1px solid #e2e8f0;
-            }
-
-            .card-title {
-                font-size: 1.25rem;
-                font-weight: 600;
-                color: #1e293b;
-                margin-bottom: 0.5rem;
-            }
-
-            .card-meta {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 1rem;
-                color: #64748b;
-                font-size: 0.875rem;
-            }
-
-            .card-meta-item {
-                display: flex;
-                align-items: center;
-                gap: 0.25rem;
-            }
-
-            .card-content {
-                padding: 1.5rem;
-            }
-
-            .card-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
-            }
-
-            @media (max-width: 768px) {
-                .card-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-
-            /* Badge */
-            .badge {
-                padding: 0.25rem 0.75rem;
-                border-radius: 9999px;
-                font-size: 0.75rem;
-                font-weight: 500;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }
-
-            .badge-success {
-                background: #dcfce7;
-                color: #166534;
-                border: 1px solid #bbf7d0;
-            }
-
-            .badge-warning {
-                background: #fef3c7;
-                color: #92400e;
-                border: 1px solid #fde68a;
-            }
-
-            .badge-danger {
-                background: #fee2e2;
-                color: #991b1b;
-                border: 1px solid #fecaca;
-            }
-
-            /* Ticket Details */
-            .ticket-section {
-                background: #f8fafc;
-                border-radius: 0.75rem;
-                padding: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            .ticket-section h4 {
-                font-weight: 600;
-                color: #1e293b;
-                margin-bottom: 0.75rem;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .ticket-detail {
-                background: white;
-                border-radius: 0.5rem;
-                padding: 1rem;
-                margin-bottom: 0.75rem;
-                border: 1px solid #e2e8f0;
-            }
-
-            .ticket-detail-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 0.75rem;
-                font-size: 0.875rem;
-            }
-
-            .ticket-detail-item {
+            /* Enhanced Ticket Cards */
+            .tickets-list-horizontal {
                 display: flex;
                 flex-direction: column;
+                gap: 2rem;
             }
 
-            .ticket-detail-label {
-                color: #64748b;
-                font-size: 0.75rem;
-                margin-bottom: 0.25rem;
+            .ticket-horizontal-card {
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--border-color);
+                border-radius: 24px;
+                padding: 2rem;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
+                overflow: hidden;
             }
 
-            .ticket-detail-value {
-                font-weight: 500;
-                color: #1e293b;
+            .ticket-horizontal-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: var(--gradient-1);
             }
 
-            .ticket-code {
-                font-family: 'Courier New', monospace;
-                background: #f1f5f9;
-                padding: 0.25rem 0.5rem;
-                border-radius: 0.25rem;
+            .ticket-horizontal-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+                border-color: var(--primary);
             }
 
-            /* Payment Info */
-            .payment-section {
-                background: #f8fafc;
-                border-radius: 0.75rem;
-                padding: 1rem;
-            }
-
-            .payment-total {
-                display: flex;
-                justify-content: space-between;
+            .ticket-card-content {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 2rem;
                 align-items: center;
-                margin-bottom: 0.5rem;
-                padding-bottom: 0.5rem;
-                border-bottom: 1px solid #e2e8f0;
             }
 
-            .payment-total-amount {
-                font-size: 1.25rem;
+            .ticket-info h3 {
+                font-size: 1.5rem;
                 font-weight: 700;
-                color: #059669;
+                margin-bottom: 1rem;
+                color: var(--text-light);
+                background: var(--gradient-1);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
 
-            .payment-date {
-                display: flex;
-                justify-content: space-between;
-                color: #64748b;
-                font-size: 0.875rem;
+            .ticket-meta {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+                margin-bottom: 1.5rem;
             }
 
-            /* Action Buttons */
-            .action-buttons {
+            .ticket-meta-item {
                 display: flex;
+                align-items: center;
                 gap: 0.75rem;
+                padding: 0.75rem;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                transition: all 0.3s ease;
+            }
+
+            .ticket-meta-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: translateX(4px);
+            }
+
+            .ticket-meta-item i {
+                color: var(--primary);
+                font-size: 1.1rem;
+                width: 20px;
+                text-align: center;
+            }
+
+            .ticket-meta-item span {
+                color: var(--text-light);
+                font-weight: 500;
+            }
+
+            .ticket-stats {
+                display: flex;
+                gap: 2rem;
                 margin-top: 1rem;
             }
 
-            .btn-sm {
-                padding: 0.5rem 1rem;
+            .ticket-stat {
+                text-align: center;
+                padding: 1rem;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                min-width: 120px;
+            }
+
+            .ticket-stat-value {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--success);
+                margin-bottom: 0.25rem;
+            }
+
+            .ticket-stat-label {
                 font-size: 0.875rem;
+                color: var(--text-muted);
+            }
+
+            /* Action Buttons */
+            .ticket-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-end;
             }
 
             .btn-refund {
-                background: #fef2f2;
-                color: #dc2626;
-                border: 1px solid #fecaca;
+                background: linear-gradient(135deg, var(--danger), #dc2626);
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border-radius: 50px;
+                border: none;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                position: relative;
+                overflow: hidden;
             }
 
-            .btn-refund:hover {
-                background: #fee2e2;
+            .btn-refund::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
             }
 
-            .btn-view {
-                background: #eff6ff;
-                color: #2563eb;
-                border: 1px solid #dbeafe;
+            .btn-refund:hover:not(:disabled)::before {
+                left: 100%;
             }
 
-            .btn-view:hover {
-                background: #dbeafe;
+            .btn-refund:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+            }
+
+            .btn-refund:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                background: var(--text-muted);
+            }
+
+            .btn-refund:disabled::before {
+                display: none;
+            }
+
+            .btn-feedback {
+                background: var(--gradient-2);
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border-radius: 50px;
+                border: none;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-feedback::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-feedback:hover::before {
+                left: 100%;
+            }
+
+            .btn-feedback:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
             }
 
             /* Empty State */
             .empty-state {
                 text-align: center;
-                padding: 4rem 2rem;
-                background: white;
-                border-radius: 1rem;
-                margin-bottom: 2rem;
+                padding: 6rem 2rem;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--border-color);
+                border-radius: 24px;
+                margin-bottom: 3rem;
             }
 
             .empty-icon {
-                width: 6rem;
-                height: 6rem;
-                background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+                width: 8rem;
+                height: 8rem;
+                background: var(--gradient-1);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0 auto 1.5rem;
-                font-size: 2rem;
+                margin: 0 auto 2rem;
+                font-size: 3rem;
+                color: white;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .empty-icon::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+                animation: shimmer 3s infinite;
+            }
+
+            @keyframes shimmer {
+                0% {
+                    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                }
+                100% {
+                    transform: translateX(100%) translateY(100%) rotate(45deg);
+                }
             }
 
             .empty-title {
-                font-size: 1.25rem;
-                font-weight: 600;
-                color: #1e293b;
-                margin-bottom: 0.5rem;
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--text-light);
+                margin-bottom: 1rem;
             }
 
             .empty-description {
-                color: #64748b;
-                margin-bottom: 1.5rem;
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
-            /*ticket-history*/
-            .tickets-list-horizontal {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
-            .ticket-horizontal-card {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: #ffffff;
-                border: 1px solid #e5e7eb;
-                border-radius: 1rem;
-                padding: 1.5rem;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-                transition: transform 0.2s;
-            }
-
-            .ticket-horizontal-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
-            }
-
-            .ticket-info h3 {
-                font-size: 1.25rem;
-                font-weight: 600;
-                margin-bottom: 0.5rem;
-                color: #1e293b;
-            }
-
-            .ticket-info p {
-                margin: 0.2rem 0;
-                color: #334155;
-            }
-
-            .refund-form {
-                align-self: flex-start;
-            }
-
-            .btn-refund {
-                background-color: #fee2e2;
-                color: #dc2626;
-                border: 1px solid #fecaca;
-                padding: 0.5rem 1rem;
-                border-radius: 9999px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: background 0.2s;
-            }
-
-            .btn-refund:hover {
-                background-color: #fecaca;
-            }
-
-
-            /* Suggestions */
-            .suggestions-section {
-                margin-top: 3rem;
-            }
-
-            .suggestions-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1.5rem;
-            }
-
-            .suggestions-title {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #1e293b;
-            }
-
-            .suggestions-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 1.5rem;
-            }
-
-            .suggestion-card {
-                background: white;
-                border-radius: 1rem;
-                overflow: hidden;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                transition: all 0.3s;
-            }
-
-            .suggestion-card:hover {
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-                transform: translateY(-4px);
-            }
-
-            .suggestion-image {
-                width: 100%;
-                height: 12rem;
-                background: linear-gradient(135deg, #f3f4f6, #d1d5db);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #6b7280;
-                font-size: 0.875rem;
-                position: relative;
-            }
-
-            .suggestion-price {
-                position: absolute;
-                top: 1rem;
-                right: 1rem;
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(10px);
-                padding: 0.25rem 0.75rem;
-                border-radius: 9999px;
-                font-weight: 600;
-                color: #1e293b;
-                font-size: 0.875rem;
-            }
-
-            .suggestion-content {
-                padding: 1.5rem;
-            }
-
-            .suggestion-name {
-                font-weight: 600;
-                color: #1e293b;
-                margin-bottom: 0.75rem;
-                font-size: 1.125rem;
-                line-height: 1.4;
-            }
-
-            .suggestion-meta {
-                color: #64748b;
-                font-size: 0.875rem;
-                margin-bottom: 1rem;
-            }
-
-            .suggestion-meta-item {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .suggestion-stats {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1rem;
-                font-size: 0.875rem;
-                color: #64748b;
-            }
-
-            .suggestion-rating {
-                display: flex;
-                align-items: center;
-                gap: 0.25rem;
-            }
-
-            .suggestion-attendees {
-                display: flex;
-                align-items: center;
-                gap: 0.25rem;
-            }
-
-            /* Footer */
+            /* Enhanced Footer */
             .footer {
-                background: #1e293b;
-                color: white;
-                margin-top: 4rem;
+                background: var(--darker-bg);
+                border-top: 1px solid var(--border-color);
+                margin-top: 6rem;
             }
 
             .footer-container {
-                max-width: 1280px;
+                max-width: 1400px;
                 margin: 0 auto;
-                padding: 3rem 1rem;
+                padding: 4rem 2rem 2rem;
             }
 
             .footer-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 2rem;
+                gap: 3rem;
+                margin-bottom: 3rem;
+            }
+
+            .footer-brand {
+                font-size: 1.75rem;
+                font-weight: 700;
+                background: var(--gradient-1);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .footer-description {
+                color: var(--text-muted);
+                margin-bottom: 1.5rem;
+                line-height: 1.6;
             }
 
             .footer-section h3 {
                 font-weight: 600;
-                margin-bottom: 1rem;
-                color: white;
+                margin-bottom: 1.5rem;
+                color: var(--text-light);
+                font-size: 1.1rem;
             }
 
             .footer-section ul {
@@ -650,196 +646,348 @@
             }
 
             .footer-section ul li {
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.75rem;
             }
 
             .footer-section ul li a {
-                color: #94a3b8;
+                color: var(--text-muted);
                 text-decoration: none;
-                transition: color 0.2s;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
             }
 
             .footer-section ul li a:hover {
-                color: white;
-            }
-
-            .footer-brand {
-                font-size: 1.5rem;
-                font-weight: 700;
-                background: linear-gradient(135deg, #60a5fa, #a78bfa);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                margin-bottom: 1rem;
-            }
-
-            .footer-description {
-                color: #94a3b8;
-                margin-bottom: 1rem;
+                color: var(--primary);
+                transform: translateX(4px);
             }
 
             .social-links {
                 display: flex;
-                gap: 0.75rem;
+                gap: 1rem;
+                margin-top: 1rem;
             }
 
             .social-link {
-                width: 2rem;
-                height: 2rem;
-                background: #334155;
+                width: 3rem;
+                height: 3rem;
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                color: white;
+                color: var(--text-light);
                 text-decoration: none;
-                transition: all 0.2s;
+                transition: all 0.3s ease;
+                font-size: 1.2rem;
             }
 
             .social-link:hover {
-                background: #3b82f6;
-                transform: translateY(-2px);
+                background: var(--gradient-1);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
             }
 
             .newsletter-form {
                 display: flex;
                 gap: 0.5rem;
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
             }
 
             .newsletter-input {
                 flex: 1;
-                padding: 0.75rem;
-                border: 1px solid #475569;
-                border-radius: 0.5rem;
-                background: #334155;
-                color: white;
+                padding: 0.75rem 1rem;
+                border: 1px solid var(--border-color);
+                border-radius: 50px;
+                background: var(--card-bg);
+                color: var(--text-light);
+                transition: all 0.3s ease;
+            }
+
+            .newsletter-input:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
             }
 
             .newsletter-input::placeholder {
-                color: #94a3b8;
+                color: var(--text-muted);
             }
 
             .newsletter-btn {
-                background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+                background: var(--gradient-1);
                 border: none;
                 color: white;
-                padding: 0.75rem 1rem;
-                border-radius: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                border-radius: 50px;
                 cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .newsletter-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
             }
 
             .footer-bottom {
-                border-top: 1px solid #334155;
-                margin-top: 2rem;
+                border-top: 1px solid var(--border-color);
                 padding-top: 2rem;
                 text-align: center;
-                color: #94a3b8;
+                color: var(--text-muted);
             }
 
-            /* Responsive */
+            .language-flags {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            .language-flags img {
+                width: 24px;
+                height: 18px;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .language-flags img:hover {
+                transform: scale(1.1);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 1024px) {
+                .ticket-card-content {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
+                }
+
+                .ticket-actions {
+                    align-items: center;
+                    flex-direction: row;
+                    justify-content: center;
+                }
+
+                .page-title {
+                    font-size: 2.5rem;
+                }
+            }
+
             @media (max-width: 768px) {
                 .header-container {
                     flex-direction: column;
-                    height: auto;
-                    padding: 1rem;
                     gap: 1rem;
+                    padding: 1rem;
                 }
 
                 .search-container {
                     margin: 0;
                     max-width: none;
+                    width: 100%;
                 }
 
-                .filter-tabs {
-                    max-width: none;
+                .back-button-container {
+                    padding: 1rem;
                 }
 
-                .status-filters {
-                    flex-direction: column;
+                .main-container {
+                    padding: 1rem;
                 }
 
-                .suggestions-grid {
+                .page-title {
+                    font-size: 2rem;
+                }
+
+                .ticket-horizontal-card {
+                    padding: 1.5rem;
+                }
+
+                .ticket-meta {
                     grid-template-columns: 1fr;
                 }
+
+                .ticket-stats {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .ticket-actions {
+                    flex-direction: column;
+                    width: 100%;
+                }
+
+                .btn-refund,
+                .btn-feedback {
+                    width: 100%;
+                    justify-content: center;
+                }
+            }
+
+            /* Loading Animation */
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
+            .loading {
+                animation: pulse 2s infinite;
+            }
+
+            /* Scroll Animations */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .fade-in-up {
+                animation: fadeInUp 0.6s ease forwards;
             }
         </style>
     </head>
+
     <body>
         <!-- Header -->
         <header class="header">
             <div class="header-container">
-                <div class="logo">MasterTicket</div>
-
+                <div class="logo">
+                    <i class="fas fa-ticket-alt"></i>
+                    MasterTicket
+                </div>
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Tìm kiếm sự kiện...">
+                    <input type="text" class="search-input" placeholder="Tìm kiếm sự kiện, vé đã mua...">
                 </div>
-
                 <div class="header-actions">
-                    <a href="#" class="btn btn-outline">Tạo sự kiện</a>
-                    <a href="#" class="btn btn-primary">Tài khoản</a>
+                    <a href="#" class="btn btn-outline">
+                        <i class="fas fa-plus"></i>
+                        Tạo sự kiện
+                    </a>
+                    <div class="account">
+                        <a href="${pageContext.request.contextPath}/updateProfile" class="link">
+                            <i class="fas fa-user"></i>
+                            Tài khoản
+                        </a>
+                    </div>
                 </div>
             </div>
         </header>
 
+        <!-- Enhanced Back Button -->
+        <div class="back-button-container">
+            <a href="javascript:history.back()" class="back-button" title="Quay lại trang trước">
+                <i class="fas fa-arrow-left"></i>
+                <span>Quay lại</span>
+            </a>
+        </div>
+
         <!-- Main Content -->
         <main class="main-container">
-            <div class="page-header">
-                <h1 class="page-title">Vé đã mua</h1>
-                <p class="page-subtitle">Quản lý và theo dõi các vé bạn đã mua</p>
+            <div class="page-header fade-in-up">
+                <h1 class="page-title">
+                    <i class="fas fa-history"></i>
+                    Vé đã mua
+                </h1>
+                <p class="page-subtitle">Quản lý và theo dõi tất cả các vé bạn đã mua tại MasterTicket</p>
             </div>
 
             <c:choose>
                 <c:when test="${not empty orderHistory}">
                     <div class="tickets-list-horizontal">
-                        <c:forEach var="order" items="${orderHistory}">
-                            <div class="ticket-horizontal-card">
-                                <div class="ticket-info">
-                                    <h3>${order['eventName']}</h3>
-                                    <p><i class="fas fa-map-marker-alt"></i> ${order['physicalLocation']}</p>
-                                    <p><i class="fas fa-calendar-alt"></i> ${order['startTime']}</p>
-                                    <p>Số lượng vé: <strong>${order['totalQuantity']}</strong></p>
-                                    <p>Tổng tiền: <strong>${order['totalAmount']} đ</strong></p>
-                                    <p>Ngày đặt: ${order['createdAt']}</p>
-                                </div>
+                        <c:forEach var="order" items="${orderHistory}" varStatus="status">
+                            <div class="ticket-horizontal-card fade-in-up" style="animation-delay: ${status.index * 0.1}s">
+                                <div class="ticket-card-content">
+                                    <div class="ticket-info">
+                                        <h3>
+                                            <i class="fas fa-calendar-check"></i>
+                                            ${order['eventName']}
+                                        </h3>
 
-                                <div class="ticket-action">
-                                    <c:choose>
-                                        <c:when test="${order['canRefund'] == true}">
-                                            <form method="get" action="${pageContext.request.contextPath}/RefundTicketServlet"
-                                                  onsubmit="return confirm('Bạn có chắc muốn hoàn trả vé này không?');"
-                                                  class="refund-form">
+                                        <div class="ticket-meta">
+                                            <div class="ticket-meta-item">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <span>${order['physicalLocation']}</span>
+                                            </div>
+                                            <div class="ticket-meta-item">
+                                                <i class="fas fa-clock"></i>
+                                                <span>${order['startTime']}</span>
+                                            </div>
+                                            <div class="ticket-meta-item">
+                                                <i class="fas fa-calendar-plus"></i>
+                                                <span>Đặt: ${order['createdAt']}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="ticket-stats">
+                                            <div class="ticket-stat">
+                                                <div class="ticket-stat-value">${order['totalQuantity']}</div>
+                                                <div class="ticket-stat-label">Số vé</div>
+                                            </div>
+                                            <div class="ticket-stat">
+                                                <div class="ticket-stat-value">${order['totalAmount']}đ</div>
+                                                <div class="ticket-stat-label">Tổng tiền</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ticket-actions">
+                                        <c:choose>
+                                            <c:when test="${order['canRefund'] == true}">
+                                                <form method="get" action="${pageContext.request.contextPath}/RefundTicketServlet"
+                                                      onsubmit="return confirm('Bạn có chắc muốn hoàn trả vé này không?');">
+                                                    <input type="hidden" name="orderId" value="${order['orderId']}" />
+                                                    <button type="submit" class="btn-refund">
+                                                        <i class="fas fa-undo"></i>
+                                                        Hoàn trả vé
+                                                    </button>
+                                                </form>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <button class="btn-refund" disabled>
+                                                    <i class="fas fa-ban"></i>
+                                                    Không thể hoàn vé
+                                                </button>
+                                            </c:otherwise>
+                                        </c:choose>
+
+                                        <c:if test="${order['startTime'] lt now}">
+                                            <form method="get" action="${pageContext.request.contextPath}/FeedbackServlet">
                                                 <input type="hidden" name="orderId" value="${order['orderId']}" />
-                                                <button type="submit" class="btn btn-refund">Hoàn trả vé</button>
+                                                <input type="hidden" name="eventId" value="${order['eventId']}" />
+                                                <button type="submit" class="btn-feedback">
+                                                    <i class="fas fa-star"></i>
+                                                    Đánh giá sự kiện
+                                                </button>
                                             </form>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <button class="btn btn-refund" disabled style="opacity: 0.5; cursor: not-allowed;">Không thể hoàn vé</button>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <c:if test="${order['startTime'] lt now}">
-                                        <form method="get" action="${pageContext.request.contextPath}/FeedbackServlet" class="feedback-form" style="margin-top: 10px;">
-                                            <input type="hidden" name="orderId" value="${order['orderId']}" />
-                                            <input type="hidden" name="eventId" value="${order['eventId']}" />
-                                            <button type="submit" class="btn btn-feedback"><i class="fas fa-comment"></i> Gửi phản hồi</button>
-                                        </form>
-                                    </c:if>
+                                        </c:if>
+                                    </div>
                                 </div>
                             </div>
                         </c:forEach>
                     </div>
                 </c:when>
-
                 <c:otherwise>
-                    <div class="empty-state">
+                    <div class="empty-state fade-in-up">
                         <div class="empty-icon">
                             <i class="fas fa-ticket-alt"></i>
                         </div>
                         <h3 class="empty-title">Bạn chưa có vé nào</h3>
-                        <p class="empty-description">Khám phá các sự kiện thú vị và đặt vé ngay hôm nay!</p>
+                        <p class="empty-description">
+                            Khám phá hàng ngàn sự kiện thú vị và đặt vé ngay hôm nay để tạo nên những trải nghiệm đáng nhớ!
+                        </p>
                         <a href="explore.jsp" class="btn btn-primary">
-                            <i class="fas fa-search"></i>
+                            <i class="fas fa-compass"></i>
                             Khám phá sự kiện
                         </a>
                     </div>
@@ -847,14 +995,18 @@
             </c:choose>
         </main>
 
-
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-container">
                 <div class="footer-grid">
                     <div>
-                        <div class="footer-brand">MasterTicket</div>
-                        <p class="footer-description">Nền tảng đặt vé sự kiện hàng đầu Việt Nam</p>
+                        <div class="footer-brand">
+                            <i class="fas fa-ticket-alt"></i>
+                            MasterTicket
+                        </div>
+                        <p class="footer-description">
+                            Nền tảng đặt vé sự kiện hàng đầu Việt Nam, mang đến trải nghiệm giải trí tuyệt vời cho mọi người.
+                        </p>
                         <div class="social-links">
                             <a href="#" class="social-link">
                                 <i class="fab fa-facebook-f"></i>
@@ -865,75 +1017,143 @@
                             <a href="#" class="social-link">
                                 <i class="fab fa-tiktok"></i>
                             </a>
+                            <a href="#" class="social-link">
+                                <i class="fab fa-youtube"></i>
+                            </a>
                         </div>
                     </div>
 
                     <div>
-                        <h3>Hỗ trợ khách hàng</h3>
+                        <h3><i class="fas fa-headset"></i> Hỗ trợ khách hàng</h3>
                         <ul>
-                            <li><a href="#">Câu hỏi thường gặp</a></li>
-                            <li><a href="#">Liên hệ</a></li>
-                            <li><a href="#">Chính sách bảo mật</a></li>
-                            <li><a href="#">Điều khoản dịch vụ</a></li>
+                            <li><a href="#"><i class="fas fa-question-circle"></i> Câu hỏi thường gặp</a></li>
+                            <li><a href="#"><i class="fas fa-phone"></i> Liên hệ hỗ trợ</a></li>
+                            <li><a href="#"><i class="fas fa-shield-alt"></i> Chính sách bảo mật</a></li>
+                            <li><a href="#"><i class="fas fa-file-contract"></i> Điều khoản dịch vụ</a></li>
                         </ul>
-                        <p style="color: #94a3b8; margin-top: 1rem;">
-                            <i class="fas fa-envelope"></i>
-                            <a href="mailto:support@masterticket.vn" style="color: #94a3b8;">support@masterticket.vn</a>
+                        <p style="color: var(--text-muted); margin-top: 1rem;">
+                            <i class="fas fa-envelope" style="color: var(--success);"></i>
+                            <a href="mailto:support@masterticket.vn" style="color: var(--text-muted);">
+                                support@masterticket.vn
+                            </a>
                         </p>
                     </div>
 
                     <div>
-                        <h3>Khám phá</h3>
+                        <h3><i class="fas fa-compass"></i> Khám phá</h3>
                         <ul>
-                            <li><a href="#">Tạo tài khoản</a></li>
-                            <li><a href="#">Tin tức</a></li>
-                            <li><a href="#">Sự kiện nổi bật</a></li>
+                            <li><a href="#"><i class="fas fa-user-plus"></i> Tạo tài khoản</a></li>
+                            <li><a href="#"><i class="fas fa-newspaper"></i> Tin tức & Blog</a></li>
+                            <li><a href="#"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
+                            <li><a href="#"><i class="fas fa-calendar-week"></i> Lịch sự kiện</a></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h3>Nhận thông báo sự kiện</h3>
+                        <h3><i class="fas fa-bell"></i> Nhận thông báo mới</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                            Đăng ký để nhận thông tin về các sự kiện mới nhất và ưu đãi đặc biệt.
+                        </p>
                         <form class="newsletter-form">
                             <input type="email" class="newsletter-input" placeholder="Email của bạn..." required>
                             <button type="submit" class="newsletter-btn">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </form>
-                        <p style="color: #94a3b8; font-size: 0.875rem;">
-                            Ngôn ngữ: 
-                            <img src="https://flagcdn.com/w20/vn.png" alt="Vietnamese" style="width: 20px; margin: 0 5px;">
-                            <img src="https://flagcdn.com/w20/gb.png" alt="English" style="width: 20px; margin: 0 5px;">
-                        </p>
+
+                        <div style="color: var(--text-muted); font-size: 0.9rem;">
+                            <i class="fas fa-globe"></i> Ngôn ngữ:
+                            <div class="language-flags">
+                                <img src="https://flagcdn.com/w20/vn.png" alt="Tiếng Việt" title="Tiếng Việt">
+                                <img src="https://flagcdn.com/w20/gb.png" alt="English" title="English">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="footer-bottom">
-                    <p>&copy; 2024 MasterTicket. Tất cả quyền được bảo lưu.</p>
+                    <p>&copy; 2024 MasterTicket. Tất cả quyền được bảo lưu. | Thiết kế với ❤️ tại Việt Nam</p>
                 </div>
             </div>
         </footer>
 
         <script>
-            // Filter tabs functionality
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.addEventListener('click', function () {
-                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-
-            // Status buttons functionality
-            document.querySelectorAll('.status-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-
             // Search functionality
             document.querySelector('.search-input').addEventListener('input', function () {
-                // Add search logic here
-                console.log('Searching for:', this.value);
+                const searchTerm = this.value.toLowerCase();
+                const tickets = document.querySelectorAll('.ticket-horizontal-card');
+
+                tickets.forEach(ticket => {
+                    const eventName = ticket.querySelector('h3').textContent.toLowerCase();
+                    const location = ticket.querySelector('.ticket-meta-item span').textContent.toLowerCase();
+
+                    if (eventName.includes(searchTerm) || location.includes(searchTerm)) {
+                        ticket.style.display = 'block';
+                        ticket.classList.add('fade-in-up');
+                    } else {
+                        ticket.style.display = 'none';
+                    }
+                });
+            });
+
+            // Smooth scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in-up');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all animatable elements
+            document.querySelectorAll('.ticket-horizontal-card, .empty-state').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Newsletter form submission
+            document.querySelector('.newsletter-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const email = this.querySelector('.newsletter-input').value;
+
+                // Show success message (you can implement actual subscription logic here)
+                alert('Cảm ơn bạn đã đăng ký! Chúng tôi sẽ gửi thông tin sự kiện mới nhất đến email của bạn.');
+                this.querySelector('.newsletter-input').value = '';
+            });
+
+            // Add loading states for forms
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function () {
+                    const button = this.querySelector('button[type="submit"]');
+                    if (button && !button.disabled) {
+                        button.classList.add('loading');
+                        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                    }
+                });
+            });
+
+            // Add keyboard shortcut for back button
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    history.back();
+                }
+            });
+
+            // Add smooth scroll to top functionality
+            window.addEventListener('scroll', function () {
+                const backButton = document.querySelector('.back-button');
+                if (window.scrollY > 300) {
+                    backButton.style.position = 'fixed';
+                    backButton.style.top = '2rem';
+                    backButton.style.left = '2rem';
+                    backButton.style.zIndex = '1000';
+                } else {
+                    backButton.style.position = 'static';
+                }
             });
         </script>
     </body>
