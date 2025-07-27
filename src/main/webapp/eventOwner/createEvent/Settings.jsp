@@ -347,7 +347,7 @@
                 <div class="step-connector"></div>
                 <div class="progress-step">
                     <div class="step-number inactive">4</div>
-                    <span>Payment</span>
+                    <span>TicketInfo</span>
                 </div>
             </div>
         </div>

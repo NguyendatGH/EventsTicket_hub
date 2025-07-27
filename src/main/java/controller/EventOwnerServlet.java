@@ -135,6 +135,7 @@ public class EventOwnerServlet extends HttpServlet {
             case "step3":
                 processStep3(request, response);
                 break;
+            
             case "createMap":
                 processCreateMap(request, response);
                 break;
