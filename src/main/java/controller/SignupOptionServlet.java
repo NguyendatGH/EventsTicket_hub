@@ -18,11 +18,11 @@ public class SignupOptionServlet extends HttpServlet {
         String role = request.getParameter("role");
 
         if ("user".equals(role)) {
-            response.sendRedirect("registerUser.jsp");
+            response.sendRedirect("authentication/registerUser.jsp");
         } else if ("organizer".equals(role)) {
-            response.sendRedirect("registerOrganizer.jsp");
+            response.sendRedirect("authentication/registerOrganizer.jsp");
         } else {
-            response.sendRedirect("register.jsp");
+            response.sendRedirect("authentication/register.jsp");
         }
     }
 }

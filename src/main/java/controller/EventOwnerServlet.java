@@ -734,6 +734,25 @@ public class EventOwnerServlet extends HttpServlet {
             return;
         }
         if (result.isSuccess()) {
+            // Gửi notification cho admin khi có event mới
+            try {
+                // Giả sử admin có userID = 1 (hoặc lấy danh sách admin từ DB nếu cần gửi cho nhiều admin)
+                int adminUserId = 1;
+                models.Notification notification = new models.Notification();
+                notification.setUserID(adminUserId);
+                notification.setTitle("Sự kiện mới được tạo");
+                notification.setContent("Event owner " + u.getName() + " vừa tạo sự kiện: " + event.getName());
+                notification.setNotificationType("event");
+                notification.setRelatedID(result.getEventId());
+                notification.setIsRead(false);
+                notification.setCreatedAt(java.time.LocalDateTime.now());
+                notification.setPriority("high");
+                dao.NotificationDAO notificationDAO = new dao.NotificationDAO();
+                notificationDAO.insertNotification(notification);
+                controller.AdminNotificationWebSocket.sendToAllAdmins(notification);
+            } catch (Exception ex) {
+                logger.warning("Không thể gửi notification cho admin: " + ex.getMessage());
+            }
             session.removeAttribute("event");
             session.removeAttribute("seatMapData");
             session.removeAttribute("seatMapDataConfirmed");

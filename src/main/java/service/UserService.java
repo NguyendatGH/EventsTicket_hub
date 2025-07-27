@@ -115,6 +115,8 @@ public class UserService {
                 user.getAvatar(),
                 user.getIsLocked(),
                 user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getRole(),
                 user.getLastLoginAt());
         dto.setRole(user.getRole());
         return dto;
