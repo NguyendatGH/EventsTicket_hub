@@ -16,6 +16,7 @@ public class Feedback {
     private String adminResponse;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String userName;
 
     public Feedback() {
     }
@@ -113,6 +114,20 @@ public class Feedback {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    public java.util.Date getCreatedAtDate() {
+        return java.sql.Timestamp.valueOf(this.createdAt);
+    }
+    public java.util.Date getUpdatedAtDate() {
+        return java.sql.Timestamp.valueOf(this.updatedAt);
+    }
+    
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
     
     @Override

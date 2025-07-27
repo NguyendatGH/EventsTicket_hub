@@ -564,6 +564,7 @@
                 <li><a href="#">📋 Rules</a></li>
                 <li><a href="#">⚙️ Settings</a></li>
                 <li><a href="#">📈 Analytics</a></li>
+                <li><a href="${pageContext.request.contextPath}/support-owner">🎧 Support</a></li>
             </ul>
         </div>
 
@@ -583,7 +584,7 @@
                 </div>
                 <div class="user-info">
                     <span>Welcome, Event Manager</span>
-
+                    <a href="${pageContext.request.contextPath}/eventOwner/updateEventOwnerProfile.jsp" class="btn btn-primary" style="margin-right: 10px;">Edit Profile</a>
                     <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">Logout</a>
                 </div>
             </nav>

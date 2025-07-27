@@ -1,905 +1,701 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@page import="dto.UserDTO"%>
 <!DOCTYPE html>
 <html lang="vi">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-        <title>MasterTicket - Chi tiết sự kiện</title>
-        <style>
-
-            :root {
-                --primary: #667aff;      /* Màu xanh dương dịu hơn */
-                --secondary: #e06bce;    /* Màu hồng/tím nhẹ nhàng hơn */
-                --dark-bg: #161b22;      /* Nền tối (hơi ngả xanh) */
-                --darker-bg: #0d1117;    /* Nền tối hơn */
-                --card-bg: #21262d;      /* Nền cho các thẻ thông tin */
-                --border-color: #30363d; /* Màu viền tinh tế */
-                --text-light: #e6edf3;   /* Màu chữ trắng ngà, dễ chịu cho mắt */
-                --text-muted: #8b949e;   /* Màu chữ phụ */
-                --success: #00cc66;
-                --warning: #ffcc00;
-                --danger: #ff3333;
-            }
-
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: 'Segoe UI', Arial, sans-serif;
-                background: linear-gradient(to bottom, var(--darker-bg), var(--dark-bg));
-                color: var(--text-light);
-                min-height: 100vh;
-            }
-
-
-            .header-container {
-                display: flex;
-                justify-content: center;
-                background-color: var(--darker-bg); /* Giữ nguyên nền header */
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .header {
-                max-width: 1300px;
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 15px 40px;
-            }
-
-            .logo {
-                font-size: 24px;
-                font-weight: bold;
-                color: var(--primary); /* Sử dụng màu primary mới */
-            }
-
-            .search {
-                display: flex;
-                align-items: center;
-            }
-
-            .search input {
-                padding: 10px 15px;
-                border-radius: 25px;
-                border: 1px solid var(--border-color);
-                width: 300px;
-                background-color: var(--card-bg); /* Nền ô search nhất quán */
-                color: var(--text-light);
-                font-size: 14px;
-            }
-
-            .search button {
-                padding: 10px 15px;
-                margin-left: 10px;
-                background-color: var(--primary);
-                border: none;
-                border-radius: 25px;
-                color: white;
-                cursor: pointer;
-                font-weight: bold;
-                transition: all 0.2s;
-            }
-
-            .search button:hover {
-                background-color: #5566dd; /* Hover tối hơn một chút */
-            }
-
-            .actions {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-            }
-
-            .primary-btn {
-                background-color: var(--secondary);
-                border: none;
-                padding: 10px 20px;
-                color: white;
-                border-radius: 25px;
-                cursor: pointer;
-                font-weight: bold;
-                transition: all 0.2s;
-            }
-
-            .primary-btn:hover {
-                background-color: #c85ab6; /* Hover tối hơn một chút */
-            }
-
-            .link {
-                color: var(--text-light);
-                text-decoration: none;
-                font-weight: 500;
-                padding: 8px 12px;
-                border-radius: 5px;
-                transition: all 0.2s;
-            }
-
-            .link:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-
-            .account {
-                background-color: var(--card-bg);
-                border: 1px solid var(--border-color);
-                padding: 8px 16px;
-                border-radius: 25px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .account:hover {
-                background-color: #444455;
-            }
-
-
-            .main-content {
-                max-width: 1300px;
-                margin: 40px auto; /* Tăng khoảng cách từ header */
-                padding: 0 30px;
-            }
-
-
-            .event-header {
-                display: flex;
-                gap: 40px; /* Tăng khoảng cách giữa poster và thông tin */
-                margin-bottom: 50px; /* Tăng khoảng cách tới phần dưới */
-            }
-
-            .event-poster {
-                width: 300px;
-                height: 400px;
-                border-radius: 10px;
-                overflow: hidden;
-                flex-shrink: 0;
-                box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            }
-
-            .event-poster img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-            .event-info {
-                flex: 1;
-            }
-
-            .event-title {
-                font-size: 32px; /* Chữ to, rõ ràng hơn */
-                margin-bottom: 20px;
-                color: var(--text-light);
-                font-weight: 700;
-            }
-
-            .event-meta {
-                display: flex;
-                flex-direction: column; /* xếp dọc cho rõ */
-                gap: 15px;
-                margin-bottom: 25px;
-                color: var(--text-muted);
-                font-size: 16px;
-            }
-
-            .event-meta-item {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .event-description {
-                margin-bottom: 30px;
-                line-height: 1.7; /* Giãn dòng cho dễ đọc */
-                color: var(--text-muted);
-            }
-
-            /* === UNIFIED DARK THEME FOR CONTENT SECTIONS === */
-
-            .ticket-detail-container {
-                display: flex;
-                flex-direction: column;
-                gap: 40px; /* Thêm khoảng cách giữa các khối thông tin */
-            }
-
-            .section-card {
-                background-color: var(--card-bg);
-                border: 1px solid var(--border-color);
-                border-radius: 10px;
-                padding: 25px 30px;
-            }
-
-            .section-title {
-                font-size: 24px;
-                font-weight: 600;
-                margin-bottom: 25px;
-                color: var(--primary);
-                padding-bottom: 10px;
-                border-bottom: 2px solid var(--primary); /* Thêm gạch chân để làm nổi bật tiêu đề */
-                display: inline-block; /* Để border-bottom vừa với chữ */
-            }
-
-            /* Thẻ thông tin chi tiết */
-            .event-card-detail .event-name { /* Đổi tên class để tránh xung đột */
-                font-size: 20px;
-                font-weight: 600;
-                margin-bottom: 15px;
-                color: var(--text-light); /* Đổi màu chữ */
-            }
-
-            .event-card-detail .event-description {
-                font-size: 15px;
-                line-height: 1.6;
-                margin-bottom: 20px;
-                color: var(--text-muted); /* Đổi màu chữ */
-            }
-
-            .event-card-detail .event-meta {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-
-            .event-card-detail .meta-item {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                font-size: 15px;
-                color: var(--text-muted); /* Đổi màu chữ */
-            }
-            .event-card-detail .meta-item span{
-                color: var(--text-light); /* Đổi màu chữ */
-            }
-
-
-            /* === DARK THEME FOR TICKET TABLE === */
-            .ticket-table {
-                width: 100%;
-                border-collapse: collapse;
-                background-color: transparent; /* Bỏ nền cũ */
-                overflow: hidden;
-            }
-
-            .ticket-table th {
-                text-align: left;
-                padding: 15px;
-                background-color: rgba(110, 118, 129, 0.2); /* Nền header bảng */
-                font-weight: 600;
-                color: var(--text-light); /* Màu chữ header */
-            }
-
-            .ticket-table td {
-                padding: 15px;
-                border-bottom: 1px solid var(--border-color);
-                color: var(--text-muted); /* Màu chữ nội dung */
-            }
-            .ticket-table td:last-child {
-                color: var(--text-light);
-                font-weight: 500;
-            }
-
-            .ticket-table tr:last-child td {
-                border-bottom: none;
-            }
-
-            .ticket-note {
-                margin-top: 15px;
-                font-size: 13px;
-                color: var(--text-muted);
-                font-style: italic;
-            }
-
-            /* --- Feedback Section Styles --- */
-            .feedback-section {
-                margin-top: 40px; /* Khoảng cách phía trên phần feedback */
-            }
-
-            .feedback-form {
-                margin-bottom: 30px;
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .feedback-form textarea {
-                width: 100%;
-                padding: 15px;
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                background-color: var(--darker-bg); /* Nền tối hơn cho textarea */
-                color: var(--text-light);
-                font-size: 15px;
-                resize: vertical;
-                min-height: 100px;
-            }
-
-            .feedback-form textarea::placeholder {
-                color: var(--text-muted);
-            }
-
-            .feedback-form .rating {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                font-size: 16px;
-                color: var(--text-muted);
-            }
-
-            .feedback-form .rating .fa-star {
-                cursor: pointer;
-                color: var(--text-muted); /* Màu sao mặc định */
-                transition: color 0.2s;
-            }
-
-            /* Màu sao đã chọn/hover - có thể thêm JS sau để đánh giá động */
-            .feedback-form .rating .fa-star.active,
-            .feedback-form .rating .fa-star:hover {
-                color: var(--warning); /* Màu vàng cho sao đã chọn/hover */
-            }
-
-            .feedback-form .primary-btn {
-                align-self: flex-start; /* Căn nút sang trái */
-                padding: 10px 25px;
-            }
-
-            .feedback-list h3 {
-                font-size: 20px;
-                color: var(--text-light);
-                margin-bottom: 20px;
-                padding-bottom: 10px;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .feedback-item {
-                background-color: var(--darker-bg); /* Nền hơi tối hơn cho từng mục feedback */
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                padding: 15px 20px;
-                margin-bottom: 15px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            }
-
-            .feedback-item:last-child {
-                margin-bottom: 0;
-            }
-
-            .feedback-item .feedback-text {
-                font-size: 15px;
-                line-height: 1.6;
-                color: var(--text-light);
-                margin-bottom: 10px;
-            }
-
-            .feedback-item .feedback-meta {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                font-size: 13px;
-                color: var(--text-muted);
-            }
-
-            .feedback-item .feedback-meta .feedback-author {
-                font-weight: 600;
-                color: var(--primary);
-            }
-
-            .feedback-item .feedback-meta .feedback-stars .fas.fa-star {
-                color: var(--warning); /* Màu vàng cho sao đã điền */
-            }
-
-            /* === SUGGESTIONS SECTION === */
-            .suggestions {
-                margin-top: 60px;
-            }
-
-            .suggestions-title {
-                font-size: 24px;
-                margin-bottom: 30px;
-                color: var(--secondary);
-                text-align: center;
-                font-weight: 600;
-            }
-
-            .suggestions-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 20px;
-            }
-
-            /* Styling cho card gợi ý */
-            .event-card {
-                background-color: var(--card-bg); /* Nền card nhất quán */
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                overflow: hidden;
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-                color: inherit;
-                text-decoration: none;
-            }
-
-            .event-card img {
-                width: 100%;
-                height: 150px;
-                object-fit: cover;
-                display: block;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .event-card .card-body {
-                padding: 15px;
-            }
-
-            .event-card h4 {
-                font-size: 16px;
-                margin-bottom: 5px;
-                color: var(--text-light);
-            }
-
-            .event-card p {
-                font-size: 13px;
-                margin-bottom: 10px;
-                color: var(--text-muted);
-            }
-
-            .event-card .price {
-                font-weight: bold;
-                font-size: 14px;
-                color: var(--secondary);
-            }
-
-            .event-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-                border-color: var(--primary);
-            }
-
-            /* ==== FOOTER SECTION ==== */
-            .footer {
-                padding: 40px 15px;
-                background-color: var(--darker-bg);
-                margin-top: 80px;
-                border-top: 1px solid var(--border-color);
-            }
-            .footer-content {
-                max-width: 1300px;
-                margin: 0 auto;
-                box-sizing: border-box;
-            }
-            .footer-container {
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 20px;
-                padding: 0px 15px;
-            }
-            .footer-section {
-                flex: 1;
-                min-width: 250px;
-                margin: 10px;
-            }
-            .footer-section h3 {
-                color: #ddd;
-                margin-bottom: 15px;
-            }
-            .footer-section ul {
-                list-style: none;
-                padding: 0;
-            }
-            .footer-section ul li {
-                padding: 10px 0;
-            }
-            .footer-section ul li a {
-                text-decoration: none;
-                color: #aaa;
-                transition: 0.3s;
-            }
-            .footer-section ul li a:hover,
-            .footer-section a:hover {
-                color: #fff;
-            }
-            .footer-section p, .footer-section a {
-                color: #aaa;
-                margin: 5px 0;
-                text-decoration: underline;
-            }
-            .footer-section li {
-                padding: 5px 0;
-            }
-            .subscribe-box {
-                display: flex;
-                align-items: center;
-                border: 2px solid #6f42c1;
-                border-radius: 8px;
-                padding: 5px 10px;
-                background: #000;
-                margin-bottom: 15px;
-                gap: 10px;
-            }
-            .fa-envelope:before {
-                content: "\f0e0";
-                color: #15d715;
-            }
-            .subscribe-box input {
-                flex: 1;
-                border: none;
-                background: transparent;
-                color: white;
-                padding: 8px;
-                outline: none;
-                font-size: 14px;
-            }
-            .subscribe-box button {
-                background: #6f42c1;
-                border: none;
-                border-radius: 5px;
-                padding: 8px 12px;
-                color: white;
-                cursor: pointer;
-                transition: background 0.3s;
-            }
-            .subscribe-box button:hover {
-                background: #5a339e;
-            }
-            .language img {
-                width: 30px;
-                margin: 5px 10px 5px 0;
-                cursor: pointer;
-                border-radius: 4px;
-                transition: transform 0.2s;
-            }
-            .language img:hover {
-                transform: scale(1.1);
-            }
-            .social-icons {
-                margin-top: 15px;
-            }
-            .social-images img {
-                width: 30px;
-                margin-right: 10px;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: transform 0.3s;
-            }
-            .social-images img:hover {
-                transform: scale(1.2);
-            }
-
-            /* Responsive */
-            @media (max-width: 1024px) {
-                .event-header {
-                    flex-direction: column;
-                }
-                .event-poster {
-                    width: 100%;
-                    height: auto;
-                    aspect-ratio: 3/4; /* Giữ tỉ lệ poster */
-                }
-            }
-            @media (max-width: 768px) {
-                .header {
-                    flex-direction: column;
-                    gap: 15px;
-                    padding: 15px 20px;
-                }
-                .search input {
-                    width: 100%;
-                }
-                .main-content {
-                    padding: 0 20px;
-                    margin-top: 20px;
-                }
-                .footer {
-                    padding: 30px 20px;
-                }
-                .footer-content {
-                    padding: 0;
-                }
-                .footer-container {
-                    flex-direction: column;
-                    align-items: center;
-                    text-align: center;
-                }
-                .subscribe-box {
-                    flex-direction: column;
-                    align-items: stretch;
-                }
-                .subscribe-box input,
-                .subscribe-box button {
-                    width: 100%;
-                    box-sizing: border-box;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header-container">
-            <header class="header">
-                <div class="logo">MasterTicket</div>
-                <div class="search">
-                    <input type="text" placeholder="Bạn đang tìm kiếm gì hôm nay?">
-                    <button>Tìm kiếm</button>
-                </div>
-                <div class="actions">
-                    <button class="primary-btn">Create Event</button>
-                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">Vé đã mua</a>
-                    <div class="account">Account</div>
-                </div>
-            </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MasterTicket - Chi tiết sự kiện</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            /* Gradient tím xanh + hiệu ứng mảng sáng mờ */
+            background: linear-gradient(180deg, #1e164e 0%, #181c2a 60%, #0d1117 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            height: 400px;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 60% 100%, rgba(102,122,255,0.18) 0%, rgba(224,107,206,0.10) 60%, transparent 100%);
+            filter: blur(10px);
+        }
+        .header {
+            background: #181c2a;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #23263a;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667aff;
+            text-decoration: none;
+        }
+        .search-bar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            margin: 0 2rem;
+            max-width: 500px;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 0.7rem 1.2rem;
+            border-radius: 25px 0 0 25px;
+            border: none;
+            background: #23263a;
+            color: #e6edf3;
+            font-size: 1rem;
+        }
+        .search-bar button {
+            padding: 0.7rem 1.5rem;
+            border-radius: 0 25px 25px 0;
+            border: none;
+            background: #667aff;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #e6edf3;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: #667aff;
+        }
+        .btn-primary {
+            background: #667aff;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: #5566dd;
+        }
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.2rem 0.5rem 0 0.5rem;
+            background: none;
+        }
+        .section-card, .ticket-table-section, .event-description, .organizer-section, .feedback-section {
+            background: rgba(24,28,42,0.98);
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 1.2rem 1.2rem;
+            margin-bottom: 1.2rem;
+            position: relative;
+            z-index: 1;
+            color: #e6edf3;
+        }
+        .ticket-banner {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            position: relative;
+        }
+        .ticket-banner .ticket-info {
+            flex: 1;
+            background: #fff;
+            color: #181c2a;
+            border-radius: 18px;
+            padding: 2rem 2.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            position: relative;
+        }
+        .ticket-banner .ticket-info .event-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #181c2a;
+        }
+        .ticket-banner .ticket-info .event-meta {
+            font-size: 1rem;
+            color: #444;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+        .ticket-banner .ticket-info .event-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .ticket-banner .ticket-info .barcode {
+            margin-top: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+        .ticket-banner .ticket-info .barcode img {
+            height: 48px;
+        }
+        .ticket-banner .ticket-info .price {
+            font-size: 1.1rem;
+            color: #667aff;
+            font-weight: bold;
+        }
+        .ticket-banner .ticket-info .btn-primary {
+            align-self: flex-end;
+            margin-top: 1rem;
+        }
+        .ticket-banner .event-image {
+            width: 220px;
+            height: 320px;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-left: 2.5rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            flex-shrink: 0;
+            background: #23263a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ticket-banner .event-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            color: #667aff;
+            font-weight: bold;
+            margin-bottom: 1.2rem;
+        }
+        .event-detail-content {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .event-detail-main {
+            flex: 2;
+        }
+        .event-detail-side {
+            flex: 1;
+            min-width: 220px;
+        }
+        .event-description {
+            background: #23263a;
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            color: #e6edf3;
+            font-size: 1.05rem;
+        }
+        .event-detail-side .side-banner {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .event-detail-side .side-banner img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+        }
+        .event-detail-side .side-banner .side-title {
+            font-size: 1rem;
+            color: #181c2a;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .event-detail-side .side-banner .side-desc {
+            font-size: 0.95rem;
+            color: #444;
+        }
+        .ticket-table-section {
+            background: #23263a;
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+        .ticket-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .ticket-table th, .ticket-table td {
+            padding: 1rem 0.7rem;
+            text-align: left;
+            color: #e6edf3;
+        }
+        .ticket-table th {
+            color: #667aff;
+            font-weight: 600;
+            border-bottom: 1px solid #30363d;
+        }
+        .ticket-table tr {
+            border-bottom: 1px solid #23263a;
+        }
+        .ticket-table tr:last-child {
+            border-bottom: none;
+        }
+        .ticket-table .price {
+            color: #00cc66;
+            font-weight: bold;
+        }
+        .ticket-note {
+            color: #ffcc00;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+        .organizer-section {
+            background: #23263a;
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .organizer-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .organizer-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .organizer-info {
+            flex: 1;
+        }
+        .organizer-info .org-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .organizer-info .org-desc {
+            color: #8b949e;
+            font-size: 0.97rem;
+        }
+        .organizer-section .btn-primary {
+            margin-left: auto;
+        }
+        .suggestions {
+            margin-top: 2.5rem;
+        }
+        .suggestions-title {
+            font-size: 1.2rem;
+            color: #e06bce;
+            font-weight: bold;
+            margin-bottom: 1.2rem;
+        }
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+        }
+        .event-card {
+            background: #23263a;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-decoration: none;
+            color: #e6edf3;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .event-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(102,122,255,0.12);
+        }
+        .event-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #181c2a;
+        }
+        .event-card .card-body {
+            padding: 1rem 1.2rem;
+        }
+        .event-card .card-body h4 {
+            font-size: 1.05rem;
+            font-weight: bold;
+            margin: 0 0 0.5rem 0;
+            color: #fff;
+        }
+        .event-card .card-body p {
+            font-size: 0.95rem;
+            color: #8b949e;
+            margin: 0.2rem 0;
+        }
+        .event-card .card-body .price {
+            color: #00cc66;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .footer {
+            background: #181c2a;
+            color: #8b949e;
+            padding: 3rem 0 1.5rem 0;
+            margin-top: 3rem;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: space-between;
+        }
+        .footer-section {
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
+        .footer-section h3 {
+            color: #667aff;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1rem 0;
+        }
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+        .footer-section ul li a {
+            color: #8b949e;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .footer-section ul li a:hover {
+            color: #667aff;
+        }
+        .subscribe-box {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            border: 2px solid #667aff;
+            border-radius: 8px;
+            padding: 5px;
+            background: #23263a;
+        }
+        .subscribe-box input {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 25px;
+            background: transparent;
+            color: #e6edf3;
+            outline: none;
+        }
+        .subscribe-box button {
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 25px;
+            background: #667aff;
+            color: #e6edf3;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .subscribe-box button:hover {
+            background: #5566dd;
+        }
+        .language {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .language img {
+            width: 24px;
+            height: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .language img:hover {
+            transform: scale(1.1);
+        }
+        .social-icons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .social-images img {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .social-images img:hover {
+            transform: scale(1.1);
+        }
+        @media (max-width: 900px) {
+            .main-container { padding: 1rem 0.2rem 0 0.2rem; }
+            .ticket-banner { flex-direction: column; align-items: stretch; }
+            .ticket-banner .event-image { margin-left: 0; margin-top: 2rem; width: 100%; height: 220px; }
+            .event-detail-content { flex-direction: column; gap: 1.2rem; }
+            .event-detail-side { min-width: unset; }
+        }
+        @media (max-width: 600px) {
+            .header { flex-direction: column; gap: 1rem; padding: 1rem 0.5rem; }
+            .search-bar { margin: 1rem 0; }
+            .main-container { padding: 0.5rem 0.1rem 0 0.1rem; }
+            .ticket-banner { padding: 1rem; }
+            .ticket-banner .ticket-info { padding: 1rem; }
+            .event-detail-content { gap: 0.5rem; }
+            .event-description, .ticket-table-section, .organizer-section { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
+        <form class="search-bar" action="${pageContext.request.contextPath}/home" method="get">
+            <input type="text" name="search" placeholder="Bạn tìm sự kiện gì?" />
+            <button type="submit">Tìm Kiếm</button>
+        </form>
+        <div class="nav-links">
+            <a href="${pageContext.request.contextPath}/home">Trang Chủ</a>
+            <a href="#">Các sự kiện hot</a>
+            <a href="#">Săn voucher giảm giá</a>
+            <a href="#">Tổ chức sự kiện</a>
+            <a href="${pageContext.request.contextPath}/login">Đăng nhập</a>
+            <a href="${pageContext.request.contextPath}/register" class="btn-primary">Đăng ký</a>
         </div>
-
-        <fmt:setLocale value="vi_VN" />
-
-        <div class="main-content">
-            <c:if test="${not empty event}">
-                <div class="event-header">
-                    <div class="event-poster">
-                        <img src="${event.imageURL}" alt="Poster sự kiện ${event.name}">
-                    </div>
-                    <div class="event-info">
-                        <h1 class="event-title">${event.name}</h1>
-                        <div class="event-meta">
-                            <div class="event-meta-item">
-                                <span>⏰</span>
-                                <span>
-                                    <fmt:formatDate value="${event.startTime}" pattern="HH:mm"/> -
-                                    <fmt:formatDate value="${event.endTime}" pattern="HH:mm, dd/MM/yyyy"/>
-                                </span>
-                            </div>
-                            <div class="event-meta-item">
-                                <span>📍</span>
-                                <span>${event.physicalLocation}</span>
-                            </div>
-                        </div>
-                        <p class="event-description">${event.description}</p>
+    </div>
+    <div class="main-container">
+        <!-- Ticket Banner -->
+        <div class="ticket-banner">
+            <div class="ticket-info">
+                <div class="event-title">${event.name}</div>
+                <div class="event-meta">
+                    <span><i class="fa fa-calendar"></i> <fmt:formatDate value="${event.startTime}" pattern="HH:mm, dd/MM/yyyy"/></span>
+                    <span><i class="fa fa-map-marker-alt"></i> ${event.physicalLocation}</span>
+                </div>
+                <div class="barcode">
+                    <img src="${pageContext.request.contextPath}/asset/image/Ticket_duotone.svg" alt="barcode" />
+                    <span>Price from: <span class="price">
                         <c:choose>
-                            <c:when test="${not empty sessionScope.user}">
-                                <button class="primary-btn"
-                                        onclick="handleBuyTickets(${event.eventID}, '${event.hasSeatingChart}')">
-                                    Mua vé ngay
-                                </button>
-                                <button onClick="handleStartChat(${event.eventID})">Chat ngay</button>
+                            <c:when test="${not empty ticketList}">
+                                <fmt:formatNumber value="${ticketList[0].price}" type="currency" currencyCode="VND"/>
                             </c:when>
-                            <c:otherwise>
-                                <c:url var="loginUrl" value="/login">
-                                    <c:param name="redirect" value="EventServlet?id=${event.eventID}" />
-                                </c:url>
-                                <button class="primary-btn" onclick="location.href = '${loginUrl}'">
-                                    Đăng nhập để mua vé
-                                </button>
-                            </c:otherwise>
+                            <c:otherwise>Liên hệ</c:otherwise>
                         </c:choose>
-                    </div>
+                    </span></span>
                 </div>
-
-                <div class="ticket-detail-container">
-                    <div class="event-info-section section-card">
-                        <h2 class="section-title">Thông tin chi tiết</h2>
-                        <div class="event-card-detail">
-                            <h3 class="event-name">${event.name}</h3>
-                            <div class="event-meta">
-                                <div class="meta-item">
-                                    <strong>⏰ Thời gian:</strong>
-                                    <span><fmt:formatDate value="${event.startTime}" pattern="HH:mm, dd/MM/yyyy"/></span>
-                                </div>
-                                <div class="meta-item">
-                                    <strong>📍 Địa điểm:</strong>
-                                    <span>${event.physicalLocation}</span>
-                                </div>
-                                <div class="meta-item">
-                                    <strong>💰 Giá từ:</strong>
-                                    <span>
-                                        <c:choose>
-                                            <c:when test="${not empty ticketList}">
-                                                <fmt:formatNumber value="${ticketList[0].price}" type="currency" currencyCode="VND"/>
-                                            </c:when>
-                                            <c:otherwise>Liên hệ</c:otherwise>
-                                        </c:choose>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ticket-info-section section-card">
-                        <h2 class="section-title">Loại vé và giá</h2>
-
-                        <c:if test="${empty ticketList}">
-                            <p>Chưa có vé cho sự kiện này hoặc vé đã ngừng bán.</p>
-                        </c:if>
-
-                        <c:if test="${not empty ticketList}">
-                            <table class="ticket-table">
-                                <thead>
+                <button class="btn-primary" onclick="handleBuyTickets('${event.eventID}', '${event.hasSeatingChart}')">Buy Now</button>
+            </div>
+            <div class="event-image">
+                <c:choose>
+                    <c:when test="${not empty event.imageURL && fn:startsWith(event.imageURL, 'http')}">
+                        <img src="${event.imageURL}" alt="${event.name}" />
+                    </c:when>
+                    <c:otherwise>
+                        <img src="${pageContext.request.contextPath}/uploads/event_banners/${event.imageURL}" alt="${event.name}" />
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>
+        <!-- Event Detail Content -->
+        <div class="event-detail-content">
+            <div class="event-detail-main">
+                <div class="section-title">Thông tin chi tiết</div>
+                <div class="event-description">
+                    <b>${event.name}</b><br/>
+                    <fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy"/> tại <b>${event.physicalLocation}</b><br/><br/>
+                    ${event.description}
+                </div>
+                <div class="ticket-table-section">
+                    <div class="section-title">Hạng vé & giá</div>
+                    <c:if test="${empty ticketList}">
+                        <p>Chưa có vé cho sự kiện này hoặc vé đã ngừng bán.</p>
+                    </c:if>
+                    <c:if test="${not empty ticketList}">
+                        <table class="ticket-table">
+                            <thead>
+                                <tr>
+                                    <th>Loại vé</th>
+                                    <th>Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="ticket" items="${ticketList}">
                                     <tr>
-                                        <th>Loại vé</th>
-                                        <th>Giá</th>
+                                        <td><strong>${ticket.ticketName}</strong><br/><span style="font-size: 0.9em; color: #aaa;">${ticket.ticketDescription}</span></td>
+                                        <td class="price"><fmt:formatNumber value="${ticket.price}" type="currency" currencyCode="VND"/></td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <c:forEach var="ticket" items="${ticketList}">
-                                        <tr>
-                                            <td>
-                                                <strong>${ticket.ticketName}</strong>
-                                                <br>
-                                                <span style="font-size: 0.9em; color: #555;">Loại: ${ticket.category}</span>
-                                                <br>
-                                                <small style="font-size: 0.8em; color: #777;">${ticket.ticketDescription}</small>
-                                            </td>
-                                            <td>
-                                                <fmt:formatNumber value="${ticket.price}" type="currency" currencyCode="VND"/>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </tbody>
-                            </table>
-                            <p class="ticket-note">* Vé được cập nhật liên tục và có thể thay đổi.</p>
-                        </c:if>
-                    </div>
-                </div>
-
-                <div class="feedback-section section-card">
-                    <h2 class="section-title">Để lại phản hồi của bạn</h2>
-                    <div class="feedback-form">
-                        <textarea placeholder="Chia sẻ cảm nhận của bạn về sự kiện này..." rows="5"></textarea>
-                        <div class="rating">
-                            <span>Đánh giá sự kiện này:</span>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                        <button class="primary-btn">Gửi phản hồi</button>
-                    </div>
-                    <div class="feedback-list">
-                        <h3>Phản hồi gần đây:</h3>
-                        <div class="feedback-item">
-                            <p class="feedback-text">"Sự kiện tuyệt vời! Rất thích không khí và các màn trình diễn."</p>
-                            <div class="feedback-meta">
-                                <span class="feedback-author">Bởi Nguyễn Văn A</span>
-                                <span class="feedback-date"> vào 10/07/2025</span>
-                                <span class="feedback-stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="feedback-item">
-                            <p class="feedback-text">"Sự kiện nhìn chung khá tốt, nhưng chất lượng âm thanh có thể cải thiện hơn."</p>
-                            <div class="feedback-meta">
-                                <span class="feedback-author">Bởi Trần Thị B</span>
-                                <span class="feedback-date"> vào 08/07/2025</span>
-                                <span class="feedback-stars">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </c:if>
-            <c:if test="${empty event}">
-                <p style="text-align: center; font-size: 20px; color: var(--danger);">Không tìm thấy sự kiện. Vui lòng thử lại.</p>
-            </c:if>
-
-
-            <div class="suggestions">
-                <h2 class="suggestions-title">Có Thể Bạn Cũng Thích</h2>
-                <div class="suggestions-grid">
-                    <c:forEach var="suggestedEvent" items="${suggestedEvents}">
-                        <a href="EventServlet?id=${suggestedEvent.eventID}" class="event-card">
-                            <img src="${suggestedEvent.imageURL}" alt="${suggestedEvent.name}">
-                            <div class="card-body">
-                                <h4>${suggestedEvent.name}</h4>
-                                <p>
-                                    <fmt:formatDate value="${suggestedEvent.startTime}" pattern="dd/MM/yyyy"/> •
-                                    ${suggestedEvent.physicalLocation}
-                                </p>
-                                <p class="price">Từ
-                                    <c:choose>
-                                        <c:when test="${not empty suggestedEvent.ticketList}">
-                                            <fmt:formatNumber value="${suggestedEvent.ticketList[0].price}" type="currency" currencyCode="VND"/>
-                                        </c:when>
-                                        <c:otherwise>Liên hệ</c:otherwise>
-                                    </c:choose>
-                                </p>
-                            </div>
-                        </a>
-                    </c:forEach>
-                    <c:if test="${empty suggestedEvents}">
-                        <p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Không có sự kiện gợi ý nào vào lúc này.</p>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                        <p class="ticket-note">* Vé được cập nhật liên tục và có thể thay đổi.</p>
                     </c:if>
                 </div>
             </div>
+            <div class="event-detail-side">
+                <div class="side-banner">
+                    <img src="${pageContext.request.contextPath}/asset/image/Banner_secondary.svg" alt="side banner" />
+                    <div class="side-title">BABYMONSTER HELLO MONSTERS</div>
+                    <div class="side-desc">Giảm 150K khi thanh toán bằng VNPAY</div>
+                </div>
+                <div class="organizer-section">
+                    <div class="organizer-logo">
+                        <img src="${pageContext.request.contextPath}/uploads/user_avatar/maylangthang.jpg" alt="May Lang Thang" />
+                    </div>
+                    <div class="organizer-info">
+                        <div class="org-name">May Lang Thang</div>
+                        <div class="org-desc">Nơi âm nhạc và cảm xúc thăng hoa</div>
+                    </div>
+                    <a href="#" class="btn-primary">Xem Thêm</a>
+                </div>
+            </div>
         </div>
-
-
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-container">
-                    <div class="footer-section">
-                        <h3>Dịch vụ khách hàng</h3>
-                        <ul>
-                            <li><a href="#">Câu hỏi thường gặp</a></li>
-                            <li><a href="#">Liên hệ chúng tôi</a></li>
-                            <li><a href="#">Chính sách bảo mật</a></li>
-                            <li><a href="#">Điều khoản dịch vụ</a></li>
-                        </ul>
-                        <p><i class="fas fa-envelope"></i> <a href="mailto:support@masterTicket.vn">support@masterTicket.vn</a></p>
-                    </div>
-
-                    <div class="footer-section">
-                        <h3>Sitemap</h3>
-                        <ul>
-                            <li><a href="#">Tạo tài khoản</a></li>
-                            <li><a href="#">Tin tức</a></li>
-                            <li><a href="#">Sự kiện nổi bật</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="footer-section">
-                        <h3>Đăng ký để nhận cập nhật sự kiện.</h3>
-                        <form class="subscribe-box">
-                            <input type="email" placeholder="Email của bạn..." required />
-                            <button type="submit"><i class="fas fa-paper-plane"></i></button>
-                        </form>
-
-                        <div class="language">
-                            <p>Ngôn ngữ:</p>
-                            <img src="https://flagcdn.com/w40/vn.png" alt="Tiếng Việt" />
-                            <img src="https://flagcdn.com/w40/gb.png" alt="Tiếng Anh" />
+        <!-- Suggestions -->
+        <div class="suggestions">
+            <div class="suggestions-title">Có Thể Bạn Cũng Thích</div>
+            <div class="suggestions-grid">
+                <c:forEach var="suggestedEvent" items="${suggestedEvents}">
+                    <a href="EventServlet?id=${suggestedEvent.eventID}" class="event-card">
+                        <c:choose>
+                            <c:when test="${not empty suggestedEvent.imageURL && fn:startsWith(suggestedEvent.imageURL, 'http')}">
+                                <img src="${suggestedEvent.imageURL}" alt="${suggestedEvent.name}" />
+                            </c:when>
+                            <c:otherwise>
+                                <img src="${pageContext.request.contextPath}/uploads/event_banners/${suggestedEvent.imageURL}" alt="${suggestedEvent.name}" />
+                            </c:otherwise>
+                        </c:choose>
+                        <div class="card-body">
+                            <h4>${suggestedEvent.name}</h4>
+                            <p><fmt:formatDate value="${suggestedEvent.startTime}" pattern="dd/MM/yyyy"/> • ${suggestedEvent.physicalLocation}</p>
                         </div>
-
-                        <div class="social-icons">
-                            <p>Theo dõi chúng tôi:</p>
-                            <div class="social-images">
-                                <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
-                                <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />
-                                <img src="https://cdn-icons-png.flaticon.com/512/3046/3046120.png" alt="TikTok" />
+                    </a>
+                </c:forEach>
+                <c:if test="${empty suggestedEvents}">
+                    <p style="grid-column: 1 / -1; text-align: center; color: #8b949e;">Không có sự kiện gợi ý nào vào lúc này.</p>
+                </c:if>
+            </div>
+        </div>
+        <!-- Feedback Section -->
+        <div class="feedback-section section-card">
+            <h2 class="section-title">Đánh giá & Phản hồi từ người tham dự</h2>
+            <c:choose>
+                <c:when test="${not empty feedbackList}">
+                    <c:forEach var="fb" items="${feedbackList}">
+                        <div class="feedback-item">
+                            <div class="feedback-meta">
+                                <span class="feedback-author">${fb.userName}</span>
+                                <span class="feedback-date">
+                                    <fmt:formatDate value="${fb.createdAtDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                </span>
+                                <span class="feedback-stars">
+                                    <c:forEach begin="1" end="${fb.rating}" var="i">★</c:forEach>
+                                </span>
+                            </div>
+                            <div class="feedback-text">${fb.content}</div>
+                            <div class="feedback-actions">
+                                <button class="btn-like" title="Thích"><i class="fa fa-thumbs-up"></i> Thích</button>
+                                <button class="btn-reply" title="Phản hồi"><i class="fa fa-reply"></i> Phản hồi</button>
                             </div>
                         </div>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <div class="feedback-item">
+                        <div class="feedback-text">Chưa có phản hồi nào cho sự kiện này.</div>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Customer Services</h3>
+                <ul>
+                    <li><a href="#">FAQS</a></li>
+                    <li><a href="#">Contact us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+                <p><a href="mailto:support@masterticket.vn">support@masterticket.vn</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>SiteMap</h3>
+                <ul>
+                    <li><a href="#">Create Account</a></li>
+                    <li><a href="#">News</a></li>
+                    <li><a href="#">Top-Rated Events</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Subscribe for event updates</h3>
+                <form class="subscribe-box">
+                    <input type="email" placeholder="Your email..." required />
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+                <div class="language">
+                    <p>Language:</p>
+                    <img src="https://flagcdn.com/w40/vn.png" alt="Tiếng Việt" />
+                    <img src="https://flagcdn.com/w40/gb.png" alt="English" />
+                </div>
+                <div class="social-icons">
+                    <p>Follow us:</p>
+                    <div class="social-images">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook" />
+                        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />
+                        <img src="https://cdn-icons-png.flaticon.com/512/3046/3046120.png" alt="TikTok" />
                     </div>
                 </div>
             </div>
-        </footer>
-
-        <script type="text/javascript">
-            var contextPath = '${pageContext.request.contextPath}';
-            console.log("[EventDetail.jsp - Inline JS] Context Path được định nghĩa là: '" + contextPath + "'");
-
-            function handleBuyTickets(eventId, hasSeatingChartStr) {
-                console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
-                console.log("  - eventId nhận được:", eventId, "(kiểu:", typeof eventId, ")");
-                console.log("  - hasSeatingChartStr nhận được:", hasSeatingChartStr, "(kiểu:", typeof hasSeatingChartStr, ")");
-
-                if (hasSeatingChartStr === 'true') {
-                    console.log("  - KẾT LUẬN: CÓ sơ đồ ghế. Chuyển hướng tới BookChairServlet.");
-                    window.location.href = '${pageContext.request.contextPath}/BookChairServlet?eventId=' + eventId;
-                } else {
-                    console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
-                    window.location.href = '${pageContext.request.contextPath}/TicketInfoServlet?eventId=' + eventId;
-                }
+        </div>
+    </footer>
+    <script>
+        function handleBuyTickets(eventId, hasSeatingChartStr) {
+            if (hasSeatingChartStr === 'true') {
+                window.location.href = '${pageContext.request.contextPath}/BookChairServlet?eventId=' + eventId;
+            } else {
+                window.location.href = '${pageContext.request.contextPath}/TicketSelectionServlet?eventId=' + eventId;
             }
-
-            function handleStartChat(eventId){
-                console.log("Starting chat for eventId: ", eventId);
-            window.location.href = '${pageContext.request.contextPath}/init-chat?eventId=' + eventId;
-            }
-        </script>
-    </body>
+        }
+    </script>
+</body>
 </html>

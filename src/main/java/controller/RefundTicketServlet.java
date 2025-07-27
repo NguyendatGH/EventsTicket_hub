@@ -1,6 +1,7 @@
 package controller;
 
 import dao.RefundDAO;
+import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,7 +19,7 @@ public class RefundTicketServlet extends HttpServlet {
 
         String orderIdParam = request.getParameter("orderId");
         HttpSession session = request.getSession();
-        models.User currentUser = (models.User) session.getAttribute("user");
+        UserDTO currentUser = (UserDTO) session.getAttribute("user");
 
         if (orderIdParam == null || currentUser == null) {
             session.setAttribute("flashMessage_fail", "Không đủ thông tin để hoàn vé.");

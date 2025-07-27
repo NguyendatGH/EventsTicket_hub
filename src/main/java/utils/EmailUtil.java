@@ -1,4 +1,4 @@
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -18,7 +18,7 @@ import java.util.Properties;
 public class EmailUtil {
     public static void sendEmail(String toEmail, String subject, String body) throws MessagingException {
         final String fromEmail = "amshuuhuy10@gmail.com";
-        final String password = "jvjt kyho ugdm rmls";
+        final String password = "pjvv oggp emgo lkdv";
 
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com"); 

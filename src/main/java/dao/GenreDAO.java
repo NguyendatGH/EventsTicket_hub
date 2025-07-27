@@ -17,8 +17,8 @@ public class GenreDAO {
     public List<Genre> getAllGenres() {
         List<Genre> genres = new ArrayList<>();
         String sql = "SELECT GenreID, GenreName, Description, CreatedAt FROM Genres ORDER BY GenreName";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -60,5 +60,21 @@ public class GenreDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        GenreDAO genreDAO = new GenreDAO();
+        System.out.println("--- Test getAllGenres() ---");
+        List<Genre> genres = genreDAO.getAllGenres();
+        for (Genre g : genres) {
+            System.out.println(g.getGenreID() + " - " + g.getGenreName() + " - " + g.getDescription());
+        }
+        System.out.println("--- Test getGenreById(1) ---");
+        Genre genre = genreDAO.getGenreById(1);
+        if (genre != null) {
+            System.out.println(genre.getGenreID() + " - " + genre.getGenreName() + " - " + genre.getDescription());
+        } else {
+            System.out.println("Genre with ID 1 not found");
+        }
     }
 }

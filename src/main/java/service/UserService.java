@@ -104,7 +104,7 @@ public class UserService {
     }
 
     private UserDTO convertToDTO(User user) {
-        return new UserDTO(
+        UserDTO dto = new UserDTO(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
@@ -115,7 +115,11 @@ public class UserService {
                 user.getAvatar(),
                 user.getIsLocked(),
                 user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getRole(),
                 user.getLastLoginAt());
+        dto.setRole(user.getRole());
+        return dto;
     }
 
     private User combineObject(UserDTO userDTO, User user) {

@@ -68,7 +68,6 @@ CREATE TABLE Zones (
     FOREIGN KEY (event_id) REFERENCES Events(EventID)
 );
 
-
 -- Bảng Seat (cải thiện)
 CREATE TABLE Seat (
     SeatID INT IDENTITY(1,1) PRIMARY KEY,
@@ -103,6 +102,7 @@ CREATE TABLE TicketInfo (
     CONSTRAINT CK_TicketInfo_SalesTime CHECK (SalesEndTime > SalesStartTime),
     CONSTRAINT CK_TicketInfo_MaxQuantity CHECK (MaxQuantityPerOrder > 0)
 );
+
 
 -- Bảng TicketInventory (mới - quản lý số lượng ticket)
 CREATE TABLE TicketInventory (
@@ -164,7 +164,6 @@ CREATE TABLE Orders (
     CONSTRAINT FK_Orders_User FOREIGN KEY (UserID) REFERENCES Users(Id),
     CONSTRAINT FK_Orders_PaymentMethod FOREIGN KEY (PaymentMethodID) REFERENCES PaymentMethod(PaymentMethodID)
 );
-
 
 
 -- Bảng OrderItems (Gộp thông tin từ OrderItems cũ và OrderTickets)
@@ -357,6 +356,23 @@ CREATE TABLE Refunds (
     CONSTRAINT FK_Refunds_Admin FOREIGN KEY (AdminID) REFERENCES Users(Id),
     CONSTRAINT FK_Refunds_PaymentMethod FOREIGN KEY (PaymentMethodID) REFERENCES PaymentMethod(PaymentMethodID),
  
+);
+-- Bảng supportItems
+CREATE TABLE SupportItems (
+    SupportID INT IDENTITY(1,1) PRIMARY KEY,
+    FromEmail NVARCHAR(255) NOT NULL,
+    ToEmail NVARCHAR(255) NOT NULL,
+    Subject NVARCHAR(255) NOT NULL,
+    SendDate DATE NOT NULL,
+    SendTimestamp DATETIME NOT NULL,
+    Content NVARCHAR(MAX) NOT NULL,
+    Status NVARCHAR(50) NOT NULL,
+    Priority NVARCHAR(50) NOT NULL,
+    Category NVARCHAR(100) NOT NULL,
+    CreatedDate DATE NOT NULL,
+    LastModified DATE NOT NULL,
+    AdminResponse NVARCHAR(MAX) NULL,
+    AssignedAdmin NVARCHAR(255) NULL
 );
 Go
 
@@ -745,41 +761,39 @@ BEGIN
     END
 END;
 GO
-
-
+-- DELETE from Users
+-- DBCC CHECKIDENT ('Users', RESEED, 0);
 -- Insert into Users (Administrator with Id=1)
 INSERT INTO Users (Username, Email, PasswordHash, Role, Gender, Birthday, PhoneNumber, Address, Avatar, isLocked, LastLoginAt)
 VALUES
-(N'Admin', 'adminEventWeb@support.com', 'ddfa08f04ffbedd937ce079026ead9826c0f4572feee5e45ff2a66d058c0c9d5', 'admin', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', 'https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png', 0, GETDATE()),
-(N'TayNguyen Sound', 'organizer@ticketbox.vn', '058caa5e5eec0aa2911b924607646627dbf0815d513576ada793072e78810691', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', 'https://i1.sndcdn.com/avatars-2RgyZdB5k8fW6HXl-lENkFQ-t500x500.jpg', 0, GETDATE()),
-(N'Mây Lang Thang', 'music_events@hcmc.com', 'e51a4dbbf6c5021893e89253da30c135286bb8cdfb8019d87d666e5483e21c21', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', 'https://yt3.googleusercontent.com/ytc/AIdro_l4eBctyyqzD3BxJ7-cWiEjr0y35flQ8TCI1KUFjgIV6g=w544-c-h544-k-c0x00ffffff-no-l90-rj', 0, GETDATE()),
-(N'VFF', 'sports_events@hcmc.com', '42148a0e9fdc241f7d762b460c4ee97442621455745864c23adb3e4abbcdf17c', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDO9aNJzXLps11YKgoXkwEqHNvvet0RKlwV7Ps2LNSUIUXS_iJ65s4SKf8iJVgigVdW-c&usqp=CAU', 0, GETDATE()),
-(N'Lê Văn A', 'customer1@ticketbox.vn', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', 'https://whatisxwearing.com/wp-content/uploads/2024/07/glenn-quagmire-feature-image-768x549.png', 0, GETDATE()),
-(N'Trần Văn B', 'tranvanb@ticketbox.vn', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6', 'customer', 'Male', '1992-04-15', '0956789012', '303 Customer St, HCMC', 'https://imgv3.fotor.com/images/gallery/generate-a-3d-style-ai-avatar-of-a-boy-in-fotor.jpg', 0, GETDATE()),
-(N'Nguyễn Thị C', 'nguyenthic@ticketbox.vn', 'b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1', 'customer', 'Female', '1994-06-22', '0967890123', '404 Customer Rd, HCMC', 'https://imgv3.fotor.com/images/gallery/generate-a-game-style-ai-avatar-of-a-female-in-fotor.jpg', 0, GETDATE()),
-(N'Hà Nội Events', 'hanevents@hcmc.com', 'c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2', 'event_owner', 'Other', '1987-09-10', '0978901234', '505 Event Ave, Hanoi', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcTYMzUNHez9pc5Z4yvGkVtNXnR1HjnRpAbgEw&s', 0, GETDATE()),
-(N'Sài Gòn Sports', 'saigonsports@hcmc.com', 'd4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3', 'event_owner', 'Male', '1983-12-05', '0989012345', '606 Sports Ln, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcTx55BGjl7TzD_zOf6Do6UAPgcX_gh2z0GRCA&s', 0, GETDATE()),
-(N'Phạm Thị D', 'phamthid@ticketbox.vn', 'e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4', 'customer', 'Female', '1998-08-30', '0990123456', '707 Customer Pl, HCMC', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcTNt9UpcsobJNOGFHPeBt-88iRmqjflBnIjhw&s', 0, GETDATE()),
-(N'Nguyễn Văn An', N'nguyen.van.an@gmail.com', N'hashedpassword1', N'customer', N'Male', '1990-05-15', N'0123456789', N'123 Nguyễn Trãi, Hà Nội', 'https://cdn.hackernoon.com/images/bfqrt3x6hAVgXkezEqVTPC5AAFA2-lbc3lp3.jpeg', 0, NULL),
-(N'Trần Thị Bình', N'tran.thi.binh@gmail.com', N'hashedpassword2', N'customer', N'Female', '1992-08-22', N'0987654321', N'456 Lê Lợi, Hồ Chí Minh', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcRvnjz9eaaGZclTeqFpP3FTR5ct0SM6EJf4hQ&s', 0, NULL),
-(N'Lê Minh Châu', N'le.minh.chau@gmail.com', N'hashedpassword3', N'event_owner', N'Male', '1988-12-03', N'0345678901', N'789 Trần Phú, Đà Nẵng', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcQuAtGQgXiMdA6EezJNLBblvBni6Rux33Jxerf4qhGN4_FoPQPwpQQ1f9RYDnKSHp9ngGc&usqp=CAU', 0, NULL),
-(N'Phạm Thùy Dung', N'pham.thuy.dung@gmail.com', N'hashedpassword4', N'customer', N'Female', '1995-03-18', N'0456789012', N'321 Bạch Đằng, Hải Phòng', 'https://pbs.twimg.com/profile_images/378800000008627217/72ba7f1e4c2f3cc3ceff43066926dea8_400x400.jpeg', 0, NULL),
-(N'Hoàng Quốc Duy', N'hoang.quoc.duy@gmail.com', N'hashedpassword5', N'customer', N'Other', '1991-07-09', N'0567890123', N'654 Đồng Khởi, Cần Thơ', 'https://cdn.24h.com.vn/upload/1-2025/images/2025-01-21/adt1737420908-ngan-ngam-thay-ca-si-jack-j97-72912__anh_cat_3_2_schema_article.jpg', 0, NULL),
-(N'Vũ Đình Hưng', N'vu.dinh.hung@gmail.com', N'hashedpassword6', N'customer', N'Male', '1993-11-25', N'0678901234', N'987 Lý Thường Kiệt, Huế', 'https://anhnail.vn/wp-content/uploads/2025/01/hinh-jack-j97-meme-19.webp', 0, NULL),
-(N'Đặng Thị Lan', N'dang.thi.lan@gmail.com', N'hashedpassword7', N'customer', N'Female', '1989-04-12', N'0789012345', N'159 Nguyễn Huệ, Vũng Tàu', N'https://i.pinimg.com/originals/65/5d/65/655d65cd95ddd4e408f2bf9bd6d25dd3.jpg', 0, NULL),
-(N'Bùi Văn Minh', N'bui.van.minh@gmail.com', N'hashedpassword8', N'event_owner', N'Male', '1994-09-30', N'0890123456', N'753 Lê Thánh Tôn, Nha Trang', 'https://play-lh.googleusercontent.com/aTTVA77bs4tVS1UvnsmD_T0w-rdZef7UmjpIsg-8RVDOVl_EVEHjmkn6qN7C0teRS3o=w240-h480-rw', 0, NULL),
-(N'Ngô Thị Nga', N'ngo.thi.nga@gmail.com', N'hashedpassword9', N'customer', N'Female', '1987-01-14', N'0901234567', N'852 Hai Bà Trưng, Quy Nhơn', 'https://m.media-amazon.com/images/M/MV5BNzczMzQ3MmItMGFjZC00NzEwLWEzZWYtZTliMjkwOWQ2YzIxXkEyXkFqcGdeQXRyYW5zY29kZS13b3JrZmxvdw@@._V1_.jpg', 0, NULL),
-(N'Đinh Công Phúc', N'dinh.cong.phuc@gmail.com', N'hashedpassword10', N'customer', N'Male', '1996-06-07', N'0912345678', N'741 Phan Chu Trinh, Đà Lạt', 'https://i.pinimg.com/236x/a8/8d/d0/a88dd0ca40e1d6d9d21be2ff40c60688.jpg', 0, NULL),
-(N'Mai Thị Quỳnh', N'mai.thi.quynh@gmail.com', N'hashedpassword11', N'customer', N'Other', '1990-10-28', N'0923456789', N'963 Nguyễn Thị Minh Khai, Phan Thiết', 'https://forum.plutonium.pw/assets/uploads/profile/uid-3277129/3277129-profileavatar-1713595666789.png', 0, NULL),
-(N'Chu Thị Sương', N'chu.thi.suong@gmail.com', N'hashedpassword12', N'customer', N'Female', '1992-02-19', N'0934567890', N'147 Võ Văn Tần, Long An', 'https://static.wikia.nocookie.net/17304df8-37ad-444c-a525-15a227cf46d2/scale-to-width/755', 0, NULL),
-(N'Lý Văn Tùng', N'ly.van.tung@gmail.com', N'hashedpassword13', N'event_owner', N'Male', '1985-08-11', N'0945678901', N'258 Cách Mạng Tháng 8, Biên Hòa', 'https://encrypted-tbn0.gstatic.com/images?q=3Dtbn:ANd9GcQNH1PS3jqSe__oz_xA31yrtRidjG-Ya1584A&s', 0, NULL),
-(N'Dương Thị Uyên', N'duong.thi.uyen@gmail.com', N'hashedpassword14', N'customer', N'Female', '1998-12-05', N'0956789012', N'369 An Dương Vương, Mỹ Tho', 'https://i.imgflip.com/4/2wifvo.jpg', 0, NULL),
-(N'Trịnh Minh Vũ', N'trinh.minh.vu@gmail.com', N'hashedpassword15', N'customer', N'Male', '1991-05-23', N'0967890123', N'482 Nguyễn Văn Linh, Rạch Giá', 'https://i.imgflip.com/4/40noj6.jpg', 0, NULL),
-(N'Nguyen Tan Dat', 'tandatbtqb@gmail.com', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', 'https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png', 0, GETDATE());
+(N'Admin', 'adminEventWeb@support.com', 'ddfa08f04ffbedd937ce079026ead9826c0f4572feee5e45ff2a66d058c0c9d5', 'admin', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', '', 0, GETDATE()),
+(N'TayNguyen Sound', 'organizer@ticketbox.vn', '058caa5e5eec0aa2911b924607646627dbf0815d513576ada793072e78810691', 'event_owner', 'Female', '1985-05-15', '0912345678', '456 Event St, HCMC', 'taynguyensound-avt.jpg', 0, GETDATE()),
+(N'Mây Lang Thang', 'music_events@hcmc.com', 'e51a4dbbf6c5021893e89253da30c135286bb8cdfb8019d87d666e5483e21c21', 'event_owner', 'Male', '1990-03-20', '0923456789', '789 Music Ave, HCMC', 'maylangthang.jpg', 0, GETDATE()),
+(N'VFF', 'sports_events@hcmc.com', '42148a0e9fdc241f7d762b460c4ee97442621455745864c23adb3e4abbcdf17c', 'event_owner', 'Other', '1988-07-10', '0934567890', '101 Sports Rd, HCMC', 'vff.png', 0, GETDATE()),
+(N'Lê Văn A', 'customer1@ticketbox.vn', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Female', '1995-11-25', '0945678901', '202 Customer Ln, HCMC', 'LeVanA.png', 0, GETDATE()),
+(N'Trần Văn B', 'tranvanb@ticketbox.vn', 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6', 'customer', 'Male', '1992-04-15', '0956789012', '303 Customer St, HCMC', '', 0, GETDATE()),
+(N'Nguyễn Thị C', 'nguyenthic@ticketbox.vn', 'b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1', 'customer', 'Female', '1994-06-22', '0967890123', '404 Customer Rd, HCMC', '', 0, GETDATE()),
+(N'Hà Nội Events', 'hanevents@hcmc.com', 'c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2', 'event_owner', 'Other', '1987-09-10', '0978901234', '505 Event Ave, Hanoi', '', 0, GETDATE()),
+(N'Sài Gòn Sports', 'saigonsports@hcmc.com', 'd4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3', 'event_owner', 'Male', '1983-12-05', '0989012345', '606 Sports Ln, HCMC', '', 0, GETDATE()),
+(N'Phạm Thị D', 'phamthid@ticketbox.vn', 'e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a1b2c3d4', 'customer', 'Female', '1998-08-30', '0990123456', '707 Customer Pl, HCMC', '', 0, GETDATE()),
+(N'Nguyễn Văn An', N'nguyen.van.an@gmail.com', N'hashedpassword1', N'customer', N'Male', '1990-05-15', N'0123456789', N'123 Nguyễn Trãi, Hà Nội', '', 0, NULL),
+(N'Trần Thị Bình', N'tran.thi.binh@gmail.com', N'hashedpassword2', N'customer', N'Female', '1992-08-22', N'0987654321', N'456 Lê Lợi, Hồ Chí Minh', '', 0, NULL),
+(N'Lê Minh Châu', N'le.minh.chau@gmail.com', N'hashedpassword3', N'event_owner', N'Male', '1988-12-03', N'0345678901', N'789 Trần Phú, Đà Nẵng', '', 0, NULL),
+(N'Phạm Thùy Dung', N'pham.thuy.dung@gmail.com', N'hashedpassword4', N'customer', N'Female', '1995-03-18', N'0456789012', N'321 Bạch Đằng, Hải Phòng', '', 0, NULL),
+(N'Hoàng Quốc Duy', N'hoang.quoc.duy@gmail.com', N'hashedpassword5', N'customer', N'Other', '1991-07-09', N'0567890123', N'654 Đồng Khởi, Cần Thơ', '', 0, NULL),
+(N'Vũ Đình Hưng', N'vu.dinh.hung@gmail.com', N'hashedpassword6', N'customer', N'Male', '1993-11-25', N'0678901234', N'987 Lý Thường Kiệt, Huế', '', 0, NULL),
+(N'Đặng Thị Lan', N'dang.thi.lan@gmail.com', N'hashedpassword7', N'customer', N'Female', '1989-04-12', N'0789012345', N'159 Nguyễn Huệ, Vũng Tàu', '', 0, NULL),
+(N'Bùi Văn Minh', N'bui.van.minh@gmail.com', N'hashedpassword8', N'event_owner', N'Male', '1994-09-30', N'0890123456', N'753 Lê Thánh Tôn, Nha Trang', '', 0, NULL),
+(N'Ngô Thị Nga', N'ngo.thi.nga@gmail.com', N'hashedpassword9', N'customer', N'Female', '1987-01-14', N'0901234567', N'852 Hai Bà Trưng, Quy Nhơn', '', 0, NULL),
+(N'Đinh Công Phúc', N'dinh.cong.phuc@gmail.com', N'hashedpassword10', N'customer', N'Male', '1996-06-07', N'0912345678', N'741 Phan Chu Trinh, Đà Lạt', '', 0, NULL),
+(N'Mai Thị Quỳnh', N'mai.thi.quynh@gmail.com', N'hashedpassword11', N'customer', N'Other', '1990-10-28', N'0923456789', N'963 Nguyễn Thị Minh Khai, Phan Thiết', '', 0, NULL),
+(N'Chu Thị Sương', N'chu.thi.suong@gmail.com', N'hashedpassword12', N'customer', N'Female', '1992-02-19', N'0934567890', N'147 Võ Văn Tần, Long An', '', 0, NULL),
+(N'Lý Văn Tùng', N'ly.van.tung@gmail.com', N'hashedpassword13', N'event_owner', N'Male', '1985-08-11', N'0945678901', N'258 Cách Mạng Tháng 8, Biên Hòa', '', 0, NULL),
+(N'Dương Thị Uyên', N'duong.thi.uyen@gmail.com', N'hashedpassword14', N'customer', N'Female', '1998-12-05', N'0956789012', N'369 An Dương Vương, Mỹ Tho', '', 0, NULL),
+(N'Trịnh Minh Vũ', N'trinh.minh.vu@gmail.com', N'hashedpassword15', N'customer', N'Male', '1991-05-23', N'0967890123', N'482 Nguyễn Văn Linh, Rạch Giá', '', 0, NULL),
+(N'Nguyen Tan Dat', 'tandatbtqb@gmail.com', '1f28a586d5c3af781e15c49fc8cc1b8721a8508f32f8dc4264197e4908fef2b8', 'customer', 'Male', '1980-01-01', '0901234567', '123 Admin St, HCMC', '/uploads/user_avatar/dat.jpeg', 0, GETDATE());
 
-select * from Events
-
-select * from Users
+-- select * from Users
 --select * from users;
 --adminEventWeb@support.com: admin123@
 --organizer@ticketbox.vn: eventowner123
@@ -800,46 +814,46 @@ VALUES
 (N'Hội nghị', N'Hội nghị và seminar'),
 ('Others', 'Miscellaneous events');
 
-select * from Genres;
+-- select * from Genres;
 
 
---select * from Events
+select * from Events
 --delete from Events
 --DBCC CHECKIDENT ('Events', RESEED, 0);
 -- Insert into Events
-INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt)
-VALUES
-(N'HỘI THẢO AI VÀ CHUYỂN ĐỔI SỐ', 'A seminar on AI and digital transformation', 'Ho Chi Minh City', '2025-08-12 09:00:00', '2025-08-14 12:00:00', 150, 1, 'completed', 4, 2, 'https://phanmemmkt.vn/wp-content/uploads/2024/07/HOI-THAO-UNG-DUNG-CONG-NGHE-AI-TRONG-QUAN-TRI-DOANH-NGHIEP.jpg', 0, 0, '2025-05-15 08:00:00', '2025-06-12 12:00:00'),
-(N'CHẠY BỘ GÂY QUỸ VÌ TRẺ EM', 'Charity run for children', 'Thao Dien Park', '2025-09-06 06:00:00', '2025-09-08 09:00:00', 300, 1, 'completed', 3, 4, 'https://news.mbbank.com.vn/file-service/uploads/v1/images/20b88c9f-9e37-4f55-83fa-208ec3d1e380-banner_giai_chay_2-04.jpg?width=1812&height=1024', 0, 0, '2025-05-10 06:00:00', '2025-06-08 09:00:00'),
-(N'LỄ HỘI TRÀ VIỆT 2025', 'Vietnamese Tea Cultural Festival', 'Le Van Tam Park', '2025-08-16 10:00:00', '2025-08-16 15:00:00', 250, 1, 'completed', 4, 2, 'https://isaigon.vn/wp-content/uploads/2025/05/sddefault.webp', 0, 0, '2025-05-18 08:30:00', '2025-06-16 15:00:00'),
-(N'Workshop Lather for Health - Bọt xà bông, Bọt sức khoẻ', 'Mental wellness workshop for young people', 'Bach Dang Center', '2025-09-05 13:00:00', '2025-09-05 16:00:00', 80, 1, 'completed', 4, 2, 'https://yhoccongdong.com/wp-content/uploads/2024/07/Workshop-Lather-for-Health-Bot-xa-bong-Bot-suc-khoe.png', 0, 0, '2025-05-08 09:00:00', '2025-06-05 16:00:00'),
-(N'GALA VĂN NGHỆ SINH VIÊN 2025', 'University student music and performance night', 'Hoa Binh Theater', '2025-09-09 18:00:00', '2025-09-09 21:00:00', 200, 1, 'completed', 1, 2, 'https://www.ueh.edu.vn/images/upload/editer/20250401081950_HD%202025%20NEW_1499x600.png', 0, 0, '2025-05-12 10:00:00', '2025-06-09 21:00:00'),
-(N'HỘI NGHỊ CÔNG NGHỆ BLOCKCHAIN VIỆT NAM', 'National blockchain technology summit', 'Riverside Palace', '2025-08-13 09:00:00', '2025-08-13 17:00:00', 180, 1, 'completed', 4, 2, 'https://insider.blockchainwork.net/wp-content/uploads/2022/10/BLOCKCHAIN-SUMMIT-2022-Dien-dan-cap-cao-blockchain-Viet-Nam-Nguon-eventbrite-800x400-c-center.jpg', 0, 0, '2025-05-14 11:00:00', '2025-06-13 17:00:00'),
-(N'Nhà Hát Kịch IDECAF: 12 Bà Mụ', 'A captivating theater performance', 'Ho Chi Minh City', '2025-08-25 12:30:00', '2025-08-25 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7c/18/6f/b32013793b1dbda15606e1cca4ab40ac.jpg', 1, 0, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
-(N'The Island And The Bay', 'A scenic cultural event', 'Ho Chi Minh City', '2025-09-27 07:00:00', '2025-09-27 09:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/7d/cd/82/bea62d09033db74784ee82e8f811ff60.png', 0, 0, '2025-06-02 10:00:00', '2025-06-02 10:00:00'),
-(N'Địa Đạo Củ Chi : Trăng Chiến Khu', 'Historical reenactment', 'Ho Chi Minh City', '2025-08-28 11:00:00', '2025-08-28 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/a6/0a/4a/60e9e35f58d00a4df2f987fe5f02803c.jpg', 0, 0, '2025-06-03 11:00:00', '2025-06-03 11:00:00'),
-(N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI', 'A vibrant theater show', 'Ho Chi Minh City', '2025-09-29 12:30:00', '2025-09-29 14:30:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/1a/2c/a1/8d41e6a6d325f907b7e14b4582428461.jpg', 0, 0, '2025-06-04 12:00:00', '2025-06-04 12:00:00'),
-(N'NGÀY AN LÀNH - khoá tu 1 ngày cuối tuần', 'A peaceful retreat', 'Ho Chi Minh City', '2025-011-30 01:30:00', '2025-011-30 03:30:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/d5/f7/31/b8dc405591074e95b041acf1f3d4d57e.jpg', 0, 0, '2025-06-05 13:00:00', '2025-06-05 13:00:00'),
-(N'[Dốc Mộng Mơ] Hãy Để Anh Đi - Quốc Thiên & Bùi Công Nam', 'Music concert with popular artists', 'Ho Chi Minh City', '2025-09-01 12:30:00', '2025-09-01 14:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/a2/70/f0/a39e4fd823cd2f7b4186138c2c983012.jpg', 1, 0, '2025-06-06 14:00:00', '2025-06-06 14:00:00'),
-(N'ISAAC WITH LOVE - FANMEETING IN HO CHI MINH', 'Fan meeting with Isaac', 'Ho Chi Minh City', '2025-10-02 10:00:00', '2025-10-02 12:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/9a/10/52/9efce559d9ab037ff649429ea74a2a4a.jpg', 0, 0, '2025-06-07 15:00:00', '2025-06-07 15:00:00'),
-(N'LULULOLA SHOW HƯƠNG TRÀM | MỘT NỬA SỰ THẬT', 'Hương Tràm live performance', 'Ho Chi Minh City', '2025-11-03 10:30:00', '2025-11-03 12:30:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/77/67/54/d1ee978159818ef0d07bbefa3e3cd6cb.png', 1, 0, '2025-06-08 16:00:00', '2025-06-08 16:00:00'),
-(N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-12-04 11:00:00', '2025-12-04 13:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/3a/b7/00/2eb78869acb58fc6980137a595b89b53.jpg', 0, 0, '2025-06-09 17:00:00', '2025-06-09 17:00:00'),
-(N'[CONCERT] ANH TRAI VƯỢT NGÀN CHÔNG GAI DAY5, DAY6', 'Popular music concert', 'Ho Chi Minh City', '2025-08-05 11:00:00', '2025-08-05 13:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/23/f2/8c/da6aee269301e6142fafc511a801be51.jpg', 0, 0, '2025-06-10 18:00:00', '2025-06-10 18:00:00'),
-(N'SAXOPHONE FESTIVAL - SMOKE & SILK', 'Jazz saxophone event', 'Ho Chi Minh City', '2025-08-06 12:00:00', '2025-08-06 14:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/5f/1f/06/163a5bb4ca28688762920970ff950111.png', 0, 0, '2025-06-11 19:00:00', '2025-06-11 19:00:00'),
-(N'Lion Championship 23 - 2025', 'MMA championship', 'Ho Chi Minh City', '2025-08-07 12:00:00', '2025-08-07 14:00:00', 200, 1, 'active', 3, 4, 'https://images.tkbcdn.com/2/608/332/ts/ds/51/5f/ca/fac991cc2a4bba8b33e563950a6aaa7a.jpg', 0, 0, '2025-06-12 20:00:00', '2025-06-12 20:00:00'),
-(N'VBA 2025 - Saigon Heat vs CT Catfish', 'Basketball league match', 'Ho Chi Minh City', '2025-09-08 12:30:00', '2025-09-08 14:30:00', 200, 1, 'active', 3, 4, 'https://images.tkbcdn.com/2/608/332/ts/ds/93/0e/29/7f646019dd57ad00287f633b1f452087.jpg', 0, 0, '2025-06-13 21:00:00', '2025-06-13 21:00:00'),
-(N'Vở cải lương "CÂU THƠ YÊN NGỰA"', 'Traditional Vietnamese opera', 'Ho Chi Minh City', '2025-09-09 13:00:00', '2025-09-09 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/5a/e0/78/9193c340c70ea454ed1ebaddedcf8dfc.jpg', 0, 0, '2025-06-14 22:00:00', '2025-06-14 22:00:00'),
-(N'[Viện pháp HCM] CONCERT LUIZA', 'Classical music concert', 'Ho Chi Minh City', '2025-10-10 13:00:00', '2025-10-10 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/03/07/93/56c6b9b83197539cca52c3bb13397de5.png', 0, 0, '2025-06-15 23:00:00', '2025-06-15 23:00:00'),
-(N'HBAshow: Lê Hiếu - Bạch Công Khanh "Bài Tình Ca Cho Em"', 'Romantic music show', 'Ho Chi Minh City', '2025-10-11 13:00:00', '2025-10-11 15:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/ce/ca/81/ee52041ca219455e6c63d567b432a1d9.png', 0, 0, '2025-06-16 09:00:00', '2025-06-16 09:00:00'),
-(N'Vở cải lương "Sấm vang dòng Như Nguyệt"', 'Historical Vietnamese opera', 'Ho Chi Minh City', '2025-08-12 13:00:00', '2025-08-12 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/3e/83/b9/4cbc8280f4561730dc2111e7da0153a0.jpg', 0, 0, '2025-06-17 10:00:00', '2025-06-17 10:00:00'),
-(N'THE BEST OF POP - ROCK - MOVIE MUSIC & FASHION RHYTHM', 'Pop and rock music event', 'Ho Chi Minh City', '2025-09-13 13:00:00', '2025-09-13 15:00:00', 200, 1, 'active', 1, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/de/1d/3a/0e31e92b668d06ed9fa520aa76f23292.png', 0, 0, '2025-06-18 11:00:00', '2025-06-18 11:00:00'),
-(N'autoFEST@HCMC [Music Party & Merchandise]', 'Music and automotive merchandise event', 'Ho Chi Minh City', '2025-09-14 02:00:00', '2025-09-14 04:00:00', 200, 1, 'active', 2, 3, 'https://images.tkbcdn.com/2/608/332/ts/ds/87/43/e3/7e239ba463207db6e0e12cee4e433536.jpg', 0, 0, '2025-06-19 12:00:00', '2025-06-19 12:00:00'),
-(N'Automotive Mobility Solutions Conference', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-08-15 03:00:00', '2025-08-15 05:00:00', 200, 1, 'active', 4, 2, 'https://images.tkbcdn.com/2/608/332/ts/ds/4d/8c/8a/4b0586d8a8733d9ed6cc9f5115960529.png', 0, 0, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
 
 
 INSERT INTO Events (Name, Description, PhysicalLocation, StartTime, EndTime, TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt)
 VALUES
-(N'hehe', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-08-15 03:00:00', '2025-08-15 05:00:00', 200, 1, 'active', 4, 2, 'https://cdn-cjhkj.nitrocdn.com/krXSsXVqwzhduXLVuGLToUwHLNnSxUxO/assets/images/optimized/rev-ff94111/spotme.com/wp-content/uploads/2020/07/Hero-1.jpg', 0, 0, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
+(N'HỘI THẢO AI VÀ CHUYỂN ĐỔI SỐ', 'A seminar on AI and digital transformation', 'Ho Chi Minh City', '2025-08-12 09:00:00', '2025-08-14 12:00:00', 150, 1, 'completed', 4, 2, 'hoi_thao_ai_va_chuyen_doi_so.jpg', 0, 0, '2025-05-15 08:00:00', '2025-06-12 12:00:00'),
+(N'CHẠY BỘ GÂY QUỸ VÌ TRẺ EM', 'Charity run for children', 'Thao Dien Park', '2025-09-06 06:00:00', '2025-09-08 09:00:00', 300, 1, 'completed', 3, 4, 'giaichaybo.jpg', 0, 0, '2025-05-10 06:00:00', '2025-06-08 09:00:00'),
+(N'LỄ HỘI TRÀ VIỆT 2025', 'Vietnamese Tea Cultural Festival', 'Le Van Tam Park', '2025-08-16 10:00:00', '2025-08-16 15:00:00', 250, 1, 'completed', 4, 2, 'lehoitraviet.webp', 0, 0, '2025-05-18 08:30:00', '2025-06-16 15:00:00'),
+(N'Workshop Lather for Health - Bọt xà bông, Bọt sức khoẻ', 'Mental wellness workshop for young people', 'Bach Dang Center', '2025-09-05 13:00:00', '2025-09-05 16:00:00', 80, 1, 'completed', 4, 2, 'Workshop-Lather-for-Health-Bot-xa-bong-Bot-suc-khoe.png', 0, 0, '2025-05-08 09:00:00', '2025-06-05 16:00:00'),
+(N'GALA VĂN NGHỆ SINH VIÊN 2025', 'University student music and performance night', 'Hoa Binh Theater', '2025-09-09 18:00:00', '2025-09-09 21:00:00', 200, 1, 'completed', 1, 2, 'UEH.png', 0, 0, '2025-05-12 10:00:00', '2025-06-09 21:00:00'),
+(N'HỘI NGHỊ CÔNG NGHỆ BLOCKCHAIN VIỆT NAM', 'National blockchain technology summit', 'Riverside Palace', '2025-08-13 09:00:00', '2025-08-13 17:00:00', 180, 1, 'completed', 4, 2, 'blockchain.jpg', 0, 0, '2025-05-14 11:00:00', '2025-06-13 17:00:00'),
+(N'Nhà Hát Kịch IDECAF: 12 Bà Mụ', 'A captivating theater performance', 'Ho Chi Minh City', '2025-08-25 12:30:00', '2025-08-25 14:30:00', 200, 1, 'active', 1, 2, '12bamu.jpg', 1, 0, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
+(N'The Island And The Bay', 'A scenic cultural event', 'Ho Chi Minh City', '2025-09-27 07:00:00', '2025-09-27 09:00:00', 200, 1, 'active', 1, 2, 'theIsland.jpeg', 0, 0, '2025-06-02 10:00:00', '2025-06-02 10:00:00'),
+(N'Địa Đạo Củ Chi : Trăng Chiến Khu', 'Historical reenactment', 'Ho Chi Minh City', '2025-08-28 11:00:00', '2025-08-28 13:00:00', 200, 1, 'active', 4, 2, 'diadaocuchi.jpg',0, 0, '2025-06-03 11:00:00', '2025-06-03 11:00:00'),
+(N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI', 'A vibrant theater show', 'Ho Chi Minh City', '2025-09-29 12:30:00', '2025-09-29 14:30:00', 200, 1, 'active', 1, 2, 'xomvittroi.jpg', 0, 0, '2025-06-04 12:00:00', '2025-06-04 12:00:00'),
+(N'NGÀY AN LÀNH - khoá tu 1 ngày cuối tuần', 'A peaceful retreat', 'Ho Chi Minh City', '2025-011-30 01:30:00', '2025-011-30 03:30:00', 200, 1, 'active', 4, 2, 'khoatunganngay.jpg', 0, 0, '2025-06-05 13:00:00', '2025-06-05 13:00:00'),
+(N'[Dốc Mộng Mơ] Hãy Để Anh Đi - Quốc Thiên & Bùi Công Nam', 'Music concert with popular artists', 'Ho Chi Minh City', '2025-09-01 12:30:00', '2025-09-01 14:30:00', 200, 1, 'active', 2, 3, 'haydeanhdi.jpg', 1, 0, '2025-06-06 14:00:00', '2025-06-06 14:00:00'),
+(N'ISAAC WITH LOVE - FANMEETING IN HO CHI MINH', 'Fan meeting with Isaac', 'Ho Chi Minh City', '2025-10-02 10:00:00', '2025-10-02 12:00:00', 200, 1, 'active', 4, 2, 'issacevent.jpg', 0, 0, '2025-06-07 15:00:00', '2025-06-07 15:00:00'),
+(N'LULULOLA SHOW HƯƠNG TRÀM | MỘT NỬA SỰ THẬT', 'Hương Tràm live performance', 'Ho Chi Minh City', '2025-11-03 10:30:00', '2025-11-03 12:30:00', 200, 1, 'active', 2, 3, 'lulula.jpeg', 1, 0, '2025-06-08 16:00:00', '2025-06-08 16:00:00'),
+(N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-12-04 11:00:00', '2025-12-04 13:00:00', 200, 1, 'active', 4, 2, 'amthucando.jpg', 0, 0, '2025-06-09 17:00:00', '2025-06-09 17:00:00'),
+(N'[CONCERT] ANH TRAI VƯỢT NGÀN CHÔNG GAI DAY5, DAY6', 'Popular music concert', 'Ho Chi Minh City', '2025-08-05 11:00:00', '2025-08-05 13:00:00', 200, 1, 'active', 2, 3, 'antraivuotchonggai.jpg', 0, 0, '2025-06-10 18:00:00', '2025-06-10 18:00:00'),
+(N'SAXOPHONE FESTIVAL - SMOKE & SILK', 'Jazz saxophone event', 'Ho Chi Minh City', '2025-08-06 12:00:00', '2025-08-06 14:00:00', 200, 1, 'active', 1, 2, 'smok&silk.jpeg', 0, 0, '2025-06-11 19:00:00', '2025-06-11 19:00:00'),
+(N'Lion Championship 23 - 2025', 'MMA championship', 'Ho Chi Minh City', '2025-08-07 12:00:00', '2025-08-07 14:00:00', 200, 1, 'active', 3, 4, 'lionchampion.jpg', 0, 0, '2025-06-12 20:00:00', '2025-06-12 20:00:00'),
+(N'VBA 2025 - Saigon Heat vs CT Catfish', 'Basketball league match', 'Ho Chi Minh City', '2025-09-08 12:30:00', '2025-09-08 14:30:00', 200, 1, 'active', 3, 4, 'saigonchampion.jpg', 0, 0, '2025-06-13 21:00:00', '2025-06-13 21:00:00'),
+(N'Vở cải lương "CÂU THƠ YÊN NGỰA"', 'Traditional Vietnamese opera', 'Ho Chi Minh City', '2025-09-09 13:00:00', '2025-09-09 15:00:00', 200, 1, 'active', 1, 2, 'cauthoyenngua.jpg', 0, 0, '2025-06-14 22:00:00', '2025-06-14 22:00:00'),
+(N'[Viện pháp HCM] CONCERT LUIZA', 'Classical music concert', 'Ho Chi Minh City', '2025-10-10 13:00:00', '2025-10-10 15:00:00', 200, 1, 'active', 1, 2, 'luiza.jpeg', 0, 0, '2025-06-15 23:00:00', '2025-06-15 23:00:00'),
+(N'HBAshow: Lê Hiếu - Bạch Công Khanh "Bài Tình Ca Cho Em"', 'Romantic music show', 'Ho Chi Minh City', '2025-10-11 13:00:00', '2025-10-11 15:00:00', 200, 1, 'active', 2, 3, 'bachcongkhanh.jpeg', 0, 0, '2025-06-16 09:00:00', '2025-06-16 09:00:00'),
+(N'Vở cải lương "Sấm vang dòng Như Nguyệt"', 'Historical Vietnamese opera', 'Ho Chi Minh City', '2025-08-12 13:00:00', '2025-08-12 15:00:00', 200, 1, 'active', 1, 2, 'samvangdongnhunguyet.jpg', 0, 0, '2025-06-17 10:00:00', '2025-06-17 10:00:00'),
+(N'THE BEST OF POP - ROCK - MOVIE MUSIC & FASHION RHYTHM', 'Pop and rock music event', 'Ho Chi Minh City', '2025-09-13 13:00:00', '2025-09-13 15:00:00', 200, 1, 'active', 1, 2, 'thebestpop&rok.jpeg', 0, 0, '2025-06-18 11:00:00', '2025-06-18 11:00:00'),
+(N'autoFEST@HCMC [Music Party & Merchandise]', 'Music and automotive merchandise event', 'Ho Chi Minh City', '2025-09-14 02:00:00', '2025-09-14 04:00:00', 200, 1, 'active', 2, 3, 'musicparty.jpg', 0, 0, '2025-06-19 12:00:00', '2025-06-19 12:00:00'),
+(N'Automotive Mobility Solutions Conference', 'Industry conference and workshop', 'Ho Chi Minh City', '2025-08-15 03:00:00', '2025-08-15 05:00:00', 200, 1, 'active', 4, 2, 'automotive.jpeg', 0, 0, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
+
+
+
 
 INSERT INTO TicketInfo (TicketName, TicketDescription, Category, Price, SalesStartTime, SalesEndTime, EventID, MaxQuantityPerOrder, IsActive, CreatedAt, UpdatedAt)
 VALUES
@@ -864,6 +878,9 @@ VALUES
 (N'General Admission - autoFEST HCMC', N'Music party admission', N'General Admission', 180000, '2025-06-01 00:00:00', '2025-07-14 01:30:00', 25, 10, 1, '2025-06-19 12:00:00', '2025-06-19 12:00:00'),
 (N'Professional Pass - Automotive Conference', N'Industry conference access', N'Professional', 250000, '2025-06-01 00:00:00', '2025-07-15 02:30:00', 26, 5, 1, '2025-06-20 13:00:00', '2025-06-20 13:00:00');
 
+
+-- delete from TicketInventory
+-- DBCC CHECKIDENT ('TicketInventory', RESEED, 0);
 -- select * from TicketInfo
 INSERT INTO TicketInventory (TicketInfoID, TotalQuantity, SoldQuantity, ReservedQuantity, LastUpdated)
 VALUES
@@ -914,6 +931,7 @@ VALUES
 (10, 'TKT000000132025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
 --select * from Ticket
+
 -- Insert into PaymentMethod
 INSERT INTO PaymentMethod (MethodName, PromotionCode, Description, IsActive)
 VALUES
@@ -921,10 +939,8 @@ VALUES
 ('VNPay', 'VNPAY0', 'Free transaction fee - Pay with VNPay mobile app', 1),
 ('Payos', 'EWALLET0', 'Free transaction fee - Pay with mobile apps like Momo', 1);
 
---select * from PaymentMethod
-select * from Events
---select * from Orders
-select * from Orders
+-- select * from PaymentMethod
+-- select * from Events
 INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, PaymentMethodID, ContactPhone, ContactEmail, Notes, CreatedAt, UpdatedAt)
 VALUES
 ('ORD00000001', 5, 2, 300000, 0, 300000, 'paid', 'delivered', 1, '0945678901', 'customer1@ticketbox.vn', 'Deliver via email', '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
@@ -945,7 +961,7 @@ VALUES
 ('ORD00000016', 6, 8, 8000000, 800000, 720000, 'paid', 'cancelled', 1, '0945678321', 'mai.thi.quynh@gmail.com', 'Deliver via email', '2025-06-22 13:00:00', '2025-06-22 13:00:00'),
 ('ORD00000017', 7, 25, 25000000, 2500000, 22500000, 'paid', 'cancelled', 2, '0945678111', 'trinh.minh.vu@gmail.com', 'Deliver via email', '2025-06-21 17:00:00', '2025-06-21 17:00:00');
  
- select * from orders
+--  select * from orders
 
 -- Insert into OrderItems
 INSERT INTO OrderItems (OrderID, TicketInfoID, EventID, TicketID, UnitPrice, Quantity, TotalPrice, AssignedAt, CreatedAt)
@@ -1104,4 +1120,6 @@ SELECT c.ConversationID, c.CustomerID, c.EventOwnerID, c.EventID, c.Subject, c.S
                  LEFT JOIN Users u ON c.CustomerID = u.Id 
                  WHERE c.EventOwnerID = 2 AND e.Status = 'active'
 
-select * from OrderItems
+-- select * from OrderItems
+
+
