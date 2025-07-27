@@ -564,6 +564,7 @@
                 <li><a href="#">📋 Rules</a></li>
                 <li><a href="#">⚙️ Settings</a></li>
                 <li><a href="#">📈 Analytics</a></li>
+                <li><a href="${pageContext.request.contextPath}/support-owner">🎧 Support</a></li>
             </ul>
         </div>
 

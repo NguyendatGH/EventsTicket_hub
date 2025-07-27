@@ -2,8 +2,8 @@ package controller;
 
 import dao.EventDAO;
 import models.Event;
-import dto.UserDTO; // Import the User model
-import models.Notification; // Import the Notification model
+import dto.UserDTO; 
+import models.Notification; 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,27 +12,33 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+
 import java.util.ArrayList;
 import service.NotificationService;
-import service.UserService; 
+import service.UserService;
+import dao.GenreDAO;
+import models.Genre;
 
-@WebServlet("/")
+
+@WebServlet({"/", "/home"})
 public class HomePageServlet extends HttpServlet {
 
     private EventDAO eventDAO;
     private NotificationService notificationService;
-    private static final int RECORDS_PER_PAGE = 10; // Giữ lại hằng số phân trang
+    private static final int RECORDS_PER_PAGE = 10; 
 
     @Override
     public void init() throws ServletException {
-        super.init(); // Call super.init() for proper servlet initialization
+        super.init();
         eventDAO = new EventDAO();
-        notificationService = new NotificationService(); // Initialize the service
+        notificationService = new NotificationService();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        EventDAO eventDAO = new EventDAO();
 
         // Xử lý phần thông báo từ HEAD
         HttpSession session = request.getSession(false);
@@ -52,8 +58,40 @@ public class HomePageServlet extends HttpServlet {
         request.setAttribute("notifications", notifications);
         request.setAttribute("unreadCount", unreadCount);
 
-        // Xử lý phần phân trang từ 9dcfe0a0e6a3d478bcbf302ea9319c09e3eacdf5
+
         try {
+            String search = request.getParameter("search");
+            String location = request.getParameter("location");
+            String categoryParam = request.getParameter("category");
+            Integer genreId = null;
+            if (categoryParam != null && !categoryParam.isEmpty()) {
+                try {
+                    genreId = Integer.parseInt(categoryParam);
+                } catch (NumberFormatException e) {
+                    genreId = null;
+                }
+            }
+
+
+            List<String> locations = eventDAO.getAvailableLocations();
+            request.setAttribute("locations", locations);
+            GenreDAO genreDAO = new GenreDAO();
+            List<Genre> genres = genreDAO.getAllGenres();
+            request.setAttribute("genres", genres);
+
+            if ((search != null && !search.trim().isEmpty()) || (location != null && !location.trim().isEmpty()) || (genreId != null && genreId > 0)) {
+                List<Event> events = eventDAO.searchEvents(search, location, genreId);
+                request.setAttribute("events", events);
+                request.setAttribute("search", search);
+                request.setAttribute("location", location);
+                request.setAttribute("category", genreId);
+                request.setAttribute("noOfPages", 1);
+                request.setAttribute("currentPage", 1);
+                request.setAttribute("totalEvents", events.size());
+                request.getRequestDispatcher("/pages/homePage.jsp").forward(request, response);
+                return;
+            }
+
             int currentPage = 1;
             if (request.getParameter("page") != null) {
                 try {
@@ -61,7 +99,7 @@ public class HomePageServlet extends HttpServlet {
                     if (currentPage < 1)
                         currentPage = 1;
                 } catch (NumberFormatException e) {
-                    currentPage = 1; // Mặc định về trang 1 nếu lỗi
+                    currentPage = 1; 
                 }
             }
 

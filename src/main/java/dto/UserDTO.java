@@ -15,8 +15,11 @@ public class UserDTO {
     private boolean isLocked;
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
-    private String role; // ADDED: Field to store the user's role (e.g., "user", "event_owner")
-    private LocalDateTime updatedAt; // ADDED: Field to store the last update timestamp
+
+    private String role; 
+    private LocalDateTime updatedAt;
+
+
 
     public UserDTO() {
     }
@@ -34,11 +37,11 @@ public class UserDTO {
         this.isLocked = isLocked;
         this.createdAt = createdAt;
         this.lastLoginAt = lastLoginAt;
-        this.role = role; // Assign role in constructor
-        this.updatedAt = updatedAt; // Assign updatedAt in constructor
+        this.role = role; 
+        this.updatedAt = updatedAt; 
     }
 
-    // Getters and Setters
+
     public int getId() {
         return id;
     }
@@ -127,7 +130,7 @@ public class UserDTO {
         this.lastLoginAt = lastLoginAt;
     }
 
-    // ADDED: Getter and Setter for role
+
     public String getRole() {
         return role;
     }
@@ -136,7 +139,7 @@ public class UserDTO {
         this.role = role;
     }
 
-    // ADDED: Getter and Setter for updatedAt
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
