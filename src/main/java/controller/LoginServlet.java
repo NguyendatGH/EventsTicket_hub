@@ -27,6 +27,13 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
+        // Kiểm tra xem tài khoản có tồn tại và bị khóa không
+        if (userService.isAccountLocked(email)) {
+            request.setAttribute("error", "Tài khoản của quý khách đã bị khóa. Vui lòng liên hệ hotline 1900-xxxx để được hỗ trợ.");
+            request.getRequestDispatcher("authentication/login.jsp").forward(request, response);
+            return;
+        }
+
         UserDTO user = userService.login(email, password);
         if (user != null) {
             HttpSession session = request.getSession();
@@ -52,7 +59,6 @@ public class LoginServlet extends HttpServlet {
                 }
             }
         } else {
-
             request.setAttribute("error", "Email hoặc mật khẩu không đúng!");
             request.getRequestDispatcher("authentication/login.jsp").forward(request, response);
         }

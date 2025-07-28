@@ -81,24 +81,98 @@
             overflow-x: hidden;
         }
 
-        /* Background dots effect */
+        /* Background circles effect */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(255, 105, 180, 0.1) 2px, transparent 2px),
-                radial-gradient(circle at 80% 20%, rgba(255, 105, 180, 0.08) 1px, transparent 1px),
-                radial-gradient(circle at 40% 70%, rgba(255, 105, 180, 0.12) 3px, transparent 3px),
-                radial-gradient(circle at 90% 80%, rgba(255, 105, 180, 0.06) 1.5px, transparent 1.5px),
-                radial-gradient(circle at 10% 90%, rgba(255, 105, 180, 0.1) 2.5px, transparent 2.5px),
-                radial-gradient(circle at 70% 10%, rgba(255, 105, 180, 0.08) 1px, transparent 1px);
-            background-size: 200px 200px, 150px 150px, 300px 300px, 100px 100px, 250px 250px, 120px 120px;
-            pointer-events: none;
-            z-index: 0;
+            top: -200px;
+            left: -50px;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(162, 89, 247, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -400px;
+            right: -200px;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        /* Additional background circles */
+        .bg-circle-1 {
+            position: fixed;
+            top: 20%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 105, 180, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        .bg-circle-2 {
+            position: fixed;
+            top: 60%;
+            left: 80%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 193, 7, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 12s ease-in-out infinite reverse;
+        }
+
+        .bg-circle-3 {
+            position: fixed;
+            top: 80%;
+            left: 20%;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.07) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 9s ease-in-out infinite;
+        }
+
+        .bg-circle-4 {
+            position: fixed;
+            top: 10%;
+            left: 70%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(156, 39, 176, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 11s ease-in-out infinite reverse;
+        }
+
+        .bg-circle-5 {
+            position: fixed;
+            top: 40%;
+            left: 5%;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(33, 150, 243, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 7s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            100% { transform: translateY(0) rotate(360deg); }
         }
 
         .header {
@@ -247,6 +321,67 @@
             height: 4px;
             background: linear-gradient(90deg, #a259f7, #4facfe);
             border-radius: 2px;
+        }
+
+        /* Featured Event Owner Card */
+        .featured-owner-card {
+            background: rgba(36, 19, 54, 0.85);
+            border-radius: 22px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .featured-owner-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1f1d40, #4facfe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .featured-owner-info {
+            flex: 1;
+        }
+
+        .featured-owner-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .featured-owner-bio {
+            color: #bdbdfc;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .featured-export-btn {
+            background: linear-gradient(90deg, #a259f7, #4facfe);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .featured-export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(162, 89, 247, 0.4);
         }
 
         .dashboard-layout {
@@ -1058,6 +1193,13 @@
     </style>
 </head>
 <body>
+    <!-- Background circles -->
+    <div class="bg-circle-1"></div>
+    <div class="bg-circle-2"></div>
+    <div class="bg-circle-3"></div>
+    <div class="bg-circle-4"></div>
+    <div class="bg-circle-5"></div>
+    
     <div class="header">
         <div class="logo">MasterTicket</div>
         <form class="search-bar" action="#" method="get">
@@ -1074,7 +1216,7 @@
         <div class="user-info">
             <div class="user-avatar">
                 <% if (user != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
-                    <img src="${pageContext.request.contextPath}/uploads/user_avatar/<%= user.getAvatar() %>" alt="Avatar">
+                    <img src="${pageContext.request.contextPath}/avatar/<%= user.getAvatar() %>" alt="Avatar">
                 <% } else { %>
                     <%= userName != null && !userName.isEmpty() ? userName.substring(0, 1).toUpperCase() : "U" %>
                 <% } %>
@@ -1090,20 +1232,35 @@
     <div class="main-container">
         <h1 class="page-title">Ban Tổ Chức</h1>
 
+        <!-- Featured Event Owner Card -->
+        <div class="featured-owner-card">
+            <div class="featured-owner-logo">
+                <% if (user != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
+                    <img src="${pageContext.request.contextPath}/avatar/<%= user.getAvatar() %>" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                <% } else { %>
+                    <i class="fas fa-building"></i>
+                <% } %>
+            </div>
+            <div class="featured-owner-info">
+                <div class="featured-owner-name"><%= userName != null ? userName : "Event Owner" %></div>
+                <div class="featured-owner-bio">Tiểu sử: Nơi âm nhạc và cảm xúc thăng hoa</div>
+            </div>
+            <button class="featured-export-btn">Xuất dữ liệu</button>
+        </div>
+
         <div class="dashboard-layout">
             <!-- Sidebar -->
             <div class="sidebar">
                 <div class="profile-card">
                     <div class="profile-avatar">
-                        <% if (user != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
-                            <img src="${pageContext.request.contextPath}/uploads/user_avatar/<%= user.getAvatar() %>" alt="Avatar">
-                        <% } else { %>
-                            <i class="fas fa-building"></i>
-                        <% } %>
+                                        <% if (user != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
+                    <img src="${pageContext.request.contextPath}/avatar/<%= user.getAvatar() %>" alt="Avatar">
+                <% } else { %>
+                    <%= userName != null && !userName.isEmpty() ? userName.substring(0, 1).toUpperCase() : "E" %>
+                <% } %>
                     </div>
-                    <div class="profile-name"><%= userName != null ? userName : "Mây Lang Thang" %></div>
-                    <div class="profile-bio">Tiểu sử: Nơi âm nhạc và cảm xúc thăng hoa</div>
-                    <button class="export-btn">Xuất dữ liệu</button>
+                    <div class="profile-name"><%= userName != null ? userName : "Event Owner" %></div>
+                    <div class="profile-bio">Event Owner</div>
                 </div>
 
                 <div class="options-panel">
@@ -1204,7 +1361,7 @@
                         <div class="avatar-section">
                             <div class="avatar-preview" id="avatarPreview">
                                 <% if (user != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
-                                    <img src="${pageContext.request.contextPath}/uploads/user_avatar/<%= user.getAvatar() %>" alt="Avatar Preview">
+                                    <img src="${pageContext.request.contextPath}/avatar/<%= user.getAvatar() %>" alt="Avatar Preview">
                                 <% } else { %>
                                     <%= userName != null && !userName.isEmpty() ? userName.substring(0, 1).toUpperCase() : "U" %>
                                 <% } %>
@@ -1451,6 +1608,13 @@
                 if (targetLink) {
                     targetLink.classList.add('active');
                 }
+            }
+
+            // Check if there's a success or error message, switch to edit profile section
+            const successMessage = document.querySelector('.message.success');
+            const errorMessage = document.querySelector('.message.error');
+            if (successMessage || errorMessage) {
+                switchSection('edit-profile-section');
             }
 
             // Add click event listeners to option links

@@ -89,7 +89,6 @@ public class AdminServlet extends HttpServlet {
         }
         // --- Kết thúc kiểm tra quyền admin ---
 
-
         logger.info("Processing admin request for path: " + pathInfo);
         
         // ủy quyền yêu cầu và phản hồi cho các Servlet con.

@@ -151,4 +151,14 @@ public class UserService {
     public String whoisLoggedin(int userId) throws IOException, SQLException {
       return userDAO.checkRole(userId);
     }
+
+    /**
+     * Kiểm tra trạng thái tài khoản theo email
+     * @param email Email của người dùng
+     * @return true nếu tài khoản bị khóa, false nếu không
+     */
+    public boolean isAccountLocked(String email) {
+        UserDTO user = getUserByEmail(email);
+        return user != null && user.getIsLocked();
+    }
 }

@@ -1,69 +1,69 @@
 package controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Paths;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 
-@WebServlet("/images/*") 
+@WebServlet("/avatar/*")
 public class ImageServlet extends HttpServlet {
-
-    private static final long serialVersionUID = 1L;
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String imagePath = request.getPathInfo(); 
-        System.out.println("DEBUG ImageServlet: Request path info: " + imagePath);
-
-        if (imagePath == null || imagePath.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Image path is missing.");
+        
+        String basePath = (String) getServletContext().getAttribute("upload.path");
+        if (basePath == null || basePath.isEmpty()) {
+            basePath = getServletContext().getRealPath("/uploads");
+            if (basePath == null) {
+                basePath = "uploads";
+            }
+        }
+        
+        String relativePath = request.getPathInfo();
+        if (relativePath == null || relativePath.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
-
-        if (imagePath.startsWith("/")) {
-            imagePath = imagePath.substring(1);
+        
+        // Remove leading slash
+        if (relativePath.startsWith("/")) {
+            relativePath = relativePath.substring(1);
         }
-        System.out.println("DEBUG ImageServlet: Absolute image path: " + imagePath);
-
-        File imageFile = new File(imagePath);
-
- 
-        if (!imageFile.exists() || !imageFile.isFile()) {
-            System.err.println("ERROR ImageServlet: Image file not found or is not a file: " + imagePath);
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image not found.");
+        
+        String filePath = basePath + File.separator + "user_avatar" + File.separator + relativePath;
+        System.out.println("Serving avatar from: " + filePath);
+        
+        File file = new File(filePath);
+        if (!file.exists()) {
+            System.out.println("Avatar file not found: " + filePath);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
-
-        String contentType = getServletContext().getMimeType(imageFile.getName());
-        if (contentType == null) {
-
-            contentType = "application/octet-stream";
+        
+        String mimeType = getServletContext().getMimeType(file.getName());
+        if (mimeType == null) {
+            mimeType = "image/jpeg"; // Default to JPEG
         }
-        response.setContentType(contentType);
-        response.setContentLength((int) imageFile.length());
-
-        try (FileInputStream in = new FileInputStream(imageFile); OutputStream out = response.getOutputStream()) {
-
-            byte[] buffer = new byte[4096];
+        
+        response.setContentType(mimeType);
+        response.setContentLength((int) file.length());
+        
+        try (InputStream in = new FileInputStream(file);
+             OutputStream out = response.getOutputStream()) {
+            byte[] buffer = new byte[1024];
             int bytesRead;
             while ((bytesRead = in.read(buffer)) != -1) {
                 out.write(buffer, 0, bytesRead);
             }
-            System.out.println("DEBUG ImageServlet: Image served successfully: " + imagePath);
-
-        } catch (IOException e) {
-            System.err.println("ERROR ImageServlet: Error serving image " + imagePath + ": " + e.getMessage());
-            e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error serving image.");
         }
     }
 }
