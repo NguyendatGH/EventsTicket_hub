@@ -21,6 +21,7 @@
             background: linear-gradient(to bottom, #161b22, #0d1117);
             color: var(--text-light);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* Color Scheme */
@@ -46,6 +47,12 @@
             top: 0;
             z-index: 100;
             border-bottom: 1px solid var(--border-color);
+            overflow: visible;
+        }
+
+        /* Ensure all content has lower z-index than dropdown */
+        .container * {
+            z-index: 1;
         }
 
         .nav {
@@ -146,6 +153,7 @@
             align-items: center;
             gap: 1rem;
             position: relative;
+            z-index: 1000;
         }
 
         .user-info {
@@ -153,10 +161,12 @@
             align-items: center;
             gap: 0.5rem;
             cursor: pointer;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.75rem;
             border-radius: 25px;
             background: rgba(255, 255, 255, 0.1);
             transition: all 0.3s;
+            max-width: 200px;
+            overflow: hidden;
         }
 
         .user-info:hover {
@@ -164,8 +174,8 @@
         }
 
         .user-avatar {
-            width: 35px;
-            height: 35px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background-size: cover;
             background-position: center;
@@ -174,9 +184,25 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             color: white;
+            flex-shrink: 0;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .user-info span {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
         }
 
         .user-dropdown {
@@ -193,7 +219,9 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s ease-in-out;
-            z-index: 101;
+            z-index: 9999;
+            max-height: none;
+            overflow-y: visible;
         }
 
         .user-dropdown.show {
@@ -209,6 +237,7 @@
             padding: 0.75rem 0.5rem;
             border-bottom: 1px solid var(--border-color);
             transition: background 0.3s, color 0.3s;
+            white-space: nowrap;
         }
 
         .dropdown-item:last-child {
@@ -220,17 +249,35 @@
             color: var(--primary);
         }
 
+        /* Ensure dropdown is visible */
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Dropdown positioned above */
+        .user-dropdown.show[style*="bottom"] {
+            transform: translateY(0);
+            box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.3);
+        }
+
         /* Main Content */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
             min-height: calc(100vh - 200px);
+            position: relative;
+            z-index: 1;
         }
 
         .header {
             text-align: center;
             margin-bottom: 3rem;
+            position: relative;
+            z-index: 1;
         }
 
         .header h1 {
@@ -251,6 +298,8 @@
             background: #21262d;
             border-radius: 10px;
             padding: 0.5rem;
+            position: relative;
+            z-index: 1;
         }
 
         .tab-button {
@@ -287,6 +336,8 @@
             padding: 2rem;
             border-radius: 10px;
             margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         .form-group {
@@ -347,6 +398,8 @@
             background: #21262d;
             border-radius: 10px;
             padding: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         .request-item {
@@ -628,6 +681,45 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
+            }
+
+            .user-info {
+                max-width: 150px;
+                padding: 0.5rem;
+            }
+
+            .user-info span {
+                max-width: 80px;
+                font-size: 0.8rem;
+            }
+
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .user-info {
+                max-width: 120px;
+            }
+
+            .user-info span {
+                max-width: 60px;
+                font-size: 0.75rem;
+            }
+
+            .user-avatar {
+                width: 24px;
+                height: 24px;
+                font-size: 0.6rem;
+            }
+
+            .user-dropdown {
+                right: -10px;
+                min-width: 180px;
+                max-height: 250px;
             }
         }
     </style>
@@ -911,6 +1003,22 @@
         function toggleUserDropdown() {
             const dropdown = document.getElementById('userDropdown');
             dropdown.classList.toggle('show');
+            
+            if (dropdown.classList.contains('show')) {
+                // Check if dropdown goes below viewport
+                const rect = dropdown.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                if (rect.bottom > viewportHeight) {
+                    // Position dropdown above the user menu
+                    dropdown.style.top = 'auto';
+                    dropdown.style.bottom = 'calc(100% + 10px)';
+                } else {
+                    // Reset to default position
+                    dropdown.style.top = 'calc(100% + 10px)';
+                    dropdown.style.bottom = 'auto';
+                }
+            }
         }
 
         // Close dropdown when clicking outside
