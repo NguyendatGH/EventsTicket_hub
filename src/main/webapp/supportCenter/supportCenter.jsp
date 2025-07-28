@@ -19,14 +19,213 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(to bottom, #161b22, #0d1117);
-            color: #e6edf3;
+            color: var(--text-light);
             min-height: 100vh;
         }
 
+        /* Color Scheme */
+        :root {
+            --primary: #667aff;
+            --secondary: #e06bce;
+            --dark-bg: #161b22;
+            --darker-bg: #0d1117;
+            --card-bg: #21262d;
+            --border-color: #30363d;
+            --text-light: #e6edf3;
+            --text-muted: #8b949e;
+            --success: #00cc66;
+            --warning: #ffcc00;
+            --danger: #ff3333;
+        }
+
+        /* Header */
+        .header {
+            background: var(--darker-bg);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-wrap: nowrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .nav-center-content {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            flex-wrap: nowrap;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: 1rem;
+            position: relative;
+        }
+
+        .btn {
+            padding: 0.6rem 1.8rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            color: var(--text-light);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            background: rgba(102, 122, 255, 0.2);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: #5566dd;
+            transform: translateY(-2px);
+        }
+
+        /* User Menu */
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: var(--darker-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            min-width: 200px;
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease-in-out;
+            z-index: 101;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(102, 122, 255, 0.2);
+            color: var(--primary);
+        }
+
+        /* Main Content */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+            min-height: calc(100vh - 200px);
         }
 
         .header {
@@ -113,11 +312,6 @@
             font-size: 1rem;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
@@ -125,16 +319,24 @@
             border-color: #667aff;
         }
 
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
         .submit-btn {
             background: #667aff;
             color: white;
             border: none;
             padding: 1rem 2rem;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 500;
             transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .submit-btn:hover {
@@ -144,21 +346,15 @@
         .support-requests {
             background: #21262d;
             border-radius: 10px;
-            overflow: hidden;
+            padding: 2rem;
         }
 
         .request-item {
+            border: 1px solid #30363d;
+            border-radius: 8px;
             padding: 1.5rem;
-            border-bottom: 1px solid #30363d;
-            transition: background 0.3s;
-        }
-
-        .request-item:last-child {
-            border-bottom: none;
-        }
-
-        .request-item:hover {
-            background: #2d3748;
+            margin-bottom: 1rem;
+            background: #161b22;
         }
 
         .request-header {
@@ -169,7 +365,7 @@
         }
 
         .request-subject {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: #e6edf3;
         }
@@ -188,38 +384,38 @@
 
         .status-replied {
             background: #667aff;
-            color: white;
+            color: #fff;
         }
 
         .status-resolved {
             background: #00cc66;
-            color: white;
+            color: #fff;
         }
 
         .status-closed {
             background: #8b949e;
-            color: white;
+            color: #fff;
         }
 
         .request-meta {
             display: flex;
-            gap: 2rem;
+            gap: 1rem;
             margin-bottom: 1rem;
-            font-size: 0.875rem;
             color: #8b949e;
+            font-size: 0.875rem;
         }
 
         .request-content {
             color: #e6edf3;
             line-height: 1.6;
+            margin-bottom: 1rem;
         }
 
         .admin-response {
-            margin-top: 1rem;
+            background: #2d3748;
             padding: 1rem;
-            background: #161b22;
             border-radius: 6px;
-            border-left: 4px solid #667aff;
+            margin-top: 1rem;
         }
 
         .admin-response h4 {
@@ -227,22 +423,13 @@
             margin-bottom: 0.5rem;
         }
 
-        .alert {
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
+        .admin-response p {
+            color: #e6edf3;
+            margin-bottom: 0.5rem;
         }
 
-        .alert-success {
-            background: rgba(0, 204, 102, 0.1);
-            border: 1px solid #00cc66;
-            color: #00cc66;
-        }
-
-        .alert-error {
-            background: rgba(255, 51, 51, 0.1);
-            border: 1px solid #ff3333;
-            color: #ff3333;
+        .admin-response small {
+            color: #8b949e;
         }
 
         .empty-state {
@@ -257,37 +444,30 @@
             color: #667aff;
         }
 
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: #e6edf3;
+        }
+
+        /* File upload styles */
         .file-input {
             width: 100%;
             padding: 0.75rem;
-            border: 2px dashed #667aff;
+            border: 1px solid #30363d;
             border-radius: 6px;
             background: #161b22;
             color: #e6edf3;
             font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .file-input:hover {
-            border-color: #5566dd;
-            background: #1c2128;
-        }
-
-        .file-input:focus {
-            outline: none;
-            border-color: #667aff;
-            box-shadow: 0 0 0 2px rgba(102, 122, 255, 0.2);
         }
 
         .file-info {
             margin-top: 0.5rem;
+            color: #8b949e;
+            font-size: 0.875rem;
         }
 
         .file-info small {
             display: block;
-            color: #8b949e;
-            font-size: 0.875rem;
             margin-bottom: 0.25rem;
         }
 
@@ -380,26 +560,132 @@
         .attachment-download:hover {
             text-decoration: underline;
         }
+
+        /* Footer */
+        .footer {
+            background: var(--darker-bg);
+            color: var(--text-muted);
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--text-light);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-center-content {
+                display: none;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .support-tabs {
+                flex-direction: column;
+            }
+            
+            .request-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
+
+            <div class="nav-center-content">
+                <ul class="nav-links">
+                    <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
+                    <li><a href="${pageContext.request.contextPath}/support" class="active"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
+                </ul>
+            </div>
+
+            <div class="auth-buttons">
+                <c:choose>
+                    <c:when test="${sessionScope.user != null}">
+                        <div class="user-menu">
+                            <div class="user-info" onclick="toggleUserDropdown()">
+                                <div class="user-avatar">
+                                    <c:if test="${not empty sessionScope.user.avatar}">
+                                        <img src="${pageContext.request.contextPath}/uploads/user_avatar/${sessionScope.user.avatar}" alt="Avatar">
+                                    </c:if>
+                                    <c:if test="${empty sessionScope.user.avatar}">
+                                        ${fn:substring(sessionScope.user.email, 0, 1)}
+                                    </c:if>
+                                </div>
+                                Xin chào, ${sessionScope.user.name != null ? sessionScope.user.name : sessionScope.user.email} <span style="margin-left: 0.5rem;">▼</span>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
+                                <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
+                                <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
+                                <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
+                                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+                                <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
+                            </div>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="${pageContext.request.contextPath}/login" class="btn btn-outline">Đăng nhập</a>
+                        <a href="${pageContext.request.contextPath}/register" class="btn btn-primary">Đăng ký</a>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </nav>
+    </header>
+
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-headset"></i> Trung tâm hỗ trợ</h1>
             <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7</p>
         </div>
-
-        <c:if test="${not empty success}">
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> ${success}
-            </div>
-        </c:if>
-
-        <c:if test="${not empty error}">
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle"></i> ${error}
-            </div>
-        </c:if>
 
         <div class="support-tabs">
             <button class="tab-button active" onclick="showTab('new-request')">
@@ -413,19 +699,31 @@
         <!-- Tab: Gửi yêu cầu mới -->
         <div id="new-request" class="tab-content active">
             <div class="support-form">
-                <h2><i class="fas fa-edit"></i> Gửi yêu cầu hỗ trợ</h2>
+                <c:if test="${not empty error}">
+                    <div style="background: #dc3545; color: white; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                        ${error}
+                    </div>
+                </c:if>
+                
+                <c:if test="${not empty success}">
+                    <div style="background: #00cc66; color: white; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                        ${success}
+                    </div>
+                </c:if>
+
                 <form action="${pageContext.request.contextPath}/support" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="submit-request">
                     
                     <div class="form-group">
-                        <label for="subject">Tiêu đề *</label>
+                        <label for="subject">Tiêu đề</label>
                         <input type="text" id="subject" name="subject" required 
                                placeholder="Nhập tiêu đề yêu cầu hỗ trợ...">
                     </div>
 
                     <div class="form-group">
                         <label for="category">Danh mục</label>
-                        <select id="category" name="category">
+                        <select id="category" name="category" required>
+                            <option value="">Chọn danh mục</option>
                             <option value="GENERAL">Chung</option>
                             <option value="TECHNICAL">Kỹ thuật</option>
                             <option value="PAYMENT">Thanh toán</option>
@@ -437,16 +735,17 @@
 
                     <div class="form-group">
                         <label for="priority">Mức độ ưu tiên</label>
-                        <select id="priority" name="priority">
+                        <select id="priority" name="priority" required>
+                            <option value="">Chọn mức độ</option>
                             <option value="LOW">Thấp</option>
-                            <option value="MEDIUM" selected>Trung bình</option>
+                            <option value="MEDIUM">Trung bình</option>
                             <option value="HIGH">Cao</option>
                             <option value="URGENT">Khẩn cấp</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="content">Nội dung *</label>
+                        <label for="content">Nội dung</label>
                         <textarea id="content" name="content" required 
                                   placeholder="Mô tả chi tiết vấn đề của bạn..."></textarea>
                     </div>
@@ -549,7 +848,7 @@
                         <div class="empty-state">
                             <i class="fas fa-inbox"></i>
                             <h3>Chưa có yêu cầu hỗ trợ nào</h3>
-                            <p>Bạn chưa gửi yêu cầu hỗ trợ nào. Hãy tạo yêu cầu mới nếu cần hỗ trợ!</p>
+                            <p>Bạn chưa gửi yêu cầu hỗ trợ nào. Hãy gửi yêu cầu đầu tiên!</p>
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -557,30 +856,73 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>MasterTicket</h3>
+                <p>Nền tảng đặt vé sự kiện hàng đầu Việt Nam. Khám phá và tham gia các sự kiện thú vị cùng chúng tôi.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Liên kết nhanh</h3>
+                <ul>
+                    <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home#hot-events">Sự kiện hot</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home#vouchers">Săn voucher</a></li>
+                    <li><a href="${pageContext.request.contextPath}/support">Hỗ trợ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Hỗ trợ</h3>
+                <ul>
+                    <li><a href="${pageContext.request.contextPath}/support">Trung tâm hỗ trợ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/faq">Câu hỏi thường gặp</a></li>
+                    <li><a href="${pageContext.request.contextPath}/contact">Liên hệ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/terms">Điều khoản sử dụng</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 MasterTicket. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </footer>
+
     <script>
         function showTab(tabName) {
             // Hide all tab contents
             const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => content.classList.remove('active'));
-            
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
             // Remove active class from all tab buttons
             const tabButtons = document.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => button.classList.remove('active'));
-            
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
             // Show selected tab content
             document.getElementById(tabName).classList.add('active');
-            
+
             // Add active class to clicked button
             event.target.classList.add('active');
         }
 
-        // Load user requests when page loads
-        window.onload = function() {
-            console.log('Page loaded');
-            const fileInput = document.getElementById('attachments');
-            const fileList = document.getElementById('file-list');
-            console.log('File input found:', fileInput);
-            console.log('File list found:', fileList);
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.user-info') && !event.target.matches('.user-info *')) {
+                const dropdowns = document.getElementsByClassName('user-dropdown');
+                for (let dropdown of dropdowns) {
+                    if (dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            }
         };
 
         // File upload handling
@@ -680,6 +1022,15 @@
             input.files = dt.files;
             input.dispatchEvent(new Event('change'));
         }
+
+        // Load user requests when page loads
+        window.onload = function() {
+            console.log('Page loaded');
+            const fileInput = document.getElementById('attachments');
+            const fileList = document.getElementById('file-list');
+            console.log('File input found:', fileInput);
+            console.log('File list found:', fileList);
+        };
     </script>
 </body>
 </html> 
