@@ -374,7 +374,22 @@ CREATE TABLE SupportItems (
     AdminResponse NVARCHAR(MAX) NULL,
     AssignedAdmin NVARCHAR(255) NULL
 );
-Go
+GO
+
+-- Bảng SupportAttachments
+CREATE TABLE SupportAttachments (
+    AttachmentID INT IDENTITY(1,1) PRIMARY KEY,
+    SupportID INT NOT NULL,
+    FileName NVARCHAR(255) NOT NULL,
+    OriginalFileName NVARCHAR(255) NOT NULL,
+    FilePath NVARCHAR(500) NOT NULL,
+    FileType NVARCHAR(100) NOT NULL,
+    FileSize BIGINT NOT NULL,
+    UploadDate DATE NOT NULL,
+    UploadTimestamp DATETIME NOT NULL,
+    FOREIGN KEY (SupportID) REFERENCES SupportItems(SupportID) ON DELETE CASCADE
+);
+GO
 
 
 

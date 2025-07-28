@@ -130,7 +130,6 @@
         <div id="all-requests" class="tab-content active">
             <div class="support-table">
                 <div class="table-header">
-                    <div>ID</div>
                     <div>Tiêu đề</div>
                     <div>Người gửi</div>
                     <div>Danh mục</div>
@@ -143,7 +142,6 @@
                     <c:when test="${not empty allRequests}">
                         <c:forEach var="request" items="${allRequests}">
                             <div class="table-row">
-                                <div>#${request.supportId}</div>
                                 <div>${request.subject}</div>
                                 <div>${request.fromEmail}</div>
                                 <div>${request.category}</div>
@@ -192,7 +190,6 @@
         <div id="pending-requests" class="tab-content">
             <div class="support-table">
                 <div class="table-header">
-                    <div>ID</div>
                     <div>Tiêu đề</div>
                     <div>Người gửi</div>
                     <div>Danh mục</div>
@@ -205,7 +202,6 @@
                     <c:when test="${not empty pendingRequests}">
                         <c:forEach var="request" items="${pendingRequests}">
                             <div class="table-row">
-                                <div>#${request.supportId}</div>
                                 <div>${request.subject}</div>
                                 <div>${request.fromEmail}</div>
                                 <div>${request.category}</div>

@@ -28,6 +28,57 @@
                 background: linear-gradient(to bottom, #161b22, #0d1117);
                 color: var(--text-light);
                 min-height: 100vh;
+                position: relative;
+                overflow-x: hidden;
+            }
+
+            /* Background circles */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                background: 
+                    radial-gradient(circle at 20% 20%, rgba(102, 122, 255, 0.15) 0%, transparent 60%),
+                    radial-gradient(circle at 80% 40%, rgba(224, 107, 206, 0.12) 0%, transparent 60%),
+                    radial-gradient(circle at 40% 80%, rgba(102, 122, 255, 0.1) 0%, transparent 60%),
+                    radial-gradient(circle at 90% 10%, rgba(224, 107, 206, 0.08) 0%, transparent 60%),
+                    radial-gradient(circle at 10% 90%, rgba(102, 122, 255, 0.12) 0%, transparent 60%),
+                    radial-gradient(circle at 70% 70%, rgba(224, 107, 206, 0.09) 0%, transparent 60%);
+                pointer-events: none;
+                animation: float 20s ease-in-out infinite;
+            }
+
+            @keyframes float {
+                0%, 100% {
+                    transform: translateY(0px) rotate(0deg);
+                }
+                33% {
+                    transform: translateY(-20px) rotate(1deg);
+                }
+                66% {
+                    transform: translateY(10px) rotate(-1deg);
+                }
+            }
+
+            /* Additional background elements */
+            body::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -2;
+                background: 
+                    radial-gradient(circle at 30% 60%, rgba(102, 122, 255, 0.08) 0%, transparent 40%),
+                    radial-gradient(circle at 85% 25%, rgba(224, 107, 206, 0.06) 0%, transparent 40%),
+                    radial-gradient(circle at 15% 75%, rgba(102, 122, 255, 0.05) 0%, transparent 40%);
+                pointer-events: none;
+                animation: float 25s ease-in-out infinite reverse;
             }
 
             /* Color Scheme */
@@ -64,13 +115,14 @@
                 flex-wrap: nowrap;
             }
 
-            .logo {
-                font-size: 1.5rem;
-                font-weight: bold;
-                color: var(--primary);
-                text-decoration: none;
-                flex-shrink: 0;
-            }
+                    .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
 
             /* Container for middle content */
             .nav-center-content {
@@ -1107,7 +1159,7 @@
                                     <%-- Display User Avatar --%>
                                     <div class="user-avatar">
                                         <% if (user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
-                                            <img src="${pageContext.request.contextPath}/images/<%= user.getAvatar() %>" alt="Avatar">
+                                            <img src="${pageContext.request.contextPath}/uploads/user_avatar/<%= user.getAvatar() %>" alt="Avatar">
                                         <% } else { %>
                                             <%= user.getEmail().substring(0, 1).toUpperCase() %>
                                         <% } %>

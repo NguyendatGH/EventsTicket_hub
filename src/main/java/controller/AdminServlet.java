@@ -22,6 +22,8 @@ import models.IssueItem;
 import models.User;
 import service.UserService;
 import models.Event;
+import models.SupportItem;
+import models.SupportAttachment;
 
 @WebServlet(name = "AdminServlet", urlPatterns = { "/admin-servlet/*" })
 public class AdminServlet extends HttpServlet {
@@ -32,6 +34,7 @@ public class AdminServlet extends HttpServlet {
     private UserManagementServlet userManagementServlet;
     private EventManagementServlet eventManagementServlet;
     private SupportCenterServlet supportCenterServlet;
+    private AdminSupportServlet adminSupportServlet;
     private DashboardServlet dashboardServlet;
     private TransactionServlet transactionServlet;
     private UserService userService; // Instance của UserService
@@ -39,13 +42,20 @@ public class AdminServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        // Khởi tạo các Servlet con và UserService
-        userManagementServlet = new UserManagementServlet();
-        eventManagementServlet = new EventManagementServlet();
-        supportCenterServlet = new SupportCenterServlet();
-        dashboardServlet = new DashboardServlet();
-        transactionServlet = new TransactionServlet();
-        userService = new UserService();
+        try {
+            // Khởi tạo các Servlet con và UserService
+            userManagementServlet = new UserManagementServlet();
+            eventManagementServlet = new EventManagementServlet();
+            supportCenterServlet = new SupportCenterServlet();
+            adminSupportServlet = new AdminSupportServlet();
+            adminSupportServlet.init();
+            dashboardServlet = new DashboardServlet();
+            transactionServlet = new TransactionServlet();
+            userService = new UserService();
+        } catch (Exception e) {
+            logger.severe("Error initializing AdminServlet: " + e.getMessage());
+            throw new ServletException("Failed to initialize AdminServlet", e);
+        }
     }
 
     @Override
@@ -92,8 +102,8 @@ public class AdminServlet extends HttpServlet {
             } else if (pathInfo.startsWith("/event-management")) {
                 eventManagementServlet.handleRequest(request, response);
             } else if (pathInfo.startsWith("/support-center")) {
-                // Chuyển tiếp request đến AdminSupportServlet
-                request.getRequestDispatcher("/admin/support").forward(request, response);
+                // Gọi trực tiếp AdminSupportServlet
+                adminSupportServlet.doGet(request, response);
             } else if (pathInfo.startsWith("/transaction-management")) {
                 transactionServlet.handleRequest(request, response);
             } else {
@@ -139,6 +149,8 @@ public class AdminServlet extends HttpServlet {
                     userManagementServlet.handleRequest(request, response); // hoặc .doPost(request, response)
                 } else if (pathInfo.startsWith("/event-management")) {
                     eventManagementServlet.handleRequest(request, response); // hoặc .doPost(request, response)
+                } else if (pathInfo.startsWith("/support-center")) {
+                    adminSupportServlet.doPost(request, response);
                 } 
                 // Thêm các trường hợp xử lý POST cho các Servlet con khác
                 else {
