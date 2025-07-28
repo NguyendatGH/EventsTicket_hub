@@ -106,49 +106,59 @@ public class UserManagementServlet implements AdminSubServlet {
         forwardUtils.toJsp(request, response, USER_MANAGEMENT_JSP);
     }
 
-    private void handleLock(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String userIdParam = request.getParameter("userId");
-        String actionParam = request.getParameter("action");
+   private void handleLock(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String userIdParam = request.getParameter("userId");
+    String actionParam = request.getParameter("action");
 
-        if (userIdParam == null || actionParam == null) {
-            request.getSession().setAttribute("message", "Missing user ID or action");
-            request.getSession().setAttribute("messageType", "error");
-            response.sendRedirect(request.getContextPath() + "/admin-servlet/user-management");
-            return;
-        }
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> responseData = new HashMap<>();
 
-        try {
-            int userId = Integer.parseInt(userIdParam);
-            System.out.println("[++++++]user to modify: " + userIdParam);
-            boolean success = false;
-
-            if ("lock".equals(actionParam)) {
-                success = userService.changeUserAccountStatus(userId, 0);
-                logger.info("Attempting to lock user ID: " + userId);
-            } else if ("unlock".equals(actionParam)) {
-                success = userService.changeUserAccountStatus(userId, 1);
-                logger.info("Attempting to unlock user ID: " + userId);
-            }
-
-            if (success) {
-                request.getSession().setAttribute("message", "Trạng thái tài khoản đã được cập nhật!");
-                request.getSession().setAttribute("messageType", "success");
-            } else {
-                request.getSession().setAttribute("message", "Lỗi khi cập nhật trạng thái");
-                request.getSession().setAttribute("messageType", "error");
-            }
-        } catch (NumberFormatException e) {
-            logger.severe("invalid user id: " + userIdParam);
-            request.getSession().setAttribute("message", "ID không hơp lệ");
-            request.getSession().setAttribute("messageType", "error");
-        } catch (Exception e) {
-            logger.severe("Error updating user status: " + e.getMessage());
-            request.getSession().setAttribute("message", "An error occurred while updating user status");
-            request.getSession().setAttribute("messageType", "error");
-        }
-
-        response.sendRedirect(request.getContextPath() + "/admin-servlet/user-management");
+    if (userIdParam == null || actionParam == null) {
+        responseData.put("success", false);
+        responseData.put("message", "Missing user ID or action");
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        mapper.writeValue(response.getWriter(), responseData);
+        return;
     }
+
+    try {
+        int userId = Integer.parseInt(userIdParam);
+        System.out.println("[++++++]user to modify: " + userIdParam);
+        boolean success = false;
+
+        if ("lock".equals(actionParam)) {
+            success = userService.changeUserAccountStatus(userId, 0);
+            logger.info("Attempting to lock user ID: " + userId);
+        } else if ("unlock".equals(actionParam)) {
+            success = userService.changeUserAccountStatus(userId, 1);
+            logger.info("Attempting to unlock user ID: " + userId);
+        }
+
+        if (success) {
+            responseData.put("success", true);
+            responseData.put("message", "Trạng thái tài khoản đã được cập nhật!");
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            responseData.put("success", false);
+            responseData.put("message", "Lỗi khi cập nhật trạng thái");
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    } catch (NumberFormatException e) {
+        logger.severe("invalid user id: " + userIdParam);
+        responseData.put("success", false);
+        responseData.put("message", "ID không hợp lệ");
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    } catch (Exception e) {
+        logger.severe("Error updating user status: " + e.getMessage());
+        responseData.put("success", false);
+        responseData.put("message", "An error occurred while updating user status");
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    mapper.writeValue(response.getWriter(), responseData);
+}
 
     private void handleEditInfo(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {

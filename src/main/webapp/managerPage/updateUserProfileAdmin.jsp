@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cập nhật thông tin người dùng - MasterTicket</title>
+    <title>Cập nhật thông tin người dùng - EventTicketHub</title>
     <style>
         * {
             margin: 0;
