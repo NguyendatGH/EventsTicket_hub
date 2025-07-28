@@ -504,9 +504,9 @@
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" />
                 </a>
                 <a href="#" title="Sign in with Zalo">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" onclick="alert('soon!')"/>
                 </a>
-                <a href="#" title="Sign in with Facebook">
+                <a href="#" title="Sign in with Facebook" onclick="alert('soon!')">
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" />
                 </a>
             </div>

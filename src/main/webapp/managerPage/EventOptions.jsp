@@ -8,16 +8,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quản lý sự kiện</title>
     <style>
+        :root {
+            --primary-bg: #070a17;
+            --secondary-bg: rgba(15, 23, 42, 0.9);
+            --accent-blue: #0f67ff;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border-light: rgba(255, 255, 255, 0.2);
+            --border-dark: rgba(255, 255, 255, 0.1);
+            --success-green: #28a745;
+            --error-red: #ff0c0c;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
             min-height: 100vh;
-            background-color: #070a17;
+            background: var(--primary-bg);
+            color: var(--text-primary);
             overflow-x: hidden;
             position: relative;
         }
@@ -29,57 +44,61 @@
         }
 
         .sidebar {
-            width: 16%;
-            background: rgba(15, 23, 42, 0.9);
+            width: 280px;
+            background: var(--secondary-bg);
             backdrop-filter: blur(20px);
-            border-right: 1px solid #4d4d4d;
             padding: 2rem 0;
             transition: transform 0.3s ease;
+            position: fixed;
+            height: 100%;
             z-index: 1100;
+            border-right: 1px solid var(--border-dark);
         }
 
         .logo {
-            color: white;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            margin-bottom: 5rem;
+            color: var(--text-primary);
             padding: 0 2rem;
+            margin-bottom: 3rem;
+            letter-spacing: 0.5px;
         }
 
         .admin-section {
             padding: 0 2rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
         }
 
         .admin-avatar {
-            width: 120px;
-            height: 120px;
-            background: rgba(71, 85, 105, 0.8);
+            width: 100px;
+            height: 100px;
+            background: var(--card-bg);
             border-radius: 50%;
+            margin: 0 auto 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 2rem;
+            box-shadow: var(--shadow);
         }
 
         .admin-avatar svg {
-            width: 80px;
-            height: 80px;
-            color: #94a3b8;
+            width: 60px;
+            height: 60px;
+            color: var(--text-secondary);
         }
 
         .admin-name {
-            color: white;
-            font-size: 24px;
+            font-size: 1.25rem;
             font-weight: 600;
-            text-align: center;
-            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
         }
 
         .admin-role {
-            color: #94a3b8;
             font-size: 0.875rem;
-            text-align: center;
+            color: var(--text-secondary);
+            font-weight: 400;
         }
 
         .nav-menu {
@@ -87,28 +106,25 @@
         }
 
         .nav-item {
-            border-bottom: 1px solid rgba(15, 23, 42, 0.14);
+            border-bottom: 1px solid var(--border-dark);
         }
 
         .nav-link {
-            display: block;
-            color: white;
-            background-color: rgba(255, 255, 255, 0.18);
-            text-decoration: none;
+            display: flex;
+            align-items: center;
             padding: 1rem 2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
             position: relative;
         }
 
+        .nav-link:hover,
         .nav-link.active {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
-
-        .nav-link:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            box-shadow: inset 4px 0 0 var(--accent-blue);
         }
 
         .logout {
@@ -116,23 +132,23 @@
             bottom: 2rem;
             left: 2rem;
             right: 2rem;
-            color: #94a3b8;
+            color: var(--text-secondary);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             font-weight: 500;
             transition: color 0.3s ease;
         }
 
         .logout:hover {
-            color: white;
+            color: var(--text-primary);
         }
 
         .main-content {
             flex: 1;
-            padding: 0 94px;
-            padding-top: 2rem;
+            margin-left: 280px;
+            padding: 2rem 3rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -143,153 +159,129 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .breadcrumb {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 16px;
+            gap: 0.75rem;
+            font-size: 0.875rem;
             font-weight: 500;
-            background: rgba(255, 255, 255, 0.18);
-            border-radius: 12px;
-            padding: 10px 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            box-shadow: var(--shadow);
         }
 
         .breadcrumb-item {
-            color: #a8a8a8;
+            color: var(--text-secondary);
         }
 
         .breadcrumb-current {
-            color: white;
-        }
-
-        .section {
-            margin-bottom: 30px;
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         .section-title {
-            font-size: 24px;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 20px;
-            color: white;
-        }
-
-        .overview-section {
-            border-radius: 12px;
-            margin-bottom: 30px;
-            width: 100%;
-        }
-
-        .link-container {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-            background-color: rgba(255, 255, 255, 0.18);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-        }
-
-        .link-label {
-            font-size: 14px;
-            color: #e6e6e6;
-            min-width: 80px;
-            padding-left: 20px;
-        }
-
-        .link-input {
-            flex: 1;
-            padding: 12px 16px;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
         }
 
         .event-name-section {
-            background: rgba(255, 255, 255, 0.18);
+            background: var(--card-bg);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 100%;
+            padding: 1.5rem;
+            border: 1px solid var(--border-dark);
+            box-shadow: var(--shadow);
         }
 
         .event-input-group {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 1.5rem;
         }
 
         .event-label {
-            font-size: 15px;
+            font-size: 0.9375rem;
             font-weight: 500;
-            color: #e0e0e0;
+            color: var(--text-secondary);
             min-width: 100px;
         }
 
         .event-input {
             flex: 1;
-            padding: 12px 20px;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            font-size: 22px;
+            padding: 0.75rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            font-size: 1.125rem;
             font-weight: 500;
             border-radius: 8px;
+            transition: border-color 0.3s ease;
         }
 
         .event-input:focus {
             outline: none;
-            border-color: #0f67ff;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(15, 103, 255, 0.2);
         }
 
         .description-section {
-            background: rgba(255, 255, 255, 0.18);
+            background: var(--card-bg);
             border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 34px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border: 1px solid var(--border-dark);
+            box-shadow: var(--shadow);
         }
 
         .description-title {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 15px;
-            color: #ffffff;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
         }
 
         .description-text {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #ffffff;
             width: 100%;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
             border-radius: 8px;
-            padding: 8px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .description-text:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(15, 103, 255, 0.2);
         }
 
         .details-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 34px;
-            margin-bottom: 34px;
+            gap: 1.5rem;
         }
 
         .details-section {
-            background: rgba(255, 255, 255, 0.18);
+            background: var(--card-bg);
             border-radius: 12px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border: 1px solid var(--border-dark);
+            box-shadow: var(--shadow);
         }
 
         .detail-item {
             display: flex;
             align-items: center;
-            margin-bottom: 34px;
-            font-size: 14px;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .detail-item:last-child {
@@ -297,127 +289,174 @@
         }
 
         .detail-label {
-            color: #dbdbdb;
+            font-size: 0.875rem;
             font-weight: 500;
+            color: var(--text-secondary);
             min-width: 80px;
-            font-size: 14px;
         }
 
         .detail-value {
-            margin-top: 30px;
-            color: white;
-            text-align: start;
-            font-size: 16px;
-            padding-left: 10px;
-            width: 100%;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            font-size: 0.9375rem;
             border-radius: 8px;
-            padding: 8px;
+            transition: border-color 0.3s ease;
         }
 
         .detail-value:focus {
             outline: none;
-            border-color: #0f67ff;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(15, 103, 255, 0.2);
         }
 
         .events-material {
-            color: white;
+            margin-bottom: 2rem;
         }
 
         .material-header {
-            margin-bottom: 12px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
         }
 
         .material-wrapper {
-            border-style: dotted;
-            border-color: rgba(79, 102, 206, 0.94);
-            border-width: 4px;
+            border: 2px dashed var(--accent-blue);
             border-radius: 12px;
-            padding: 40px 20px;
-            margin-bottom: 34px;
+            padding: 2rem;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
         }
 
-        .content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .banner-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
         }
 
         .img-wrapper {
-            width: 80%;
-            box-sizing: border-box;
-            object-fit: cover;
-            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .img-wrapper img {
             width: 100%;
             height: auto;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            transition: transform 0.3s ease;
+        }
+
+        .img-wrapper img:hover {
+            transform: scale(1.02);
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .upload-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .upload-input {
+            padding: 0.75rem;
+            background: var(--card-bg);
+            border: 2px dashed var(--border-light);
+            color: var(--text-primary);
             border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .upload-input:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .file-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
         }
 
         .event-option {
             display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 34px;
-            margin-bottom: 34px;
+            gap: 1rem;
+            justify-content: flex-end;
         }
 
         .btn {
-            padding: 12px 18px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            color: white;
-            font-size: 16px;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9375rem;
             font-weight: 600;
-            gap: 14px;
-            border-radius: 12px;
-            border: 1px solid transparent;
+            color: var(--text-primary);
+            border-radius: 8px;
+            border: none;
             cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .approve {
-            background-color: #0f67ff;
+        .btn.save {
+            background: var(--success-green);
         }
 
-        .reject {
-            background-color: transparent;
-            border: 1px solid #0f67ff;
+        .btn.save:hover {
+            background: #218838;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
         }
 
-        .save {
-            background-color: #28a745;
+        .btn.reject {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .btn.reject:hover {
+            background: var(--accent-blue);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(15, 103, 255, 0.3);
         }
 
         .hamburger {
             display: none;
             position: fixed;
-            top: 20px;
-            right: 34px;
-            z-index: 1100;
-            background: none;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1200;
+            background: var(--card-bg);
             border: none;
-            padding: 8px;
+            padding: 0.5rem;
             cursor: pointer;
-            width: 32px;
-            height: 32px;
-            flex-direction: column;
-            justify-content: space-around;
+            border-radius: 8px;
         }
 
         .hamburger span {
             display: block;
-            width: 20px;
-            height: 2px;
-            background: white;
+            width: 24px;
+            height: 3px;
+            background: var(--text-primary);
+            margin: 4px 0;
             transition: all 0.3s ease;
         }
 
         .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(2px, 2px);
+            transform: rotate(45deg) translate(5px, 5px);
         }
 
         .hamburger.active span:nth-child(2) {
@@ -425,7 +464,7 @@
         }
 
         .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -6px);
+            transform: rotate(-45deg) translate(7px, -7px);
         }
 
         .overlay {
@@ -435,9 +474,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(21, 27, 58, 0.384);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
-            z-index: 950;
+            z-index: 1000;
+            opacity: 0;
             transition: opacity 0.3s ease;
         }
 
@@ -447,64 +487,67 @@
         }
 
         .bg_elips {
-            width: 800px;
-            height: 800px;
+            width: 700px;
+            height: 700px;
             object-fit: cover;
             position: fixed;
             z-index: -1;
             pointer-events: none;
-            opacity: 0.7;
+            opacity: 0.6;
+            filter: blur(50px);
         }
 
         .firstElement {
-            top: -200px;
-            left: -50px;
+            top: -150px;
+            left: -100px;
         }
 
         .secondElement {
-            bottom: -400px;
-            right: -200px;
+            bottom: -200px;
+            right: -150px;
         }
 
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--card-bg);
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(38, 62, 114, 0.5);
+            background: var(--accent-blue);
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(45, 70, 126, 0.7);
+            background: #0d55cc;
         }
 
         .error-message {
-            color: #ff0c0c;
-            background: rgba(255, 0, 0, 0.1);
-            padding: 10px;
+            background: rgba(255, 12, 12, 0.1);
+            color: var(--error-red);
+            padding: 0.75rem 1rem;
             border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
         }
 
         .success-message {
-            color: #28a745;
             background: rgba(40, 167, 69, 0.1);
-            padding: 10px;
+            color: var(--success-green);
+            padding: 0.75rem 1rem;
             border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
         }
 
         @media (max-width: 1400px) {
             .main-content {
-                padding: 0 50px;
+                padding: 1.5rem 2rem;
             }
         }
 
@@ -514,36 +557,22 @@
             }
 
             .sidebar {
-                width: 20%;
+                width: 260px;
             }
 
             .main-content {
-                padding: 0 30px;
+                margin-left: 260px;
             }
 
             .bg_elips {
                 width: 600px;
                 height: 600px;
             }
-
-            .firstElement {
-                top: -150px;
-                left: -30px;
-            }
-
-            .secondElement {
-                bottom: -300px;
-                right: -150px;
-            }
         }
 
         @media (max-width: 992px) {
             .sidebar {
-                width: 260px;
-                position: fixed;
-                height: 100%;
                 transform: translateX(-100%);
-                z-index: 1000;
             }
 
             .sidebar.active {
@@ -551,54 +580,22 @@
             }
 
             .main-content {
-                padding: 0 20px;
+                margin-left: 0;
+                padding: 1.5rem;
             }
 
-            .overview-section {
-                width: 100%;
-            }
-
-            .event-name-section {
-                width: 100%;
-            }
-
-            .admin-avatar {
-                width: 100px;
-                height: 100px;
-            }
-
-            .admin-avatar svg {
-                width: 60px;
-                height: 60px;
-            }
-
-            .admin-name {
-                font-size: 20px;
-            }
-
-            .logo {
-                font-size: 1.3rem;
+            .hamburger {
+                display: flex;
             }
 
             .event-input-group {
-                display: flex;
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
 
-            .event-input {
-                width: 100%;
-            }
-
-            .link-container {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 20px;
-                gap: 20px;
-            }
-
-            .link-input {
+            .event-input,
+            .detail-value,
+            .description-text {
                 width: 100%;
             }
 
@@ -606,25 +603,11 @@
                 width: 500px;
                 height: 500px;
             }
-
-            .firstElement {
-                top: -120px;
-                left: -20px;
-            }
-
-            .secondElement {
-                bottom: -250px;
-                right: -120px;
-            }
-
-            .hamburger {
-                display: flex;
-            }
         }
 
         @media (max-width: 768px) {
             .main-content {
-                padding: 0 15px;
+                padding: 1rem;
             }
 
             .top-bar {
@@ -634,23 +617,13 @@
             }
 
             .event-input {
-                font-size: 20px;
+                font-size: 1rem;
             }
 
             .bg_elips {
                 width: 400px;
                 height: 400px;
                 opacity: 0.5;
-            }
-
-            .firstElement {
-                top: -100px;
-                left: -15px;
-            }
-
-            .secondElement {
-                bottom: -200px;
-                right: -100px;
             }
         }
 
@@ -659,13 +632,9 @@
                 width: 100%;
             }
 
-            .main-content {
-                padding: 0 10px;
-            }
-
             .event-option {
                 flex-direction: column;
-                gap: 15px;
+                gap: 0.75rem;
             }
 
             .btn {
@@ -679,26 +648,10 @@
                 opacity: 0.4;
             }
 
-            .firstElement {
-                top: -80px;
-                left: -10px;
-            }
-
-            .secondElement {
-                bottom: -150px;
-                right: -50px;
-            }
-
-            .event-input {
-                font-size: 18px;
-            }
-
-            .description-text {
-                font-size: 16px;
-            }
-
+            .event-input,
+            .description-text,
             .detail-value {
-                font-size: 14px;
+                font-size: 0.875rem;
             }
         }
 
@@ -707,7 +660,7 @@
                 transform: translateY(0);
             }
             50% {
-                transform: translateY(-20px);
+                transform: translateY(-15px);
             }
             100% {
                 transform: translateY(0);
@@ -731,8 +684,8 @@
     </button>
     <div class="container">
         <div class="overlay"></div>
-     <aside class="sidebar">
-        <div class="logo">MasterTicket</div>
+    <aside class="sidebar">
+        <div class="logo">EventTicketHub</div>
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -742,7 +695,7 @@
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lý website MasterTicket</div>
+          <div class="admin-role">Quản lý website </div>
         </div>
         <nav>
           <ul class="nav-menu">
@@ -790,7 +743,7 @@
           </svg>
           Đăng xuất
         </a>
-      </aside>
+    </aside>
         <main class="main-content">
             <div class="top-bar">
                 <div class="breadcrumb">
@@ -805,18 +758,11 @@
             <c:if test="${not empty success}">
                 <div class="success-message">${success}</div>
             </c:if>
-            <!-- CHANGED: Updated form action to correct servlet URL -->
-            <form id="updateEventForm" action="${pageContext.request.contextPath}/admin-servlet/event-management" method="POST" onsubmit="return validateForm()">
+            <form id="updateEventForm" action="${pageContext.request.contextPath}/admin-servlet/event-management" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                 <input type="hidden" name="action" value="update" />
                 <input type="hidden" name="eventID" value="${event.eventID}" />
                 <div class="section">
                     <h2 class="section-title">Tổng quan</h2>
-                    <div class="overview-section">
-                        <div class="link-container">
-                            <span class="link-label">Tên sự kiện</span>
-                            <input type="text" class="link-input" value="${event.name}" readonly />
-                        </div>
-                    </div>
                 </div>
                 <div class="event-name-section">
                     <div class="event-input-group">
@@ -830,6 +776,10 @@
                 </div>
                 <div class="details-grid">
                     <div class="details-section">
+                   <div class="detail-item">
+                            <span class="detail-label">Chủ sở hữu:</span>
+                            <input type="text" class="detail-value" name="Ownername" value="${ownerName}" disabled />
+                        </div>
                         <div class="detail-item">
                             <span class="detail-label">Thời gian bắt đầu:</span>
                             <input type="datetime-local" class="detail-value" name="startTime" value="<fmt:formatDate value='${event.startTime}' pattern='yyyy-MM-dd\'T\'HH:mm' />" required />
@@ -860,19 +810,30 @@
                     </div>
                 </div>
                 <div class="events-material">
-                    <h3 class="material-header">Hình ảnh</h3>
-                    <div class="material-wrapper">
-                        <div class="banner">
-                            <h3 class="banner-header">Hình ảnh chính</h3>
-                            <div class="banner-content content">
-                                <div class="img-wrapper">
-                                    <img id="imagePreview" src="${event.imageURL}" alt="Hình ảnh chính" onerror="this.src='${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg'" />
-                                    <input type="text" class="detail-value" id="imageURL" name="imageURL" value="${event.imageURL}" placeholder="Nhập URL ảnh" maxlength="500" />
-                                </div>
+            <h3 class="material-header">Hình ảnh sự kiện</h3>
+            <div class="material-wrapper">
+                <div class="banner">
+                    <h3 class="banner-header">Ảnh đại diện sự kiện</h3>
+                    <div class="banner-content content">
+                        <div class="img-wrapper">
+                            <c:choose>
+                                <c:when test="${not empty event.imageURL}">
+                                    <img id="imagePreview" src="${pageContext.request.contextPath}/uploads/event_banners/${event.imageURL}" alt="Hình ảnh sự kiện"  />
+                                </c:when>
+                                <c:otherwise>
+                                    <img id="imagePreview" src="${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg" alt="Hình ảnh mặc định" />
+                                </c:otherwise>
+                            </c:choose>
+                            <div class="upload-section">
+                                <label for="imageFile" class="upload-label">Chọn ảnh từ máy tính</label>
+                                <input type="file" id="imageFile" name="imageFile" accept="image/*" class="upload-input" onchange="previewImage(this)" required>
+                                <div id="fileInfo" class="file-info">Định dạng: JPG, PNG, GIF | Tối đa: 5MB</div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
                 <div class="event-option">
                     <button type="submit" class="btn save">Cập nhật</button>
                     <a href="${pageContext.request.contextPath}/admin-servlet/event-management" class="btn reject">Quay lại</a>
@@ -881,8 +842,8 @@
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function animateEllipses() {
+<script>
+      function animateEllipses() {
             const ellipses = document.querySelectorAll(".bg_elips");
             ellipses.forEach((ellipse, index) => {
                 const duration = 8000 + index * 2000;
@@ -920,22 +881,39 @@
             });
         }
 
-        // Xem trước ảnh khi nhập URL
-        const imageURLInput = document.getElementById('imageURL');
-        const imagePreview = document.getElementById('imagePreview');
-        if (imageURLInput && imagePreview) {
-            imageURLInput.addEventListener('input', () => {
-                const url = imageURLInput.value.trim();
-                if (url) {
-                    imagePreview.src = url;
-                } else {
-                    imagePreview.src = '${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg';
+        function previewImage(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            const fileInfo = document.getElementById('fileInfo');
+            
+            reader.onloadend = function() {
+                const preview = document.getElementById('imagePreview');
+                if (preview) {
+                    preview.src = reader.result;
                 }
-            });
+                
+                if (fileInfo && file) {
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                    fileInfo.textContent = `Tên file: ${file.name} | Kích thước: ${fileSize}MB`;
+                    fileInfo.style.color = '#28a745';
+                }
+            }
+            
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                const preview = document.getElementById('imagePreview');
+                if (preview) {
+                    preview.src = '${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg';
+                }
+                if (fileInfo) {
+                    fileInfo.textContent = 'Định dạng: JPG, PNG, GIF | Tối đa: 5MB';
+                    fileInfo.style.color = '#a8a8a8';
+                }
+            }
         }
 
         function validateForm() {
-            // ADDED: Check if SweetAlert2 is available
             if (!window.Swal) {
                 alert('Lỗi: Không thể tải thư viện SweetAlert2. Vui lòng kiểm tra kết nối mạng.');
                 return false;
@@ -947,7 +925,7 @@
             const startTime = document.querySelector('input[name="startTime"]').value;
             const endTime = document.querySelector('input[name="endTime"]').value;
             const totalTicketCount = document.querySelector('input[name="totalTicketCount"]').value;
-            const imageURL = document.querySelector('input[name="imageURL"]').value.trim();
+            const imageFile = document.querySelector('input[name="imageFile"]').files[0];
 
             if (!name) {
                 Swal.fire('Lỗi', 'Tên sự kiện không được để trống', 'error');
@@ -957,10 +935,12 @@
                 Swal.fire('Lỗi', 'Tên sự kiện không được vượt quá 100 ký tự', 'error');
                 return false;
             }
+
             if (description.length > 1000) {
                 Swal.fire('Lỗi', 'Mô tả không được vượt quá 1000 ký tự', 'error');
                 return false;
             }
+
             if (!physicalLocation) {
                 Swal.fire('Lỗi', 'Địa điểm không được để trống', 'error');
                 return false;
@@ -969,6 +949,7 @@
                 Swal.fire('Lỗi', 'Địa điểm không được vượt quá 200 ký tự', 'error');
                 return false;
             }
+
             if (!startTime) {
                 Swal.fire('Lỗi', 'Thời gian bắt đầu không được để trống', 'error');
                 return false;
@@ -981,16 +962,29 @@
                 Swal.fire('Lỗi', 'Thời gian bắt đầu phải trước thời gian kết thúc', 'error');
                 return false;
             }
+
             if (isNaN(totalTicketCount) || totalTicketCount < 0) {
                 Swal.fire('Lỗi', 'Số lượng vé phải là số không âm', 'error');
                 return false;
             }
-            if (imageURL && !isValidURL(imageURL)) {
-                Swal.fire('Lỗi', 'URL ảnh không hợp lệ', 'error');
+
+            if (!imageFile) {
+                Swal.fire('Lỗi', 'Vui lòng chọn ảnh cho sự kiện', 'error');
                 return false;
             }
 
-            // ADDED: Show a loading SweetAlert while submitting
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(imageFile.type)) {
+                Swal.fire('Lỗi', 'Chỉ chấp nhận file ảnh định dạng JPG, PNG hoặc GIF', 'error');
+                return false;
+            }
+
+            const maxSize = 5 * 1024 * 1024;
+            if (imageFile.size > maxSize) {
+                Swal.fire('Lỗi', 'Kích thước ảnh không được vượt quá 5MB', 'error');
+                return false;
+            }
+
             Swal.fire({
                 title: 'Đang xử lý',
                 text: 'Vui lòng chờ trong khi cập nhật sự kiện...',
@@ -1003,26 +997,14 @@
             return true;
         }
 
-        function isValidURL(url) {
-            try {
-                new URL(url);
-                return url.match(/\.(jpeg|jpg|gif|png|svg)$/i) != null;
-            } catch (_) {
-                return false;
-            }
-        }
-        function editEvent(eventId) {
-    window.location.href = '${pageContext.request.contextPath}/editEvent?eventId=' + eventId;
-}
         animateEllipses();
 
-        // ADDED: Display server-side success/error messages as SweetAlert on page load
         <c:if test="${not empty error}">
             Swal.fire('Lỗi', '${error}', 'error');
         </c:if>
         <c:if test="${not empty success}">
             Swal.fire('Thành công', '${success}', 'success');
         </c:if>
-    </script>
+</script>
 </body>
 </html>
