@@ -28,9 +28,28 @@ mvnw.cmd
 
 #DBConnection
 src/main/java/context/DBConnection.java
-#api key
-<<<<<<< HEAD
+
+# Configuration files with sensitive data
 *.properties
-=======
-# .properties
->>>>>>> 0ec33686ff710dd25c67a289a5e1508f7be7e198
+*.config
+*.env
+
+# API keys and secrets
+api-keys/
+secrets/
+
+# Database connection and configuration
+src/main/java/context/DBConnection.java
+!src/main/java/context/DBConnection.java.template
+src/main/resources/database.properties
+src/main/resources/application.properties
+src/main/resources/config.properties
+
+# Log files
+*.log
+logs/
+
+# Uploaded files
+src/main/webapp/uploads/support_attachments/
+src/main/webapp/uploads/user_avatar/
+src/main/webapp/uploads/event_banners/

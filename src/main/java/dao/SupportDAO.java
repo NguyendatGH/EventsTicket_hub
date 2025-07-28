@@ -1,6 +1,7 @@
 package dao;
 
 import models.SupportItem;
+import models.SupportAttachment;
 import context.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class SupportDAO {
         String sql = "INSERT INTO SupportItems (FromEmail, ToEmail, Subject, SendDate, SendTimestamp, Content, Status, Priority, Category, CreatedDate, LastModified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             ps.setString(1, supportItem.getFromEmail());
             ps.setString(2, supportItem.getToEmail());
@@ -29,7 +30,15 @@ public class SupportDAO {
             ps.setDate(11, supportItem.getLastModified());
             
             int result = ps.executeUpdate();
-            return result > 0;
+            if (result > 0) {
+                // Get the generated support ID
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    supportItem.setSupportId(rs.getInt(1));
+                }
+                return true;
+            }
+            return false;
             
         } catch (SQLException e) {
             logger.severe("Error creating support request: " + e.getMessage());
@@ -48,6 +57,8 @@ public class SupportDAO {
             
             while (rs.next()) {
                 SupportItem item = mapRowToSupportItem(rs);
+                // Load attachments for this support item
+                loadAttachmentsForSupportItem(item);
                 supportItems.add(item);
             }
             
@@ -71,6 +82,8 @@ public class SupportDAO {
             
             while (rs.next()) {
                 SupportItem item = mapRowToSupportItem(rs);
+                // Load attachments for this support item
+                loadAttachmentsForSupportItem(item);
                 supportItems.add(item);
             }
             
@@ -92,7 +105,10 @@ public class SupportDAO {
             ResultSet rs = ps.executeQuery();
             
             if (rs.next()) {
-                return mapRowToSupportItem(rs);
+                SupportItem item = mapRowToSupportItem(rs);
+                // Load attachments for this support item
+                loadAttachmentsForSupportItem(item);
+                return item;
             }
             
         } catch (SQLException e) {
@@ -137,6 +153,8 @@ public class SupportDAO {
             
             while (rs.next()) {
                 SupportItem item = mapRowToSupportItem(rs);
+                // Load attachments for this support item
+                loadAttachmentsForSupportItem(item);
                 supportItems.add(item);
             }
             
@@ -184,5 +202,11 @@ public class SupportDAO {
             rs.getString("AdminResponse"),
             rs.getString("AssignedAdmin")
         );
+    }
+
+    private void loadAttachmentsForSupportItem(SupportItem supportItem) {
+        SupportAttachmentDAO attachmentDAO = new SupportAttachmentDAO();
+        List<SupportAttachment> attachments = attachmentDAO.getAttachmentsBySupportId(supportItem.getSupportId());
+        supportItem.setAttachments(attachments);
     }
 } 

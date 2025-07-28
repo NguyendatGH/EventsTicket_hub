@@ -15,88 +15,286 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
             margin: 0;
-            /* Gradient tím xanh + hiệu ứng mảng sáng mờ */
-            background: linear-gradient(180deg, #1e164e 0%, #181c2a 60%, #0d1117 100%);
+            background: linear-gradient(to bottom, #161b22, #0d1117);
             position: relative;
             overflow-x: hidden;
         }
+
+        /* Background circles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(102, 122, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 80% 40%, rgba(224, 107, 206, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 40% 80%, rgba(102, 122, 255, 0.1) 0%, transparent 60%),
+                radial-gradient(circle at 90% 10%, rgba(224, 107, 206, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 10% 90%, rgba(102, 122, 255, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 70% 70%, rgba(224, 107, 206, 0.09) 0%, transparent 60%);
+            pointer-events: none;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-20px) rotate(1deg);
+            }
+            66% {
+                transform: translateY(10px) rotate(-1deg);
+            }
+        }
+
+        /* Additional background elements */
         body::after {
             content: '';
             position: fixed;
-            left: 0; right: 0; bottom: 0;
-            height: 400px;
-            z-index: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(circle at 30% 60%, rgba(102, 122, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 25%, rgba(224, 107, 206, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 15% 75%, rgba(102, 122, 255, 0.05) 0%, transparent 40%);
             pointer-events: none;
-            background: radial-gradient(ellipse at 60% 100%, rgba(102,122,255,0.18) 0%, rgba(224,107,206,0.10) 60%, transparent 100%);
-            filter: blur(10px);
+            animation: float 25s ease-in-out infinite reverse;
         }
+        /* Color Scheme */
+        :root {
+            --primary: #667aff;
+            --secondary: #e06bce;
+            --dark-bg: #161b22;
+            --darker-bg: #0d1117;
+            --card-bg: #21262d;
+            --border-color: #30363d;
+            --text-light: #e6edf3;
+            --text-muted: #8b949e;
+            --success: #00cc66;
+            --warning: #ffcc00;
+            --danger: #ff3333;
+        }
+
         .header {
-            background: #181c2a;
+            background: var(--darker-bg);
             padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #23263a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            overflow: visible;
         }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-wrap: nowrap;
+        }
+
         .logo {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #667aff;
+            color: var(--primary);
             text-decoration: none;
+            flex-shrink: 0;
+            margin-left: 1rem;
         }
-        .search-bar {
-            flex: 1;
+
+        .nav-center-content {
             display: flex;
             align-items: center;
-            margin: 0 2rem;
-            max-width: 500px;
+            flex-grow: 1;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: nowrap;
         }
-        .search-bar input {
-            flex: 1;
-            padding: 0.7rem 1.2rem;
-            border-radius: 25px 0 0 25px;
-            border: none;
-            background: #23263a;
-            color: #e6edf3;
-            font-size: 1rem;
-        }
-        .search-bar button {
-            padding: 0.7rem 1.5rem;
-            border-radius: 0 25px 25px 0;
-            border: none;
-            background: #667aff;
-            color: #fff;
-            font-size: 1rem;
-            cursor: pointer;
-        }
+
         .nav-links {
             display: flex;
             gap: 1.5rem;
-            align-items: center;
+            list-style: none;
+            flex-wrap: nowrap;
         }
+
         .nav-links a {
-            color: #e6edf3;
+            color: var(--text-light);
             text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
         }
+
         .nav-links a:hover {
-            color: #667aff;
+            color: var(--primary);
         }
-        .btn-primary {
-            background: #667aff;
-            color: #fff;
+
+        .auth-buttons {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-shrink: 0;
+            margin-left: 1rem;
+            position: relative;
+        }
+
+        .btn {
+            padding: 0.6rem 1.8rem;
             border: none;
             border-radius: 25px;
-            padding: 0.6rem 1.8rem;
-            font-weight: 500;
-            font-size: 1rem;
             cursor: pointer;
-            transition: background 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            color: var(--text-light);
         }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            background: rgba(102, 122, 255, 0.2);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+        }
+
         .btn-primary:hover {
             background: #5566dd;
+            transform: translateY(-2px);
         }
+
+        /* User Menu */
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            max-width: 200px;
+            overflow: hidden;
+        }
+
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .user-info span {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: var(--darker-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            min-width: 200px;
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease-in-out;
+            z-index: 9999;
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown-item {
+            display: block;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s, color 0.3s;
+            white-space: nowrap;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(102, 122, 255, 0.2);
+            color: var(--primary);
+        }
+
+        /* Ensure all content has lower z-index than dropdown */
+        .container * {
+            z-index: 1;
+        }
+
+
         .main-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -487,21 +685,52 @@
 </head>
 <body>
     <!-- Header -->
-    <div class="header">
-        <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
-        <form class="search-bar" action="${pageContext.request.contextPath}/home" method="get">
-            <input type="text" name="search" placeholder="Bạn tìm sự kiện gì?" />
-            <button type="submit">Tìm Kiếm</button>
-        </form>
-        <div class="nav-links">
-            <a href="${pageContext.request.contextPath}/home">Trang Chủ</a>
-            <a href="#">Các sự kiện hot</a>
-            <a href="#">Săn voucher giảm giá</a>
-            <a href="#">Tổ chức sự kiện</a>
-            <a href="${pageContext.request.contextPath}/login">Đăng nhập</a>
-            <a href="${pageContext.request.contextPath}/register" class="btn-primary">Đăng ký</a>
-        </div>
-    </div>
+    <header class="header">
+        <nav class="nav">
+            <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
+
+            <div class="nav-center-content">
+                <ul class="nav-links">
+                    <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
+                    <li><a href="${pageContext.request.contextPath}/support"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
+                </ul>
+            </div>
+
+            <div class="auth-buttons">
+                <c:choose>
+                    <c:when test="${sessionScope.user != null}">
+                        <div class="user-menu">
+                            <div class="user-info" onclick="toggleUserDropdown()">
+                                <div class="user-avatar">
+                                    <c:if test="${not empty sessionScope.user.avatar}">
+                                        <img src="${pageContext.request.contextPath}/uploads/user_avatar/${sessionScope.user.avatar}" alt="Avatar">
+                                    </c:if>
+                                    <c:if test="${empty sessionScope.user.avatar}">
+                                        ${fn:substring(sessionScope.user.email, 0, 1)}
+                                    </c:if>
+                                </div>
+                                Xin chào, ${sessionScope.user.name != null ? sessionScope.user.name : sessionScope.user.email} <span style="margin-left: 0.5rem;">▼</span>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
+                                <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
+                                <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
+                                <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
+                                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+                                <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
+                            </div>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="${pageContext.request.contextPath}/login" class="btn btn-outline">Đăng nhập</a>
+                        <a href="${pageContext.request.contextPath}/register" class="btn btn-primary">Đăng ký</a>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </nav>
+    </header>
     <div class="main-container">
         <!-- Ticket Banner -->
         <div class="ticket-banner">
@@ -696,6 +925,39 @@
                 window.location.href = '${pageContext.request.contextPath}/TicketSelectionServlet?eventId=' + eventId;
             }
         }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+            
+            if (dropdown.classList.contains('show')) {
+                // Check if dropdown goes below viewport
+                const rect = dropdown.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                
+                if (rect.bottom > viewportHeight) {
+                    // Position dropdown above the user menu
+                    dropdown.style.top = 'auto';
+                    dropdown.style.bottom = 'calc(100% + 10px)';
+                } else {
+                    // Reset to default position
+                    dropdown.style.top = 'calc(100% + 10px)';
+                    dropdown.style.bottom = 'auto';
+                }
+            }
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.user-info') && !event.target.matches('.user-info *')) {
+                const dropdowns = document.getElementsByClassName('user-dropdown');
+                for (let dropdown of dropdowns) {
+                    if (dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                    }
+                }
+            }
+        };
     </script>
 </body>
 </html>

@@ -21,6 +21,7 @@ public class SupportItem {
     private Date lastModified;
     private String adminResponse;
     private String assignedAdmin;
+    private java.util.List<SupportAttachment> attachments;
 
   
     public SupportItem() {
@@ -74,6 +75,7 @@ public class SupportItem {
         this.lastModified = lastModified;
         this.adminResponse = adminResponse;
         this.assignedAdmin = assignedAdmin;
+        this.attachments = new java.util.ArrayList<>();
     }
 
   
@@ -191,6 +193,21 @@ public class SupportItem {
     public void setAssignedAdmin(String assignedAdmin) {
         this.assignedAdmin = assignedAdmin;
         this.lastModified = new Date(System.currentTimeMillis());
+    }
+
+    public java.util.List<SupportAttachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(java.util.List<SupportAttachment> attachments) {
+        this.attachments = attachments;
+    }
+
+    public void addAttachment(SupportAttachment attachment) {
+        if (this.attachments == null) {
+            this.attachments = new java.util.ArrayList<>();
+        }
+        this.attachments.add(attachment);
     }
 
     // Utility methods
