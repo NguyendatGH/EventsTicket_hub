@@ -29,7 +29,6 @@ public class GenreDAO {
                 genre.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 genres.add(genre);
             }
-            System.out.println("Fetched " + genres.size() + " genres from database");
         } catch (SQLException e) {
             System.out.println("Error fetching genres: " + e.getMessage());
             e.printStackTrace();
@@ -50,7 +49,6 @@ public class GenreDAO {
                 genre.setGenreName(rs.getString("GenreName"));
                 genre.setDescription(rs.getString("Description"));
                 genre.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                System.out.println("Fetched genre with ID: " + genreId);
                 return genre;
             } else {
                 System.out.println("No genre found with ID: " + genreId);

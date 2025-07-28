@@ -122,8 +122,16 @@
             <c:remove var="message" scope="session" />
             <c:remove var="messageType" scope="session" />
         </c:if>
-        <form action="${pageContext.request.contextPath}/admin-servlet/user-management/edit-user" method="POST">
+        <form action="${pageContext.request.contextPath}/admin-servlet/user-management/edit-user?userId=${user.id}" method="POST"  enctype="multipart/form-data">
             <input type="hidden" name="userId" value="${user.id}" />
+            <div class="form-group">
+        <label>Ảnh đại diện</label>
+        <c:if test="${not empty user.avatar}">
+            <img src="${pageContext.request.contextPath}/uploads/user_avatar/${user.avatar}" 
+                 style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+        </c:if>
+        <input type="file" name="avatarFile" accept="image/*">
+    </div>
             <div class="form-group">
                 <label for="name">Tên người dùng</label>
                 <input type="text" id="name" name="name" value="${user.name}" required />
@@ -152,10 +160,7 @@
                 <label for="address">Địa chỉ</label>
                 <input type="text" id="address" name="address" value="${user.address}" />
             </div>
-            <div class="form-group">
-                <label for="avatar">URL Avatar</label>
-                <input type="text" id="avatar" name="avatar" value="${user.avatar}" />
-            </div>
+         
             <div class="form-actions">
                 <button type="submit" class="submit-btn">Cập nhật</button>
                 <a href="${pageContext.request.contextPath}/admin-servlet/user-management" class="cancel-btn">Hủy</a>
