@@ -740,8 +740,11 @@ public class EventOwnerServlet extends HttpServlet {
                 int adminUserId = 1;
                 models.Notification notification = new models.Notification();
                 notification.setUserID(adminUserId);
-                notification.setTitle("Sự kiện mới được tạo");
-                notification.setContent("Event owner " + u.getName() + " vừa tạo sự kiện: " + event.getName());
+                notification.setTitle("🎫 Sự kiện mới được tạo");
+                notification.setContent("Event Owner: " + u.getName() + 
+                                    " | Sự kiện: " + event.getName() + 
+                                    " | Địa điểm: " + event.getPhysicalLocation() + 
+                                    " | Thời gian: " + event.getStartTime());
                 notification.setNotificationType("event");
                 notification.setRelatedID(result.getEventId());
                 notification.setIsRead(false);
@@ -749,7 +752,8 @@ public class EventOwnerServlet extends HttpServlet {
                 notification.setPriority("high");
                 dao.NotificationDAO notificationDAO = new dao.NotificationDAO();
                 notificationDAO.insertNotification(notification);
-                controller.AdminNotificationWebSocket.sendToAllAdmins(notification);
+                
+
             } catch (Exception ex) {
                 logger.warning("Không thể gửi notification cho admin: " + ex.getMessage());
             }

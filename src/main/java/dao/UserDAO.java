@@ -77,22 +77,27 @@ public class UserDAO implements IUserDAO {
     // Thêm người dùng là "Customer"
     @Override
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO Users (Email, PasswordHash, Role, CreatedAt, UpdatedAt, Gender, Birthday, PhoneNumber, Address, IsLocked) "
+        String sql = "INSERT INTO Users (Username, Email, PasswordHash, Role, CreatedAt, UpdatedAt, Gender, Birthday, PhoneNumber, Address, IsLocked) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, user.getEmail());
-            stmt.setString(2, user.getPasswordHash());
-            stmt.setString(3, user.getRole());
-            stmt.setTimestamp(4, Timestamp.valueOf(user.getCreatedAt()));
-            stmt.setTimestamp(5, Timestamp.valueOf(user.getUpdatedAt()));
-            stmt.setString(6, user.getGender());
-            stmt.setDate(7, new java.sql.Date(user.getBirthday().getTime()));
-            stmt.setString(8, user.getPhoneNumber());
-            stmt.setString(9, user.getAddress());
-            stmt.setBoolean(10, user.getIsLocked());
+            stmt.setString(1, user.getName()); // Name maps to Username in database
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getPasswordHash());
+            stmt.setString(4, user.getRole());
+            stmt.setTimestamp(5, Timestamp.valueOf(user.getCreatedAt()));
+            stmt.setTimestamp(6, Timestamp.valueOf(user.getUpdatedAt()));
+            stmt.setString(7, user.getGender());
+            stmt.setDate(8, new java.sql.Date(user.getBirthday().getTime()));
+            stmt.setString(9, user.getPhoneNumber());
+            stmt.setString(10, user.getAddress());
+            stmt.setBoolean(11, user.getIsLocked());
 
-            return stmt.executeUpdate() > 0;
+            System.out.println("UserDAO - Inserting user: " + user.getEmail());
+            int result = stmt.executeUpdate();
+            System.out.println("UserDAO - Insert result: " + result);
+            return result > 0;
         } catch (SQLException e) {
+            System.err.println("UserDAO - SQL Error: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

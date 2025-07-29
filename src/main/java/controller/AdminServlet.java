@@ -96,6 +96,9 @@ public class AdminServlet extends HttpServlet {
                 request.getRequestDispatcher("/admin/support").forward(request, response);
             } else if (pathInfo.startsWith("/transaction-management")) {
                 transactionServlet.handleRequest(request, response);
+            } else if (pathInfo.startsWith("/refund-management")) {
+                // Chuyển tiếp request đến AdminRefundServlet
+                request.getRequestDispatcher("/admin/refund").forward(request, response);
             } else {
                 logger.warning("Unknown path for admin: " + pathInfo);
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Đường dẫn quản trị không hợp lệ.");

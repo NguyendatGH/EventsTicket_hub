@@ -229,4 +229,18 @@ public class OrderDAO {
         return BigDecimal.ZERO;
     }
 
+    public BigDecimal getOrderAmount(int orderId) {
+        String sql = "SELECT TotalAmount FROM Orders WHERE OrderID = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getBigDecimal("TotalAmount");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

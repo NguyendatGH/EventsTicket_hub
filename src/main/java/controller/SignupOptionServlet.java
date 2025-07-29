@@ -14,15 +14,32 @@ import java.io.IOException;
 
 @WebServlet("/signupOption")
 public class SignupOptionServlet extends HttpServlet {
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Handle GET requests by redirecting to the register page
+        response.sendRedirect(request.getContextPath() + "/authentication/register.jsp");
+    }
+    
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String role = request.getParameter("role");
+        
+        System.out.println("SignupOptionServlet - Role: " + role);
+        System.out.println("Context Path: " + request.getContextPath());
 
         if ("user".equals(role)) {
-            response.sendRedirect("authentication/registerUser.jsp");
+            String redirectUrl = request.getContextPath() + "/authentication/registerUser.jsp";
+            System.out.println("Redirecting to: " + redirectUrl);
+            response.sendRedirect(redirectUrl);
         } else if ("organizer".equals(role)) {
-            response.sendRedirect("authentication/registerOrganizer.jsp");
+            String redirectUrl = request.getContextPath() + "/authentication/registerOrganizer.jsp";
+            System.out.println("Redirecting to: " + redirectUrl);
+            response.sendRedirect(redirectUrl);
         } else {
-            response.sendRedirect("authentication/register.jsp");
+            String redirectUrl = request.getContextPath() + "/authentication/register.jsp";
+            System.out.println("Redirecting to: " + redirectUrl);
+            response.sendRedirect(redirectUrl);
         }
     }
 }

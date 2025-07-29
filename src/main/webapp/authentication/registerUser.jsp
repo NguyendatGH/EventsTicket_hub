@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -495,7 +496,12 @@
                     <div class="error-message">${error}</div>
                 </c:if>
 
-                <form action="register" method="post" class="register-form">
+                <form action="${pageContext.request.contextPath}/register" method="post" class="register-form">
+                    <div class="form-group">
+                        <label for="name">Họ và tên</label>
+                        <input type="text" id="name" name="name" placeholder="Vui lòng nhập họ và tên" required>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" placeholder="Vui lòng nhập email" required>
@@ -538,6 +544,11 @@
                     <div class="form-group">
                         <label for="language">Ngôn ngữ</label>
                         <input type="text" id="language" name="language" placeholder="Nhập ngôn ngữ" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Địa chỉ</label>
+                        <input type="text" id="address" name="address" placeholder="Nhập địa chỉ" required>
                     </div>
 
                     <div class="submit-section">
