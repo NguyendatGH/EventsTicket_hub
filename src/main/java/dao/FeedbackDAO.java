@@ -70,11 +70,13 @@ public class FeedbackDAO {
                         rs.getInt("OrderID"),
                         rs.getInt("Rating"),
                         rs.getString("Content"),
-                        rs.getBoolean("IsApprove"),
+                        rs.getBoolean("IsApproved"),
                         rs.getString("AdminResponse"),
                         rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                        rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                        rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                        rs.getString("UserName")
                 );
+
                 list.add(fb);
             }
         } catch (SQLException e) {
@@ -83,5 +85,44 @@ public class FeedbackDAO {
         return list;
     }
 
-    // Bạn có thể viết thêm: getFeedbackByOrderID, approveFeedback, respondToFeedback,...
+    public List<Feedback> getApprovedFeedbackByEvent(int eventId) {
+        List<Feedback> list = new ArrayList<>();
+        String sql = "SELECT f.*, u.FullName AS UserName "
+                + "FROM Feedback f "
+                + "JOIN Users u ON f.UserID = u.UserID "
+                + "WHERE f.EventID = ? AND f.IsApproved = 1 "
+                + "ORDER BY f.CreatedAt DESC";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, eventId);
+            ResultSet rs = ps.executeQuery();
+            System.out.println(">>> Getting feedback for eventId = " + eventId);
+            System.out.println(">>> Query: " + sql);
+
+            while (rs.next()) {
+                Feedback fb = new Feedback(
+                        rs.getInt("FeedbackID"),
+                        rs.getInt("UserID"),
+                        rs.getInt("EventID"),
+                        rs.getInt("OrderID"),
+                        rs.getInt("Rating"),
+                        rs.getString("Content"),
+                        rs.getBoolean("IsApproved"),
+                        rs.getString("AdminResponse"),
+                        rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                        rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                        rs.getString("UserName")
+                );
+                System.out.println(">>> Feedback content = " + rs.getString("Content") + ", user = " + rs.getString("UserName"));
+
+                fb.setUserName(rs.getString("UserName"));
+                list.add(fb);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }

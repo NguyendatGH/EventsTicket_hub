@@ -1,8 +1,6 @@
-
 package models;
 
 import java.time.LocalDateTime;
-
 
 public class Feedback {
 
@@ -16,8 +14,25 @@ public class Feedback {
     private String adminResponse;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String userName;
 
     public Feedback() {
+    }
+
+    public Feedback(int feedbackID, int userID, int eventID, int orderID, int rating,
+            String content, boolean isApprove, String adminResponse,
+            LocalDateTime createdAt, LocalDateTime updatedAt, String userName) {
+        this.feedbackID = feedbackID;
+        this.userID = userID;
+        this.eventID = eventID;
+        this.orderID = orderID;
+        this.rating = rating;
+        this.content = content;
+        this.isApprove = isApprove;
+        this.adminResponse = adminResponse;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.userName = userName;
     }
 
     public Feedback(int feedbackID, int userID, int eventID, int orderID, int rating,
@@ -114,20 +129,28 @@ public class Feedback {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public String toString() {
-        return "Feedback{" +
-                "feedbackID=" + feedbackID +
-                ", userID=" + userID +
-                ", eventID=" + eventID +
-                ", orderID=" + orderID +
-                ", rating=" + rating +
-                ", content='" + content + '\'' +
-                ", isApprove=" + isApprove +
-                ", adminResponse='" + adminResponse + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        return "Feedback{"
+                + "feedbackID=" + feedbackID
+                + ", userID=" + userID
+                + ", eventID=" + eventID
+                + ", orderID=" + orderID
+                + ", rating=" + rating
+                + ", content='" + content + '\''
+                + ", isApprove=" + isApprove
+                + ", adminResponse='" + adminResponse + '\''
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + '}';
     }
 }

@@ -14,7 +14,6 @@ import models.Seat;
 public class OrderItemDAO extends DBConnection {
 
     public void addOrderItem(OrderItem item, Connection conn) throws SQLException {
-        // Cập nhật câu lệnh SQL để khớp với các trường trong model đã tối ưu
         String sql = "INSERT INTO dbo.OrderItems (OrderID, TicketInfoID, EventID, TicketID, UnitPrice, Quantity, TotalPrice, CreatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE())";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -27,8 +26,6 @@ public class OrderItemDAO extends DBConnection {
             } else {
                 ps.setNull(4, Types.INTEGER);
             }
-
-            // SỬA LỖI Ở ĐÂY: Dùng setBigDecimal thay vì setDouble
             ps.setBigDecimal(5, item.getUnitPrice());
             ps.setInt(6, item.getQuantity());
             ps.setBigDecimal(7, item.getTotalPrice());

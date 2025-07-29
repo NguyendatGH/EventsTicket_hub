@@ -766,10 +766,10 @@
                         <i class="fas fa-plus"></i>
                         Tạo sự kiện
                     </button>
-                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
+<!--                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
                         <i class="fas fa-history"></i>
                         Vé đã mua
-                    </a>
+                    </a>-->
                     <div class="account">
                         <a href="${pageContext.request.contextPath}/updateProfile" class="link">
                             <i class="fas fa-user"></i>
@@ -941,66 +941,40 @@
 
                     <div class="section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-comment-dots"></i>
-                            Để lại phản hồi của bạn
+                            <i class="fas fa-comments"></i>
+                            Phản hồi từ người tham dự
                         </h2>
-                        <div class="feedback-form">
-                            <textarea placeholder="Chia sẻ cảm nhận của bạn về sự kiện này..." rows="5"></textarea>
-                            <div class="rating">
-                                <span>Đánh giá sự kiện này:</span>
-                                <i class="far fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <i class="far fa-star"></i>
-                                <i class="far fa-star"></i>
-                            </div>
-                            <button class="primary-btn">
-                                <i class="fas fa-paper-plane"></i>
-                                Gửi phản hồi
-                            </button>
-                        </div>
 
-                        <div class="feedback-list">
-                            <h3 style="margin-bottom: 1.5rem; color: var(--text-light);">
-                                <i class="fas fa-comments"></i>
-                                Phản hồi gần đây
-                            </h3>
-                            <div class="feedback-item">
-                                <p class="feedback-text">"Sự kiện tuyệt vời! Rất thích không khí và các màn trình diễn."</p>
-                                <div class="feedback-meta">
-                                    <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
-                                        <i class="fas fa-user-circle"></i>
-                                        Nguyễn Văn A
-                                    </span>
-                                    <span class="feedback-date" style="color: var(--text-muted);"> • 10/07/2025</span>
-                                    <span class="feedback-stars">
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="feedback-item">
-                                <p class="feedback-text">"Sự kiện nhìn chung khá tốt, nhưng chất lượng âm thanh có thể cải thiện hơn."</p>
-                                <div class="feedback-meta">
-                                    <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
-                                        <i class="fas fa-user-circle"></i>
-                                        Trần Thị B
-                                    </span>
-                                    <span class="feedback-date" style="color: var(--text-muted);"> • 08/07/2025</span>
-                                    <span class="feedback-stars">
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                                        <i class="far fa-star" style="color: var(--text-muted);"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        <c:choose>
+                            <c:when test="${not empty feedbackList}">
+                                <c:forEach var="fb" items="${feedbackList}">
+                                    <div class="feedback-item">
+                                        <p class="feedback-text">"${fb.content}"</p>
+                                        <div class="feedback-meta">
+                                            <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
+                                                <i class="fas fa-user-circle"></i>
+                                                ${fb.userName}
+                                            </span>
+                                            <span class="feedback-date" style="color: var(--text-muted);">
+                                                • <fmt:formatDate value="${fb.createdAt}" pattern="dd/MM/yyyy"/>
+                                            </span>
+                                            <span class="feedback-stars">
+                                                <c:forEach begin="1" end="5" var="i">
+                                                    <i class="${i <= fb.rating ? 'fas' : 'far'} fa-star" style="color: ${i <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>
+                                                </c:forEach>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <p style="color: var(--text-muted); margin-top: 1rem;">
+                                    Hiện tại chưa có phản hồi nào cho sự kiện này.
+                                </p>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
+
                 </div>
             </c:if>
 

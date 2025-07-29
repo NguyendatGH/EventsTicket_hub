@@ -922,17 +922,18 @@
                                 </span>
                             </div>
                         </c:forEach>
+                        <!--
+                                                <div class="mt-ticket-info-row" id="discount-row" style="display: none;">
+                                                    <span>
+                                                        <i class="fas fa-percentage"></i>
+                                                        Giảm giá:
+                                                    </span>
+                                                    <span>
+                                                        <span id="discount-amount">-</span>
+                                                        <span id="discount-extra"></span>
+                                                    </span>
+                                                </div>-->
 
-                        <div class="mt-ticket-info-row" id="discount-row" style="display: none;">
-                            <span>
-                                <i class="fas fa-percentage"></i>
-                                Giảm giá:
-                            </span>
-                            <span>
-                                <span id="discount-amount">-</span>
-                                (<span id="discount-percent">0</span>%)
-                            </span>
-                        </div>
 
                         <div class="mt-ticket-info-row mt-ticket-info-total" data-original-amount="${sessionScope.currentOrder.totalAmount}">
                             <span>
@@ -968,6 +969,7 @@
         </div>
 
         <script>
+
             dayjs.extend(dayjs_plugin_duration);
 
             const totalSeconds = 10 * 60;
@@ -998,129 +1000,224 @@
             const timerInterval = setInterval(updateTimer, 1000);
 
             let promoAlreadyApplied = false;
+            let previouslyAppliedCode = '';
 
             document.getElementById('applyPromoBtn').addEventListener('click', () => {
                 const codeInput = document.getElementById('promoCodeInput');
-                const msgEl = document.getElementById('promoMessage');
-                const rawCode = codeInput.value;
+                const rawCode = codeInput.value.trim().toUpperCase();
 
-                if (promoAlreadyApplied) {
-                    msgEl.style.color = 'var(--warning)';
-                    msgEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Mã đã được áp dụng. Không thể áp dụng lại.';
-                    msgEl.style.background = 'rgba(245, 158, 11, 0.1)';
-                    msgEl.style.border = '1px solid var(--warning)';
+                console.log('Applying promo code:', rawCode);
+                clearPromotionMessage();
+
+                if (!rawCode) {
+                    showPromotionMessage('Vui lòng nhập mã khuyến mãi.', 'danger', 'fas fa-exclamation-circle');
                     return;
                 }
 
-                if (!rawCode || rawCode.trim() === "") {
-                    msgEl.style.color = 'var(--danger)';
-                    msgEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Vui lòng nhập mã khuyến mãi.';
-                    msgEl.style.background = 'rgba(239, 68, 68, 0.1)';
-                    msgEl.style.border = '1px solid var(--danger)';
+                if (promoAlreadyApplied && rawCode === previouslyAppliedCode) {
+                    showPromotionMessage(`Mã <strong>${rawCode}</strong> đã được áp dụng trước đó.`, 'warning', 'fas fa-exclamation-triangle');
                     return;
                 }
 
-                const encodedCode = encodeURIComponent(rawCode.trim());
-                console.log("Gửi mã:", encodedCode);
-
-                // Show loading state
                 const applyBtn = document.getElementById('applyPromoBtn');
-                applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-                applyBtn.disabled = true;
+                setButtonLoading(applyBtn, true);
+
+                const encodedCode = encodeURIComponent(rawCode);
 
                 fetch('/OnlineSellingTicketEvents/ApplyPromotionServlet?promoCode=' + encodedCode)
                         .then(response => {
                             if (!response.ok)
-                                throw new Error("Phản hồi không hợp lệ");
+                                throw new Error(`HTTP error! status: ${response.status}`);
                             return response.json();
                         })
                         .then(data => {
-                            console.log("Response:", data);
-                            if (data.valid) {
-                                promoAlreadyApplied = true;
-                                const original = parseFloat(data.originalTotal);
-                                const discount = parseFloat(data.discountAmount);
-                                const percent = original > 0 ? Math.round(discount / original * 100) : 0;
-
-                                msgEl.style.color = 'var(--success)';
-                                msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Đã áp dụng mã <strong>${rawCode.trim()}</strong> thành công!`;
-                                msgEl.style.background = 'rgba(16, 185, 129, 0.1)';
-                                msgEl.style.border = '1px solid var(--success)';
-
-                                document.getElementById('discount-row').style.display = 'flex';
-                                document.getElementById('discount-amount').textContent = `- ${data.discountFormatted}`;
-                                document.getElementById('discount-percent').textContent = `${percent}`;
-                                document.getElementById('totalAmount').textContent = data.newTotalFormatted;
-                                document.getElementById('appliedPromoCode').value = rawCode.trim();
+                            if (data.valid === true) {
+                                handlePromotionSuccess(data, rawCode);
+                                codeInput.value = '';
                             } else {
-                                msgEl.style.color = 'var(--danger)';
-                                msgEl.innerHTML = `<i class="fas fa-times-circle"></i> ${data.message || 'Mã khuyến mãi không hợp lệ.'}`;
-                                msgEl.style.background = 'rgba(239, 68, 68, 0.1)';
-                                msgEl.style.border = '1px solid var(--danger)';
+                                handlePromotionError(data);
                             }
                         })
                         .catch(error => {
-                            console.error("Lỗi khi gọi API mã khuyến mãi", error);
-                            msgEl.style.color = 'var(--danger)';
-                            msgEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Lỗi hệ thống khi áp dụng mã.';
-                            msgEl.style.background = 'rgba(239, 68, 68, 0.1)';
-                            msgEl.style.border = '1px solid var(--danger)';
+                            console.error("Error applying promotion:", error);
+                            showPromotionMessage('Lỗi hệ thống khi áp dụng mã. Vui lòng thử lại.', 'danger', 'fas fa-exclamation-triangle');
                         })
                         .finally(() => {
-                            // Reset button state
-                            applyBtn.innerHTML = '<i class="fas fa-check"></i> Áp dụng';
-                            applyBtn.disabled = false;
+                            setButtonLoading(applyBtn, false);
                         });
             });
 
-            // Auto-load state if promo code already applied
-            window.addEventListener('DOMContentLoaded', () => {
-                const appliedCode = document.getElementById('appliedPromoCode').value;
-                const msgEl = document.getElementById('promoMessage');
-                const totalAmountEl = document.getElementById('totalAmount');
-                const discountRow = document.getElementById('discount-row');
+            function handlePromotionSuccess(data, promoCode) {
+                promoAlreadyApplied = true;
+                previouslyAppliedCode = promoCode;
 
-                const totalOriginal = parseFloat(totalAmountEl.parentElement.getAttribute('data-original-amount'));
-                totalAmountEl.textContent = new Intl.NumberFormat('vi-VN', {
-                    style: 'currency',
-                    currency: 'VND',
-                    maximumFractionDigits: 0
-                }).format(totalOriginal);
-                discountRow.style.display = 'none';
+                document.getElementById('appliedPromoCode').value = promoCode;
 
-                if (appliedCode) {
-                    promoAlreadyApplied = true;
-                    fetch('/OnlineSellingTicketEvents/ApplyPromotionServlet?promoCode=' + encodeURIComponent(appliedCode))
-                            .then(response => {
-                                if (!response.ok)
-                                    throw new Error("Phản hồi không hợp lệ");
-                                return response.json();
-                            })
-                            .then(data => {
-                                if (data.valid) {
-                                    const original = parseFloat(data.originalTotal);
-                                    const discount = parseFloat(data.discountAmount);
-                                    const percent = original > 0 ? Math.round(discount / original * 100) : 0;
+                showPromotionMessage(`Đã áp dụng mã <strong>${promoCode}</strong> thành công!`, 'success', 'fas fa-check-circle');
+                updateOrderSummary(data);
+            }
 
-                                    msgEl.style.color = 'var(--success)';
-                                    msgEl.innerHTML = `<i class="fas fa-check-circle"></i> Đã áp dụng mã <strong>${appliedCode}</strong><br/>
-                                    Giảm: <strong>${data.discountFormatted}</strong> (${percent}%)<br/>
-                                    Tổng mới: <strong>${data.newTotalFormatted}</strong>`;
-                                    msgEl.style.background = 'rgba(16, 185, 129, 0.1)';
-                                    msgEl.style.border = '1px solid var(--success)';
-
-                                    discountRow.style.display = 'flex';
-                                    document.getElementById('discount-amount').textContent = `- ${data.discountFormatted}`;
-                                    document.getElementById('discount-percent').textContent = `${percent}`;
-                                }
-                            })
-                            .catch(err => {
-                                console.error("Không thể hiển thị mã khuyến mãi khi reload", err);
-                            });
+            function handlePromotionError(data) {
+                let errorMessage = 'Mã khuyến mãi không hợp lệ.';
+                if (data.message && typeof data.message === 'string' && data.message.trim() !== '') {
+                    errorMessage = data.message;
                 }
+
+                showPromotionMessage(errorMessage, 'danger', 'fas fa-times-circle');
+                const discountRow = document.getElementById('discount-row');
+                if (discountRow) {
+                    discountRow.style.display = 'none';
+                }
+            }
+
+            function updateOrderSummary(data) {
+                const discountRow = document.getElementById('discount-row');
+                const totalAmountEl = document.getElementById('totalAmount');
+
+                if (discountRow) {
+                    discountRow.style.display = 'none';
+                }
+
+                if (totalAmountEl && data.newTotalFormatted) {
+                    totalAmountEl.textContent = data.newTotalFormatted;
+                }
+            }
+
+            function showPromotionMessage(message, type, iconClass) {
+                const msgEl = document.getElementById('promoMessage');
+                if (!msgEl)
+                    return;
+                const icon = iconClass ? `<i class="${iconClass}"></i> ` : '';
+                msgEl.innerHTML = icon + message;
+                styleMessage(msgEl, type);
+            }
+
+            function clearPromotionMessage() {
+                const msgEl = document.getElementById('promoMessage');
+                if (!msgEl)
+                    return;
+                msgEl.innerHTML = '';
+                msgEl.style.background = '';
+                msgEl.style.border = '';
+                msgEl.style.color = '';
+                msgEl.style.padding = '';
+                msgEl.style.borderRadius = '';
+                msgEl.style.marginTop = '';
+            }
+
+
+            function setButtonLoading(button, isLoading) {
+                if (!button)
+                    return;
+                if (isLoading) {
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                    button.disabled = true;
+                } else {
+                    button.innerHTML = '<i class="fas fa-check"></i> Áp dụng';
+                    button.disabled = false;
+                }
+            }
+
+            function styleMessage(el, type) {
+                if (!el)
+                    return;
+
+                const styles = {
+                    success: {color: '#059669', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981'},
+                    danger: {color: '#dc2626', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444'},
+                    warning: {color: '#d97706', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid #f59e0b'}
+                };
+
+                const style = styles[type] || styles.danger;
+
+                el.style.color = style.color;
+                el.style.background = style.background;
+                el.style.border = style.border;
+                el.style.padding = '12px';
+                el.style.borderRadius = '6px';
+                el.style.marginTop = '10px';
+                el.style.fontSize = '14px';
+                el.style.lineHeight = '1.5';
+            }
+
+
+            function restorePromotionState() {
+                const appliedCodeInput = document.getElementById('appliedPromoCode');
+                const appliedCode = appliedCodeInput ? appliedCodeInput.value.trim().toUpperCase() : '';
+
+                if (!appliedCode) {
+                    resetPromotionUI();
+                    return;
+                }
+
+                const codeInput = document.getElementById('promoCodeInput');
+                if (codeInput)
+                    codeInput.value = appliedCode;
+
+                promoAlreadyApplied = true;
+                previouslyAppliedCode = appliedCode;
+
+                fetch('/OnlineSellingTicketEvents/ApplyPromotionServlet?promoCode=' + encodeURIComponent(appliedCode))
+                        .then(response => {
+                            if (!response.ok)
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.valid) {
+                                showPromotionMessage(`Mã <strong>${appliedCode}</strong> đã được áp dụng!`, 'success', 'fas fa-check-circle');
+                                updateOrderSummary(data);
+                            } else {
+                                resetPromotionState();
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error restoring promotion state:", error);
+                            resetPromotionState();
+                        });
+            }
+
+            function resetPromotionState() {
+                promoAlreadyApplied = false;
+                previouslyAppliedCode = '';
+                const appliedCodeInput = document.getElementById('appliedPromoCode');
+                if (appliedCodeInput)
+                    appliedCodeInput.value = '';
+                resetPromotionUI();
+            }
+
+
+            function resetPromotionUI() {
+                clearPromotionMessage();
+
+                const discountRow = document.getElementById('discount-row');
+                if (discountRow)
+                    discountRow.style.display = 'none';
+
+                const totalAmountEl = document.getElementById('totalAmount');
+                if (totalAmountEl) {
+                    const totalRowEl = totalAmountEl.parentElement;
+                    const originalAmount = parseFloat(totalRowEl.getAttribute('data-original-amount'));
+                    if (!isNaN(originalAmount)) {
+                        totalAmountEl.textContent = new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                            maximumFractionDigits: 0
+                        }).format(originalAmount);
+                    }
+                }
+
+                const codeInput = document.getElementById('promoCodeInput');
+                if (codeInput)
+                    codeInput.value = '';
+            }
+
+            window.addEventListener('DOMContentLoaded', () => {
+                console.log('Page loaded, initializing promotion system...');
+                setTimeout(() => restorePromotionState(), 100);
             });
 
-            // Add fade-in animation observer
+
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
@@ -1138,7 +1235,7 @@
                 observer.observe(el);
             });
 
-            // Add keyboard shortcut for back button
+
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
                     history.back();

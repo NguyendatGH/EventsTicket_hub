@@ -107,7 +107,7 @@
                 font-size: 1.5rem;
                 cursor: pointer;
                 padding: 0.5rem;
-                display: none; 
+                display: none;
             }
 
             /* Search and Filter Container - Always horizontal on wider screens */
@@ -690,7 +690,7 @@
             @media (max-width: 768px) { /* Mobile specific adjustments */
                 .nav {
                     flex-direction: column;
-                    align-items: flex-start; 
+                    align-items: flex-start;
                 }
                 .logo {
                     width: 100%;
@@ -709,12 +709,12 @@
                     display: none; /* Hidden by default, toggled by JS */
                     flex-direction: column; /* Always vertical on mobile */
                     width: 100%;
-                    padding: 1rem 0; 
-                    border-top: none; 
-                    box-shadow: none; 
-                    background: transparent; 
+                    padding: 1rem 0;
+                    border-top: none;
+                    box-shadow: none;
+                    background: transparent;
                 }
-                
+
                 .nav-links.active, .search-filter-container.active {
                     display: flex;
                 }
@@ -723,9 +723,14 @@
                     order: unset; /* Reset order */
                     margin-left: auto; /* Keep pushing to right */
                 }
-                 /* Ensure toggles are on the same line as logo */
-                .nav > .search-filter-toggle { margin-left: auto; margin-right: 0.5rem; }
-                .nav > .nav-toggle { margin-left: 0; }
+                /* Ensure toggles are on the same line as logo */
+                .nav > .search-filter-toggle {
+                    margin-left: auto;
+                    margin-right: 0.5rem;
+                }
+                .nav > .nav-toggle {
+                    margin-left: 0;
+                }
 
                 .auth-buttons {
                     order: unset; /* Reset order */
@@ -873,7 +878,7 @@
         </style>
     </head>
     <body>
-        <%  
+        <%
             // Retrieve user and events from session/request attributes
             UserDTO user = (UserDTO) session.getAttribute("user");
             List<Event> events = (List<Event>) request.getAttribute("events");
@@ -892,7 +897,7 @@
         <header class="header">
             <nav class="nav">
                 <a href="${pageContext.request.contextPath}/home" class="logo">MasterTicket</a>
-                
+
                 <button class="search-filter-toggle" id="searchFilterToggle" aria-label="Toggle search and filters">
                     <i class="fas fa-search"></i>
                 </button>
@@ -914,7 +919,7 @@
                         <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="auth-buttons">
                     <c:choose>
                         <c:when test="${not empty sessionScope.user}">
@@ -975,29 +980,29 @@
                 <p>Hiện tại chưa có sự kiện nào được tổ chức. Vui lòng quay lại sau!</p>
             </div>
             <% } else { %>
-            
+
             <div class="section-header">
                 <h2 class="section-title" id="hot-events">Sự kiện nổi bật</h2>
                 <a href="${pageContext.request.contextPath}/home?page=1" class="view-all">Xem tất cả</a>
             </div>
 
             <div class="event-grid">
-                <%  
+                <%
                     for (Event event : events) {
                 %>
                 <div class="event-card searchable-event" 
-                    data-event-id="<%= event.getEventID() %>"
-                    data-event-name="<%= event.getName() != null ? event.getName().toLowerCase() : "" %>"
-                    data-event-description="<%= event.getDescription() != null ? event.getDescription().toLowerCase() : "" %>"
-                    data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : "" %>"
-                    data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : "" %>"
-                    onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
+                     data-event-id="<%= event.getEventID()%>"
+                     data-event-name="<%= event.getName() != null ? event.getName().toLowerCase() : ""%>"
+                     data-event-description="<%= event.getDescription() != null ? event.getDescription().toLowerCase() : ""%>"
+                     data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : ""%>"
+                     data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : ""%>"
+                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
                     <div class="event-image">
-     <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) { %>
-    <img src="${pageContext.request.contextPath}/uploads/event_banners/<%= event.getImageURL() %>" alt="<%= event.getName() %>" />
-<% } else { %>
-    <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
-<% } %>
+                        <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) {%>
+                        <img src="${pageContext.request.contextPath}/uploads/event_banners/<%= event.getImageURL()%>" alt="<%= event.getName()%>" />
+                        <% } else { %>
+                        <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
+                        <% }%>
                     </div>
                     <div class="event-info">
                         <div class="event-title"><%= event.getName()%></div>
@@ -1019,42 +1024,42 @@
             </div>
 
             <div class="pagination-controls">
-                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage - 1 %>" 
-                   class="<%= (currentPage == 1) ? "disabled" : "" %>">Trước</a>
-                
-                <% 
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage - 1%>" 
+                   class="<%= (currentPage == 1) ? "disabled" : ""%>">Trước</a>
+
+                <%
                     // Display page numbers
                     int startPage = Math.max(1, currentPage - 2);
                     int endPage = Math.min(noOfPages, currentPage + 2);
 
                     if (startPage > 1) {
-                        %><a href="${pageContext.request.contextPath}/home?page=1">1</a><%
-                        if (startPage > 2) {
-                            %><span>...</span><%
-                        }
-                    }
+                %><a href="${pageContext.request.contextPath}/home?page=1">1</a><%
+                            if (startPage > 2) {
+                %><span>...</span><%
+                                    }
+                                }
 
-                    for (int i = startPage; i <= endPage; i++) {
-                        if (i == currentPage) {
-                            %><span class="current-page"><%= i %></span><%
-                        } else {
-                            %><a href="${pageContext.request.contextPath}/home?page=<%= i %>"><%= i %></a><%
-                        }
-                    }
+                                for (int i = startPage; i <= endPage; i++) {
+                                    if (i == currentPage) {
+                %><span class="current-page"><%= i%></span><%
+                            } else {
+                %><a href="${pageContext.request.contextPath}/home?page=<%= i%>"><%= i%></a><%
+                                    }
+                                }
 
-                    if (endPage < noOfPages) {
-                        if (endPage < noOfPages - 1) {
-                            %><span>...</span><%
-                        }
-                        %><a href="${pageContext.request.contextPath}/home?page=<%= noOfPages %>"><%= noOfPages %></a><%
-                    }
+                                if (endPage < noOfPages) {
+                                    if (endPage < noOfPages - 1) {
+                    %><span>...</span><%
+                                }
+                    %><a href="${pageContext.request.contextPath}/home?page=<%= noOfPages%>"><%= noOfPages%></a><%
+                            }
                 %>
-                
-                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage + 1 %>" 
-                   class="<%= (currentPage == noOfPages) ? "disabled" : "" %>">Sau</a>
+
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage + 1%>" 
+                   class="<%= (currentPage == noOfPages) ? "disabled" : ""%>">Sau</a>
             </div>
 
-            <% } %>
+            <% }%>
 
             <div class="ticket-section">
                 <div class="ticket-content">
@@ -1151,9 +1156,9 @@
                     eventCards.forEach(card => {
                         const eventName = card.getAttribute('data-event-name');
                         const eventDescription = card.getAttribute('data-event-description');
-                        const eventLocation = card.getAttribute('data-event-location'); 
-                        const eventStartTime = card.getAttribute('data-event-start-time'); 
-                        
+                        const eventLocation = card.getAttribute('data-event-location');
+                        const eventStartTime = card.getAttribute('data-event-start-time');
+
                         let isVisible = true;
 
                         // Filter by text query (name, description, location)
@@ -1162,9 +1167,9 @@
                                 isVisible = false;
                             }
                         }
-                        
+
                         // Filter by location input (already included in general query, but kept for explicit filter)
-                        if (locationQuery) { 
+                        if (locationQuery) {
                             if (!eventLocation || !eventLocation.includes(locationQuery)) {
                                 isVisible = false;
                             }
@@ -1174,8 +1179,8 @@
                         if (selectedDate && eventStartTime) {
                             const eventDate = new Date(parseInt(eventStartTime));
                             if (eventDate.getFullYear() !== selectedDate.getFullYear() ||
-                                eventDate.getMonth() !== selectedDate.getMonth() ||
-                                eventDate.getDate() !== selectedDate.getDate()) {
+                                    eventDate.getMonth() !== selectedDate.getMonth() ||
+                                    eventDate.getDate() !== selectedDate.getDate()) {
                                 isVisible = false;
                             }
                         }
@@ -1218,11 +1223,11 @@
 
                     // Start auto-play only if there are multiple slides
                     if (slides.length > 1) {
-                         setInterval(nextSlide, 5000);
+                        setInterval(nextSlide, 5000);
                     }
                 }
             }
-            
+
             // Toggle for navigation links on small screens
             function setupNavToggle() {
                 const navToggle = document.getElementById('navToggle');
