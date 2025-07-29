@@ -16,11 +16,16 @@ public class UserDTO {
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
 
+    private String role; 
+    private LocalDateTime updatedAt;
+
+
+
     public UserDTO() {
     }
 
     public UserDTO(int id, String name, String email, String gender, Date birthday, String phoneNumber, String address,
-            String avatar, boolean isLocked, LocalDateTime createdAt, LocalDateTime lastLoginAt) {
+                   String avatar, boolean isLocked, LocalDateTime createdAt, LocalDateTime lastLoginAt, String role, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -32,9 +37,11 @@ public class UserDTO {
         this.isLocked = isLocked;
         this.createdAt = createdAt;
         this.lastLoginAt = lastLoginAt;
+        this.role = role; 
+        this.updatedAt = updatedAt; 
     }
 
-    // Getters and Setters
+
     public int getId() {
         return id;
     }
@@ -123,6 +130,24 @@ public class UserDTO {
         this.lastLoginAt = lastLoginAt;
     }
 
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public String toString() {
         return "UserDTO{" +
@@ -137,6 +162,8 @@ public class UserDTO {
                 ", isLocked=" + isLocked +
                 ", createdAt=" + createdAt +
                 ", lastLoginAt=" + lastLoginAt +
+                ", role='" + role + '\'' + // Include role in toString
+                ", updatedAt=" + updatedAt + // Include updatedAt in toString
                 '}';
     }
 }

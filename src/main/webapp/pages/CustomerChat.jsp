@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,6 +31,8 @@
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
             --neon-pulse: drop-shadow(0 0 10px currentColor);
+            --highlight-bg: rgba(255, 204, 0, 0.2);
+            --highlight-selected: rgba(255, 204, 0, 0.4);
         }
 
         * {
@@ -187,6 +189,7 @@
         }
 
         .conversation-time {
+            display: none;
             color: var(--text-muted);
             font-size: 12px;
         }
@@ -202,6 +205,10 @@
             justify-content: center;
             font-size: 11px;
             font-weight: bold;
+        }
+
+        .conversation-badge.hidden {
+            display: none;
         }
 
         /* Main Chat Area */
@@ -326,6 +333,19 @@
             position: relative;
             animation: messageSlide 0.3s ease-out;
             margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .message.highlight {
+            background: var(--highlight-bg);
+            border-radius: 18px;
+            transform: scale(1.02);
+        }
+
+        .message.highlight-selected {
+            background: var(--highlight-selected);
+            box-shadow: 0 0 10px var(--warning);
+            transform: scale(1.03);
         }
 
         @keyframes messageSlide {
@@ -416,20 +436,46 @@
             margin-top: 8px;
             padding-top: 8px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .attachment-link {
-            display: block;
-            color: var(--accent);
+            display: flex;
+            align-items: center;
+            color: white;
             text-decoration: none;
-            padding: 3px 0;
-            transition: color 0.3s ease;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            transition: background 0.3s ease, color 0.3s ease;
             font-size: 12px;
+            cursor: pointer;
         }
 
         .attachment-link:hover {
-            color: var(--accent);
-            text-decoration: underline;
+            background: var(--hover-bg);
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .attachment-link .file-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .attachment-link .file-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .attachment-link .file-size {
+            color: var(--text-muted);
+            margin-left: 8px;
+            font-size: 11px;
         }
 
         /* Input Area */
@@ -599,6 +645,67 @@
             width: 20px;
         }
 
+        .message-search-container {
+            padding: 0 20px 15px;
+            position: relative;
+        }
+
+        .message-search-input {
+            width: 100%;
+            padding: 10px 35px 10px 15px;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            color: var(--text-light);
+            font-size: 13px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .message-search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .search-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        .search-nav-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .search-nav-btn:hover {
+            background: var(--hover-bg);
+            transform: translateY(-1px);
+        }
+
+        .search-nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .search-results-count {
+            display: none;
+            flex: 1;
+            text-align: center;
+            font-weight: 500;
+            display:none;
+        }
+
         /* Empty state */
         .empty-state {
             display: flex;
@@ -668,22 +775,22 @@
             .sidebar {
                 width: 280px;
             }
-            
+
             .container {
                 flex-direction: column;
             }
-            
+
             .sidebar {
                 width: 100%;
                 height: 200px;
             }
-            
+
             .conversations-list {
                 display: flex;
                 overflow-x: auto;
                 overflow-y: hidden;
             }
-            
+
             .conversation {
                 min-width: 200px;
                 border-bottom: none;
@@ -700,21 +807,23 @@
                 <h1>Đoạn chat</h1>
                 <div class="search-container">
                     <div class="search-icon">🔍</div>
-                    <input type="text" class="search-input" placeholder="Tìm kiếm ">
+                    <input type="text" class="search-input" placeholder="Tìm kiếm">
                 </div>
             </div>
-            
+
             <div class="conversations-list">
                 <c:if test="${empty conversations}">
                     <div class="empty-state">
                         <div class="empty-state-icon">💬</div>
-                        <p>Chưa có cuộc trò chuyện nào !.</p>
+                        <p>Chưa có cuộc trò chuyện nào!</p>
                     </div>
                 </c:if>
-                
+
                 <c:forEach items="${conversations}" var="conv">
                     <div class="conversation ${conv.conversationID == currentConversationId ? 'active' : ''}"
-                         onclick="window.location.href='${pageContext.request.contextPath}/chat?conversation_id=${conv.conversationID}&eventId=${conv.eventID}'">
+                         onclick="window.location.href='${pageContext.request.contextPath}/chat?conversation_id=${conv.conversationID}&eventId=${conv.eventID}'"
+                         data-conversation-id="${conv.conversationID}"
+                         data-unread-count="0">
                         <div class="conversation-avatar">
                             ${conv.subject != null ? conv.subject.substring(0,1).toUpperCase() : 'C'}
                         </div>
@@ -726,7 +835,7 @@
                         </div>
                         <div class="conversation-meta">
                             <div class="conversation-time" data-last-message-at="${conv.lastMessageAt}"></div>
-                            <div class="conversation-badge">2</div>
+                            <div class="conversation-badge hidden">0</div>
                         </div>
                     </div>
                 </c:forEach>
@@ -739,12 +848,12 @@
                 <div class="chat-header-left">
                     <div class="chat-avatar">
                         <c:if test="${eventOwner != null}">
-                             <img src="${eventOwner.avatar}" style="width: 100%; height: 100%; object-fit: cover;"/>
+                            <img src="${pageContext.request.contextPath}/uploads/user_avatar/${eventOwner.avatar}" style="width: 100%; height: 100%; object-fit: cover;"/>
                         </c:if>
                     </div>
                     <div class="chat-user-info">
                         <h3>
-                            <c:if test="${user != null}">
+                            <c:if test="${eventOwner != null}">
                                 ${eventOwner.name}
                             </c:if>
                         </h3>
@@ -773,17 +882,17 @@
                     <c:set var="currentTimestamp" value="${message.updatedAt}" />
                     <fmt:formatDate var="formattedTime" value="${currentTimestamp}" pattern="HH:mm" />
                     <fmt:formatDate var="formattedDate" value="${currentTimestamp}" pattern="dd/MM/yyyy" />
-                    
+
                     <c:if test="${status.first or empty previousTimestamp}">
-                          <div class="message-timestamp">
-                                <fmt:formatDate value="${currentTimestamp}" pattern="dd/MM/yyyy HH:mm" />
-                          </div>
+                        <div class="message-timestamp">
+                            <fmt:formatDate value="${currentTimestamp}" pattern="dd/MM/yyyy HH:mm" />
+                        </div>
                     </c:if>
 
                     <c:if test="${not status.first and not empty previousTimestamp}">
                         <jsp:useBean id="dateValue" class="java.util.Date" />
                         <jsp:setProperty name="dateValue" property="time" value="${currentTimestamp.time - previousTimestamp.time}" />
-                        <c:if test="${dateValue.time > 1800000}"> 
+                        <c:if test="${dateValue.time > 1800000}">
                             <div class="message-timestamp">
                                 <fmt:formatDate value="${currentTimestamp}" pattern="dd/MM/yyyy HH:mm" />
                             </div>
@@ -791,7 +900,7 @@
                     </c:if>
 
                     <div class="message ${message.senderID == user.id ? 'sent' : 'received'}">
-                         <div class="message-sender">${message.senderID == user.id ? user.name : customer.name}</div>
+                        <div class="message-sender">${message.senderID == user.id ? user.name : eventOwner.name}</div>
                         <div class="message-bubble">
                             <div class="message-content">
                                 ${message.messageContent}
@@ -808,7 +917,7 @@
                             </div>
                             <c:if test="${status.last or (not status.last and messages[status.index + 1].senderID != message.senderID)}">
                                 <div class="message-time">
-                                  <fmt:formatDate value="${message.updatedAt}" pattern="HH:mm" />
+                                    <fmt:formatDate value="${message.updatedAt}" pattern="HH:mm" />
                                 </div>
                             </c:if>
                         </div>
@@ -825,7 +934,7 @@
                     <button type="button" class="file-btn" onclick="document.getElementById('fileInput').click()">
                         📎
                     </button>
-                    <input type="text" id="messageInput" placeholder="Type your message here..." autocomplete="off" 
+                    <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." autocomplete="off" 
                            <c:if test="${currentConversationId == null}">disabled</c:if> />
                 </div>
                 
@@ -840,12 +949,12 @@
             <div class="right-sidebar-header">
                 <div class="profile-section">
                     <div class="profile-avatar">
-                        <c:if test="${user != null}">
-                           <img src="${eventOwner.avatar}" style="width: 100%; height: 100%; object-fit: cover;"/>
+                        <c:if test="${eventOwner != null}">
+                            <img src="${pageContext.request.contextPath}/uploads/user_avatar/${eventOwner.avatar}" style="width: 100%; height: 100%; object-fit: cover;"/>
                         </c:if>
                     </div>
                     <div class="profile-name">
-                        <c:if test="${user != null}">
+                        <c:if test="${eventOwner != null}">
                             ${eventOwner.name}
                         </c:if>
                     </div>
@@ -856,23 +965,22 @@
             <div class="section-divider"></div>
             
             <div class="section-title">Thông tin về đoạn chat</div>
-            <div class="menu-item">
-                <div class="menu-icon">🔍</div>
-                <span>Tìm tin nhắn</span>
+            <div class="message-search-container">
+                <input type="text" id="messageSearchInput" class="message-search-input" placeholder="Tìm kiếm tin nhắn...">
+                <div class="search-navigation">
+                    <button class="search-nav-btn" id="prevResultBtn" disabled><</button>
+                    <span class="search-results-count" id="searchResultsCount">0/0</span>
+                    <button class="search-nav-btn" id="nextResultBtn" disabled>></button>
+                </div>
             </div>
             
             <div class="section-divider"></div>
             
             <div class="section-title">File phương tiện & file</div>
             <div class="menu-item">
-                <div class="menu-icon">📷</div>
+               <div class="menu-icon">📄</div>
                 <span>File phương tiện</span>
             </div>
-            <div class="menu-item">
-                <div class="menu-icon">📄</div>
-                <span>File</span>
-            </div>
-            
             <div class="section-divider"></div>
         </div>
     </div>
@@ -898,18 +1006,17 @@ function initWebSocket(conversationId, userId, currentUserName, otherUserName, i
                 const message = JSON.parse(event.data);
                 const isCurrentUser = message.senderID == userId;
 
-                if(!isCurrentUser){
-                addMessage(
-                    message.senderID,
-                    isCurrentUser ? currentUserName : otherUserName,
-                    message.messageContent,
-                    message.createdAt,
-                    message.conversationID,
-                    isCurrentUser,
-                    message.attachments || []
-                );
-                }else{
-                    console.log("skipping render")
+                if (!isCurrentUser) {
+                    addMessage(
+                        message.senderID,
+                        isCurrentUser ? currentUserName : otherUserName,
+                        message.messageContent,
+                        message.createdAt,
+                        message.conversationID,
+                        isCurrentUser,
+                        message.attachments || []
+                    );
+                    updateUnreadCount(message.conversationID, 1);
                 }
                 if (isOwner) {
                     updateConversationPreview(message.conversationID, message.messageContent, message.createdAt);
@@ -937,7 +1044,7 @@ function sendMessageWithFiles(conversationId, userId, userName) {
     const selectedFiles = Array.from(fileInput.files);
     
     if ((!content && selectedFiles.length === 0) || !conversationId) {
-    console.log("no content to send")
+        console.log("no content to send");
         return Promise.resolve(false);
     }
     
@@ -971,8 +1078,10 @@ function sendMessageWithFiles(conversationId, userId, userName) {
                     []
                 );
             }
+            resetUnreadCount(conversationId);
+            clearSearch();
             return true;
-        }else{
+        } else {
             console.log("error when sending message!", data.message);
             return false;
         }
@@ -993,6 +1102,7 @@ function addMessage(userId, username, content, timestamp, msgConversationId, isC
     
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message ' + (isCurrentUser ? 'sent' : 'received');
+    messageDiv.dataset.content = content; // Store content for search
     
     if (document.querySelector('.message-sender')) {
         const messageSender = document.createElement('div');
@@ -1024,7 +1134,11 @@ function addMessage(userId, username, content, timestamp, msgConversationId, isC
     
     const messageTime = document.createElement('div');
     messageTime.className = 'message-time';
-    messageTime.textContent = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messageTime.textContent = new Date(timestamp).toLocaleTimeString('vi-VN', { 
+        timeZone: 'Asia/Ho_Chi_Minh', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
     
     messageBubble.appendChild(messageContent);
     messageBubble.appendChild(messageTime);
@@ -1032,6 +1146,7 @@ function addMessage(userId, username, content, timestamp, msgConversationId, isC
     
     messagesContainer.appendChild(messageDiv);
     scrollToBottom();
+    updateSearchResults();
 }
 
 function scrollToBottom() {
@@ -1061,13 +1176,27 @@ function updateConversationTime() {
                 const lastMessageTime = new Date(lastMessageAt);
                 if (!isNaN(lastMessageTime.getTime())) {
                     const now = new Date();
-                    const diffInMinutes = Math.floor((now - lastMessageTime) / (1000 * 60));
-                    element.textContent = diffInMinutes > 0 ? `${diffInMinutes} phút trước` : 'Vừa xong';
+                    const nowInGMT7 = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+                    const diffInMinutes = Math.floor((nowInGMT7 - lastMessageTime) / (1000 * 60));
+                    if (diffInMinutes < 1) {
+                        element.textContent = 'Vừa xong';
+                    } else if (diffInMinutes < 60) {
+                        element.textContent = `${diffInMinutes} phút trước`;
+                    } else {
+                        element.textContent = lastMessageTime.toLocaleString('vi-VN', {
+                            timeZone: 'Asia/Ho_Chi_Minh',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
                 } else {
                     element.textContent = 'Không xác định';
                 }
             } catch (e) {
-                console.error('Error parsing lastMessageAt:', e);
+                console.error('Error parsing lastMessageAt:', e, 'Raw value:', lastMessageAt);
                 element.textContent = 'Không xác định';
             }
         } else {
@@ -1076,13 +1205,11 @@ function updateConversationTime() {
     });
 }
 
-
-
 function updateConversationPreview(conversationId, content, timestamp) {
     const conversationElements = document.querySelectorAll('.conversation');
     conversationElements.forEach(element => {
-        const onclick = element.getAttribute('onclick');
-        if (onclick && onclick.includes(`conversation_id=${conversationId}`)) {
+        const convId = element.getAttribute('data-conversation-id');
+        if (convId === conversationId.toString()) {
             const preview = element.querySelector('.conversation-preview');
             if (preview) {
                 preview.textContent = content.length > 30 ? content.substring(0, 27) + '...' : content;
@@ -1094,6 +1221,147 @@ function updateConversationPreview(conversationId, content, timestamp) {
         }
     });
     updateConversationTime();
+}
+
+function updateUnreadCount(conversationId, increment) {
+    const conversationElements = document.querySelectorAll('.conversation');
+    conversationElements.forEach(element => {
+        const convId = element.getAttribute('data-conversation-id');
+        if (convId === conversationId.toString()) {
+            const badge = element.querySelector('.conversation-badge');
+            if (badge) {
+                let currentCount = parseInt(element.getAttribute('data-unread-count')) || 0;
+                currentCount += increment;
+                element.setAttribute('data-unread-count', currentCount);
+                badge.textContent = currentCount;
+                badge.classList.toggle('hidden', currentCount === 0);
+            }
+        }
+    });
+}
+
+function resetUnreadCount(conversationId) {
+    const conversationElements = document.querySelectorAll('.conversation');
+    conversationElements.forEach(element => {
+        const convId = element.getAttribute('data-conversation-id');
+        if (convId === conversationId.toString()) {
+            const badge = element.querySelector('.conversation-badge');
+            if (badge) {
+                element.setAttribute('data-unread-count', '0');
+                badge.textContent = '0';
+                badge.classList.add('hidden');
+            }
+        }
+    });
+}
+
+function initMessageSearch() {
+    const searchInput = document.getElementById('messageSearchInput');
+    const prevBtn = document.getElementById('prevResultBtn');
+    const nextBtn = document.getElementById('nextResultBtn');
+    const resultsCount = document.getElementById('searchResultsCount');
+    let currentMatchIndex = -1;
+    let matches = [];
+
+    function updateSearchResults() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        matches = [];
+        currentMatchIndex = -1;
+
+        const messages = document.querySelectorAll('.message');
+        messages.forEach((message, index) => {
+            const contentElement = message.querySelector('.message-content');
+            const originalContent = message.dataset.content || contentElement.textContent;
+            message.classList.remove('highlight', 'highlight-selected');
+
+            if (searchTerm && originalContent.toLowerCase().includes(searchTerm)) {
+                matches.push({ element: message, content: originalContent });
+                message.classList.add('highlight');
+            }
+        });
+
+        // Group matches by content for navigation
+        matches = matches.sort((a, b) => a.content.localeCompare(b.content));
+        updateSearchNavigation();
+        
+        if (matches.length > 0) {
+            scrollToMatch(0); // Auto-select first match
+        }
+    }
+
+    function updateSearchNavigation() {
+        resultsCount.textContent = matches.length > 0 ? `${currentMatchIndex + 1}/${matches.length}` : '0/0';
+        prevBtn.disabled = matches.length === 0 || currentMatchIndex <= 0;
+        nextBtn.disabled = matches.length === 0 || currentMatchIndex >= matches.length - 1;
+    }
+
+    function scrollToMatch(index) {
+        if (index >= 0 && index < matches.length) {
+            // Remove previous selection
+            if (currentMatchIndex >= 0 && currentMatchIndex < matches.length) {
+                matches[currentMatchIndex].element.classList.remove('highlight-selected');
+            }
+
+            currentMatchIndex = index;
+            const message = matches[index].element;
+            message.classList.add('highlight-selected');
+            
+            // Scroll to message with offset for better visibility
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageRect = message.getBoundingClientRect();
+            const containerRect = messagesContainer.getBoundingClientRect();
+            const scrollOffset = messageRect.top - containerRect.top + messagesContainer.scrollTop - 100;
+            
+            messagesContainer.scrollTo({
+                top: scrollOffset,
+                behavior: 'smooth'
+            });
+
+            updateSearchNavigation();
+        }
+    }
+
+    function navigateToNextSameContent(direction = 1) {
+        if (currentMatchIndex < 0 || matches.length === 0) return;
+
+        const currentContent = matches[currentMatchIndex].content.toLowerCase();
+        let nextIndex = currentMatchIndex;
+
+        do {
+            nextIndex = (nextIndex + direction + matches.length) % matches.length;
+            if (matches[nextIndex].content.toLowerCase() === currentContent) {
+                scrollToMatch(nextIndex);
+                break;
+            }
+        } while (nextIndex !== currentMatchIndex);
+    }
+
+    function clearSearch() {
+        searchInput.value = '';
+        matches = [];
+        currentMatchIndex = -1;
+        document.querySelectorAll('.message').forEach(message => {
+            message.classList.remove('highlight', 'highlight-selected');
+        });
+        updateSearchNavigation();
+    }
+
+    searchInput.addEventListener('input', updateSearchResults);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && matches.length > 0) {
+            navigateToNextSameContent(1);
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        navigateToNextSameContent(-1);
+    });
+
+    nextBtn.addEventListener('click', () => {
+        navigateToNextSameContent(1);
+    });
+
+    return clearSearch;
 }
 
 function initChatCommon() {
@@ -1111,36 +1379,34 @@ function initChatCommon() {
     window.addEventListener('load', function() {
         scrollToBottom();
         updateConversationTime();
+        resetUnreadCount('${currentConversationId}');
     });
-    
 }
 
 const conversationId = '${currentConversationId}';
-    const currentUserId = ${user.id};
-    const currentUserName = '${user.name}';
-    const otherUserName = '${eventOwner.name}';
-    
-    let socket = initWebSocket(conversationId, currentUserId, currentUserName, otherUserName);
-    
-    function sendMessage() {
-        sendMessageWithFiles(conversationId, currentUserId, currentUserName)
-            .catch(console.error);
-    }
-    
-    initChatCommon();
-    
-    function exit() {
-        if (socket) {
-            socket.close();
-        }
-        window.location.href = '${pageContext.request.contextPath}/';
-    }
+const currentUserId = ${user.id};
+const currentUserName = '${user.name}';
+const otherUserName = '${eventOwner.name}';
 
-      window.onload = function(){
-        scrollToBottom();
-        updateConversationTime();
-    };
+let socket = initWebSocket(conversationId, currentUserId, currentUserName, otherUserName);
+const clearSearch = initMessageSearch();
 
+function sendMessage() {
+    sendMessageWithFiles(conversationId, currentUserId, currentUserName)
+        .catch(console.error);
+}
+
+function exit() {
+    if (socket) {
+        socket.close();
+    }
+    window.location.href = '${pageContext.request.contextPath}/';
+}
+
+window.onload = function() {
+    scrollToBottom();
+    updateConversationTime();
+};
 </script>
 </body>
 </html>

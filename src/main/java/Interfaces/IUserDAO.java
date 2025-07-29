@@ -48,4 +48,12 @@ public interface IUserDAO {
     Map<String, Integer> getUserRoleDistribution();
 
     Map<String, Map<String, Integer>> getLoginDistributionByMonth();
+
+    UserDTO getUserDTOByEmail(String email);
+
+    boolean insertUserFromGoogleDTO(User user);
+
+    boolean updateUserInfoForGoogle(int userId, String name, String avatar, String googleId);
+
+    UserDTO getEventOwnerByEventID(int eventID);
 }

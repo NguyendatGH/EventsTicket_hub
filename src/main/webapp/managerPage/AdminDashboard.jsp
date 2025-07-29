@@ -6,9 +6,20 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MasterTicket Admin</title>
+    <title>EventTicketHub Admin</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
+    :root {
+       --primary-bg: #070a17;
+        --secondary-bg: rgba(15, 23, 42, 0.9);
+        --success-green: #28a745;
+        --error-red: #dc3545;
+        --text-primary: #ffffff;
+        --text-secondary: #94a3b8;
+        --border-dark: rgba(255, 255, 255, 0.1);
+        --border-light: rgba(255, 255, 255, 0.2);
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
       * {
         margin: 0;
         padding: 0;
@@ -16,73 +27,75 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         position: relative;
-        background-color: #070a17;
-        min-height: 100vh;
+            background-color: var(--primary-bg);
+        color: var(--text-primary);
         overflow-x: hidden;
       }
 
       .container {
         display: flex;
-        height: 100vh;
         position: relative;
         z-index: 1;
       }
 
       .sidebar {
-        width: 16%;
-        background: rgba(15, 23, 42, 0.9);
+        width: 280px;
+        background: var(--secondary-bg);
         backdrop-filter: blur(20px);
-        border-right: 1px solid #4d4d4d;
+        border-right: 1px solid var(--border-dark);
         padding: 2rem 0;
         transition: transform 0.3s ease;
+        position: fixed;
+        height: 100%;
         z-index: 1100;
       }
 
       .logo {
-        color: white;
-        font-size: 1.5rem;
+        color: var(--text-primary);
+        font-size: 1.75rem;
         font-weight: 700;
-        margin-bottom: 5rem;
+        margin-bottom: 3rem;
         padding: 0 2rem;
+        letter-spacing: 0.5px;
       }
 
       .admin-section {
-        padding: 0 2rem;
-        margin-bottom: 3rem;
+       padding: 0 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
       }
 
       .admin-avatar {
-        width: 120px;
-        height: 120px;
-        background: rgba(71, 85, 105, 0.8);
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.08);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 2rem;
+        margin: 0 auto 1.5rem;
+        box-shadow: var(--shadow);
       }
 
       .admin-avatar svg {
-        width: 80px;
-        height: 80px;
-        color: #94a3b8;
+        width: 60px;
+        height: 60px;
+        color: var(--text-secondary);
       }
 
       .admin-name {
-        color: white;
-        font-size: 24px;
+      color: var(--text-primary);
+        font-size: 1.25rem;
         font-weight: 600;
-        text-align: center;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
       }
 
       .admin-role {
-        color: #94a3b8;
+         color: var(--text-secondary);
         font-size: 0.875rem;
-        text-align: center;
+        font-weight: 400;
       }
 
       .nav-menu {
@@ -90,13 +103,12 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       .nav-item {
-        border-bottom: 1px solid rgba(15, 23, 42, 0.14);
+         border-bottom: 1px solid var(--border-dark);
       }
 
       .nav-link {
         display: block;
-        color: white;
-        background-color: rgba(255, 255, 255, 0.18);
+        color: var(--text-secondary);
         text-decoration: none;
         padding: 1rem 2rem;
         font-weight: 500;
@@ -104,38 +116,34 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         position: relative;
       }
 
+      .nav-link:hover,
       .nav-link.active {
-        background: rgba(255, 255, 255, 0.05);
-        color: white;
-      }
-
-      .nav-link:hover {
-        color: white;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        box-shadow: inset 4px 0 0 #0f67ff;
       }
 
       .logout {
-        position: absolute;
+       position: fixed;
         bottom: 2rem;
         left: 2rem;
-        right: 2rem;
-        color: #94a3b8;
+        color: var(--text-secondary);
         text-decoration: none;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
         font-weight: 500;
         transition: color 0.3s ease;
       }
 
       .logout:hover {
-        color: white;
+        color: var(--text-primary);
       }
 
       .main-content {
         flex: 1;
-        padding: 0 94px;
-        padding-top: 2rem;
+        margin-left: 280px;
+        padding: 2rem 3rem;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -642,7 +650,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <div class="container">
       <div class="overlay"></div>
         <aside class="sidebar">
-        <div class="logo">MasterTicket</div>
+        <div class="logo">EventTicketHub</div>
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -652,7 +660,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lý website MasterTicket</div>
+          <div class="admin-role">Quản lý website </div>
         </div>
         <nav>
           <ul class="nav-menu">
@@ -704,7 +712,18 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       <main class="main-content">
         <header class="header">
           <h1 class="page-title">Bảng điều khiển</h1>
-          <div class="control-panel">Tổng quan</div>
+          <div style="display: flex; align-items: center; gap: 24px;">
+            <div id="notification-bell" style="position: relative; cursor: pointer;">
+              <svg width="28" height="28" fill="white" viewBox="0 0 24 24">
+                <path d="M12 2C9.243 2 7 4.243 7 7v2.071C7 10.13 6.37 11.09 5.44 11.58A1 1 0 0 0 5 12.5V17l-1 1v1h16v-1l-1-1v-4.5a1 1 0 0 0-.44-.92C17.63 11.09 17 10.13 17 9.071V7c0-2.757-2.243-5-5-5zm0 18c-1.104 0-2-.896-2-2h4c0 1.104-.896 2-2 2z"/>
+              </svg>
+              <span id="notification-badge" style="position: absolute; top: 0; right: 0; background: #ff3333; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; display: none;">0</span>
+              <div id="notification-popup" style="display: none; position: absolute; right: 0; top: 36px; background: #222; color: white; min-width: 300px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 9999;">
+                <div id="notification-list" style="max-height: 300px; overflow-y: auto;"></div>
+              </div>
+            </div>
+            <div class="control-panel">Tổng quan</div>
+          </div>
         </header>
         <section class="stats-grid">
           <div class="stat-card">
@@ -928,6 +947,61 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
       const ctx = document.getElementById("revenueChart").getContext("2d");
       const revenueChart = new Chart(ctx, config);
+
+      // Notification Bell WebSocket
+      const notificationBell = document.getElementById('notification-bell');
+      const notificationBadge = document.getElementById('notification-badge');
+      const notificationPopup = document.getElementById('notification-popup');
+      const notificationList = document.getElementById('notification-list');
+      let notificationCount = 0;
+      let notifications = [];
+
+      notificationBell.addEventListener('click', function() {
+        if (notificationPopup.style.display === 'none' || notificationPopup.style.display === '') {
+          notificationPopup.style.display = 'block';
+          notificationBadge.style.display = 'none';
+          notificationCount = 0;
+          // Hiển thị thông báo hoặc "Không có thông báo nào cả"
+          renderNotificationList();
+        } else {
+          notificationPopup.style.display = 'none';
+        }
+      });
+
+      function renderNotificationList() {
+        notificationList.innerHTML = '';
+        // Lọc chỉ thông báo khi eventowner tạo event mới
+        const eventNotifications = notifications.filter(n => n.notificationType === 'event');
+        if (eventNotifications.length === 0) {
+          notificationList.innerHTML = '<div style="padding: 16px; color: #aaa; text-align: center;">Không có thông báo nào cả</div>';
+        } else {
+          eventNotifications.forEach(notification => addNotificationToList(notification));
+        }
+      }
+
+      function addNotificationToList(notification) {
+        const div = document.createElement('div');
+        div.style.padding = '12px';
+        div.style.borderBottom = '1px solid #333';
+        div.innerHTML = '<b>' + notification.title + '</b><br>' +
+          "<span style='font-size: 13px;'>" + notification.content + '</span><br>' +
+          "<span style='font-size: 11px; color: #aaa;'>" + new Date(notification.createdAt).toLocaleString('vi-VN') + '</span>';
+        notificationList.appendChild(div);
+      }
+
+      // WebSocket connection
+      const ws = new WebSocket("ws://" + window.location.host + "${pageContext.request.contextPath}/websocket/admin-notification");
+      ws.onmessage = function(event) {
+        const notification = JSON.parse(event.data);
+        notifications.unshift(notification);
+        notificationCount++;
+        notificationBadge.textContent = notificationCount;
+        notificationBadge.style.display = 'block';
+        // Nếu popup đang mở, cập nhật lại danh sách
+        if (notificationPopup.style.display === 'block') {
+          renderNotificationList();
+        }
+      };
     </script>
   </body>
 </html>

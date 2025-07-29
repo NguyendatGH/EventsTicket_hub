@@ -20,8 +20,8 @@ import java.util.Collections;
 
 public class GoogleUtils {
 
-    private static final String CLIENT_ID = "Your Client ID";
-    private static final String CLIENT_SECRET = "Your Client Secret";
+    private static final String CLIENT_ID = ".";
+    private static final String CLIENT_SECRET = ".";
     private static final String REDIRECT_URI = "http://localhost:8080/OnlineSellingTicketEvents/login-google";
 
     public static String getRedirectUrl() {

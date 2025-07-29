@@ -138,6 +138,20 @@ public class Feedback {
         this.userName = userName;
     }
 
+    
+    public java.util.Date getCreatedAtDate() {
+        return java.sql.Timestamp.valueOf(this.createdAt);
+    }
+    public java.util.Date getUpdatedAtDate() {
+        return java.sql.Timestamp.valueOf(this.updatedAt);
+    }
+    
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
     @Override
     public String toString() {
         return "Feedback{"

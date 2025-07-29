@@ -1,6 +1,5 @@
 create database EventTicketDB
 
-
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Username NVARCHAR(255) NOT NULL,
@@ -358,7 +357,39 @@ CREATE TABLE Refunds (
     CONSTRAINT FK_Refunds_PaymentMethod FOREIGN KEY (PaymentMethodID) REFERENCES PaymentMethod(PaymentMethodID),
  
 );
-Go
+-- Bảng supportItems
+CREATE TABLE SupportItems (
+    SupportID INT IDENTITY(1,1) PRIMARY KEY,
+    FromEmail NVARCHAR(255) NOT NULL,
+    ToEmail NVARCHAR(255) NOT NULL,
+    Subject NVARCHAR(255) NOT NULL,
+    SendDate DATE NOT NULL,
+    SendTimestamp DATETIME NOT NULL,
+    Content NVARCHAR(MAX) NOT NULL,
+    Status NVARCHAR(50) NOT NULL,
+    Priority NVARCHAR(50) NOT NULL,
+    Category NVARCHAR(100) NOT NULL,
+    CreatedDate DATE NOT NULL,
+    LastModified DATE NOT NULL,
+    AdminResponse NVARCHAR(MAX) NULL,
+    AssignedAdmin NVARCHAR(255) NULL
+);
+GO
+
+-- Bảng SupportAttachments
+CREATE TABLE SupportAttachments (
+    AttachmentID INT IDENTITY(1,1) PRIMARY KEY,
+    SupportID INT NOT NULL,
+    FileName NVARCHAR(255) NOT NULL,
+    OriginalFileName NVARCHAR(255) NOT NULL,
+    FilePath NVARCHAR(500) NOT NULL,
+    FileType NVARCHAR(100) NOT NULL,
+    FileSize BIGINT NOT NULL,
+    UploadDate DATE NOT NULL,
+    UploadTimestamp DATETIME NOT NULL,
+    FOREIGN KEY (SupportID) REFERENCES SupportItems(SupportID) ON DELETE CASCADE
+);
+GO
 
 
 
@@ -823,7 +854,7 @@ VALUES
 (N'[Dốc Mộng Mơ] Hãy Để Anh Đi - Quốc Thiên & Bùi Công Nam', 'Music concert with popular artists', 'Ho Chi Minh City', '2025-09-01 12:30:00', '2025-09-01 14:30:00', 200, 1, 'active', 2, 3, 'haydeanhdi.jpg', 1, 0, '2025-06-06 14:00:00', '2025-06-06 14:00:00'),
 (N'ISAAC WITH LOVE - FANMEETING IN HO CHI MINH', 'Fan meeting with Isaac', 'Ho Chi Minh City', '2025-10-02 10:00:00', '2025-10-02 12:00:00', 200, 1, 'active', 4, 2, 'issacevent.jpg', 0, 0, '2025-06-07 15:00:00', '2025-06-07 15:00:00'),
 (N'LULULOLA SHOW HƯƠNG TRÀM | MỘT NỬA SỰ THẬT', 'Hương Tràm live performance', 'Ho Chi Minh City', '2025-11-03 10:30:00', '2025-11-03 12:30:00', 200, 1, 'active', 2, 3, 'lulula.jpeg', 1, 0, '2025-06-08 16:00:00', '2025-06-08 16:00:00'),
-(N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-12-04 11:00:00', '2025-12-04 13:00:00', 200, 1, 'active', 4, 2, 'amthucando.jpg', 0, 0, '2025-06-09 17:00:00', '2025-06-09 17:00:00'),
+(N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-12-04 11:00:00', '2025-12-04 13:00:00', 200, 1, 'active', 4, 2, 'amthucando.jpg', 1, 0, '2025-06-09 17:00:00', '2025-06-09 17:00:00'),
 (N'[CONCERT] ANH TRAI VƯỢT NGÀN CHÔNG GAI DAY5, DAY6', 'Popular music concert', 'Ho Chi Minh City', '2025-08-05 11:00:00', '2025-08-05 13:00:00', 200, 1, 'active', 2, 3, 'antraivuotchonggai.jpg', 0, 0, '2025-06-10 18:00:00', '2025-06-10 18:00:00'),
 (N'SAXOPHONE FESTIVAL - SMOKE & SILK', 'Jazz saxophone event', 'Ho Chi Minh City', '2025-08-06 12:00:00', '2025-08-06 14:00:00', 200, 1, 'active', 1, 2, 'smok&silk.jpeg', 0, 0, '2025-06-11 19:00:00', '2025-06-11 19:00:00'),
 (N'Lion Championship 23 - 2025', 'MMA championship', 'Ho Chi Minh City', '2025-08-07 12:00:00', '2025-08-07 14:00:00', 200, 1, 'active', 3, 4, 'lionchampion.jpg', 0, 0, '2025-06-12 20:00:00', '2025-06-12 20:00:00'),

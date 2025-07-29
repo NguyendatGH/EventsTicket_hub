@@ -17,8 +17,6 @@ public class DBConnection {
     private static final String USER_DB = "sa"; 
     private static final String PASS_DB = "123"; 
 
-
-
     private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
     public static Connection getConnection() {

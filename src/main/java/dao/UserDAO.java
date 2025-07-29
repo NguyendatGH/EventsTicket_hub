@@ -16,6 +16,7 @@ import models.TopEventOwner;
 import models.User;
 import context.DBConnection;
 import dto.UserDTO;
+import java.time.LocalDateTime;
 import utils.HashUtil;
 
 public class UserDAO implements IUserDAO {
@@ -121,7 +122,7 @@ public class UserDAO implements IUserDAO {
             stmt.setDate(4, new java.sql.Date(user.getBirthday().getTime()));
             stmt.setString(5, user.getPhoneNumber());
             stmt.setString(6, user.getAddress());
-            stmt.setString(7, user.getAvatar()); // Thêm dòng này để cập nhật avatar
+            stmt.setString(7, user.getAvatar());
             stmt.setTimestamp(8, Timestamp.valueOf(java.time.LocalDateTime.now()));
             stmt.setInt(9, user.getId());
 
@@ -252,16 +253,21 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public boolean insertUserFromGoogle(User user) {
-        String sql = "INSERT INTO Users (Email, Role, CreatedAt, IsLocked, GoogleId) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (Username, Email, Role, CreatedAt, UpdatedAt, IsLocked, GoogleId, Avatar, PasswordHash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getRole());
-            ps.setTimestamp(3, Timestamp.valueOf(user.getCreatedAt()));
-            ps.setBoolean(4, user.getIsLocked());
-            ps.setString(5, user.getGoogleId());
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getRole());
+            ps.setTimestamp(4, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setTimestamp(5, Timestamp.valueOf(user.getUpdatedAt()));
+            ps.setBoolean(6, user.getIsLocked());
+            ps.setString(7, user.getGoogleId());
+            ps.setString(8, user.getAvatar());
+            ps.setString(9, user.getPasswordHash());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            System.err.println("Lỗi khi insert user từ Google: " + e.getMessage());
         }
         return false;
     }
@@ -286,8 +292,7 @@ public class UserDAO implements IUserDAO {
         List<User> list = new ArrayList<>();
         String sql = "select * from users u where u.role != 'admin';";
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             ResultSet rs = stmt.executeQuery();
 
@@ -405,8 +410,7 @@ public class UserDAO implements IUserDAO {
             sql = "Update Users SET isLocked = 0 where id = ?";
         }
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
             int rowsUpdated = stmt.executeUpdate();
@@ -420,8 +424,30 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public boolean updateUserInfo(User u) {
-        return true;
+    public boolean updateUserInfo(User user) {
+        String sql = "UPDATE Users SET Username = ?, Avatar = ?, GoogleId = ?, LastLoginAt = ?, UpdatedAt = ? WHERE Id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getAvatar());
+            stmt.setString(3, user.getGoogleId());
+
+            if (user.getLastLoginAt() != null) {
+                stmt.setTimestamp(4, Timestamp.valueOf(user.getLastLoginAt()));
+            } else {
+                stmt.setNull(4, Types.TIMESTAMP);
+            }
+
+            stmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(6, user.getId());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi update user info: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
@@ -454,12 +480,15 @@ public class UserDAO implements IUserDAO {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null)
+                if (rs != null) {
                     rs.close();
-                if (stmt != null)
+                }
+                if (stmt != null) {
                     stmt.close();
-                if (conn != null)
+                }
+                if (conn != null) {
                     conn.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -488,14 +517,14 @@ public class UserDAO implements IUserDAO {
         Map<String, Integer> newUsersLogin = new HashMap<>();
         Map<String, Integer> oldUsersLogin = new HashMap<>();
 
-        String sql = "SELECT FORMAT(LastLoginAt, 'yyyy-MM') as LoginMonth, " +
-                "CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END as UserType, " +
-                "COUNT(*) as LoginCount " +
-                "FROM Users " +
-                "WHERE LastLoginAt IS NOT NULL AND Role != 'admin' " +
-                "GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'), " +
-                "         CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END " +
-                "ORDER BY LoginMonth";
+        String sql = "SELECT FORMAT(LastLoginAt, 'yyyy-MM') as LoginMonth, "
+                + "CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END as UserType, "
+                + "COUNT(*) as LoginCount "
+                + "FROM Users "
+                + "WHERE LastLoginAt IS NOT NULL AND Role != 'admin' "
+                + "GROUP BY FORMAT(LastLoginAt, 'yyyy-MM'), "
+                + "         CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END "
+                + "ORDER BY LoginMonth";
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -520,14 +549,12 @@ public class UserDAO implements IUserDAO {
         loginDistribution.put("old", oldUsersLogin);
         return loginDistribution;
     }
-    
 
     public String checkRole(int userId) throws IOException, SQLException {
         String res = "";
         String sql = "SELECT Role FROM Users WHERE Id = ?";
 
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, userId);
 
@@ -539,5 +566,135 @@ public class UserDAO implements IUserDAO {
         }
 
         return res;
+    }
+
+    @Override
+    public UserDTO getUserDTOByEmail(String email) {
+        String sql = "SELECT * FROM Users WHERE Email = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setId(rs.getInt("Id"));
+                    userDTO.setName(rs.getString("Username"));
+                    userDTO.setEmail(rs.getString("Email"));
+                    userDTO.setRole(rs.getString("Role"));
+
+                    Timestamp createdAt = rs.getTimestamp("CreatedAt");
+                    userDTO.setCreatedAt(createdAt != null ? createdAt.toLocalDateTime() : null);
+
+                    Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+                    userDTO.setUpdatedAt(updatedAt != null ? updatedAt.toLocalDateTime() : null);
+
+                    userDTO.setGender(rs.getString("Gender"));
+                    userDTO.setBirthday(rs.getDate("Birthday"));
+                    userDTO.setPhoneNumber(rs.getString("PhoneNumber"));
+                    userDTO.setAddress(rs.getString("Address"));
+                    userDTO.setAvatar(rs.getString("Avatar"));
+                    userDTO.setIsLocked(rs.getBoolean("IsLocked"));
+
+                    Timestamp lastLoginAt = rs.getTimestamp("LastLoginAt");
+                    userDTO.setLastLoginAt(lastLoginAt != null ? lastLoginAt.toLocalDateTime() : null);
+
+                    return userDTO;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean insertUserFromGoogleDTO(User user) {
+        String sql = "INSERT INTO Users (Username, Email, Role, CreatedAt, UpdatedAt, IsLocked, GoogleId, Avatar, PasswordHash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getRole());
+            ps.setTimestamp(4, Timestamp.valueOf(user.getCreatedAt()));
+            ps.setTimestamp(5, Timestamp.valueOf(user.getUpdatedAt()));
+            ps.setBoolean(6, user.getIsLocked());
+            ps.setString(7, user.getGoogleId());
+            ps.setString(8, user.getAvatar());
+            ps.setString(9, user.getPasswordHash());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi insert user từ Google: " + e.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateUserInfoForGoogle(int userId, String name, String avatar, String googleId) {
+        String sql = "UPDATE Users SET Username = ?, Avatar = ?, GoogleId = ?, LastLoginAt = ?, UpdatedAt = ? WHERE Id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, avatar);
+            stmt.setString(3, googleId);
+            stmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(6, userId);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi update user info: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public UserDTO getEventOwnerByEventID(int eventId) {
+        String sql = "SELECT u.id, u.Username, u.Email, u.Gender, u.Birthday, u.PhoneNumber, u.Address, u.Avatar, " +
+                "u.IsLocked, u.CreatedAt, u.LastLoginAt, u.role, u.UpdatedAt " +
+                "FROM Events e " +
+                "LEFT JOIN Users u ON e.OwnerID = u.id " +
+                "WHERE e.EventID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, eventId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                UserDTO u = new UserDTO();
+                u.setId(rs.getInt("id"));
+                u.setName(rs.getString("Username"));
+                u.setEmail(rs.getString("Email"));
+                u.setGender(rs.getString("Gender"));
+                u.setBirthday(rs.getDate("Birthday"));
+                u.setPhoneNumber(rs.getString("PhoneNumber"));
+                u.setAddress(rs.getString("Address"));
+                u.setAvatar(rs.getString("Avatar"));
+                u.setIsLocked(rs.getBoolean("IsLocked"));
+                Timestamp createdAt = rs.getTimestamp("CreatedAt");
+                if (createdAt != null) {
+                    u.setCreatedAt(createdAt.toLocalDateTime());
+                }
+                Timestamp lastLoginAt = rs.getTimestamp("LastLoginAt");
+                if (lastLoginAt != null) {
+                    u.setLastLoginAt(lastLoginAt.toLocalDateTime());
+                }
+                u.setRole(rs.getString("role"));
+                Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+                if (updatedAt != null) {
+                    u.setUpdatedAt(updatedAt.toLocalDateTime());
+                }
+
+                return u;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

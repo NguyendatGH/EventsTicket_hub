@@ -31,12 +31,6 @@ public class EventDAO {
 
     private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
 
-    /**
-     * Gets the total count of approved and non-deleted events.
-     * Connection is managed via try-with-resources.
-     * 
-     * @return The total count of events.
-     */
     public int getTotalApprovedEventsCount() {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM Events WHERE IsApproved = 1 AND IsDeleted = 0";
@@ -184,7 +178,7 @@ public class EventDAO {
         String sql;
 
         if (currentEvent != null && currentEvent.getGenreID() != null) {
-            sql = "SELECT * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC LIMIT 3";
+            sql = "SELECT TOP 3 * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC";
             try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, currentEvent.getGenreID());
                 ps.setInt(2, currentEventId);
@@ -221,7 +215,7 @@ public class EventDAO {
 
             sql = "SELECT * FROM Events WHERE isDeleted = 0 AND isApproved = 1"
                     + excludeClause.toString()
-                    + " ORDER BY StartTime DESC LIMIT ?";
+                    + " ORDER BY StartTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
             try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -974,13 +968,11 @@ public class EventDAO {
 
     public List<Event> getApprovedEventsPaginated(int offset, int limit) {
         List<Event> events = new ArrayList<>();
-        // Đảm bảo chỉ chọn các trường CÓ THẬT trong bảng Events của bạn
-        // Đã loại bỏ 'Ranking'
         String allColumns = "EventID, Name, Description, PhysicalLocation, StartTime, EndTime, " +
                 "TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, " +
                 "HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt";
 
-        String sql = "SELECT " + allColumns + " FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 " +
+        String sql = "SELECT " + allColumns + " FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE() " +
                 "ORDER BY StartTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (Connection conn = DBConnection.getConnection();
@@ -990,7 +982,7 @@ public class EventDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    events.add(mapRowToEvent(rs)); // Sử dụng phương thức helper mapRowToEvent
+                    events.add(mapRowToEvent(rs));
                 }
             }
         } catch (SQLException e) {
@@ -1039,5 +1031,143 @@ public class EventDAO {
         }
 
         return res;
+    }
+
+    public List<Event> searchEvents(String keyword) {
+        List<Event> list = new ArrayList<>();
+        String sql = "SELECT * FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE() AND (Name LIKE ? OR Description LIKE ?) ORDER BY StartTime DESC";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            String kw = "%" + keyword + "%";
+            ps.setString(1, kw);
+            ps.setString(2, kw);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToEvent(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Event> searchEvents(String keyword, String location) {
+        List<Event> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE()");
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (Name LIKE ? OR Description LIKE ?)");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+        }
+        if (location != null && !location.trim().isEmpty()) {
+            sql.append(" AND PhysicalLocation LIKE ?");
+            params.add("%" + location.trim() + "%");
+        }
+        sql.append(" ORDER BY StartTime DESC");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToEvent(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Event> searchEvents(String keyword, String location, Integer genreId) {
+        List<Event> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE()");
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (Name LIKE ? OR Description LIKE ?)");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+        }
+        if (location != null && !location.trim().isEmpty()) {
+            sql.append(" AND PhysicalLocation LIKE ?");
+            params.add("%" + location.trim() + "%");
+        }
+        if (genreId != null && genreId > 0) {
+            sql.append(" AND GenreID = ?");
+            params.add(genreId);
+        }
+        sql.append(" ORDER BY StartTime DESC");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToEvent(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<String> getAvailableLocations() {
+        List<String> locations = new ArrayList<>();
+        String sql = "SELECT DISTINCT PhysicalLocation FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE() ORDER BY PhysicalLocation";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String location = rs.getString("PhysicalLocation");
+                if (location != null && !location.trim().isEmpty()) {
+                    locations.add(location);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return locations;
+    }
+
+    public List<Event> searchEventsForAdmin(String keyword, String location, boolean activeOnly) {
+        List<Event> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM Events WHERE IsDeleted = 0");
+        List<Object> params = new ArrayList<>();
+
+        // Thêm điều kiện active/non-active
+        if (activeOnly) {
+            sql.append(" AND IsApproved = 1 AND EndTime > GETDATE()");
+        } else {
+            sql.append(" AND (IsApproved = 0 OR EndTime <= GETDATE())");
+        }
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (Name LIKE ? OR Description LIKE ?)");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+        }
+        if (location != null && !location.trim().isEmpty()) {
+            sql.append(" AND PhysicalLocation LIKE ?");
+            params.add("%" + location.trim() + "%");
+        }
+        sql.append(" ORDER BY StartTime DESC");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToEvent(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }
