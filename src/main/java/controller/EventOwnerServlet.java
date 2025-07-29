@@ -186,7 +186,8 @@ public class EventOwnerServlet extends HttpServlet {
 
         // Lấy danh sách sự kiện của người dùng
         List<Event> myEvents = eventDao.getAllMyEvent(userID);
-
+        
+        System.out.println("event of owner2: " +myEvents);
         // Tính toán phân trang
         int totalEvents = myEvents.size();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
@@ -202,7 +203,7 @@ public class EventOwnerServlet extends HttpServlet {
         int start = (currentPage - 1) * pageSize;
         int end = Math.min(start + pageSize, totalEvents);
         List<Event> eventsForPage = myEvents.subList(start, end);
-
+        System.out.println("eventsForPage" +eventsForPage);
         // Lấy danh sách thể loại
         List<Genre> genres = genreDAO.getAllGenres();
 

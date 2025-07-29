@@ -708,7 +708,7 @@
 
         .search-results-count {
             display: none;
-            flex: 1;
+            flex : 1;
             text-align: center;
             font-weight: 500;
         }

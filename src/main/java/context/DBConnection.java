@@ -16,7 +16,7 @@ public class DBConnection {
     private static final String DB_URL = "jdbc:sqlserver://172.16.0.170:1433;databaseName=EventTicketDB;encrypt=true;trustServerCertificate=true";
     private static final String USER_DB = "sa"; 
     private static final String PASS_DB = "Admin2404!"; 
-
+  
     private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
     public static Connection getConnection() {
