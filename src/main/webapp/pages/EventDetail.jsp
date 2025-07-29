@@ -919,12 +919,18 @@
     </footer>
     <script>
         function handleBuyTickets(eventId, hasSeatingChartStr) {
-            if (hasSeatingChartStr === 'true') {
-                window.location.href = '${pageContext.request.contextPath}/BookChairServlet?eventId=' + eventId;
-            } else {
-                window.location.href = '${pageContext.request.contextPath}/TicketSelectionServlet?eventId=' + eventId;
+                console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
+                console.log("  - eventId nhận được:", eventId, "(kiểu:", typeof eventId, ")");
+                console.log("  - hasSeatingChartStr nhận được:", hasSeatingChartStr, "(kiểu:", typeof hasSeatingChartStr, ")");
+
+                if (hasSeatingChartStr === 'true') {
+                    console.log("  - KẾT LUẬN: CÓ sơ đồ ghế. Chuyển hướng tới BookChairServlet.");
+                   window.location.href = '${pageContext.request.contextPath}/BookSeatServlet?eventId=' + eventId;
+                } else {
+                    console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
+                    window.location.href = '${pageContext.request.contextPath}/TicketInfoServlet?eventId=' + eventId;
+                }
             }
-        }
 
         function toggleUserDropdown() {
             const dropdown = document.getElementById('userDropdown');

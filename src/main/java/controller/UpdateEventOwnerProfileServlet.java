@@ -108,17 +108,25 @@ public class UpdateEventOwnerProfileServlet extends HttpServlet {
             user.setUpdatedAt(java.time.LocalDateTime.now());
             
             // Cập nhật avatar nếu có
-            updateAvatarIfProvided(request, user);
+            boolean avatarUpdated = updateAvatarIfProvided(request, user);
             
             // Lưu vào database
             boolean updated = userDAO.updateProfile(user);
             if (updated) {
-                // Cập nhật session với thông tin mới
-                session.setAttribute("user", user);
-                session.setAttribute("userName", user.getName());
-                session.setAttribute("userEmail", user.getEmail());
+                            // Cập nhật session với thông tin mới
+            session.setAttribute("user", user);
+            session.setAttribute("userName", user.getName());
+            session.setAttribute("userEmail", user.getEmail());
+            
+            // Debug: Print avatar info
+            System.out.println("User avatar after update: " + user.getAvatar());
+            System.out.println("Session user avatar: " + ((User) session.getAttribute("user")).getAvatar());
                 
-                request.setAttribute("success", "Cập nhật thông tin cá nhân thành công!");
+                String successMessage = "Cập nhật thông tin cá nhân thành công!";
+                if (avatarUpdated) {
+                    successMessage += " Avatar đã được cập nhật.";
+                }
+                request.setAttribute("success", successMessage);
             } else {
                 request.setAttribute("error", "Cập nhật thông tin cá nhân thất bại. Vui lòng thử lại.");
             }
@@ -126,20 +134,27 @@ public class UpdateEventOwnerProfileServlet extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("error", "Đã xảy ra lỗi khi cập nhật thông tin cá nhân: " + e.getMessage());
         }
+        
+        // Set a flag to indicate we should show edit profile section
+        request.setAttribute("showEditProfile", "true");
         request.getRequestDispatcher("eventOwner/updateEventOwnerProfile.jsp").forward(request, response);
     }
 
-    private void updateAvatarIfProvided(HttpServletRequest request, User user) throws IOException, ServletException {
+    private boolean updateAvatarIfProvided(HttpServletRequest request, User user) throws IOException, ServletException {
         Part filePart = request.getPart("avatar");
 
         if (filePart == null || filePart.getSize() == 0) {
-            return;
+            System.out.println("No avatar file provided or file is empty");
+            return false;
         }
 
         String submittedFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
         if (submittedFileName == null || submittedFileName.isEmpty()) {
-            return;
+            System.out.println("Submitted file name is null or empty");
+            return false;
         }
+
+        System.out.println("Processing avatar upload: " + submittedFileName + ", size: " + filePart.getSize());
 
         String fileExtension = "";
         int dotIndex = submittedFileName.lastIndexOf('.');
@@ -148,7 +163,19 @@ public class UpdateEventOwnerProfileServlet extends HttpServlet {
         }
         String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
 
-        String uploadPath = "D:/uploads/avatars/";
+        // Get the upload base path from context attribute (set by UploadPathListener)
+        String basePath = (String) getServletContext().getAttribute("upload.path");
+        if (basePath == null || basePath.isEmpty()) {
+            // Fallback to real path
+            basePath = getServletContext().getRealPath("/uploads");
+            if (basePath == null) {
+                basePath = "uploads";
+            }
+        }
+        
+        String uploadPath = basePath + File.separator + "user_avatar" + File.separator;
+        System.out.println("Base path: " + basePath);
+        System.out.println("Upload path: " + uploadPath);
 
         File uploadDir = new File(uploadPath);
 
@@ -163,9 +190,14 @@ public class UpdateEventOwnerProfileServlet extends HttpServlet {
         }
 
         String filePath = uploadPath + uniqueFileName;
+        System.out.println("Upload path: " + uploadPath);
+        System.out.println("File path: " + filePath);
+        
         try {
             filePart.write(filePath);
             user.setAvatar(uniqueFileName);
+            System.out.println("Avatar uploaded successfully: " + uniqueFileName);
+            return true;
         } catch (IOException e) {
             System.err.println("ERROR: Failed to write avatar file to disk at " + filePath + ": " + e.getMessage());
             e.printStackTrace();

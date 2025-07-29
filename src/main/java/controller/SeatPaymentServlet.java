@@ -1,159 +1,164 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dao.EventDAO;
-// import dao.SeatDAO;
-import java.io.IOException;
-import java.io.PrintWriter;
+import dao.SeatDAO;
+import dao.TicketInfoDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import models.Event;
 import models.Order;
 import models.OrderItem;
 import models.Seat;
-import models.User;
+import models.TicketInfo;
+import dto.UserDTO;
 
-/**
- *
- * @author admin
- */
 @WebServlet(name = "SeatPaymentServlet", urlPatterns = {"/SeatPaymentServlet"})
 public class SeatPaymentServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet SeatPaymentServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet SeatPaymentServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+    private static final Logger LOGGER = Logger.getLogger(SeatPaymentServlet.class.getName());
+    private EventDAO eventDAO;
+    private SeatDAO seatDAO;
+    private TicketInfoDAO ticketInfoDAO;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        eventDAO = new EventDAO();
+        seatDAO = new SeatDAO();
+        ticketInfoDAO = new TicketInfoDAO();
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//
-//        HttpSession session = request.getSession();
-//        User currentUser = (User) session.getAttribute("user");
-//
-//        // 1. Kiểm tra đăng nhập
-//        if (currentUser == null) {
-//            response.sendRedirect(request.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        try {
-//            // 2. Lấy các tham số từ URL
-//            int eventId = Integer.parseInt(request.getParameter("eventId"));
-//            String[] seatIdsStr = request.getParameter("seatIds").split(",");
-//
-//            EventDAO eventDAO = new EventDAO();
-//            SeatDAO seatDAO = new SeatDAO();
-//
-//            Event event = eventDAO.getEventById(eventId);
-//
-//            List<OrderItem> orderItems = new ArrayList<>();
-//            BigDecimal totalAmount = BigDecimal.ZERO;
-//
-//            
-//            for (String seatIdStr : seatIdsStr) {
-//                int seatId = Integer.parseInt(seatIdStr.trim());
-//
-//                // Bạn cần tạo phương thức này trong SeatDAO
-//                Seat seat = seatDAO.getSeatById(seatId);
-//
-//                // Chỉ xử lý nếu ghế tồn tại và đang ở trạng thái "available"
-//                if (seat != null && "available".equalsIgnoreCase(seat.getSeatStatus())) {
-//                    OrderItem item = new OrderItem();
-//                    item.setSeatId(seat.getSeatId()); 
-//                    item.setQuantity(1); 
-//                    item.setUnitPrice(seat.getPrice().doubleValue()); 
-//                    item.setEventName(event.getName());
-//                    item.setTicketTypeName("Ghế " + seat.getSeatRow() + seat.getSeatNumber() + " (" + seat.getSeatSection() + ")");
-//
-//                    orderItems.add(item);
-//                    totalAmount = totalAmount.add(seat.getPrice()); 
-//            }
-//
-//            // Nếu không có ghế nào hợp lệ (ví dụ: đã bị người khác mua mất)
-//            if (orderItems.isEmpty()) {
-//                response.sendRedirect(request.getContextPath() + "/book-chair?eventId=" + eventId + "&error=seat_taken");
-//                return;
-//            }
-//
-//            // 5. Tạo đối tượng Order để hiển thị trên trang xác nhận
-//            Order order = new Order();
-//            order.setUserId(currentUser.getId());
-//            order.setEvent(event); // Gán đối tượng Event vào Order
-//            order.setItems(orderItems);
-//            order.setTotalAmount(totalAmount);
-//            order.setOrderStatus("PENDING_PAYMENT"); // Trạng thái chờ thanh toán
-//            order.setCreatedAt(new Date());
-//
-//            // 6. Lưu đơn hàng tạm thời vào session để các bước sau (như VNPay) có thể lấy ra
-//            session.setAttribute("currentOrder", order);
-//
-//            // 7. Gửi đơn hàng đến trang JSP để hiển thị
-//            request.setAttribute("order", order);
-//            request.getRequestDispatcher("/pages/Payment.jsp").forward(request, response);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi khi tạo đơn hàng.");
-//        }
-//    }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        UserDTO currentUser = (UserDTO) session.getAttribute("user");
+
+        // 1. Kiểm tra đăng nhập
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        try {
+            // 2. Lấy các tham số từ URL
+            String eventIdStr = request.getParameter("eventId");
+            String seatIdsStr = request.getParameter("seatIds");
+
+            if (eventIdStr == null || eventIdStr.trim().isEmpty() || seatIdsStr == null || seatIdsStr.trim().isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Yêu cầu thiếu tham số 'eventId' hoặc 'seatIds' hợp lệ.");
+                return;
+            }
+
+            int eventId = Integer.parseInt(eventIdStr);
+            Event event = eventDAO.getEventById(eventId);
+            if (event == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy sự kiện.");
+                return;
+            }
+
+            // 3. Chuyển seatIds thành danh sách
+            String[] seatIdArray = seatIdsStr.split(",");
+            List<Integer> seatIds = new ArrayList<>();
+            for (String seatId : seatIdArray) {
+                try {
+                    seatIds.add(Integer.parseInt(seatId.trim()));
+                } catch (NumberFormatException e) {
+                    LOGGER.warning("Seat ID không hợp lệ: " + seatId);
+                }
+            }
+
+            if (seatIds.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Không có ghế nào hợp lệ.");
+                return;
+            }
+
+            // 4. Lấy thông tin ghế từ database
+            List<Seat> seats = seatDAO.getSeatsByIds(seatIds);
+            if (seats == null || seats.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy ghế.");
+                return;
+            }
+
+            // 5. Tạo OrderItems từ ghế
+            List<OrderItem> orderItems = new ArrayList<>();
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            for (Seat seat : seats) {
+                if (!"available".equalsIgnoreCase(seat.getStatus())) {
+                    response.sendRedirect(request.getContextPath() + "/BookSeatServlet?eventId=" + eventId + "&error=seat_taken");
+                    return;
+                }
+
+                TicketInfo ticket = ticketInfoDAO.getTicketInfoBySeat(seat.getSeatId());
+                if (ticket == null) {
+                    LOGGER.warning("Không tìm thấy TicketInfo cho seatId: " + seat.getSeatId());
+                    continue;
+                }
+                System.out.println("ticket sau khi lay: "+ticket);
+
+
+
+                OrderItem item = new OrderItem();
+                item.setTicketInfoId(ticket.getTicketInfoID());
+                item.setQuantity(1); // Mỗi ghế là 1 vé
+                item.setUnitPrice(ticket.getPrice());
+                item.setEventName(event.getName());
+                item.setTicketTypeName(ticket.getTicketName());
+                item.setEventId(event.getEventID());
+
+                orderItems.add(item);
+                totalAmount = totalAmount.add(ticket.getPrice());
+            }
+
+            if (orderItems.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Không thể tạo đơn hàng từ ghế.");
+                return;
+            }
+
+            // 6. Tạo và lưu Order
+            Order order = new Order();
+            order.setUserId(currentUser.getId());
+            order.setContactEmail(currentUser.getEmail());
+            order.setEvent(event);
+            order.setItems(orderItems);
+            order.setTotalAmount(totalAmount);
+            order.setOrderStatus("PENDING_PAYMENT");
+            order.setCreatedAt(LocalDateTime.now());
+
+            session.setAttribute("currentOrder", order);
+
+            request.getRequestDispatcher("/pages/Payment.jsp").forward(request, response);
+
+
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.SEVERE, "Định dạng tham số không hợp lệ", e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Định dạng tham số không hợp lệ.");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Lỗi khi xử lý thanh toán (GET)", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Đã có lỗi xảy ra.");
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        // Chuyển hướng về trang chủ nếu truy cập bằng POST
+        response.sendRedirect(request.getContextPath() + "/");
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Handles payment processing for seat-based event tickets.";
+    }
 }

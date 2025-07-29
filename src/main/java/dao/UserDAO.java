@@ -154,7 +154,8 @@ public class UserDAO implements IUserDAO {
     public boolean changePassword(int userId, String oldPassword, String newPassword) {
         String checkSql = "SELECT PasswordHash FROM Users WHERE Id = ? AND IsLocked = 0";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
 
             checkStmt.setInt(1, userId);
             ResultSet rs = checkStmt.executeQuery();
@@ -525,7 +526,9 @@ public class UserDAO implements IUserDAO {
                 + "         CASE WHEN CreatedAt >= DATEADD(MONTH, -3, GETDATE()) THEN 'new' ELSE 'old' END "
                 + "ORDER BY LoginMonth";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 String loginMonth = rs.getString("LoginMonth");
@@ -644,5 +647,54 @@ public class UserDAO implements IUserDAO {
             System.err.println("Lỗi khi update user info: " + e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public UserDTO getEventOwnerByEventID(int eventId) {
+        String sql = "SELECT u.id, u.Username, u.Email, u.Gender, u.Birthday, u.PhoneNumber, u.Address, u.Avatar, " +
+                "u.IsLocked, u.CreatedAt, u.LastLoginAt, u.role, u.UpdatedAt " +
+                "FROM Events e " +
+                "LEFT JOIN Users u ON e.OwnerID = u.id " +
+                "WHERE e.EventID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, eventId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                UserDTO u = new UserDTO();
+                u.setId(rs.getInt("id"));
+                u.setName(rs.getString("Username"));
+                u.setEmail(rs.getString("Email"));
+                u.setGender(rs.getString("Gender"));
+                u.setBirthday(rs.getDate("Birthday"));
+                u.setPhoneNumber(rs.getString("PhoneNumber"));
+                u.setAddress(rs.getString("Address"));
+                u.setAvatar(rs.getString("Avatar"));
+                u.setIsLocked(rs.getBoolean("IsLocked"));
+                Timestamp createdAt = rs.getTimestamp("CreatedAt");
+                if (createdAt != null) {
+                    u.setCreatedAt(createdAt.toLocalDateTime());
+                }
+                Timestamp lastLoginAt = rs.getTimestamp("LastLoginAt");
+                if (lastLoginAt != null) {
+                    u.setLastLoginAt(lastLoginAt.toLocalDateTime());
+                }
+                u.setRole(rs.getString("role"));
+                Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+                if (updatedAt != null) {
+                    u.setUpdatedAt(updatedAt.toLocalDateTime());
+                }
+
+                return u;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

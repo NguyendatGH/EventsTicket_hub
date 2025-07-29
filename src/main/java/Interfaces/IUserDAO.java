@@ -54,4 +54,6 @@ public interface IUserDAO {
     boolean insertUserFromGoogleDTO(User user);
 
     boolean updateUserInfoForGoogle(int userId, String name, String avatar, String googleId);
+
+    UserDTO getEventOwnerByEventID(int eventID);
 }

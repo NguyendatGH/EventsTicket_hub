@@ -1,37 +1,52 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.Part;
 import models.TopEventOwner;
 import service.EventService;
+import service.UserService;
 import models.Event;
 import dao.UserDAO;
 import utils.ToggleEvent;
 import utils.ForwardJspUtils;
+import jakarta.servlet.annotation.MultipartConfig;
 
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+        maxFileSize = 1024 * 1024 * 5, // 5 MB
+        maxRequestSize = 1024 * 1024 * 10 // 10 MB
+)
 public class EventManagementServlet implements AdminSubServlet {
     private static final Logger logger = Logger.getLogger(EventManagementServlet.class.getName());
     private static final String EVENT_MANAGEMENT_JSP = "managerPage/AdminEventManagement.jsp";
     private static final String EVENT_DETAIL_JSP = "managerPage/EventOptions.jsp";
+    private static final String UPLOAD_DIR = "uploads/event_banners";
     private final ForwardJspUtils forwardUtils;
     private final EventService eventServices;
+    private UserService userService;
     private final UserDAO userDAO;
 
     public EventManagementServlet() {
         this.forwardUtils = new ForwardJspUtils();
         this.eventServices = new EventService();
+        this.userService = new UserService();
         this.userDAO = new UserDAO();
     }
 
@@ -137,6 +152,11 @@ public class EventManagementServlet implements AdminSubServlet {
     private void handleUpdateEvent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         logger.info("Processing update event request");
+        if (!request.getContentType().startsWith("multipart/form-data")) {
+            request.setAttribute("error", "Invalid form content type");
+            forwardUtils.toJsp(request, response, EVENT_DETAIL_JSP);
+            return;
+        }
         String eventIDStr = request.getParameter("eventID");
         System.out.println("event Id for updating: " + eventIDStr);
         int eventID;
@@ -149,14 +169,47 @@ public class EventManagementServlet implements AdminSubServlet {
             return;
         }
 
+        String imageFileName = null;
+        try {
+            Part filePart = request.getPart("imageFile");
+            if (filePart != null && filePart.getSize() > 0) {
+                // Tạo thư mục upload nếu chưa tồn tại
+                String uploadPath = getUploadPath(request);
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                // Tạo tên file duy nhất
+                String originalFileName = getFileName(filePart);
+                String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+
+                // Lưu file
+                File file = new File(uploadPath + File.separator + uniqueFileName);
+                try (InputStream fileContent = filePart.getInputStream()) {
+                    Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                imageFileName = uniqueFileName;
+            }
+        } catch (Exception e) {
+            logger.severe("Error uploading file: " + e.getMessage());
+            request.setAttribute("error", "Lỗi khi tải lên ảnh: " + e.getMessage());
+            forwardUtils.toJsp(request, response, EVENT_DETAIL_JSP);
+            return;
+        }
+
         Event event = new Event();
         event.setEventID(eventID);
         event.setName(request.getParameter("name"));
         event.setDescription(request.getParameter("description"));
         event.setPhysicalLocation(request.getParameter("physicalLocation"));
         event.setStatus(request.getParameter("status"));
-        event.setImageURL(request.getParameter("imageURL"));
         event.setUpdatedAt(new Date());
+        if (imageFileName != null) {
+            event.setImageURL(imageFileName);
+        }
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
@@ -213,6 +266,9 @@ public class EventManagementServlet implements AdminSubServlet {
         }
 
         Event event = eventServices.getEventById(eventID);
+        System.out.println(event.getImageURL());
+        String ownerName = userService.getEventOwnerName(eventID);
+        request.setAttribute("ownerName", ownerName);
         if (event == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy sự kiện");
             return;
@@ -221,5 +277,22 @@ public class EventManagementServlet implements AdminSubServlet {
         request.setAttribute("event", event);
         request.setAttribute("editMode", true);
         forwardUtils.toJsp(request, response, EVENT_DETAIL_JSP);
+    }
+
+    private String getUploadPath(HttpServletRequest request) {
+        // Lấy đường dẫn tuyệt đối đến thư mục gốc của webapp
+        String appPath = request.getServletContext().getRealPath("");
+        // Trả về đường dẫn đến thư mục upload
+        return appPath + File.separator + UPLOAD_DIR;
+    }
+
+    private String getFileName(final Part part) {
+        final String partHeader = part.getHeader("content-disposition");
+        for (String content : partHeader.split(";")) {
+            if (content.trim().startsWith("filename")) {
+                return content.substring(content.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+        return null;
     }
 }

@@ -149,6 +149,16 @@ public class UserService {
     }
 
     public String whoisLoggedin(int userId) throws IOException, SQLException {
-      return userDAO.checkRole(userId);
+        return userDAO.checkRole(userId);
+    }
+
+    public boolean isAccountLocked(String email) {
+        UserDTO user = getUserByEmail(email);
+        return user != null && user.getIsLocked();
+    }
+
+    public String getEventOwnerName(int eventId) {
+        UserDTO u = userDAO.getEventOwnerByEventID(eventId);
+        return u.getName();
     }
 }
