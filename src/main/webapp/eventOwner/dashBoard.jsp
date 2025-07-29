@@ -636,12 +636,9 @@
     <div class="sidebar">
         <div class="brand">🎟️ MasterTicket</div>
         <ul class="menu">
-            <li><a href="#" class="active">📅 My Events</a></li>
-            <li><a href="#">📊 Manage Reports</a></li>
-            <li><a href="#">📋 Rules</a></li>
-            <li><a href="#">⚙️ Settings</a></li>
-            <li><a href="#">📈 Analytics</a></li>
-            <li><a href="${pageContext.request.contextPath}/support-owner">🎧 Support</a></li>
+            <li><a href="#" class="active">📅 Sự kiện của tôi</a></li>
+            <li><a href="${pageContext.request.contextPath}/support-owner">🎧 Hỗ trợ</a></li>
+            <a href="${pageContext.request.contextPath}/eventOwner/updateEventOwnerProfile.jsp" >⚙ Chỉnh sửa trang cá nhân</a>
         </ul>
     </div>
 
@@ -653,26 +650,24 @@
         <!-- Navigation -->
         <nav class="navbar">
             <div class="nav-links">
-                <a href="#">Home</a>
-                <a href="#">Shows</a>
-                <a href="#">Offers & Discount</a>
-                <a href="#" class="active">Dashboard</a>
+                <a href="#"  class="active">Trang chủ</a>
+                <a href="${pageContext.request.contextPath}/support-owner">Hỗ trợ</a>
                 <button class="chat-btn" onclick="window.location.href = '${pageContext.request.contextPath}/chat'">
-                    💬 Go to Chat
+                    💬 Chat với chúng tôi
                 </button>
             </div>
             <div class="user-info">
                 <span>Welcome, Event Manager</span>
-                <a href="${pageContext.request.contextPath}/eventOwner/updateEventOwnerProfile.jsp" class="btn btn-primary" style="margin-right: 10px;">Edit Profile</a>
-                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">Logout</a>
+                
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">Đăng xuất</a>
             </div>
         </nav>
 
         <!-- My Created Events Section -->
         <div class="content-section">
             <div class="section-header">
-                <h2>📌 My Created Events</h2>
-                <button class="btn btn-primary" onclick="openModal()">+ Create New Event</button>
+                <h2>📌 Sự kiện đã tạo</h2>
+                <button class="btn btn-primary" onclick="openModal()">+ Tạo sự kiện</button>
             </div>
 
             <div class="event-list">
@@ -716,7 +711,7 @@
                     </c:when>
                     <c:otherwise>
                         <div class="event-item" style="text-align: center;">
-                            <p style="color: #9ca3af;">You haven't created any events yet.</p>
+                            <p style="color: #9ca3af;">Bạn chưa tạo sự kiện nào!</p>
                         </div>
                     </c:otherwise>
                 </c:choose>

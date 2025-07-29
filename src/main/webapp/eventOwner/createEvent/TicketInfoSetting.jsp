@@ -332,12 +332,28 @@
         background: rgba(244, 67, 54, 0.2);
         color: #f44336;
         border: 1px solid rgba(244, 67, 54, 0.3);
+        position: relative;
     }
 
     .alert-success {
         background: rgba(76, 175, 80, 0.2);
         color: #4CAF50;
         border: 1px solid rgba(76, 175, 80, 0.3);
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .alert-dismiss {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        cursor: pointer;
+        color: inherit;
+        font-size: 16px;
+        background: none;
+        border: none;
     }
 
     /* Action Buttons */
@@ -440,11 +456,11 @@
         <div class="main-content">
             <h1 class="page-title">Ticket Info Settings</h1>
             <p class="page-subtitle">Review and confirm ticket information</p>
-            <c:if test="${not empty successMessage}">
-                <div class="alert alert-success">${successMessage}</div>
-            </c:if>
             <c:if test="${not empty errorMessage}">
-                <div class="alert">${errorMessage}</div>
+                <div class="alert">
+                    <span>${errorMessage}</span>
+                    <button class="alert-dismiss">✕</button>
+                </div>
             </c:if>
             <form action="${pageContext.request.contextPath}/organizer-servlet" method="post" id="ticketForm">
                 <input type="hidden" name="action" value="create"/>
@@ -508,9 +524,7 @@
                 </div>
                 <div class="action-buttons">
                     <a href="${pageContext.request.contextPath}/organizer-servlet?action=${event.hasSeatingChart ? 'customizeSeats' : 'step3'}" class="btn-secondary">← Back</a>
-                    <c:if test="${empty successMessage}">
-                        <button type="submit" class="btn-primary">Create Event →</button>
-                    </c:if>
+                    <button type="submit" class="btn-primary" id="createEventBtn">Create Event →</button>
                 </div>
             </form>
         </div>
@@ -547,16 +561,51 @@
             }
         });
 
-        document.getElementById('ticketForm')?.addEventListener('submit', function(e) {
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('alert-dismiss')) {
+                e.target.closest('.alert, .alert-success').remove();
+            }
+        });
+
+        document.getElementById('ticketForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             if (!${event.hasSeatingChart}) {
                 const totalTicketCount = parseInt(document.querySelector('input[name="totalTicketCount"]').value);
                 const quantities = Array.from(document.querySelectorAll('input[name="ticketQuantity[]"]')).map(input => parseInt(input.value) || 0);
                 const totalQuantity = quantities.reduce((sum, qty) => sum + qty, 0);
                 if (totalQuantity !== totalTicketCount) {
-                    alert('Sum of ticket quantities must equal total ticket count');
-                    e.preventDefault();
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert';
+                    errorAlert.innerHTML = '<span>Sum of ticket quantities must equal total ticket count</span><button class="alert-dismiss">✕</button>';
+                    document.querySelector('.main-content').insertBefore(errorAlert, document.querySelector('.form-section'));
+                    return;
                 }
             }
+
+            const form = this;
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Đã tạo sự kiện thành công');
+                    window.location.href = '${pageContext.request.contextPath}/events';
+                } else {
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert';
+                    errorAlert.innerHTML = `<span>${data.error || 'An error occurred while creating the event'}</span><button class="alert-dismiss">✕</button>`;
+                    document.querySelector('.main-content').insertBefore(errorAlert, document.querySelector('.form-section'));
+                }
+            })
+            .catch(error => {
+                const errorAlert = document.createElement('div');
+                errorAlert.className = 'alert';
+                errorAlert.innerHTML = '<span>An error occurred while creating the event</span><button class="alert-dismiss">✕</button>';
+                document.querySelector('.main-content').insertBefore(errorAlert, document.querySelector('.form-section'));
+            });
         });
     </script>
 </body>

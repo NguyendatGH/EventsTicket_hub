@@ -1,4 +1,3 @@
-//timeandtype
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
@@ -281,6 +280,21 @@
             backdrop-filter: blur(5px);
         }
         
+        .error-message {
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 10px;
+            background-color: #f44336;
+            color: #fff;
+            display: none; /* Hidden by default */
+            border-left: 4px solid #d32f2f;
+            backdrop-filter: blur(5px);
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -350,6 +364,7 @@
         <h1 class="page-title">Time & Type</h1>
         <p class="page-subtitle">Set up your event schedule</p>
         
+        <div id="toast-container" class="toast-container"></div>
         <c:if test="${not empty errorMessage}">
             <div class="alert">${errorMessage}</div>
         </c:if>
@@ -377,6 +392,7 @@
                         </div>
                     </div>
                 </div>
+                <div id="error-message" class="error-message"></div>
             </div>
             
             <div class="action-buttons">
@@ -388,12 +404,43 @@
 
     <script>
         document.getElementById('eventForm').addEventListener('submit', function(e) {
-            const startTime = new Date(document.querySelector('input[name="startTime"]').value);
-            const endTime = new Date(document.querySelector('input[name="endTime"]').value);
-            if (startTime >= endTime) {
-                alert('End date/time must be after start date/time');
+            const startTimeInput = document.querySelector('input[name="startTime"]');
+            const endTimeInput = document.querySelector('input[name="endTime"]');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Ensure GMT+7 timezone by appending offset
+            const startTime = new Date(startTimeInput.value + ':00+07:00');
+            const endTime = new Date(endTimeInput.value + ':00+07:00');
+            
+            // Use real-time current time
+            const currentTime = new Date();
+
+            // Check for valid dates
+            if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+                errorMessage.textContent = 'Please enter valid dates and times';
+                errorMessage.classList.add('show');
                 e.preventDefault();
+                return;
             }
+
+            // Check if end time is after start time
+            if (startTime >= endTime) {
+                errorMessage.textContent = 'End date/time must be after start date/time';
+                errorMessage.classList.add('show');
+                e.preventDefault();
+                return;
+            }
+
+            // Check if start time is before current time
+            if (startTime < currentTime) {
+                errorMessage.textContent = `Start date/time cannot be before current time (${currentTime.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })} GMT+7)`;
+                errorMessage.classList.add('show');
+                e.preventDefault();
+                return;
+            }
+
+            // Clear error message if validation passes
+            errorMessage.classList.remove('show');
         });
     </script>
 </body>
