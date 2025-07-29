@@ -601,38 +601,38 @@
                         <c:when test="${not empty myEvents}">
                             <c:forEach var="event" items="${myEvents}" begin="${(myEventsCurrentPage-1)*myEventsPageSize}" end="${myEventsCurrentPage*myEventsPageSize-1}">
                                 <div class="event-item">
-    <div class="event-info">
-        <h3><c:out value="${event.name}" /></h3>
-        <p>
-            <c:if test="${not empty event.physicalLocation}">
-                📍 <c:out value="${event.physicalLocation}" /> • 
-            </c:if>
-            📅 <fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy" /> - 
-            <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" />
-            <c:if test="${not empty event.totalTicketCount}">
-                • 🎫 <c:out value="${event.totalTicketCount}" /> tickets
-            </c:if>
-        </p>
-    </div>
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <div class="event-status 
-             <c:choose>
-                 <c:when test="${event.status eq 'active'}">status-active</c:when>
-                 <c:when test="${event.status eq 'pending'}">status-pending</c:when>
-                 <c:otherwise>status-ended</c:otherwise>
-             </c:choose>">
-            <c:choose>
-                <c:when test="${event.status eq 'active'}">Active</c:when>
-                <c:when test="${event.status eq 'pending'}">Pending</c:when>
-                <c:otherwise>Ended</c:otherwise>
-            </c:choose>
-        </div>
-        <div class="event-actions">
-            <button class="btn-edit" onclick="editEvent(${event.eventID})">Edit</button>
-            <button class="btn-delete" onclick="deleteEvent(${event.eventID})">Delete</button>
-        </div>
-    </div>
-</div>
+                                    <div class="event-info">
+                                        <h3><c:out value="${event.name}" /></h3>
+                                        <p>
+                                            <c:if test="${not empty event.physicalLocation}">
+                                                📍 <c:out value="${event.physicalLocation}" /> • 
+                                            </c:if>
+                                            📅 <fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy" /> - 
+                                            <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" />
+                                            <c:if test="${not empty event.totalTicketCount}">
+                                                • 🎫 <c:out value="${event.totalTicketCount}" /> tickets
+                                            </c:if>
+                                        </p>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="event-status 
+                                             <c:choose>
+                                                 <c:when test="${event.status eq 'active'}">status-active</c:when>
+                                                 <c:when test="${event.status eq 'pending'}">status-pending</c:when>
+                                                 <c:otherwise>status-ended</c:otherwise>
+                                             </c:choose>">
+                                            <c:choose>
+                                                <c:when test="${event.status eq 'active'}">Active</c:when>
+                                                <c:when test="${event.status eq 'pending'}">Pending</c:when>
+                                                <c:otherwise>Ended</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                        <div class="event-actions">
+                                            <button class="btn-edit" onclick="editEvent(${event.eventID})">Edit</button>
+                                            <button class="btn-delete" onclick="deleteEvent(${event.eventID})">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
@@ -683,7 +683,7 @@
                     <div class="number">$122</div>
                     <div class="label">Total Revenue</div>
                 </div>
-                
+
             </div>
 
             <!-- Recent Events Section -->
@@ -796,18 +796,18 @@
         </div>
 
         <!-- Modal -->
-   <button class="btn btn-primary" onclick="openModal()">+ Create New Event</button>
-<div id="eventModal" class="modal">
-    <div class="modal-content">
-        <button class="close-btn" onclick="closeModal()">&times;</button>
-        <h2 style="color: #4CAF50; margin-bottom: 20px;">🎭 Create New Event</h2>
-        <p style="margin-bottom: 20px;">Ready to create an amazing event experience?</p>
-        <div style="display: flex; gap: 15px; justify-content: center;">
-            <button class="btn btn-primary" onclick="window.location.href='eventOwner/NotesWhenPostEvent.jsp'">Start Creating</button>
-            <button class="btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="openModal()">+ Create New Event</button>
+        <div id="eventModal" class="modal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <h2 style="color: #4CAF50; margin-bottom: 20px;">🎭 Create New Event</h2>
+                <p style="margin-bottom: 20px;">Ready to create an amazing event experience?</p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button class="btn btn-primary" onclick="window.location.href = 'eventOwner/NotesWhenPostEvent.jsp'">Start Creating</button>
+                    <button class="btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
         <!-- Footer -->
         <footer class="footer">
@@ -852,128 +852,128 @@
                     <h3>Contact Information</h3>
                     <p>📧 Email: <a href="mailto:support@masterticket.vn">support@masterticket.vn</a></p>
                     <p>📱 Phone: +84 123 456 789</p>
-                    <p>🏢 Address: 123 Tech Street, District 1, Ho Chi Minh City</p>
+                    <p>🏢 Address: FPTU, Da Nang</p>
                 </div>
             </div>
         </footer>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            function openModal() {
-                document.getElementById('eventModal').style.display = 'block';
-            }
-
-            function closeModal() {
-                document.getElementById('eventModal').style.display = 'none';
-            }
-
-            // Close modal when clicking outside
-            window.onclick = function (event) {
-                const modal = document.getElementById('eventModal');
-                if (event.target == modal) {
-                    modal.style.display = 'none';
+                function openModal() {
+                    document.getElementById('eventModal').style.display = 'block';
                 }
-            }
 
-            // Add some interactive effects
-            document.querySelectorAll('.stat-card').forEach(card => {
-                card.addEventListener('mouseenter', function () {
-                    this.style.transform = 'translateY(-10px) scale(1.02)';
-                });
+                function closeModal() {
+                    document.getElementById('eventModal').style.display = 'none';
+                }
 
-                card.addEventListener('mouseleave', function () {
-                    this.style.transform = 'translateY(-5px) scale(1)';
-                });
-            });
-            
-            function deleteEvent(eventId) {
-                console.log("event" , eventId);
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#4CAF50',
-        cancelButtonColor: '#f44336',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Send request to delete the event
-            fetch('${pageContext.request.contextPath}/organizer-servlet?action=delete&eventID=' + eventId, {
-                method: 'POST'
-            })
-            .then(response => {
-                if (response.ok) {
-                    Swal.fire(
-                        'Deleted!',
-                        'Your event has been deleted.',
-                        'success'
-                    ).then(() => {
-                        // Reload the page to see changes
-                        window.location.reload();
+                // Close modal when clicking outside
+                window.onclick = function (event) {
+                    const modal = document.getElementById('eventModal');
+                    if (event.target == modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+
+                // Add some interactive effects
+                document.querySelectorAll('.stat-card').forEach(card => {
+                    card.addEventListener('mouseenter', function () {
+                        this.style.transform = 'translateY(-10px) scale(1.02)';
                     });
-                } else {
-                    Swal.fire(
-                        'Error!',
-                        'Failed to delete the event.',
-                        'error'
-                    );
-                }
-            })
-            .catch(error => {
-                Swal.fire(
-                    'Error!',
-                    'An error occurred while deleting the event.',
-                    'error'
-                );
-                console.error('Error:', error);
-            });
-        }
-    });
-}
-           
-            function editEvent(eventId) {
-    Swal.fire({
-        title: 'Xác nhận',
-        text: 'Bạn có muốn chỉnh sửa sự kiện này?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Có',
-        cancelButtonText: 'Không'
-    }).then((result) => {
-        if (result.isConfirmed) {
-             window.location.href = '${pageContext.request.contextPath}/organizer-servlet?action=edit&eventID=' + eventId;
-        }
-    });
-}
 
-
-
-            // Animate numbers on load
-            window.addEventListener('load', function () {
-                const numbers = document.querySelectorAll('.number');
-                numbers.forEach(num => {
-                    const finalValue = num.textContent;
-                    let currentValue = 0;
-                    const increment = parseInt(finalValue.replace(/[^0-9]/g, '')) / 50;
-
-                    const timer = setInterval(() => {
-                        currentValue += increment;
-                        if (currentValue >= parseInt(finalValue.replace(/[^0-9]/g, ''))) {
-                            num.textContent = finalValue;
-                            clearInterval(timer);
-                        } else {
-                            if (finalValue.includes('$')) {
-                                num.textContent = '$' + Math.floor(currentValue).toLocaleString();
-                            } else if (finalValue.includes('.')) {
-                                num.textContent = (currentValue / 1000).toFixed(1);
-                            } else {
-                                num.textContent = Math.floor(currentValue).toLocaleString();
-                            }
-                        }
-                    }, 50);
+                    card.addEventListener('mouseleave', function () {
+                        this.style.transform = 'translateY(-5px) scale(1)';
+                    });
                 });
-            });
+
+                function deleteEvent(eventId) {
+                    console.log("event", eventId);
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4CAF50',
+                        cancelButtonColor: '#f44336',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'No, cancel!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Send request to delete the event
+                            fetch('${pageContext.request.contextPath}/organizer-servlet?action=delete&eventID=' + eventId, {
+                                method: 'POST'
+                            })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            Swal.fire(
+                                                    'Deleted!',
+                                                    'Your event has been deleted.',
+                                                    'success'
+                                                    ).then(() => {
+                                                // Reload the page to see changes
+                                                window.location.reload();
+                                            });
+                                        } else {
+                                            Swal.fire(
+                                                    'Error!',
+                                                    'Failed to delete the event.',
+                                                    'error'
+                                                    );
+                                        }
+                                    })
+                                    .catch(error => {
+                                        Swal.fire(
+                                                'Error!',
+                                                'An error occurred while deleting the event.',
+                                                'error'
+                                                );
+                                        console.error('Error:', error);
+                                    });
+                        }
+                    });
+                }
+
+                function editEvent(eventId) {
+                    Swal.fire({
+                        title: 'Xác nhận',
+                        text: 'Bạn có muốn chỉnh sửa sự kiện này?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Có',
+                        cancelButtonText: 'Không'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '${pageContext.request.contextPath}/organizer-servlet?action=edit&eventID=' + eventId;
+                        }
+                    });
+                }
+
+
+
+                // Animate numbers on load
+                window.addEventListener('load', function () {
+                    const numbers = document.querySelectorAll('.number');
+                    numbers.forEach(num => {
+                        const finalValue = num.textContent;
+                        let currentValue = 0;
+                        const increment = parseInt(finalValue.replace(/[^0-9]/g, '')) / 50;
+
+                        const timer = setInterval(() => {
+                            currentValue += increment;
+                            if (currentValue >= parseInt(finalValue.replace(/[^0-9]/g, ''))) {
+                                num.textContent = finalValue;
+                                clearInterval(timer);
+                            } else {
+                                if (finalValue.includes('$')) {
+                                    num.textContent = '$' + Math.floor(currentValue).toLocaleString();
+                                } else if (finalValue.includes('.')) {
+                                    num.textContent = (currentValue / 1000).toFixed(1);
+                                } else {
+                                    num.textContent = Math.floor(currentValue).toLocaleString();
+                                }
+                            }
+                        }, 50);
+                    });
+                });
         </script>
     </body>
 </html>

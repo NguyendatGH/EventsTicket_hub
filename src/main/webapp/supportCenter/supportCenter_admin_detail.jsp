@@ -68,6 +68,81 @@
       .action-btn.resolve:hover { background: #00b359; }
       .action-btn.close { background: #8b949e; color: #fff; }
       .action-btn.close:hover { background: #7a8288; }
+      
+      /* Attachment styles */
+      .attachments-list { margin-top: 1rem; }
+      .attachment-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s;
+      }
+      .attachment-item:hover {
+        background: #1c2128;
+        border-color: #667aff;
+      }
+      .attachment-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+      }
+      .attachment-icon {
+        font-size: 1.5rem;
+        color: #667aff;
+        width: 40px;
+        text-align: center;
+      }
+      .attachment-details {
+        flex: 1;
+      }
+      .attachment-name {
+        color: #e6edf3;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        word-break: break-word;
+      }
+      .attachment-meta {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: #8b949e;
+      }
+      .attachment-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .attachment-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-size: 1rem;
+      }
+      .attachment-btn.download {
+        background: #667aff;
+        color: white;
+      }
+      .attachment-btn.download:hover {
+        background: #5566dd;
+      }
+      .attachment-btn.view {
+        background: #00cc66;
+        color: white;
+      }
+      .attachment-btn.view:hover {
+        background: #00b359;
+      }
+      
       .alert { padding: 1rem; border-radius: 6px; margin-bottom: 1rem; }
       .alert-success { background: rgba(0,204,102,0.1); border: 1px solid #00cc66; color: #00cc66; }
       .alert-error { background: rgba(255,51,51,0.1); border: 1px solid #ff3333; color: #ff3333; }
@@ -115,7 +190,7 @@
       </c:if>
       <c:if test="${not empty supportItem}">
         <div class="card">
-          <div class="row"><div class="label">ID yêu cầu:</div><div class="value">#${supportItem.supportId}</div></div>
+          
           <div class="row"><div class="label">Tiêu đề:</div><div class="value">${supportItem.subject}</div></div>
           <div class="row"><div class="label">Người gửi:</div><div class="value">${supportItem.fromEmail}</div></div>
           <div class="row"><div class="label">Danh mục:</div><div class="value">${supportItem.category}</div></div>
@@ -124,6 +199,43 @@
           <div class="row"><div class="label">Thời gian gửi:</div><div class="value">${supportItem.getFormattedSendDate()}</div></div>
           <c:if test="${not empty supportItem.assignedAdmin}"><div class="row"><div class="label">Admin phụ trách:</div><div class="value">${supportItem.assignedAdmin}</div></div></c:if>
           <div class="content-section"><h3><i class="fas fa-comment"></i> Nội dung yêu cầu</h3><div class="content-text">${supportItem.content}</div></div>
+          
+          
+          
+          
+          <!-- Hiển thị file đính kèm -->
+          <c:if test="${not empty supportItem.attachments}">
+            <div class="content-section">
+              <h3><i class="fas fa-paperclip"></i> Tệp đính kèm</h3>
+              <div class="attachments-list">
+                <c:forEach var="attachment" items="${supportItem.attachments}">
+                  <div class="attachment-item">
+                    <div class="attachment-info">
+                      <i class="attachment-icon ${attachment.iconClass}"></i>
+                      <div class="attachment-details">
+                        <div class="attachment-name">${attachment.originalFileName}</div>
+                        <div class="attachment-meta">
+                          <span class="attachment-size">${attachment.formattedFileSize}</span>
+                          <span class="attachment-date">${attachment.formattedUploadDate}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="attachment-actions">
+                      <a href="${pageContext.request.contextPath}/admin/support?action=download&fileId=${attachment.attachmentId}" 
+                         class="attachment-btn download" title="Tải xuống">
+                        <i class="fas fa-download"></i>
+                      </a>
+                      <a href="${pageContext.request.contextPath}/admin/support?action=view&fileId=${attachment.attachmentId}" 
+                         class="attachment-btn view" title="Xem file" target="_blank">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                    </div>
+                  </div>
+                </c:forEach>
+              </div>
+            </div>
+          </c:if>
+          
           <c:if test="${not empty supportItem.adminResponse}"><div class="content-section"><h3><i class="fas fa-reply"></i> Phản hồi từ Admin</h3><div class="content-text">${supportItem.adminResponse}</div></div></c:if>
         </div>
         <div class="admin-response-form">

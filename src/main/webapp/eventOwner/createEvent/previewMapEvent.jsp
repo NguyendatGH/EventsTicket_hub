@@ -7,75 +7,157 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Xem trước Sơ đồ Ghế</title>
   <style>
+    /* Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0;
-      padding: 20px;
-      background-color: #f4f4f4;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #122536 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
     }
+
+    h1 {
+        margin-bottom: 20px;
+        background: linear-gradient(45deg, #4CAF50, #45a049);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+    }
+
     .container {
-      display: flex;
-      width: 100%;
-      max-width: 1200px;
-      gap: 20px;
+        display: flex;
+        width: 100%;
+        max-width: 1200px;
+        gap: 20px;
+        margin-top: 20px;
     }
+
     .info {
-      flex: 1;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        flex: 1;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(255,255,255,0.1);
     }
+
     .canvas-container {
-      flex: 2;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        flex: 2;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid rgba(255,255,255,0.1);
     }
+
     canvas {
-      border: 1px solid #ccc;
-      width: 100%;
-      height: 500px;
-      cursor: pointer;
+        border: 1px solid rgba(255,255,255,0.2);
+        width: 100%;
+        height: 500px;
+        cursor: pointer;
+        background: rgba(0,0,0,0.3);
+        border-radius: 10px;
     }
+
     select, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
     }
+
+    select {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+    }
+
+    select:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+
     button {
-      border: none;
-      cursor: pointer;
-      background-color: #28a745;
-      color: white;
+        border: none;
+        cursor: pointer;
+        background: #4CAF50;
+        color: white;
+        font-weight: 500;
     }
+
     button:hover {
-      background-color: #218838;
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
     }
+
     button.back {
-      background-color: #007bff;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
     }
+
     button.back:hover {
-      background-color: #0056b3;
+        background: rgba(76, 175, 80, 0.2);
+        border-color: #4CAF50;
     }
+
     .zone-details {
-      margin-top: 15px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      display: none;
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.1);
+        display: none;
     }
+    .ZoneInfo {
+        background-color: black;
+    }
+    .zone-details p {
+        margin: 8px 0;
+        color: rgba(255,255,255,0.8);
+    }
+
+    .zone-details strong {
+        color: #4CAF50;
+    }
+
     .error {
-      color: red;
-      margin: 10px 0;
+        color: #f44336;
+        margin: 10px 0;
+        padding: 10px;
+        background: rgba(244, 67, 54, 0.2);
+        border-radius: 5px;
+        border: 1px solid rgba(244, 67, 54, 0.3);
+        text-align: center;
     }
-  </style>
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+        }
+        
+        .info, .canvas-container {
+            width: 100%;
+        }
+        
+        canvas {
+            height: 400px;
+        }
+    }
+</style>
 </head>
 <body>
   <h1>Xem trước Sơ đồ Ghế</h1>
@@ -83,12 +165,12 @@
     <div class="error">${errorMessage}</div>
   </c:if>
   <div class="container">
-    <div class="info">
+    <div class="info ">
       <h3>Thông tin Zone</h3>
-      <select id="zoneSelect" onchange="displayZoneDetails()">
-        <option value="-1">Chọn Zone</option>
-        <c:forEach var="zone" items="${zones}">
-          <option value="${zone.id}">${zone.name} (${zone.shape}, ${zone.totalSeats} ghế, ${zone.ticketPrice} VND)</option>
+      <select  id="zoneSelect" onchange="displayZoneDetails()">
+        <option class ="ZoneInfo" value="-1">Chọn Zone</option>
+        <c:forEach  var="zone" items="${zones}">
+          <option class ="ZoneInfo" value="${zone.id}">${zone.name} (${zone.shape}, ${zone.totalSeats} ghế, ${zone.ticketPrice} VND)</option>
         </c:forEach>
       </select>
       <div id="zoneDetails" class="zone-details">
