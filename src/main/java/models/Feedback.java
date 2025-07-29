@@ -146,12 +146,6 @@ public class Feedback {
         return java.sql.Timestamp.valueOf(this.updatedAt);
     }
     
-    public String getUserName() {
-        return userName;
-    }
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
     @Override
     public String toString() {
         return "Feedback{"

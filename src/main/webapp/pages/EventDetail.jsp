@@ -762,14 +762,6 @@
                     <button><i class="fas fa-search"></i></button>
                 </div>
                 <div class="actions">
-                    <button class="primary-btn">
-                        <i class="fas fa-plus"></i>
-                        Tạo sự kiện
-                    </button>
-<!--                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
-                        <i class="fas fa-history"></i>
-                        Vé đã mua
-                    </a>-->
                     <div class="account">
                         <a href="${pageContext.request.contextPath}/updateProfile" class="link">
                             <i class="fas fa-user"></i>
@@ -985,47 +977,6 @@
                     <p style="font-size: 1.1rem;">Vui lòng kiểm tra lại đường dẫn hoặc thử tìm kiếm sự kiện khác.</p>
                 </div>
             </c:if>
-
-            <div class="suggestions">
-                <h2 class="suggestions-title" style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                    <i class="fas fa-heart"></i>
-                    Có Thể Bạn Cũng Thích
-                </h2>
-                <div class="suggestions-grid">
-                    <c:forEach var="suggestedEvent" items="${suggestedEvents}">
-                        <a href="EventServlet?id=${suggestedEvent.eventID}" class="event-card">
-                            <img src="${suggestedEvent.imageURL}" alt="${suggestedEvent.name}">
-                            <div class="card-body">
-                                <h4 style="font-size: 1.2rem; margin-bottom: 0.75rem; color: var(--text-light);">
-                                    ${suggestedEvent.name}
-                                </h4>
-                                <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                                    <i class="fas fa-calendar"></i>
-                                    <fmt:formatDate value="${suggestedEvent.startTime}" pattern="dd/MM/yyyy"/> • 
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    ${suggestedEvent.physicalLocation}
-                                </p>
-                                <p class="price" style="font-weight: 600; font-size: 1.1rem; color: var(--success);">
-                                    <i class="fas fa-tag"></i>
-                                    Từ 
-                                    <c:choose>
-                                        <c:when test="${not empty suggestedEvent.ticketList}">
-                                            <fmt:formatNumber value="${suggestedEvent.ticketList[0].price}" type="currency" currencyCode="VND"/>
-                                        </c:when>
-                                        <c:otherwise>Liên hệ</c:otherwise>
-                                    </c:choose>
-                                </p>
-                            </div>
-                        </a>
-                    </c:forEach>
-                    <c:if test="${empty suggestedEvents}">
-                        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem;">
-                            <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-                            <p style="font-size: 1.1rem;">Không có sự kiện gợi ý nào vào lúc này.</p>
-                        </div>
-                    </c:if>
-                </div>
-            </div>
         </div>
 
         <footer class="footer">
@@ -1090,6 +1041,7 @@
             var contextPath = '${pageContext.request.contextPath}';
 
             function handleBuyTickets(eventId, hasSeatingChartStr) {
+                console.log("clicked")
                 console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
                 console.log("  - eventId nhận được:", eventId, "(kiểu:", typeof eventId, ")");
                 console.log("  - hasSeatingChartStr nhận được:", hasSeatingChartStr, "(kiểu:", typeof hasSeatingChartStr, ")");
