@@ -1,11 +1,16 @@
 package controller;
 
 import dao.EventDAO;
+import dao.FeedbackDAO;
+import dao.TicketInfoDAO; 
+import models.Event;
+import models.TicketInfo;   
 import dao.TicketInfoDAO; // SỬA: Import DAO đúng
 import dao.FeedbackDAO;
 import models.Event;
 import models.TicketInfo;   // SỬA: Import Model đúng
 import models.Feedback;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,12 +18,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import models.Feedback;
 
 @WebServlet(name = "EventServlet", urlPatterns = {"/EventServlet"})
 public class EventServlet extends HttpServlet {
 
     private EventDAO eventDAO;
-    private TicketInfoDAO ticketInfoDAO; 
+
+    private TicketInfoDAO ticketInfoDAO;
     private FeedbackDAO feedbackDAO;
 
     @Override
@@ -42,6 +49,7 @@ public class EventServlet extends HttpServlet {
         try {
             int eventId = Integer.parseInt(idParam);
             Event event = eventDAO.getEventById(eventId);
+            List<Feedback> feedbackList = feedbackDAO.getApprovedFeedbackByEvent(eventId);
 
             System.out.println("eventId: " + eventId);
             System.out.println("event: " + event);
@@ -59,6 +67,9 @@ public class EventServlet extends HttpServlet {
                 request.setAttribute("ticketList", ticketList);
                 request.setAttribute("suggestedEvents", suggestedEvents);
                 request.setAttribute("feedbackList", feedbackList);
+
+                System.out.println("Feedback size for eventId " + eventId + ": " + feedbackList.size());
+
 
                 request.getRequestDispatcher("/pages/EventDetail.jsp").forward(request, response);
             } else {

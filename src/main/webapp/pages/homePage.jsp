@@ -163,7 +163,7 @@
                 font-size: 1.5rem;
                 cursor: pointer;
                 padding: 0.5rem;
-                display: none; 
+                display: none;
             }
 
             /* Search and Filter Container - Form version from main */
@@ -1000,13 +1000,22 @@
                     box-shadow: none;
                     background: transparent;
                 }
-                .nav-links.active, .search-filter-container.active {
+               .nav-links.active, .search-filter-container.active {
                     display: flex;
                 }
                 .search-filter-toggle, .nav-toggle {
                     order: unset;
                     margin-left: auto;
                 }
+                .nav > .search-filter-toggle {
+                    margin-left: auto;
+                    margin-right: 0.5rem;
+                }
+                .nav > .nav-toggle {
+                    margin-left: 0;
+                }
+
+                /* Ensure toggles are on the same line as logo */
                 .nav > .search-filter-toggle {
                     margin-left: auto;
                     margin-right: 0.5rem;
@@ -1055,7 +1064,7 @@
     </head>
     <body>
         <%
-        
+
             UserDTO user = (UserDTO) session.getAttribute("user");
 
             // --- Notification Logic ---
@@ -1126,7 +1135,6 @@
                     </ul>
                 </div>
 
-                <%-- User Profile and Notifications Section --%>
                 <div class="auth-buttons">
                     <c:choose>
                         <c:when test="${sessionScope.user != null}">
@@ -1229,9 +1237,24 @@
             </div>
 
             <div class="event-grid">
-                <%  
+                <%
                     for (Event event : events) {
                 %>
+
+                <div class="event-card searchable-event" 
+                     data-event-id="<%= event.getEventID()%>"
+                     data-event-name="<%= event.getName() != null ? event.getName().toLowerCase() : ""%>"
+                     data-event-description="<%= event.getDescription() != null ? event.getDescription().toLowerCase() : ""%>"
+                     data-event-start-time="<%= event.getStartTime() != null ? event.getStartTime().getTime() : ""%>"
+                     data-event-location="<%= event.getPhysicalLocation() != null ? event.getPhysicalLocation().toLowerCase() : ""%>"
+                     onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
+                    <div class="event-image">
+                        <% if (event.getImageURL() != null && !event.getImageURL().trim().isEmpty()) {%>
+                        <img src="${pageContext.request.contextPath}/uploads/event_banners/<%= event.getImageURL()%>" alt="<%= event.getName()%>" />
+                        <% } else { %>
+                        <span style="font-size: 50px; display: flex; justify-content: center; align-items: center; height: 100%; background-color: var(--card-bg);">🎫</span>
+                        <% }%>
+
                 <div class="event-card" 
                      data-event-id="<%= event.getEventID() %>"
                      onclick="navigateToEventDetail(this.getAttribute('data-event-id'))">
@@ -1262,6 +1285,11 @@
             </div>
 
             <div class="pagination-controls">
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage - 1%>" 
+                   class="<%= (currentPage == 1) ? "disabled" : ""%>">Trước</a>
+
+                <%
+
                 <a href="${pageContext.request.contextPath}/home?page=<%= currentPage - 1 %>&search=${fn:escapeXml(param.search)}&location=${fn:escapeXml(param.location)}&category=${fn:escapeXml(param.category)}" 
                    class="<%= (currentPage == 1) ? "disabled" : "" %>">Trước</a>
 
@@ -1271,6 +1299,30 @@
                     int endPage = Math.min(noOfPages, currentPage + 2);
 
                     if (startPage > 1) {
+                %><a href="${pageContext.request.contextPath}/home?page=1">1</a><%
+                            if (startPage > 2) {
+                %><span>...</span><%
+                                    }
+                                }
+
+                                for (int i = startPage; i <= endPage; i++) {
+                                    if (i == currentPage) {
+                %><span class="current-page"><%= i%></span><%
+                            } else {
+                %><a href="${pageContext.request.contextPath}/home?page=<%= i%>"><%= i%></a><%
+                                    }
+                                }
+
+                                if (endPage < noOfPages) {
+                                    if (endPage < noOfPages - 1) {
+                    %><span>...</span><%
+                                }
+                    %><a href="${pageContext.request.contextPath}/home?page=<%= noOfPages%>"><%= noOfPages%></a><%
+                            }
+                %>
+
+                <a href="${pageContext.request.contextPath}/home?page=<%= currentPage + 1%>" 
+                   class="<%= (currentPage == noOfPages) ? "disabled" : ""%>">Sau</a>
                         %><a href="${pageContext.request.contextPath}/home?page=1&search=${fn:escapeXml(param.search)}&location=${fn:escapeXml(param.location)}&category=${fn:escapeXml(param.category)}">1</a><%
                         if (startPage > 2) {
                             %><span>...</span><%
@@ -1297,7 +1349,7 @@
                    class="<%= (currentPage == noOfPages) ? "disabled" : "" %>">Sau</a>
             </div>
 
-            <% } %>
+            <% }%>
 
             <div class="ticket-section">
                 <div class="ticket-content">
@@ -1407,7 +1459,58 @@
                     console.error("Event ID is missing.");
                 }
             }
+            // Search and filter functionality
+            function setupSearch() {
+                const searchBox = document.getElementById('searchInput');
+                const dateInput = document.getElementById('dateInput');
+                const locationInput = document.getElementById('locationInput');
+                const eventCards = document.querySelectorAll('.searchable-event');
 
+                const applyFilters = () => {
+                    const query = searchBox.value.toLowerCase();
+                    const selectedDate = dateInput.value ? new Date(dateInput.value) : null;
+                    const locationQuery = locationInput.value.toLowerCase();
+
+                    eventCards.forEach(card => {
+                        const eventName = card.getAttribute('data-event-name');
+                        const eventDescription = card.getAttribute('data-event-description');
+                        const eventLocation = card.getAttribute('data-event-location');
+                        const eventStartTime = card.getAttribute('data-event-start-time');
+
+                        let isVisible = true;
+
+                        // Filter by text query (name, description, location)
+                        if (query) {
+                            if (!eventName.includes(query) && !eventDescription.includes(query) && !eventLocation.includes(query)) {
+                                isVisible = false;
+                            }
+                        }
+
+                        // Filter by location input (already included in general query, but kept for explicit filter)
+                        if (locationQuery) {
+                            if (!eventLocation || !eventLocation.includes(locationQuery)) {
+                                isVisible = false;
+                            }
+                        }
+
+                        // Filter by selected date (match year, month, day)
+                        if (selectedDate && eventStartTime) {
+                            const eventDate = new Date(parseInt(eventStartTime));
+                            if (eventDate.getFullYear() !== selectedDate.getFullYear() ||
+                                    eventDate.getMonth() !== selectedDate.getMonth() ||
+                                    eventDate.getDate() !== selectedDate.getDate()) {
+                                isVisible = false;
+                            }
+                        }
+
+                        card.style.display = isVisible ? 'block' : 'none';
+                    });
+                };
+
+                searchBox.addEventListener('input', applyFilters);
+                dateInput.addEventListener('change', applyFilters);
+                locationInput.addEventListener('input', applyFilters);
+            }
             // Carousel functionality
             function setupCarousel() {
                 const slides = document.querySelectorAll('.carousel-slide');

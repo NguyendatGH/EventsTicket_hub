@@ -149,7 +149,7 @@ public class OrderDAO {
                     List<OrderItem> items = itemDAO.getOrderItemsByOrderId(order.getOrderId());
                     order.setItems(items);
 
-                    // ✅ FIX: Gán event cho order để JSP có thể hiển thị
+               
                     if (!items.isEmpty()) {
                         int eventId = items.get(0).getEventId();
                         EventDAO eventDAO = new EventDAO();
