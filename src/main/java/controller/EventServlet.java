@@ -49,7 +49,6 @@ public class EventServlet extends HttpServlet {
         try {
             int eventId = Integer.parseInt(idParam);
             Event event = eventDAO.getEventById(eventId);
-            List<Feedback> feedbackList = feedbackDAO.getApprovedFeedbackByEvent(eventId);
 
             System.out.println("eventId: " + eventId);
             System.out.println("event: " + event);
