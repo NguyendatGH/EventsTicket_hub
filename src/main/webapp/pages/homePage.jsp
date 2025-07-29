@@ -1055,7 +1055,7 @@
     </head>
     <body>
         <%
-            // Retrieve UserDTO object from session
+        
             UserDTO user = (UserDTO) session.getAttribute("user");
 
             // --- Notification Logic ---
@@ -1069,9 +1069,9 @@
                 // If 'user' has a getRole() method and the role is 'event_owner', redirect them.
                 if ("event_owner".equals(user.getRole())) {
                     response.sendRedirect(request.getContextPath() + "/eventOwnerPage/eventOwnerHomePage");
-                    return; // VERY IMPORTANT: Stop further processing of THIS JSP
+                    return; 
                 }
-                // Fetch notifications ONLY if a user is logged in (and not an owner, after redirection)
+               
                 notifications = notificationService.getUserNotifications(user.getId());
                 unreadCount = notificationService.getUnreadNotificationsCount(user.getId());
             }

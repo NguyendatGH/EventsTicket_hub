@@ -13,7 +13,10 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import models.Event;
@@ -39,12 +43,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import service.EventService;
 import utils.ToggleEvent;
 
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
+        maxFileSize = 5 * 1024 * 1024, // 5MB
+        maxRequestSize = 10 * 1024 * 1024 // 10MB
+)
 @WebServlet("/organizer-servlet")
-@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 16, maxRequestSize = 1024 * 1024 * 50)
 public class EventOwnerServlet extends HttpServlet {
     private EventDAO eventDao;
     private GenreDAO genreDAO;
     private EventService eventService;
+    private static final String UPLOAD_DIR = "uploads/event_banners";
     private static final Logger logger = Logger.getLogger(EventOwnerServlet.class.getName());
 
     @Override
@@ -74,17 +82,11 @@ public class EventOwnerServlet extends HttpServlet {
             showCreateEventForm(request, response);
         } else {
             switch (action) {
-                case "list":
-                    listEvents(request, response);
-                    break;
                 case "edit":
                     editEvent(request, response);
                     break;
                 case "delete":
                     deleteEvent(request, response);
-                    break;
-                case "view":
-                    viewEvent(request, response);
                     break;
                 case "step1":
                     showStep1Form(request, response);
@@ -135,7 +137,6 @@ public class EventOwnerServlet extends HttpServlet {
             case "step3":
                 processStep3(request, response);
                 break;
-            
             case "createMap":
                 processCreateMap(request, response);
                 break;
@@ -148,6 +149,9 @@ public class EventOwnerServlet extends HttpServlet {
             case "create":
                 createEvent(request, response);
                 break;
+            case "update":
+                updateEvent(request, response);
+                break;
             default:
                 response.sendRedirect(request.getContextPath() + "/organizer-servlet");
                 break;
@@ -156,14 +160,74 @@ public class EventOwnerServlet extends HttpServlet {
 
     private void showDashboard(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Genre> genres = genreDAO.getAllGenres();
-        request.setAttribute("genres", genres);
         HttpSession session = request.getSession();
+        UserDTO user = (UserDTO) session.getAttribute("user");
+
+        if (user == null) {
+            logger.info("User not logged in, redirecting to login page");
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        // Lấy userID của người dùng hiện tại
+        int userID = user.getId();
+
+        // Lấy tham số phân trang từ request
+        int pageSize = 5; // Số lượng sự kiện mỗi trang
+        int currentPage = 1;
+        String pageParam = request.getParameter("myEventsPage");
+        if (pageParam != null && !pageParam.isEmpty()) {
+            try {
+                currentPage = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                logger.warning("Invalid page parameter: " + pageParam);
+            }
+        }
+
+        // Lấy danh sách sự kiện của người dùng
+        List<Event> myEvents = eventDao.getAllMyEvent(userID);
+
+        // Tính toán phân trang
+        int totalEvents = myEvents.size();
+        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+
+        // Đảm bảo currentPage hợp lệ
+        if (currentPage < 1) {
+            currentPage = 1;
+        } else if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+        }
+
+        // Lấy danh sách sự kiện cho trang hiện tại
+        int start = (currentPage - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalEvents);
+        List<Event> eventsForPage = myEvents.subList(start, end);
+
+        // Lấy danh sách thể loại
+        List<Genre> genres = genreDAO.getAllGenres();
+
+        // Lấy thống kê sự kiện
+        int totalTicketsSold = eventDao.getTotalTicketsSoldByOwner(userID);
+        BigDecimal totalRevenue = eventDao.getTotalRevenueByOwner(userID);
+
+        // Đặt các thuộc tính để hiển thị trên JSP
+        session.setAttribute("genres", genres);
+        session.setAttribute("myEvents", eventsForPage);
+        session.setAttribute("myEventsCurrentPage", currentPage);
+        session.setAttribute("myEventsTotalPages", totalPages);
+        session.setAttribute("myEventsPageSize", pageSize);
+        session.setAttribute("totalEvents", totalEvents);
+        session.setAttribute("totalTicketsSold", totalTicketsSold);
+        session.setAttribute("totalRevenue", totalRevenue);
+
+        // Xử lý thông báo thành công
         String successMessage = (String) session.getAttribute("successMessage");
         if (successMessage != null) {
             request.setAttribute("successMessage", successMessage);
             session.removeAttribute("successMessage");
         }
+
+        // Chuyển hướng đến trang dashboard
         request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
     }
 
@@ -737,7 +801,8 @@ public class EventOwnerServlet extends HttpServlet {
         if (result.isSuccess()) {
             // Gửi notification cho admin khi có event mới
             try {
-                // Giả sử admin có userID = 1 (hoặc lấy danh sách admin từ DB nếu cần gửi cho nhiều admin)
+                // Giả sử admin có userID = 1 (hoặc lấy danh sách admin từ DB nếu cần gửi cho
+                // nhiều admin)
                 int adminUserId = 1;
                 models.Notification notification = new models.Notification();
                 notification.setUserID(adminUserId);
@@ -766,28 +831,14 @@ public class EventOwnerServlet extends HttpServlet {
         }
     }
 
-    private void listEvents(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Integer userID = (Integer) session.getAttribute("userID");
-        request.getRequestDispatcher("/eventOwner/event-list.jsp").forward(request, response);
-    }
-
-    private void viewEvent(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int eventID = Integer.parseInt(request.getParameter("eventID"));
-        Event event = eventDao.getEventById(eventID);
-        if (event != null) {
-            request.setAttribute("event", event);
-            request.getRequestDispatcher("/eventOwner/event-view.jsp").forward(request, response);
-        } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Event not found");
-        }
-    }
-
     private void updateEvent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("Processing update event request");
+        logger.info("Processing update event request");
+        if (!request.getContentType().startsWith("multipart/form-data")) {
+            request.setAttribute("error", "Invalid form content type");
+            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            return;
+        }
         String eventIDStr = request.getParameter("eventID");
         System.out.println("event Id for updating: " + eventIDStr);
         int eventID;
@@ -796,7 +847,38 @@ public class EventOwnerServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             request.setAttribute("error", "ID sự kiện không hợp lệ");
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            return;
+        }
+
+        String imageFileName = null;
+        try {
+            Part filePart = request.getPart("imageFile");
+            if (filePart != null && filePart.getSize() > 0) {
+                // Tạo thư mục upload nếu chưa tồn tại
+                String uploadPath = getUploadPath(request);
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                // Tạo tên file duy nhất
+                String originalFileName = getFileName(filePart);
+                String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+
+                // Lưu file
+                File file = new File(uploadPath + File.separator + uniqueFileName);
+                try (InputStream fileContent = filePart.getInputStream()) {
+                    Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                imageFileName = uniqueFileName;
+            }
+        } catch (Exception e) {
+            logger.severe("Error uploading file: " + e.getMessage());
+            request.setAttribute("error", "Lỗi khi tải lên ảnh: " + e.getMessage());
+            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
             return;
         }
 
@@ -806,8 +888,10 @@ public class EventOwnerServlet extends HttpServlet {
         event.setDescription(request.getParameter("description"));
         event.setPhysicalLocation(request.getParameter("physicalLocation"));
         event.setStatus(request.getParameter("status"));
-        event.setImageURL(request.getParameter("imageURL"));
         event.setUpdatedAt(new Date());
+        if (imageFileName != null) {
+            event.setImageURL(imageFileName);
+        }
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
@@ -817,7 +901,7 @@ public class EventOwnerServlet extends HttpServlet {
             request.setAttribute("error", "Định dạng thời gian không hợp lệ");
             request.setAttribute("event", event);
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
             return;
         }
 
@@ -827,7 +911,7 @@ public class EventOwnerServlet extends HttpServlet {
             request.setAttribute("error", "Số lượng vé không hợp lệ");
             request.setAttribute("event", event);
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
             return;
         }
 
@@ -838,12 +922,12 @@ public class EventOwnerServlet extends HttpServlet {
             request.setAttribute("success", updateResult.getMessage());
             request.setAttribute("event", eventService.getEventById(eventID)); // Refresh event data
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
         } else {
             request.setAttribute("error", updateResult.getMessage());
             request.setAttribute("event", event);
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
         }
     }
 
@@ -870,7 +954,7 @@ public class EventOwnerServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy sự kiện");
             return;
         }
-        System.out.println("evvent to edit " + event);
+        System.out.println("event to edit " + event);
 
         request.setAttribute("event", event);
         // request.setAttribute("editMode", true);
@@ -920,16 +1004,20 @@ public class EventOwnerServlet extends HttpServlet {
         mapper.writeValue(response.getWriter(), responseMap);
     }
 
-    private String handleFileUpload(Part filePart, String uploadPath) throws IOException {
-        if (filePart == null || filePart.getSize() == 0) {
-            return null;
+    private String getUploadPath(HttpServletRequest request) {
+        // Lấy đường dẫn tuyệt đối đến thư mục gốc của webapp
+        String appPath = request.getServletContext().getRealPath("");
+        // Trả về đường dẫn đến thư mục upload
+        return appPath + File.separator + UPLOAD_DIR;
+    }
+
+    private String getFileName(final Part part) {
+        final String partHeader = part.getHeader("content-disposition");
+        for (String content : partHeader.split(";")) {
+            if (content.trim().startsWith("filename")) {
+                return content.substring(content.indexOf('=') + 1).trim().replace("\"", "");
+            }
         }
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
-        }
-        String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-        filePart.write(uploadPath + File.separator + fileName);
-        return "uploads/" + fileName;
+        return null;
     }
 }
