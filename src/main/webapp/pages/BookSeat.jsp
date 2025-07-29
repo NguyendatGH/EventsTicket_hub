@@ -5,7 +5,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>MasterTicket - Chọn ghế cho: ${event.name}</title>
+        <title>EventTicketHub - Chọn ghế cho: ${event.name}</title>
         <style>
             body {
                 margin: 0;
@@ -142,11 +142,15 @@
     </head>
     <body>
         <div class="header">
-            <div class="header-left">MasterTicket</div>
+            <div class="header-left">EventTicketHub</div>
             <div class="header-right">
                 <div class="account">${sessionScope.user.email}</div>
             </div>
         </div>
+        <a href="${pageContext.request.contextPath}/HomePageServlet" class="back-link">
+                <i class="fas fa-arrow-left"></i> 
+                Quay lại
+            </a>
         <div class="main-content">
             <div class="left-panel">
                 <div class="seating-area">

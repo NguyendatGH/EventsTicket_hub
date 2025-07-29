@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Event;
@@ -91,34 +93,51 @@ public class SeatPaymentServlet extends HttpServlet {
                 return;
             }
 
-            // 5. Tạo OrderItems từ ghế
-            List<OrderItem> orderItems = new ArrayList<>();
-            BigDecimal totalAmount = BigDecimal.ZERO;
+            // 5. Kiểm tra trạng thái ghế
             for (Seat seat : seats) {
                 if (!"available".equalsIgnoreCase(seat.getStatus())) {
                     response.sendRedirect(request.getContextPath() + "/BookSeatServlet?eventId=" + eventId + "&error=seat_taken");
                     return;
                 }
+            }
 
+            // 6. Nhóm ghế theo TicketInfo
+            Map<Integer, List<Seat>> seatsByTicketInfo = new HashMap<>();
+            for (Seat seat : seats) {
                 TicketInfo ticket = ticketInfoDAO.getTicketInfoBySeat(seat.getSeatId());
                 if (ticket == null) {
                     LOGGER.warning("Không tìm thấy TicketInfo cho seatId: " + seat.getSeatId());
                     continue;
                 }
-                System.out.println("ticket sau khi lay: "+ticket);
+                seatsByTicketInfo.computeIfAbsent(ticket.getTicketInfoID(), k -> new ArrayList<>()).add(seat);
+            }
 
+            // 7. Tạo OrderItems từ các nhóm ghế
+            List<OrderItem> orderItems = new ArrayList<>();
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            for (Map.Entry<Integer, List<Seat>> entry : seatsByTicketInfo.entrySet()) {
+                int ticketInfoId = entry.getKey();
+                List<Seat> ticketSeats = entry.getValue();
+                if (ticketSeats.isEmpty()) {
+                    continue;
+                }
 
+                TicketInfo ticket = ticketInfoDAO.getTicketInfoById(ticketInfoId);
+                if (ticket == null) {
+                    LOGGER.warning("Không tìm thấy TicketInfo cho ticketInfoId: " + ticketInfoId);
+                    continue;
+                }
 
                 OrderItem item = new OrderItem();
                 item.setTicketInfoId(ticket.getTicketInfoID());
-                item.setQuantity(1); // Mỗi ghế là 1 vé
+                item.setQuantity(ticketSeats.size()); // Số lượng là số ghế trong nhóm
                 item.setUnitPrice(ticket.getPrice());
                 item.setEventName(event.getName());
                 item.setTicketTypeName(ticket.getTicketName());
                 item.setEventId(event.getEventID());
 
                 orderItems.add(item);
-                totalAmount = totalAmount.add(ticket.getPrice());
+                totalAmount = totalAmount.add(ticket.getPrice().multiply(new BigDecimal(ticketSeats.size())));
             }
 
             if (orderItems.isEmpty()) {
@@ -126,7 +145,7 @@ public class SeatPaymentServlet extends HttpServlet {
                 return;
             }
 
-            // 6. Tạo và lưu Order
+            // 8. Tạo và lưu Order
             Order order = new Order();
             order.setUserId(currentUser.getId());
             order.setContactEmail(currentUser.getEmail());
@@ -139,7 +158,6 @@ public class SeatPaymentServlet extends HttpServlet {
             session.setAttribute("currentOrder", order);
 
             request.getRequestDispatcher("/pages/Payment.jsp").forward(request, response);
-
 
         } catch (NumberFormatException e) {
             LOGGER.log(Level.SEVERE, "Định dạng tham số không hợp lệ", e);
