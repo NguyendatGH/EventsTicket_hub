@@ -1,7 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -10,21 +9,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.RequestDispatcher;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
-import dao.EventDAO;
-import dao.UserDAO;
 import dto.UserDTO;
-import models.IssueItem;
-import models.User;
 import service.UserService;
-import models.Event;
-import models.SupportItem;
-import models.SupportAttachment;
+
 
 @WebServlet(name = "AdminServlet", urlPatterns = { "/admin-servlet/*" })
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB

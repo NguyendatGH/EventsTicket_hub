@@ -707,7 +707,7 @@
         }
 
         .search-results-count {
-            display: none
+            display: none;
             flex: 1;
             text-align: center;
             font-weight: 500;
