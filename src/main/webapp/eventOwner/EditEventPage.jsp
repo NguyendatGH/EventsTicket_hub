@@ -431,7 +431,6 @@
             }
         }
 
-        /* Animation for background elements */
         .bg_elips {
             position: fixed;
             z-index: -1;
@@ -461,6 +460,80 @@
                 transform: translateY(-20px);
             }
         }
+        /* Toast Container */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Toast Styles */
+.toast {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-radius: 8px;
+    min-width: 250px;
+    max-width: 400px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast.success {
+    background: var(--success-green);
+    border: 1px solid #1f8a38;
+}
+
+.toast.error {
+    background: var(--error-red);
+    border: 1px solid #cc0a0a;
+}
+
+.toast .toast-icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.toast .toast-message {
+    flex: 1;
+}
+
+.toast .toast-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: 10px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.toast .toast-close:hover {
+    opacity: 1;
+}
+
+/* Animation for toast dismissal */
+@keyframes toast-slide-out {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
     </style>
 </head>
 <body>
@@ -476,45 +549,7 @@
     <div class="overlay"></div>
     
     <div class="container">
-<!--        <aside class="sidebar">
-            <div class="logo">🎟️ MasterTicket</div>
-            <div class="admin-section">
-                <div class="admin-avatar">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                </div>
-                <div class="admin-name">Admin</div>
-                <div class="admin-role">Quản lý website MasterTicket</div>
-            </div>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/dashboard" class="nav-link">📊 Bảng điều khiển</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/event-management" class="nav-link active">📅 Danh sách sự kiện</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/user-management" class="nav-link">👥 Danh sách tài khoản</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/transaction-management" class="nav-link">💰 Danh sách giao dịch</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="${pageContext.request.contextPath}/admin-servlet/support-center" class="nav-link">💬 Hỗ trợ khách hàng</a>
-                    </li>
-                </ul>
-            </nav>
-            <a href="${pageContext.request.contextPath}/logout" class="logout">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />
-                    <path d="M20 3h-9c-1.103 0-2 .897-2 2v4h2V5h9v14h-9v-4H9v4c0 1.103.897 2 2 2h9c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2z" />
-                </svg>
-                Đăng xuất
-            </a>
-        </aside>-->
-        
+
         <main class="main-content">
             <div class="top-bar">
                 <div class="breadcrumb">
@@ -523,7 +558,7 @@
                     <span class="breadcrumb-current">Chi tiết sự kiện</span>
                 </div>
             </div>
-            
+                <div id="toast-container" class="toast-container"></div>
             <c:if test="${not empty error}">
                 <div class="error-message">${error}</div>
             </c:if>
@@ -531,7 +566,7 @@
                 <div class="success-message">${success}</div>
             </c:if>
             
-            <form id="updateEventForm" action="${pageContext.request.contextPath}/organizer-servlet" method="POST" onsubmit="return validateForm()">
+            <form id="updateEventForm" action="${pageContext.request.contextPath}/organizer-servlet" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                 <input type="hidden" name="action" value="update" />
                 <input type="hidden" name="eventID" value="${event.eventID}" />
                 
@@ -570,7 +605,6 @@
                                 <span class="event-label">Số lượng vé:</span>
                                 <input type="number" class="detail-value" name="totalTicketCount" value="${event.totalTicketCount}" required min="0" />
                             </div>
-                            
                         </div>
                     </div>
                 </div>
@@ -579,8 +613,8 @@
                     <h2 class="section-title">Hình ảnh</h2>
                     <div class="material-wrapper">
                         <div class="img-wrapper">
-                            <img id="imagePreview" src="${event.imageURL}" alt="Hình ảnh chính" onerror="this.src='${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg'" />
-                            <input type="text" class="detail-value" id="imageURL" name="imageURL" value="${event.imageURL}" placeholder="Nhập URL ảnh" maxlength="500" />
+                            <img id="imagePreview" src="${pageContext.request.contextPath}/uploads/event_banners/${event.imageURL}" alt="Hình ảnh chính" onerror="this.src='${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg'" />
+                            <input type="file" class="detail-value" id="imageFile" name="imageFile" accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml" />
                         </div>
                     </div>
                 </div>
@@ -593,198 +627,195 @@
         </main>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Hamburger menu toggle
-        const hamburger = document.querySelector('.hamburger');
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.querySelector('.overlay');
+   function showToast(message, type) {
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
         
-        if (hamburger && sidebar && overlay) {
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
+        // Add icon based on type
+        const icon = type === 'success' ? '✅' : '❌';
+        toast.innerHTML = `
+            <span class="toast-icon">${icon}</span>
+            <span class="toast-message">${message}</span>
+            <button class="toast-close">&times;</button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Show toast with animation
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+        
+        // Auto-remove toast after 4 seconds
+        setTimeout(() => {
+            toast.style.animation = 'toast-slide-out 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+        
+        // Close button functionality
+        toast.querySelector('.toast-close').addEventListener('click', () => {
+            toast.style.animation = 'toast-slide-out 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        });
+    }
+
+    // Function to animate ellipses (existing)
+    function animateEllipses() {
+        const ellipses = document.querySelectorAll(".bg_elips");
+        ellipses.forEach((ellipse, index) => {
+            const duration = 8000 + index * 2000;
+            ellipse.style.animation = `float ${duration}ms ease-in-out infinite`;
+        });
+    }
+
+    // Sidebar toggle (existing)
+    const hamburger = document.querySelector('.hamburger');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.overlay');
+
+    if (hamburger && sidebar && overlay) {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 992) {
+                    hamburger.classList.remove('active');
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
             });
-            
-            overlay.addEventListener('click', () => {
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 992 && !sidebar.contains(e.target) && !hamburger.contains(e.target)) {
                 hamburger.classList.remove('active');
                 sidebar.classList.remove('active');
                 overlay.classList.remove('active');
-            });
-        }
-        
-        // Image URL preview
-        const imageURLInput = document.getElementById('imageURL');
-        const imagePreview = document.getElementById('imagePreview');
-        
-        if (imageURLInput && imagePreview) {
-            imageURLInput.addEventListener('input', () => {
-                const url = imageURLInput.value.trim();
-                if (url) {
-                    imagePreview.src = url;
-                } else {
-                    imagePreview.src = '${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg';
-                }
-            });
-        }
-        
-        // Form validation
-        function validateForm() {
-            const name = document.querySelector('input[name="name"]').value.trim();
-            const description = document.querySelector('textarea[name="description"]').value.trim();
-            const physicalLocation = document.querySelector('input[name="physicalLocation"]').value.trim();
-            const startTime = document.querySelector('input[name="startTime"]').value;
-            const endTime = document.querySelector('input[name="endTime"]').value;
-            const totalTicketCount = document.querySelector('input[name="totalTicketCount"]').value;
-            const imageURL = document.querySelector('input[name="imageURL"]').value.trim();
-            
-            if (!name) {
-                Swal.fire('Lỗi', 'Tên sự kiện không được để trống', 'error');
-                return false;
             }
-            
-            if (name.length > 100) {
-                Swal.fire('Lỗi', 'Tên sự kiện không được vượt quá 100 ký tự', 'error');
-                return false;
-            }
-            
-            if (!physicalLocation) {
-                Swal.fire('Lỗi', 'Địa điểm không được để trống', 'error');
-                return false;
-            }
-            
-            if (physicalLocation.length > 200) {
-                Swal.fire('Lỗi', 'Địa điểm không được vượt quá 200 ký tự', 'error');
-                return false;
-            }
-            
-            if (!startTime) {
-                Swal.fire('Lỗi', 'Thời gian bắt đầu không được để trống', 'error');
-                return false;
-            }
-            
-            if (!endTime) {
-                Swal.fire('Lỗi', 'Thời gian kết thúc không được để trống', 'error');
-                return false;
-            }
-            
-            if (new Date(startTime) >= new Date(endTime)) {
-                Swal.fire('Lỗi', 'Thời gian bắt đầu phải trước thời gian kết thúc', 'error');
-                return false;
-            }
-            
-            if (isNaN(totalTicketCount) || totalTicketCount < 0) {
-                Swal.fire('Lỗi', 'Số lượng vé phải là số không âm', 'error');
-                return false;
-            }
-            
-            if (imageURL && !isValidURL(imageURL)) {
-                Swal.fire('Lỗi', 'URL ảnh không hợp lệ', 'error');
-                return false;
-            }
-            
-            // Show loading
-            Swal.fire({
-                title: 'Đang xử lý',
-                text: 'Vui lòng chờ trong khi cập nhật sự kiện...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-            
-            return true;
-        }
-        
-        function isValidURL(url) {
-            try {
-                new URL(url);
-                return url.match(/\.(jpeg|jpg|gif|png|svg)$/i) != null;
-            } catch (_) {
-                return false;
-            }
-        }
-        <script>
-    document.getElementById('imageURL').addEventListener('input', function() {
-        const url = this.value.trim();
-        const preview = document.getElementById('imagePreview');
-        
-        // Ẩn preview trước khi kiểm tra URL mới
-        preview.style.display = 'none';
-        
-        // Kiểm tra nếu URL không rỗng và hợp lệ
-        if (url && isValidUrl(url)) {
-            // Hiển thị trạng thái loading
-            preview.src = '';
-            preview.style.display = 'block';
-            preview.alt = 'Loading image...';
-            preview.style.filter = 'blur(2px)';
-            
-            // Tạo ảnh tạm để kiểm tra
-            const tempImage = new Image();
-            tempImage.onload = function() {
-                // Nếu ảnh tải thành công
-                preview.src = url;
-                preview.alt = 'Image preview';
-                preview.style.filter = 'none';
-            };
-            tempImage.onerror = function() {
-                // Nếu ảnh không tải được
-                preview.style.display = 'none';
-                showImageError("Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại!");
-            };
-            tempImage.src = url;
-        }
-    });
+        });
+    }
 
-    // Hiển thị preview ngay nếu đã có URL (khi load lại trang)
-    window.addEventListener('DOMContentLoaded', function() {
-        const urlInput = document.getElementById('imageURL');
-        if (urlInput.value) {
-            urlInput.dispatchEvent(new Event('input'));
+    // Image preview (existing)
+    function previewImage(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        const fileInfo = document.getElementById('fileInfo');
+        
+        reader.onloadend = function() {
+            const preview = document.getElementById('imagePreview');
+            if (preview) {
+                preview.src = reader.result;
+            }
+            
+            if (fileInfo && file) {
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                fileInfo.textContent = `Tên file: ${file.name} | Kích thước: ${fileSize}MB`;
+                fileInfo.style.color = '#28a745';
+            }
         }
-    });
+        
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            const preview = document.getElementById('imagePreview');
+            if (preview) {
+                preview.src = '${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg';
+            }
+            if (fileInfo) {
+                fileInfo.textContent = 'Định dạng: JPG, PNG, GIF | Tối đa: 5MB';
+                fileInfo.style.color = '#a8a8a8';
+            }
+        }
+    }
 
-    // Hàm kiểm tra URL hợp lệ
-    function isValidUrl(string) {
-        try {
-            new URL(string);
-            return true;
-        } catch (_) {
+    // Form validation (modified to use toast)
+    function validateForm() {
+        const name = document.querySelector('input[name="name"]').value.trim();
+        const description = document.querySelector('textarea[name="description"]').value.trim();
+        const physicalLocation = document.querySelector('input[name="physicalLocation"]').value.trim();
+        const startTime = document.querySelector('input[name="startTime"]').value;
+        const endTime = document.querySelector('input[name="endTime"]').value;
+        const totalTicketCount = document.querySelector('input[name="totalTicketCount"]').value;
+        const imageFile = document.querySelector('input[name="imageFile"]').files[0];
+
+        if (!name) {
+            showToast('Tên sự kiện không được để trống', 'error');
             return false;
         }
+        if (name.length > 100) {
+            showToast('Tên sự kiện không được vượt quá 100 ký tự', 'error');
+            return false;
+        }
+
+        if (description.length > 1000) {
+            showToast('Mô tả không được vượt quá 1000 ký tự', 'error');
+            return false;
+        }
+
+        if (!physicalLocation) {
+            showToast('Địa điểm không được để trống', 'error');
+            return false;
+        }
+        if (physicalLocation.length > 200) {
+            showToast('Địa điểm không được vượt quá 200 ký tự', 'error');
+            return false;
+        }
+
+        if (!startTime) {
+            showToast('Thời gian bắt đầu không được để trống', 'error');
+            return false;
+        }
+        if (!endTime) {
+            showToast('Thời gian kết thúc không được để trống', 'error');
+            return false;
+        }
+        if (new Date(startTime) >= new Date(endTime)) {
+            showToast('Thời gian bắt đầu phải trước thời gian kết thúc', 'error');
+            return false;
+        }
+
+        if (isNaN(totalTicketCount) || totalTicketCount < 0) {
+            showToast('Số lượng vé phải là số không âm', 'error');
+            return false;
+        }
+
+        if (!imageFile) {
+            showToast('Vui lòng chọn ảnh cho sự kiện', 'error');
+            return false;
+        }
+
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(imageFile.type)) {
+            showToast('Chỉ chấp nhận file ảnh định dạng JPG, PNG hoặc GIF', 'error');
+            return false;
+        }
+
+        const maxSize = 5 * 1024 * 1024;
+        if (imageFile.size > maxSize) {
+            showToast('Kích thước ảnh không được vượt quá 5MB', 'error');
+            return false;
+        }
+
+        // Show loading toast
+        showToast('Đang xử lý cập nhật sự kiện...', 'success');
+        return true;
     }
 
-    // Hàm hiển thị thông báo lỗi
-    function showImageError(message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-message';
-        errorDiv.textContent = message;
-        errorDiv.style.marginTop = '10px';
-        errorDiv.style.color = '#ff6b6b';
-        
-        const formGroup = document.getElementById('imageURL').closest('.form-group');
-        // Xóa thông báo lỗi cũ nếu có
-        const oldError = formGroup.querySelector('.error-message');
-        if (oldError) oldError.remove();
-        
-        formGroup.appendChild(errorDiv);
-        
-        // Tự động xóa thông báo sau 3 giây
-        setTimeout(() => {
-            errorDiv.remove();
-        }, 3000);
-    }
-</script>
-        
-        // Display server messages
-        <c:if test="${not empty error}">
-            Swal.fire('Lỗi', '${error}', 'error');
-        </c:if>
-        <c:if test="${not empty success}">
-            Swal.fire('Thành công', '${success}', 'success');
-        </c:if>
+    // Show toast based on server response
+    <c:if test="${not empty error}">
+        showToast('${error}', 'error');
+    </c:if>
+    <c:if test="${not empty success}">
+        showToast('${success}', 'success');
+    </c:if>
+
+    animateEllipses();
     </script>
 </body>
 </html>
