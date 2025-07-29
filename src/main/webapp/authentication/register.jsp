@@ -89,7 +89,7 @@
 <body>
 <div class="container">
     <h2>Bạn Là ?</h2>
-   <form action="signupOption" method="post" class="option-buttons">
+   <form action="${pageContext.request.contextPath}/signupOption" method="post" class="option-buttons">
 
         <button class="button" name="role" value="user">
             <svg class="icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
