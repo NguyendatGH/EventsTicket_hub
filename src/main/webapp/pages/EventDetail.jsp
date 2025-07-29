@@ -931,7 +931,7 @@
                         </c:if>
                     </div>
 
-                    <div class="section-card">
+                    <%-- <div class="section-card">
                         <h2 class="section-title">
                             <i class="fas fa-comments"></i>
                             Phản hồi từ người tham dự
@@ -965,7 +965,7 @@
                                 </p>
                             </c:otherwise>
                         </c:choose>
-                    </div>
+                    </div> --%>
 
                 </div>
             </c:if>
