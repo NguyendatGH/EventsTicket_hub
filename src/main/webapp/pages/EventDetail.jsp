@@ -931,7 +931,7 @@
                         </c:if>
                     </div>
 
-                    <div class="section-card">
+                    <%-- <div class="section-card">
                         <h2 class="section-title">
                             <i class="fas fa-comments"></i>
                             Phản hồi từ người tham dự
@@ -965,7 +965,7 @@
                                 </p>
                             </c:otherwise>
                         </c:choose>
-                    </div>
+                    </div> --%>
 
                 </div>
             </c:if>
@@ -1048,7 +1048,7 @@
 
                 if (hasSeatingChartStr === 'true') {
                     console.log("  - KẾT LUẬN: CÓ sơ đồ ghế. Chuyển hướng tới BookChairServlet.");
-                    window.location.href = contextPath + '/BookChairServlet?eventId=' + eventId;
+                    window.location.href = contextPath + '/BookSeatServlet?eventId=' + eventId;
                 } else {
                     console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
                     window.location.href = contextPath + '/TicketInfoServlet?eventId=' + eventId;
