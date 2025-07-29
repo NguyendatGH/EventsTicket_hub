@@ -751,6 +751,7 @@
                         </c:choose>
                     </span></span>
                 </div>
+                 <button class="btn-primary" onClick="handleStartChat(${event.eventID})">Chat ngay</button>
                 <button class="btn-primary" onclick="handleBuyTickets('${event.eventID}', '${event.hasSeatingChart}')">Buy Now</button>
             </div>
             <div class="event-image">
@@ -803,7 +804,6 @@
                 <div class="side-banner">
                     <img src="${pageContext.request.contextPath}/asset/image/Banner_secondary.svg" alt="side banner" />
                     <div class="side-title">BABYMONSTER HELLO MONSTERS</div>
-                    <div class="side-desc">Giảm 150K khi thanh toán bằng VNPAY</div>
                 </div>
                 <div class="organizer-section">
                     <div class="organizer-logo">
@@ -964,6 +964,11 @@
                 }
             }
         };
+
+          function handleStartChat(eventId){
+                console.log("Starting chat for eventId: ", eventId);
+            window.location.href = '${pageContext.request.contextPath}/init-chat?eventId=' + eventId;
+            }
     </script>
 </body>
 </html>
