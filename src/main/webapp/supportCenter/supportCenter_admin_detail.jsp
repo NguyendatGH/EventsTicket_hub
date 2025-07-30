@@ -10,146 +10,33 @@
     <title>Chi tiết yêu cầu hỗ trợ - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-         :root {
-       --primary-bg: #070a17;
-        --secondary-bg: rgba(15, 23, 42, 0.9);
-        --success-green: #28a745;
-        --error-red: #dc3545;
-        --text-primary: #ffffff;
-        --text-secondary: #94a3b8;
-        --border-dark: rgba(255, 255, 255, 0.1);
-        --border-light: rgba(255, 255, 255, 0.2);
-        --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
+      * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         position: relative;
-            background-color: var(--primary-bg);
-        color: var(--text-primary);
+        background-color: #070a17;
+        min-height: 100vh;
         overflow-x: hidden;
       }
-
-      .container {
-        display: flex;
-        position: relative;
-        z-index: 1;
-      }
-
+      .container { display: flex; min-height: 100vh; position: relative; z-index: 1; }
       .sidebar {
-        width: 280px;
-        background: var(--secondary-bg);
-        backdrop-filter: blur(20px);
-        border-right: 1px solid var(--border-dark);
-        padding: 2rem 0;
-        transition: transform 0.3s ease;
-        position: fixed;
-        height: 100%;
-        z-index: 1100;
+        width: 16%; background: rgba(15,23,42,0.9); backdrop-filter: blur(20px);
+        border-right: 1px solid #4d4d4d; padding: 2rem 0; transition: transform 0.3s; z-index: 1100;
       }
-
-      .logo {
-        color: var(--text-primary);
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin-bottom: 3rem;
-        padding: 0 2rem;
-        letter-spacing: 0.5px;
-      }
-
-      .admin-section {
-       padding: 0 2rem;
-        margin-bottom: 2rem;
-        text-align: center;
-      }
-
-      .admin-avatar {
-        width: 100px;
-        height: 100px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        box-shadow: var(--shadow);
-      }
-
-      .admin-avatar svg {
-        width: 60px;
-        height: 60px;
-        color: var(--text-secondary);
-      }
-
-      .admin-name {
-      color: var(--text-primary);
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-      }
-
-      .admin-role {
-         color: var(--text-secondary);
-        font-size: 0.875rem;
-        font-weight: 400;
-      }
-
-      .nav-menu {
-        list-style: none;
-      }
-
-      .nav-item {
-         border-bottom: 1px solid var(--border-dark);
-      }
-
-      .nav-link {
-        display: block;
-        color: var(--text-secondary);
-        text-decoration: none;
-        padding: 1rem 2rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        position: relative;
-      }
-
-      .nav-link:hover,
-      .nav-link.active {
-        background: rgba(255, 255, 255, 0.08);
-        color: var(--text-primary);
-        box-shadow: inset 4px 0 0 #0f67ff;
-      }
-
-      .logout {
-       position: fixed;
-        bottom: 2rem;
-        left: 2rem;
-        color: var(--text-secondary);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-weight: 500;
-        transition: color 0.3s ease;
-      }
-
-      .logout:hover {
-        color: var(--text-primary);
-      }
-
-      .main-content {
-        flex: 1;
-        margin-left: 280px;
-        padding: 2rem 3rem;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-      }
+      .logo { color: white; font-size: 1.5rem; font-weight: 700; margin-bottom: 5rem; padding: 0 2rem; }
+      .admin-section { padding: 0 2rem; margin-bottom: 3rem; }
+      .admin-avatar { width: 120px; height: 120px; background: rgba(71,85,105,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; }
+      .admin-avatar svg { width: 80px; height: 80px; color: #94a3b8; }
+      .admin-name { color: white; font-size: 24px; font-weight: 600; text-align: center; margin-bottom: 0.5rem; }
+      .admin-role { color: #94a3b8; font-size: 0.875rem; text-align: center; }
+      .nav-menu { list-style: none; }
+      .nav-item { border-bottom: 1px solid rgba(15,23,42,0.14); }
+      .nav-link { display: block; color: white; background-color: rgba(255,255,255,0.18); text-decoration: none; padding: 1rem 2rem; font-weight: 500; transition: all 0.3s; position: relative; }
+      .nav-link.active { background: rgba(255,255,255,0.05); color: white; }
+      .nav-link:hover { color: white; background: rgba(255,255,255,0.05); }
+      .logout { position: absolute; bottom: 2rem; left: 2rem; right: 2rem; color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; transition: color 0.3s; }
+      .logout:hover { color: white; }
+      .main-content { flex: 1; padding: 0 94px; padding-top: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 2rem; }
       .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
       .page-title { color: #667aff; font-size: 1.5rem; font-weight: 700; }
       .card { background: #161b22; border-radius: 12px; padding: 2rem 1.5rem; margin-bottom: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.10); }
@@ -334,11 +221,11 @@
                       </div>
                     </div>
                     <div class="attachment-actions">
-                      <a href="${pageContext.request.contextPath}/admin-servlet/support-center?action=download&fileId=${attachment.attachmentId}" 
+                      <a href="${pageContext.request.contextPath}/admin/support?action=download&fileId=${attachment.attachmentId}" 
                          class="attachment-btn download" title="Tải xuống">
                         <i class="fas fa-download"></i>
                       </a>
-                      <a href="${pageContext.request.contextPath}/admin-servlet/support-center?action=view&fileId=${attachment.attachmentId}" 
+                      <a href="${pageContext.request.contextPath}/admin/support?action=view&fileId=${attachment.attachmentId}" 
                          class="attachment-btn view" title="Xem file" target="_blank">
                         <i class="fas fa-eye"></i>
                       </a>
@@ -353,7 +240,7 @@
         </div>
         <div class="admin-response-form">
           <h2 style="color:#667aff; margin-bottom:1rem;"><i class="fas fa-edit"></i> Phản hồi yêu cầu</h2>
-          <form action="${pageContext.request.contextPath}/admin-servlet/support-center" method="post">
+          <form action="${pageContext.request.contextPath}/admin/support" method="post">
             <input type="hidden" name="supportId" value="${supportItem.supportId}">
             <div class="form-group">
               <label for="adminResponse">Nội dung phản hồi *</label>

@@ -161,8 +161,8 @@
       .tab-content { display: none; }
       .tab-content.active { display: block; }
       .support-table { background: #21262d; border-radius: 10px; overflow: hidden; }
-      .table-header { display: grid; grid-template-columns: 50px 2fr 1fr 1fr 1fr 1fr 120px; gap: 1rem; padding: 1rem; background: #161b22; font-weight: 600; color: #e6edf3; }
-      .table-row { display: grid; grid-template-columns: 50px 2fr 1fr 1fr 1fr 1fr 120px; gap: 1rem; padding: 1rem; border-bottom: 1px solid #30363d; align-items: center; transition: background 0.3s; }
+      .table-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px; gap: 1rem; padding: 1rem; background: #161b22; font-weight: 600; color: #e6edf3; }
+      .table-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px; gap: 1rem; padding: 1rem; border-bottom: 1px solid #30363d; align-items: center; transition: background 0.3s; }
       .table-row:hover { background: #2d3748; }
       .table-row:last-child { border-bottom: none; }
       .status-badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500; text-align: center; }
@@ -308,7 +308,7 @@
                     <div>Người gửi</div>
                     <div>Danh mục</div>
                     <div>Mức độ</div>
-                    <div>Thời gian</div>
+                    <div>Trạng thái</div>
                     <div>Thao tác</div>
                 </div>
 
@@ -330,7 +330,17 @@
                                         </c:choose>
                                     </span>
                                 </div>
-                                <div>${request.getFormattedSendDate()}</div>
+                                <div>
+                                    <span class="status-badge status-${fn:toLowerCase(request.status)}">
+                                        <c:choose>
+                                            <c:when test="${request.status == 'PENDING'}">Chờ xử lý</c:when>
+                                            <c:when test="${request.status == 'REPLIED'}">Đã phản hồi</c:when>
+                                            <c:when test="${request.status == 'RESOLVED'}">Đã giải quyết</c:when>
+                                            <c:when test="${request.status == 'CLOSED'}">Đã đóng</c:when>
+                                            <c:otherwise>${request.status}</c:otherwise>
+                                        </c:choose>
+                                    </span>
+                                </div>
                                 <div>
                                     <button class="action-btn view" onclick="viewDetail(${request.supportId})">
                                         <i class="fas fa-eye"></i> Xem
@@ -370,7 +380,7 @@
         }
 
         function viewDetail(supportId) {
-            window.location.href = '${pageContext.request.contextPath}/admin/support?action=view-detail&id=' + supportId;
+            window.location.href = '${pageContext.request.contextPath}/admin-servlet/support-center?action=view-detail&id=' + supportId;
         }
     </script>
 </body>
