@@ -124,4 +124,27 @@ public class SeatDAO {
             return rowsAffected > 0;
         }
     }
+
+    public boolean reserveSeats(List<Integer> seatIds, String status, Connection conn) throws SQLException {
+        String sql = "UPDATE Seat SET Status = ? WHERE SeatID = ? AND Status = 'available'";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            int updatedCount = 0;
+            for (Integer seatId : seatIds) {
+                ps.setString(1, status);
+                ps.setInt(2, seatId);
+                updatedCount += ps.executeUpdate();
+            }
+            return updatedCount == seatIds.size();
+        }
+    }
+
+    public void releaseSeats(List<Integer> seatIds, Connection conn) throws SQLException {
+        String sql = "UPDATE Seat SET Status = 'available' WHERE SeatID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (Integer seatId : seatIds) {
+                ps.setInt(1, seatId);
+                ps.executeUpdate();
+            }
+        }
+    }
 }

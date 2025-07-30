@@ -1,7 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -10,22 +9,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.RequestDispatcher;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
-import dao.EventDAO;
-import dao.UserDAO;
 import dto.UserDTO;
-import models.IssueItem;
-import models.User;
+import service.SupportService;
 import service.UserService;
 import models.Event;
 import models.SupportItem;
 import models.SupportAttachment;
 import service.SupportService;
+
+
+
 
 @WebServlet(name = "AdminServlet", urlPatterns = { "/admin-servlet/*" })
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
@@ -106,6 +101,9 @@ public class AdminServlet extends HttpServlet {
                 handleSupportCenter(request, response);
             } else if (pathInfo.startsWith("/transaction-management")) {
                 transactionServlet.handleRequest(request, response);
+            } else if (pathInfo.startsWith("/refund-management")) {
+                // Chuyển tiếp request đến AdminRefundServlet
+                request.getRequestDispatcher("/admin/refund").forward(request, response);
             } else {
                 logger.warning("Unknown path for admin: " + pathInfo);
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Đường dẫn quản trị không hợp lệ.");

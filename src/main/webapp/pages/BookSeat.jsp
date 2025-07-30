@@ -5,7 +5,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>MasterTicket - Chọn ghế cho: ${event.name}</title>
+        <title>EventTicketHub - Chọn ghế cho: ${event.name}</title>
         <style>
             body {
                 margin: 0;
@@ -13,96 +13,132 @@
                 font-family: 'Segoe UI', Arial, sans-serif;
                 color: #fff;
                 padding: 20px;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
             }
             .header {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                padding: 24px 20px 16px 20px;
+                padding: 20px;
+                background: rgba(35, 38, 58, 0.8);
+                border-radius: 12px;
+                margin-bottom: 20px;
             }
             .header-left {
-                font-size: 2rem;
-                font-weight: bold;
+                font-size: 1.8rem;
+                font-weight: 700;
             }
             .header-right {
                 display: flex;
                 align-items: center;
-                gap: 18px;
+                gap: 16px;
             }
             .header-right .account {
-                background: #23263a;
-                color: #fff;
+                background: #2e3147;
                 border: 1px solid #5e5e7a;
                 border-radius: 8px;
-                padding: 8px 18px;
-                font-size: 1rem;
+                padding: 8px 16px;
+                font-size: 0.95rem;
                 cursor: pointer;
+                transition: background 0.3s;
+            }
+            .header-right .account:hover {
+                background: #3a3e5c;
+            }
+            .back-link {
+                color: #1ed090;
+                text-decoration: none;
+                font-size: 1rem;
+                margin-bottom: 20px;
+                display: inline-block;
+                transition: color 0.3s;
+            }
+            .back-link:hover {
+                color: #26f0a0;
             }
             .main-content {
                 display: flex;
                 justify-content: center;
                 align-items: flex-start;
-                gap: 32px;
-                margin-top: 10px;
+                gap: 24px;
+                flex-grow: 1;
+                max-width: 1200px;
+                margin: 0 auto;
             }
             .left-panel {
-                flex: 3;
+                flex: 2;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
             .right-panel {
                 flex: 1;
                 background: #23263a;
-                border-radius: 24px;
-                padding: 32px;
-                min-width: 320px;
-                max-width: 350px;
-                box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+                border-radius: 16px;
+                padding: 24px;
+                min-width: 280px;
+                max-width: 340px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
                 position: sticky;
                 top: 20px;
             }
             .seating-area {
                 background: #181c2f;
-                border-radius: 32px;
-                padding: 32px;
-                box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
-                min-height: 200px;
+                border-radius: 16px;
+                padding: 24px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+                width: 100%;
+                max-width: 800px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
             }
             .stage {
-                margin: 0 auto 24px auto;
-                width: 60%;
-                background: #eee;
-                color: #222;
+                width: 80%;
+                max-width: 500px;
+                background: #d1d5db;
+                color: #1f2937;
                 text-align: center;
-                border-radius: 5px;
-                padding: 10px 0;
-                font-weight: bold;
-                font-size: 1.2em;
+                border-radius: 8px;
+                padding: 12px 0;
+                font-weight: 600;
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             }
             .event-title {
-                font-size: 1.25rem;
-                font-weight: bold;
-                margin-bottom: 18px;
+                font-size: 1.3rem;
+                font-weight: 700;
+                margin-bottom: 16px;
             }
             .event-info {
                 display: flex;
                 align-items: center;
-                gap: 10px;
-                margin-bottom: 8px;
-                color: #bdbdbd;
+                gap: 8px;
+                margin-bottom: 12px;
+                color: #d1d5db;
+                font-size: 0.95rem;
             }
             .selected-tickets {
-                margin: 24px 0 18px 0;
+                margin: 20px 0;
             }
             .section-header {
-                font-weight: bold;
-                margin-bottom: 12px;
+                font-weight: 600;
+                font-size: 1rem;
+                margin-bottom: 10px;
+                color: #e5e7eb;
             }
             #available-seats-info, #selected-seats-info {
-                min-height: 50px;
+                min-height: 60px;
+                color: #d1d5db;
+                font-size: 0.9rem;
+                line-height: 1.5;
                 transition: all 0.3s;
-                color: #bdbdbd;
             }
             .ticket-selection {
-                margin: 24px 0;
+                margin: 20px 0;
             }
             #zoneSelect, #seatQuantity {
                 border: 1px solid #5e5e7a;
@@ -110,43 +146,78 @@
                 background: #181c2f;
                 color: #fff;
                 width: 100%;
-                padding: 8px;
-                margin-bottom: 16px;
+                padding: 10px;
+                font-size: 0.95rem;
+                margin-bottom: 12px;
+                transition: border-color 0.3s;
+            }
+            #zoneSelect:focus, #seatQuantity:focus {
+                border-color: #1ed090;
+                outline: none;
             }
             .continue-btn {
                 width: 100%;
                 background: #393e5c;
                 color: #888;
                 border: none;
-                border-radius: 12px;
-                padding: 16px 0;
-                font-size: 1.1rem;
-                margin-top: 32px;
+                border-radius: 10px;
+                padding: 14px 0;
+                font-size: 1rem;
+                margin-top: 24px;
                 cursor: not-allowed;
                 text-align: center;
-                transition: all 0.2s;
+                transition: background 0.3s, color 0.3s;
             }
             .continue-btn.active {
                 background: #1ed090;
                 color: #fff;
                 cursor: pointer;
             }
+            .continue-btn.active:hover {
+                background: #26f0a0;
+            }
             #event-map {
                 width: 100%;
                 max-width: 800px;
                 height: 500px;
                 border: 1px solid #5e5e7a;
-                display: block;
+                border-radius: 8px;
+                background: #1f2937;
+            }
+            @media (max-width: 768px) {
+                .main-content {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 16px;
+                }
+                .left-panel, .right-panel {
+                    width: 100%;
+                    max-width: none;
+                }
+                .seating-area {
+                    padding: 16px;
+                }
+                .stage {
+                    width: 90%;
+                    font-size: 1rem;
+                }
+                #event-map {
+                    height: 400px;
+                }
             }
         </style>
     </head>
     <body>
         <div class="header">
-            <div class="header-left">MasterTicket</div>
+            <div class="header-left">EventTicketHub</div>
             <div class="header-right">
                 <div class="account">${sessionScope.user.email}</div>
             </div>
         </div>
+        <a href="${pageContext.request.contextPath}/HomePageServlet" class="back-link">
+                <i class="fas fa-arrow-left"></i> 
+                Quay lại
+            </a>
         <div class="main-content">
             <div class="left-panel">
                 <div class="seating-area">
@@ -350,19 +421,20 @@
             }
 
             function proceedToPayment() {
-    try {
-        if (selectedSeats.length === 0) {
-            console.log('[DEBUG-JS] No seats selected, showing alert');
-            alert('Vui lòng chọn khu vực và số lượng ghế!');
-            return;
-        }
-        const seatIds = selectedSeats.map(s => s.seatId).join(',');
-        console.log('[DEBUG-JS] Proceeding to payment with seatIds:', seatIds);
-        window.location.href = '${pageContext.request.contextPath}/SeatPaymentServlet?eventId=' + eventData.eventID + '&seatIds=' + seatIds;
-    } catch (error) {
-        console.error('[ERROR-JS] Error in proceedToPayment:', error);
-    }
-}
+                try {
+                    if (selectedSeats.length === 0) {
+                        console.log('[DEBUG-JS] No seats selected, showing alert');
+                        alert('Vui lòng chọn khu vực và số lượng ghế!');
+                        return;
+                    }
+                    const seatIds = selectedSeats.map(s => s.seatId).join(',');
+                    console.log('[DEBUG-JS] Proceeding to payment with seatIds:', seatIds);
+                    window.location.href = '${pageContext.request.contextPath}/SeatPaymentServlet?eventId=' + eventData.eventID + '&seatIds=' + seatIds;
+                } catch (error) {
+                    console.error('[ERROR-JS] Error in proceedToPayment:', error);
+                }
+            }
+
             // Initialize canvas and draw map
             try {
                 console.log('[DEBUG-JS] Initializing page');

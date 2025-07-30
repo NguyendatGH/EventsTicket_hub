@@ -821,7 +821,7 @@
 
                     totalPriceElement.textContent = formatCurrency(totalAmount);
 
-                    // Update button state
+
                     if (continueButton.getAttribute('form') === 'ticketOrderForm') {
                         if (totalQuantityOverall > 0) {
                             continueButton.disabled = false;
@@ -833,7 +833,6 @@
                     }
                 }
 
-                // Handle quantity controls
                 document.querySelectorAll('.ticket-item').forEach(item => {
                     const decreaseBtn = item.querySelector('.decrease');
                     const increaseBtn = item.querySelector('.increase');
@@ -847,7 +846,6 @@
                     let maxQuantityPerOrder = parseInt(quantityInput.dataset.maxQuantityPerOrder);
 
                     const updateQuantity = (newQuantity) => {
-                        // Clear error message
                         errorMessageSpan.style.display = 'none';
                         item.classList.remove('ticket-selected');
 
@@ -874,7 +872,6 @@
                             });
                             item.classList.add('ticket-selected');
 
-                            // Add quantity badge
                             let badge = item.querySelector('.quantity-badge');
                             if (!badge) {
                                 badge = document.createElement('div');
@@ -907,10 +904,8 @@
                     });
                 });
 
-                // Initialize
                 updateSummaryAndTotal();
 
-                // Add fade-in animation observer
                 const observerOptions = {
                     threshold: 0.1,
                     rootMargin: '0px 0px -50px 0px'

@@ -34,27 +34,37 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         String inputOtp = request.getParameter("otp");
         HttpSession session = request.getSession();
 
+        System.out.println("VerifyServlet - Input OTP: " + inputOtp);
+
         String sessionOtp = (String) session.getAttribute("otp");
         User pendingUser = (User) session.getAttribute("pendingUser");
 
+        System.out.println("VerifyServlet - Session OTP: " + sessionOtp);
+        System.out.println("VerifyServlet - Pending User: " + (pendingUser != null ? pendingUser.getEmail() : "null"));
+
         if (sessionOtp == null || pendingUser == null) {
+            System.out.println("VerifyServlet - Session data missing, redirecting to register");
             response.sendRedirect("register");
             return;
         }
 
         if (!inputOtp.equals(sessionOtp)) {
+            System.out.println("VerifyServlet - OTP mismatch");
             request.setAttribute("error", "Mã xác minh không chính xác.");
             request.getRequestDispatcher("authentication/verify.jsp").forward(request, response);
             return;
         }
 
+        System.out.println("VerifyServlet - OTP verified, inserting user...");
         boolean inserted = userDAO.insertUser(pendingUser);
         session.removeAttribute("otp");
         session.removeAttribute("pendingUser");
 
         if (inserted) {
+            System.out.println("VerifyServlet - User inserted successfully");
             request.getRequestDispatcher("authentication/success.jsp").forward(request, response);
         } else {
+            System.out.println("VerifyServlet - User insertion failed");
             request.setAttribute("error", "Đăng ký thất bại");
             request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
         }
