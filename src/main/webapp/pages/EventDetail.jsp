@@ -1057,7 +1057,7 @@
 
                 if (hasSeatingChartStr === 'true') {
                     console.log("  - KẾT LUẬN: CÓ sơ đồ ghế. Chuyển hướng tới BookChairServlet.");
-                    window.location.href = contextPath + '/BookChairServlet?eventId=' + eventId;
+                    window.location.href = contextPath + '/BookSeatServlet?eventId=' + eventId;
                 } else {
                     console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
                     window.location.href = contextPath + '/TicketInfoServlet?eventId=' + eventId;
