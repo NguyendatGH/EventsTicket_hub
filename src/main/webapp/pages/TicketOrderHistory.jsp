@@ -1170,7 +1170,7 @@
         </footer>
 
         <script>
-            // Search functionality
+
             document.querySelector('.search-input').addEventListener('input', function () {
                 const searchTerm = this.value.toLowerCase();
                 const tickets = document.querySelectorAll('.ticket-horizontal-card');
@@ -1188,7 +1188,6 @@
                 });
             });
 
-            // Smooth scroll animations
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
@@ -1202,22 +1201,18 @@
                 });
             }, observerOptions);
 
-            // Observe all animatable elements
             document.querySelectorAll('.ticket-horizontal-card, .empty-state').forEach(el => {
                 observer.observe(el);
             });
 
-            // Newsletter form submission
             document.querySelector('.newsletter-form').addEventListener('submit', function (e) {
                 e.preventDefault();
                 const email = this.querySelector('.newsletter-input').value;
 
-                // Show success message (you can implement actual subscription logic here)
                 alert('Cảm ơn bạn đã đăng ký! Chúng tôi sẽ gửi thông tin sự kiện mới nhất đến email của bạn.');
                 this.querySelector('.newsletter-input').value = '';
             });
 
-            // Add loading states for forms
             document.querySelectorAll('form').forEach(form => {
                 form.addEventListener('submit', function () {
                     const button = this.querySelector('button[type="submit"]');
@@ -1228,14 +1223,12 @@
                 });
             });
 
-            // Add keyboard shortcut for back button
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
                     history.back();
                 }
             });
 
-            // Add smooth scroll to top functionality
             window.addEventListener('scroll', function () {
                 const backButton = document.querySelector('.back-button');
                 if (window.scrollY > 300) {

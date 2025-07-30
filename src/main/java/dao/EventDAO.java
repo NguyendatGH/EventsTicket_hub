@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import models.TicketType;
 
 public class EventDAO {
 
@@ -664,7 +663,7 @@ public class EventDAO {
             try (PreparedStatement ps = conn.prepareStatement(eventQuery)) {
                 ps.setInt(1, event_id);
                 int rows = ps.executeUpdate();
-                System.out.println("fuck");
+                System.out.println("");
                 if (rows == 0) {
                     conn.rollback();
                     return new ToggleEvent(false, "Sự kiện không tồn tại");
@@ -1040,37 +1039,6 @@ public class EventDAO {
             String kw = "%" + keyword + "%";
             ps.setString(1, kw);
             ps.setString(2, kw);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapRowToEvent(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public List<Event> searchEvents(String keyword, String location) {
-        List<Event> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE()");
-        List<Object> params = new ArrayList<>();
-
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (Name LIKE ? OR Description LIKE ?)");
-            String kw = "%" + keyword.trim() + "%";
-            params.add(kw);
-            params.add(kw);
-        }
-        if (location != null && !location.trim().isEmpty()) {
-            sql.append(" AND PhysicalLocation LIKE ?");
-            params.add("%" + location.trim() + "%");
-        }
-        sql.append(" ORDER BY StartTime DESC");
-
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 list.add(mapRowToEvent(rs));

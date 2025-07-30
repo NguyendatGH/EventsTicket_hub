@@ -550,17 +550,15 @@
     </div>
 
     <script>
-        // Add loading state when form is submitted
+
         document.getElementById('refundForm').addEventListener('submit', function(e) {
             const submitBtn = document.getElementById('submitBtn');
             const btnText = document.getElementById('btnText');
-            
-            // Disable button and show loading
+
             submitBtn.disabled = true;
             btnText.innerHTML = '<span class="loading"></span>Đang xử lý...';
         });
 
-        // Character counter for textarea
         const textarea = document.getElementById('refundReason');
         const maxLength = 500;
         const charCounter = document.getElementById('charCounter');
@@ -569,8 +567,7 @@
         function updateCounter() {
             const remaining = maxLength - textarea.value.length;
             charCount.textContent = remaining + ' ký tự còn lại';
-            
-            // Update counter color based on remaining characters
+
             charCounter.classList.remove('warning', 'danger');
             if (remaining < 50) {
                 charCounter.classList.add('danger');
@@ -580,25 +577,20 @@
         }
         
         textarea.addEventListener('input', updateCounter);
-        updateCounter(); // Initial call
-        
-        // Auto-resize textarea
+        updateCounter();
+
         textarea.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.max(150, this.scrollHeight) + 'px';
         });
 
-        // Add keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Ctrl/Cmd + Enter to submit
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 document.getElementById('refundForm').dispatchEvent(new Event('submit'));
             }
         });
 
-        // Add focus management
         document.addEventListener('DOMContentLoaded', function() {
-            // Focus on textarea when page loads
             setTimeout(() => {
                 textarea.focus();
             }, 500);
