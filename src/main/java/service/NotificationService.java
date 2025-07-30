@@ -33,7 +33,7 @@ public class NotificationService {
             System.err.println("Invalid notificationId or userId for marking as read.");
             return false;
         }
-        return notificationDAO.markNotificationAsRead(notificationId, userId);
+        return notificationDAO.markAsRead(notificationId, userId);
     }
 
     // Marks all unread notifications for a user as read
@@ -42,7 +42,7 @@ public class NotificationService {
             System.err.println("Invalid userId for marking all as read.");
             return false;
         }
-        return notificationDAO.markAllNotificationsAsRead(userId);
+        return notificationDAO.markAllAsRead(userId);
     }
 
 }

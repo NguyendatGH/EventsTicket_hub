@@ -235,6 +235,151 @@
                 color: var(--primary);
             }
 
+            /* User Menu Styles */
+            .user-menu {
+                position: relative;
+            }
+
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                color: var(--text-light);
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: var(--primary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+                overflow: hidden;
+            }
+
+            .user-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            /* Notification Styles */
+            .notification-icon-container {
+                position: relative;
+                margin-right: 1rem;
+            }
+
+            .notification-icon {
+                font-size: 1.2rem;
+                cursor: pointer;
+                position: relative;
+                color: var(--text-light);
+                transition: color 0.3s;
+            }
+
+            .notification-icon:hover {
+                color: var(--primary);
+            }
+
+            .notification-badge {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background: var(--danger);
+                color: white;
+                border-radius: 50%;
+                width: 18px;
+                height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.7rem;
+                font-weight: bold;
+                opacity: 0;
+                transform: scale(0);
+                transition: all 0.3s;
+            }
+
+            .notification-badge.show {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            .notification-dropdown {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: var(--darker-bg);
+                border-radius: 10px;
+                padding: 1rem;
+                min-width: 300px;
+                max-width: 400px;
+                border: 1px solid var(--border-color);
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: all 0.3s;
+                z-index: 101;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .notification-dropdown.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .notification-item {
+                padding: 0.75rem;
+                border-bottom: 1px solid var(--border-color);
+                cursor: pointer;
+                transition: background 0.3s;
+                border-radius: 8px;
+                margin-bottom: 0.5rem;
+            }
+
+            .notification-item:hover {
+                background: rgba(102, 122, 255, 0.1);
+            }
+
+            .notification-item.unread {
+                background: rgba(102, 122, 255, 0.05);
+                border-left: 3px solid var(--primary);
+            }
+
+            .notification-title {
+                display: block;
+                font-weight: bold;
+                color: var(--text-light);
+                margin-bottom: 0.25rem;
+            }
+
+            .notification-content {
+                display: block;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .notification-time {
+                display: block;
+                color: var(--text-muted);
+                font-size: 0.8rem;
+            }
+
+            .no-notifications {
+                text-align: center;
+                color: var(--text-muted);
+                padding: 1rem;
+            }
 
             /* Main Content */
             .container {
@@ -331,6 +476,123 @@
                 transform: scale(1.2);
             }
 
+            /* Banner Section */
+            .banner-section {
+                margin: 3rem 0;
+            }
+
+            .banner-container {
+                background: linear-gradient(135deg, #667aff 0%, #764ba2 100%);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                border-radius: 16px;
+                padding: 2rem;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 8px 32px rgba(102, 122, 255, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .banner-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(102, 122, 255, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+                z-index: 1;
+            }
+
+            .banner-container::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                animation: float 6s ease-in-out infinite;
+                z-index: 2;
+            }
+
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-20px) rotate(180deg); }
+            }
+
+            .banner-content {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                z-index: 3;
+                position: relative;
+            }
+
+            .banner-text h3 {
+                color: white;
+                font-size: 1.8rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .banner-text p {
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+                max-width: 500px;
+            }
+
+            .banner-location {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+                padding: 0.75rem 1rem;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 8px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .banner-location i {
+                color: #ffd700;
+                font-size: 1.2rem;
+            }
+
+            .banner-location span {
+                color: white;
+                font-weight: 500;
+                font-size: 1rem;
+            }
+
+            .banner-action {
+                flex-shrink: 0;
+            }
+
+            .banner-decoration {
+                position: absolute;
+                right: 2rem;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 3;
+            }
+
+            .banner-icon {
+                font-size: 4rem;
+                opacity: 0.3;
+                animation: bounce 2s ease-in-out infinite;
+            }
+
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+
             /* Section Headers */
             .section-header {
                 display: flex;
@@ -359,9 +621,10 @@
             /* Event Grid */
             .event-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
                 gap: 2rem;
                 margin-bottom: 3rem;
+                justify-content: center;
             }
 
             .event-card {
@@ -418,6 +681,18 @@
                 color: var(--text-muted);
                 font-size: 0.9rem;
                 margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 0.75rem;
+                background: rgba(102, 122, 255, 0.1);
+                border-radius: 6px;
+                border-left: 3px solid var(--primary);
+            }
+
+            .event-location::before {
+                content: "📍";
+                font-size: 1rem;
             }
 
             .event-description {
@@ -915,24 +1190,36 @@
                     <ul class="nav-links" id="navLinks">
                         <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
                         <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
-                        <li><a href="#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
-                        <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
+                        <li><a href="${pageContext.request.contextPath}/support"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
                     </ul>
                 </div>
 
                 <div class="auth-buttons">
                     <c:choose>
-                        <c:when test="${not empty sessionScope.user}">
-                            <span class="user-greeting" onclick="toggleUserDropdown()">
-                                Xin chào, ${sessionScope.user.email} <span style="margin-left: 0.5rem;">▼</span>
-                            </span>
-                            <div class="user-dropdown" id="userDropdown">
-                                <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
-                                <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
-                                <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
-                                <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
-                                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
-                                <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
+                        <c:when test="${sessionScope.user != null}">
+                            <%-- User Menu with Avatar and Dropdown --%>
+                            <div class="user-menu">
+                                <div class="user-info" onclick="toggleUserDropdown()">
+                                    <%-- Display User Avatar --%>
+                                    <div class="user-avatar">
+                                        <% if (user != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) { %>
+                                            <img src="${pageContext.request.contextPath}/uploads/user_avatar/<%= user.getAvatar() %>" alt="Avatar">
+                                        <% } else if (user != null) { %>
+                                            <%= user.getEmail().substring(0, 1).toUpperCase() %>
+                                        <% } else { %>
+                                            U
+                                        <% } %>
+                                    </div>
+                                    Xin chào, <%= user != null && user.getName() != null && !user.getName().isEmpty() ? user.getName() : (user != null ? user.getEmail() : "User") %> <span style="margin-left: 0.5rem;">▼</span>
+                                </div>
+                                <div class="user-dropdown" id="userDropdown">
+                                    <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
+                                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="dropdown-item">🎫 Vé đã mua</a>
+                                    <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
+                                    <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
+                                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+                                    <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
+                                </div>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -974,7 +1261,30 @@
                 </div>
             </div>
 
-            <%  if (events == null || events.isEmpty()) {  %>
+            <!-- Banner Section -->
+            <div class="banner-section">
+                <div class="banner-container" style="background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                    <div class="banner-overlay"></div>
+                    <div class="banner-content">
+                        <div class="banner-text">
+                            <h3>🎉 Ưu đãi đặc biệt!</h3>
+                            <p>Giảm giá lên đến 50% cho các sự kiện âm nhạc và văn hóa. Đặt vé ngay hôm nay!</p>
+                            <div class="banner-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>📍 Tại các địa điểm: Hà Nội, TP.HCM, Đà Nẵng, Nha Trang</span>
+                            </div>
+                        </div>
+                        <div class="banner-action">
+                            <a href="#events" class="btn btn-primary">Khám phá ngay</a>
+                        </div>
+                    </div>
+                    <div class="banner-decoration">
+                        <div class="banner-icon">🎵</div>
+                    </div>
+                </div>
+            </div>
+
+            <% if (events == null || events.isEmpty()) { %>
             <div class="no-events">
                 <h2>Không có sự kiện nào!</h2>
                 <p>Hiện tại chưa có sự kiện nào được tổ chức. Vui lòng quay lại sau!</p>
@@ -1013,8 +1323,8 @@
                             🗓️ Thời gian không xác định
                             <% }%>
                         </div>
-                        <div class="event-location">📍 <%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
-                        <div class="event-description" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; max-height: 3.6em; line-height: 1.2em;">
+                        <div class="event-location"><%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
+                        <div class="event-description">
                             <%= event.getDescription() != null ? event.getDescription() : ""%>
                         </div>
                         <div class="event-price">Từ 150,000 VNĐ</div>
@@ -1124,10 +1434,10 @@
 
             // Close dropdown if click outside
             window.addEventListener("click", function (e) {
-                const userGreeting = document.querySelector(".user-greeting");
+                const userInfo = document.querySelector(".user-info");
                 const dropdown = document.getElementById("userDropdown");
 
-                if (userGreeting && dropdown && !userGreeting.contains(e.target) && !dropdown.contains(e.target)) {
+                if (userInfo && dropdown && !userInfo.contains(e.target) && !dropdown.contains(e.target)) {
                     dropdown.classList.remove("show");
                 }
             });
@@ -1301,25 +1611,6 @@
         </script>
         <%
             // Xóa session attribute để không hiển thị lại sau reload
-            session.removeAttribute("flashMessage_success");
-        %>
-        <% }%>
-
-        <% if (session.getAttribute("flashMessage_success") != null) { %>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const popup = document.getElementById("successPopup");
-                if (popup) {
-                    popup.style.display = "flex";
-                    // Tự động ẩn sau 5s
-                    setTimeout(() => {
-                        popup.style.display = "none";
-                    }, 5000);
-                }
-            });
-        </script>
-        <%
-            // ✅ Sau khi hiển thị, xóa flash message để không hiện lại khi reload
             session.removeAttribute("flashMessage_success");
         %>
         <% }%>

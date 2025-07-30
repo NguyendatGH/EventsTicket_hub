@@ -334,11 +334,11 @@
                       </div>
                     </div>
                     <div class="attachment-actions">
-                      <a href="${pageContext.request.contextPath}/admin/support?action=download&fileId=${attachment.attachmentId}" 
+                      <a href="${pageContext.request.contextPath}/admin-servlet/support-center?action=download&fileId=${attachment.attachmentId}" 
                          class="attachment-btn download" title="Tải xuống">
                         <i class="fas fa-download"></i>
                       </a>
-                      <a href="${pageContext.request.contextPath}/admin/support?action=view&fileId=${attachment.attachmentId}" 
+                      <a href="${pageContext.request.contextPath}/admin-servlet/support-center?action=view&fileId=${attachment.attachmentId}" 
                          class="attachment-btn view" title="Xem file" target="_blank">
                         <i class="fas fa-eye"></i>
                       </a>
@@ -353,7 +353,7 @@
         </div>
         <div class="admin-response-form">
           <h2 style="color:#667aff; margin-bottom:1rem;"><i class="fas fa-edit"></i> Phản hồi yêu cầu</h2>
-          <form action="${pageContext.request.contextPath}/admin/support" method="post">
+          <form action="${pageContext.request.contextPath}/admin-servlet/support-center" method="post">
             <input type="hidden" name="supportId" value="${supportItem.supportId}">
             <div class="form-group">
               <label for="adminResponse">Nội dung phản hồi *</label>

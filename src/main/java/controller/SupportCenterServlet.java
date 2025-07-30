@@ -104,7 +104,7 @@ public class SupportCenterServlet extends HttpServlet {
         }
 
         // Create support request
-        SupportItem supportItem = new SupportItem(user.getEmail(), subject, content);
+        SupportItem supportItem = new SupportItem(user.getId(), user.getEmail(), subject, content);
         supportItem.setCategory(category != null ? category : "GENERAL");
         supportItem.setPriority(priority != null ? priority : "MEDIUM");
         supportItem.setToEmail("admin@masterticket.com");

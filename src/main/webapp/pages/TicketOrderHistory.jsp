@@ -497,6 +497,60 @@
                 display: none;
             }
 
+            /* Refund status button styles */
+            .btn-refund.btn-pending {
+                background: linear-gradient(135deg, #f59e0b, #d97706);
+                color: white;
+            }
+
+            .btn-refund.btn-approved {
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+            }
+
+            .btn-refund.btn-rejected {
+                background: linear-gradient(135deg, #ef4444, #dc2626);
+                color: white;
+            }
+
+            /* Refund info styles */
+            .refund-info {
+                margin-top: 1rem;
+                padding: 1rem;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                border-left: 4px solid var(--primary);
+            }
+
+            .refund-status {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+            }
+
+            .refund-status.refund-pending {
+                color: #f59e0b;
+            }
+
+            .refund-status.refund-approved,
+            .refund-status.refund-completed {
+                color: #10b981;
+            }
+
+            .refund-status.refund-rejected {
+                color: #ef4444;
+            }
+
+            .refund-amount {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: #10b981;
+                font-weight: 600;
+            }
+
             .btn-feedback {
                 background: var(--gradient-2);
                 color: white;
@@ -943,6 +997,22 @@
                                                 <div class="ticket-stat-label">Tổng tiền</div>
                                             </div>
                                         </div>
+                                        
+                                        <!-- Hiển thị thông tin refund -->
+                                        <c:if test="${not empty order['refundStatus']}">
+                                            <div class="refund-info">
+                                                <div class="refund-status refund-${order['refundStatus']}">
+                                                    <i class="fas fa-undo"></i>
+                                                    <span>${order['refundInfo']}</span>
+                                                </div>
+                                                <c:if test="${order['refundStatus'] == 'approved' or order['refundStatus'] == 'completed'}">
+                                                    <div class="refund-amount">
+                                                        <i class="fas fa-money-bill-wave"></i>
+                                                        <span>Đã hoàn: ${order['refundAmount']}đ</span>
+                                                    </div>
+                                                </c:if>
+                                            </div>
+                                        </c:if>
                                     </div>
 
                                     <div class="ticket-actions">
@@ -956,6 +1026,24 @@
                                                         Hoàn trả vé
                                                     </button>
                                                 </form>
+                                            </c:when>
+                                            <c:when test="${order['refundStatus'] == 'pending'}">
+                                                <button class="btn-refund btn-pending" disabled>
+                                                    <i class="fas fa-clock"></i>
+                                                    Đang xử lý hoàn tiền
+                                                </button>
+                                            </c:when>
+                                            <c:when test="${order['refundStatus'] == 'approved' or order['refundStatus'] == 'completed'}">
+                                                <button class="btn-refund btn-approved" disabled>
+                                                    <i class="fas fa-check-circle"></i>
+                                                    Đã hoàn tiền
+                                                </button>
+                                            </c:when>
+                                            <c:when test="${order['refundStatus'] == 'rejected'}">
+                                                <button class="btn-refund btn-rejected" disabled>
+                                                    <i class="fas fa-times-circle"></i>
+                                                    Hoàn tiền bị từ chối
+                                                </button>
                                             </c:when>
                                             <c:otherwise>
                                                 <button class="btn-refund" disabled>
@@ -990,9 +1078,9 @@
                         <p class="empty-description">
                             Khám phá hàng ngàn sự kiện thú vị và đặt vé ngay hôm nay để tạo nên những trải nghiệm đáng nhớ!
                         </p>
-                        <a href="explore.jsp" class="btn btn-primary">
-                            <i class="fas fa-compass"></i>
-                            Khám phá sự kiện
+                        <a href="${pageContext.request.contextPath}/homePage" class="btn btn-primary">
+                            <i class="fas fa-home"></i>
+                            Quay về trang chủ
                         </a>
                     </div>
                 </c:otherwise>

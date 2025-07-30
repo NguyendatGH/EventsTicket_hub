@@ -20,7 +20,7 @@ import dao.GenreDAO;
 import models.Genre;
 
 
-@WebServlet({"/", "/home"})
+@WebServlet({"/", "/home", "/homePage"})
 public class HomePageServlet extends HttpServlet {
 
     private EventDAO eventDAO;
@@ -37,8 +37,6 @@ public class HomePageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        EventDAO eventDAO = new EventDAO();
 
         // Xử lý phần thông báo từ HEAD
         HttpSession session = request.getSession(false);

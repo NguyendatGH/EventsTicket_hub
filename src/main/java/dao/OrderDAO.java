@@ -10,11 +10,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import models.Event;
+import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -343,6 +347,22 @@ public class OrderDAO {
 
     public List<Map<String, Object>> getSimpleOrdersByUserId(int userId) {
         List<Map<String, Object>> list = new ArrayList<>();
+<<<<<<< HEAD
+
+        String sql = "SELECT o.OrderID, SUM(oi.Quantity) AS TotalQuantity, o.TotalAmount, o.CreatedAt, "
+                + "MIN(e.EventID) AS EventID, MIN(e.Name) AS EventName, "
+                + "MIN(e.StartTime) AS StartTime, MIN(e.PhysicalLocation) AS PhysicalLocation, "
+                + "MIN(r.RefundStatus) AS RefundStatus, MIN(r.RefundID) AS RefundID, "
+                + "MIN(r.RefundAmount) AS RefundAmount, MIN(r.RefundRequestDate) AS RefundRequestDate "
+                + "FROM Orders o "
+                + "JOIN OrderItems oi ON o.OrderID = oi.OrderID "
+                + "JOIN Events e ON oi.EventID = e.EventID "
+                + "LEFT JOIN Refunds r ON o.OrderID = r.OrderID AND r.IsDeleted = 0 "
+                + "WHERE o.UserID = ? "
+                + "GROUP BY o.OrderID, o.TotalAmount, o.CreatedAt "
+                + "ORDER BY o.CreatedAt DESC";
+
+=======
         String sql = "SELECT o.OrderID, SUM(oi.Quantity) AS TotalQuantity, o.TotalAmount, o.CreatedAt, "
                 + "MIN(e.EventID) AS EventID, MIN(e.Name) AS EventName, "
                 + "MIN(e.StartTime) AS StartTime, MIN(e.PhysicalLocation) AS PhysicalLocation "
@@ -352,6 +372,7 @@ public class OrderDAO {
                 + "WHERE o.UserID = ? "
                 + "GROUP BY o.OrderID, o.TotalAmount, o.CreatedAt "
                 + "ORDER BY o.CreatedAt DESC";
+>>>>>>> 5d8bf82a4efcd1bff391ea16cbd48a0fc40a8407
 
         try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -362,7 +383,8 @@ public class OrderDAO {
 
             while (rs.next()) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("orderId", rs.getInt("OrderID"));
+                int orderId = rs.getInt("OrderID");
+                map.put("orderId", orderId);
                 map.put("totalQuantity", rs.getInt("TotalQuantity"));
                 map.put("totalAmount", rs.getBigDecimal("TotalAmount"));
 
@@ -370,7 +392,43 @@ public class OrderDAO {
                 java.time.LocalDateTime startTime = rs.getTimestamp("StartTime").toLocalDateTime();
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime refundDeadline = startTime.minusDays(1).withHour(23).withMinute(59).withSecond(59);
-                map.put("canRefund", now.isBefore(refundDeadline));
+                
+                // Kiểm tra trạng thái refund
+                String refundStatus = rs.getString("RefundStatus");
+                Integer refundId = rs.getObject("RefundID", Integer.class);
+                BigDecimal refundAmount = rs.getBigDecimal("RefundAmount");
+                Timestamp refundRequestDate = rs.getTimestamp("RefundRequestDate");
+                
+                // Logic kiểm tra có thể refund hay không
+                boolean canRefund = false;
+                String refundInfo = null;
+                
+                if (refundStatus == null) {
+                    // Chưa có yêu cầu refund nào
+                    canRefund = now.isBefore(refundDeadline);
+                } else if ("pending".equals(refundStatus)) {
+                    // Đã có yêu cầu refund đang chờ xử lý
+                    canRefund = false;
+                    refundInfo = "Đã yêu cầu hoàn tiền - Chờ xử lý";
+                } else if ("approved".equals(refundStatus) || "completed".equals(refundStatus)) {
+                    // Đã được phê duyệt hoàn tiền
+                    canRefund = false;
+                    refundInfo = "Đã hoàn tiền thành công";
+                } else if ("rejected".equals(refundStatus)) {
+                    // Bị từ chối hoàn tiền
+                    canRefund = now.isBefore(refundDeadline);
+                    refundInfo = "Yêu cầu hoàn tiền bị từ chối";
+                } else {
+                    // Trường hợp khác
+                    canRefund = now.isBefore(refundDeadline);
+                }
+                
+                map.put("canRefund", canRefund);
+                map.put("refundStatus", refundStatus);
+                map.put("refundId", refundId);
+                map.put("refundAmount", refundAmount);
+                map.put("refundRequestDate", refundRequestDate);
+                map.put("refundInfo", refundInfo);
 
                 map.put("createdAt", createdAt.format(dateTimeFormatter));
                 map.put("createdAtShort", createdAt.format(dateOnlyFormatter));
@@ -379,7 +437,6 @@ public class OrderDAO {
                 map.put("eventId", rs.getInt("EventID"));
                 map.put("eventName", rs.getString("EventName"));
                 map.put("physicalLocation", rs.getString("PhysicalLocation"));
-                map.put("canRefund", now.isBefore(startTime.minusDays(1).withHour(23).withMinute(59).withSecond(59)));
 
                 list.add(map);
             }
@@ -416,4 +473,7 @@ public class OrderDAO {
         }
         return null;
     }
+
 }
+
+

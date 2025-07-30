@@ -21,6 +21,10 @@ public class SupportItem {
     private Date lastModified;
     private String adminResponse;
     private String assignedAdmin;
+    private int userId;
+    private int assignedAdminId;
+    private Integer eventId;
+    private Integer orderId;
     private java.util.List<SupportAttachment> attachments;
 
   
@@ -29,6 +33,20 @@ public class SupportItem {
 
    
     public SupportItem(String fromEmail, String subject, String content) {
+        this.fromEmail = fromEmail;
+        this.subject = subject;
+        this.content = content;
+        this.status = "PENDING";
+        this.priority = "MEDIUM";
+        this.category = "GENERAL";
+        this.sendDate = new Date(System.currentTimeMillis());
+        this.sendTimestamp = new Timestamp(System.currentTimeMillis());
+        this.createdDate = new Date(System.currentTimeMillis());
+        this.lastModified = new Date(System.currentTimeMillis());
+    }
+
+    public SupportItem(int userId, String fromEmail, String subject, String content) {
+        this.userId = userId;
         this.fromEmail = fromEmail;
         this.subject = subject;
         this.content = content;
@@ -193,6 +211,38 @@ public class SupportItem {
     public void setAssignedAdmin(String assignedAdmin) {
         this.assignedAdmin = assignedAdmin;
         this.lastModified = new Date(System.currentTimeMillis());
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getAssignedAdminId() {
+        return assignedAdminId;
+    }
+
+    public void setAssignedAdminId(int assignedAdminId) {
+        this.assignedAdminId = assignedAdminId;
+    }
+
+    public Integer getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Integer eventId) {
+        this.eventId = eventId;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
     }
 
     public java.util.List<SupportAttachment> getAttachments() {

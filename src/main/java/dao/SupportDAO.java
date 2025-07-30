@@ -12,22 +12,25 @@ public class SupportDAO {
     private static final Logger logger = Logger.getLogger(SupportDAO.class.getName());
 
     public boolean createSupportRequest(SupportItem supportItem) {
-        String sql = "INSERT INTO SupportItems (FromEmail, ToEmail, Subject, SendDate, SendTimestamp, Content, Status, Priority, Category, CreatedDate, LastModified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO SupportItems (UserID, FromEmail, ToEmail, Subject, SendDate, SendTimestamp, Content, Status, Priority, Category, CreatedDate, LastModified, EventID, OrderID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
-            ps.setString(1, supportItem.getFromEmail());
-            ps.setString(2, supportItem.getToEmail());
-            ps.setString(3, supportItem.getSubject());
-            ps.setDate(4, supportItem.getSendDate());
-            ps.setTimestamp(5, supportItem.getSendTimestamp());
-            ps.setString(6, supportItem.getContent());
-            ps.setString(7, supportItem.getStatus());
-            ps.setString(8, supportItem.getPriority());
-            ps.setString(9, supportItem.getCategory());
-            ps.setDate(10, supportItem.getCreatedDate());
-            ps.setDate(11, supportItem.getLastModified());
+            ps.setInt(1, supportItem.getUserId());
+            ps.setString(2, supportItem.getFromEmail());
+            ps.setString(3, supportItem.getToEmail());
+            ps.setString(4, supportItem.getSubject());
+            ps.setDate(5, supportItem.getSendDate());
+            ps.setTimestamp(6, supportItem.getSendTimestamp());
+            ps.setString(7, supportItem.getContent());
+            ps.setString(8, supportItem.getStatus());
+            ps.setString(9, supportItem.getPriority());
+            ps.setString(10, supportItem.getCategory());
+            ps.setDate(11, supportItem.getCreatedDate());
+            ps.setDate(12, supportItem.getLastModified());
+            ps.setObject(13, supportItem.getEventId());
+            ps.setObject(14, supportItem.getOrderId());
             
             int result = ps.executeUpdate();
             if (result > 0) {
@@ -143,7 +146,9 @@ public class SupportDAO {
 
     public List<SupportItem> getSupportRequestsByUserEmail(String userEmail) {
         List<SupportItem> supportItems = new ArrayList<>();
-        String sql = "SELECT * FROM SupportItems WHERE FromEmail = ? ORDER BY SendTimestamp DESC";
+        String sql = "SELECT s.* FROM SupportItems s " +
+                    "JOIN Users u ON s.UserID = u.Id " +
+                    "WHERE u.Email = ? ORDER BY s.SendTimestamp DESC";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -186,7 +191,7 @@ public class SupportDAO {
     }
 
     private SupportItem mapRowToSupportItem(ResultSet rs) throws SQLException {
-        return new SupportItem(
+        SupportItem item = new SupportItem(
             rs.getInt("SupportID"),
             rs.getString("FromEmail"),
             rs.getString("ToEmail"),
@@ -202,6 +207,18 @@ public class SupportDAO {
             rs.getString("AdminResponse"),
             rs.getString("AssignedAdmin")
         );
+        
+        // Set new fields
+        item.setUserId(rs.getInt("UserID"));
+        item.setAssignedAdminId(rs.getInt("AssignedAdminID"));
+        
+        // Handle nullable fields
+        Integer eventId = rs.getObject("EventID") != null ? rs.getInt("EventID") : null;
+        Integer orderId = rs.getObject("OrderID") != null ? rs.getInt("OrderID") : null;
+        item.setEventId(eventId);
+        item.setOrderId(orderId);
+        
+        return item;
     }
 
     private void loadAttachmentsForSupportItem(SupportItem supportItem) {
