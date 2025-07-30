@@ -484,6 +484,57 @@
                 text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
             }
 
+            /* Welcome Section Styles */
+            .welcome-section {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+                max-width: 100%;
+            }
+
+            .welcome-images {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .welcome-img {
+                width: 120px;
+                height: 120px;
+                border-radius: 15px;
+                object-fit: cover;
+                border: 3px solid rgba(255, 255, 255, 0.3);
+                transition: all 0.3s ease;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            }
+
+            .welcome-img:hover {
+                transform: scale(1.1);
+                border-color: var(--primary);
+                box-shadow: 0 12px 35px rgba(102, 122, 255, 0.4);
+            }
+
+            .welcome-text {
+                flex: 1;
+                min-width: 300px;
+            }
+
+            .welcome-text h2 {
+                font-size: clamp(1.8rem, 5vw, 2.5rem);
+                margin-bottom: 1rem;
+                color: var(--text-light);
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            }
+
+            .welcome-text p {
+                font-size: clamp(1rem, 3vw, 1.2rem);
+                margin-bottom: 2rem;
+                color: var(--text-light);
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
+
             .carousel-indicators {
                 position: absolute;
                 bottom: 20px;
@@ -507,123 +558,6 @@
                 background: var(--text-light);
                 transform: scale(1.2);
             }
-
-            /* Banner Section */
-            .banner-section {
-                margin: 3rem 0;
-            }
-
-            .banner-container {
-                background: linear-gradient(135deg, #667aff 0%, #764ba2 100%);
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                border-radius: 16px;
-                padding: 2rem;
-                position: relative;
-                overflow: hidden;
-                box-shadow: 0 8px 32px rgba(102, 122, 255, 0.3);
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .banner-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, rgba(102, 122, 255, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
-                z-index: 1;
-            }
-
-            .banner-container::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                right: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-                animation: float 6s ease-in-out infinite;
-                z-index: 2;
-            }
-
-            @keyframes float {
-                0%, 100% { transform: translateY(0px) rotate(0deg); }
-                50% { transform: translateY(-20px) rotate(180deg); }
-            }
-
-            .banner-content {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-                z-index: 3;
-                position: relative;
-            }
-
-            .banner-text h3 {
-                color: white;
-                font-size: 1.8rem;
-                font-weight: 700;
-                margin-bottom: 0.5rem;
-                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            }
-
-            .banner-text p {
-                color: rgba(255, 255, 255, 0.9);
-                font-size: 1.1rem;
-                margin-bottom: 1rem;
-                max-width: 500px;
-            }
-
-            .banner-location {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                margin-top: 1rem;
-                padding: 0.75rem 1rem;
-                background: rgba(255, 255, 255, 0.15);
-                border-radius: 8px;
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-
-            .banner-location i {
-                color: #ffd700;
-                font-size: 1.2rem;
-            }
-
-            .banner-location span {
-                color: white;
-                font-weight: 500;
-                font-size: 1rem;
-            }
-
-            .banner-action {
-                flex-shrink: 0;
-            }
-
-            .banner-decoration {
-                position: absolute;
-                right: 2rem;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: 3;
-            }
-
-            .banner-icon {
-                font-size: 4rem;
-                opacity: 0.3;
-                animation: bounce 2s ease-in-out infinite;
-            }
-
-            /* @keyframes bounce {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
-            } */
 
             /* Section Headers */
             .section-header {
@@ -1107,6 +1041,21 @@
                 }
                 .carousel-content p {
                     font-size: 0.9rem;
+                }
+                .welcome-section {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+                .welcome-images {
+                    gap: 0.5rem;
+                }
+                .welcome-img {
+                    width: 80px;
+                    height: 80px;
+                }
+                .welcome-text {
+                    min-width: auto;
+                    text-align: center;
                 }
             }
         </style>

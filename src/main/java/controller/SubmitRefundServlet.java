@@ -30,7 +30,7 @@ public class SubmitRefundServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "/pages/TicketOrderHistory.jsp");
+        response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
     }
 
     @Override
@@ -96,7 +96,7 @@ public class SubmitRefundServlet extends HttpServlet {
             if (success) {
                 // Thông báo đã được tạo tự động trong RefundDAO.insertRefund()
                 session.setAttribute("flashMessage_success", "Yêu cầu hoàn tiền đã được gửi thành công! Chúng tôi sẽ xử lý trong thời gian sớm nhất.");
-                response.sendRedirect(request.getContextPath() + "/pages/TicketOrderHistory.jsp");
+                response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
             } else {
                 request.setAttribute("errorMessage", "Có lỗi xảy ra khi gửi yêu cầu hoàn tiền. Vui lòng thử lại!");
                 request.setAttribute("orderId", orderId);

@@ -347,6 +347,9 @@ public class OrderDAO {
 
     public List<Map<String, Object>> getSimpleOrdersByUserId(int userId) {
         List<Map<String, Object>> list = new ArrayList<>();
+        
+        System.out.println("=== OrderDAO Debug ===");
+        System.out.println("Fetching orders for user ID: " + userId);
 
         String sql = "SELECT o.OrderID, SUM(oi.Quantity) AS TotalQuantity, o.TotalAmount, o.CreatedAt, "
                 + "MIN(e.EventID) AS EventID, MIN(e.Name) AS EventName, "
@@ -361,15 +364,22 @@ public class OrderDAO {
                 + "GROUP BY o.OrderID, o.TotalAmount, o.CreatedAt "
                 + "ORDER BY o.CreatedAt DESC";
 
+        System.out.println("SQL Query: " + sql);
 
         try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            System.out.println("Database connection successful");
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
+            
+            System.out.println("Executing query...");
+            int count = 0;
 
             java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             java.time.format.DateTimeFormatter dateOnlyFormatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
             while (rs.next()) {
+                count++;
+                System.out.println("Processing order #" + count);
                 Map<String, Object> map = new HashMap<>();
                 int orderId = rs.getInt("OrderID");
                 map.put("orderId", orderId);
@@ -428,7 +438,10 @@ public class OrderDAO {
 
                 list.add(map);
             }
+            
+            System.out.println("Total orders found: " + count);
         } catch (Exception e) {
+            System.out.println("Error in getSimpleOrdersByUserId: " + e.getMessage());
             e.printStackTrace();
         }
         return list;
