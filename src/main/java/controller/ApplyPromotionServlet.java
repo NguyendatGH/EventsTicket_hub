@@ -210,7 +210,7 @@ public class ApplyPromotionServlet extends HttpServlet {
 
             return formatted;
         } catch (Exception e) {
-            System.err.println("❌ Lỗi format tiền tệ: " + e.getMessage());
+            System.err.println(" Lỗi format tiền tệ: " + e.getMessage());
             return amount.toString() + " ₫";
         }
     }
