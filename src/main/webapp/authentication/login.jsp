@@ -456,8 +456,7 @@
             <button type="submit">Tìm kiếm</button>
         </form>
         <nav class="menu">
-            <a href="${pageContext.request.contextPath}/home" class="active">Trang Chủ</a>
-            <a href="#">Tạo sự kiện</a>
+            <a href="${pageContext.request.contextPath}/" class="active">Trang Chủ</a>
         </nav>
         <div class="auth-btns">
             <a href="${pageContext.request.contextPath}/authentication/register.jsp" class="signup">Đăng ký</a>
