@@ -559,6 +559,123 @@
                 transform: scale(1.2);
             }
 
+            /* Banner Section */
+            .banner-section {
+                margin: 3rem 0;
+            }
+
+            .banner-container {
+                background: linear-gradient(135deg, #667aff 0%, #764ba2 100%);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                border-radius: 16px;
+                padding: 2rem;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 8px 32px rgba(102, 122, 255, 0.3);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .banner-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(102, 122, 255, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+                z-index: 1;
+            }
+
+            .banner-container::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                animation: float 6s ease-in-out infinite;
+                z-index: 2;
+            }
+
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-20px) rotate(180deg); }
+            }
+
+            .banner-content {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                z-index: 3;
+                position: relative;
+            }
+
+            .banner-text h3 {
+                color: white;
+                font-size: 1.8rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .banner-text p {
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+                max-width: 500px;
+            }
+
+            .banner-location {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+                padding: 0.75rem 1rem;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 8px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .banner-location i {
+                color: #ffd700;
+                font-size: 1.2rem;
+            }
+
+            .banner-location span {
+                color: white;
+                font-weight: 500;
+                font-size: 1rem;
+            }
+
+            .banner-action {
+                flex-shrink: 0;
+            }
+
+            .banner-decoration {
+                position: absolute;
+                right: 2rem;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 3;
+            }
+
+            .banner-icon {
+                font-size: 4rem;
+                opacity: 0.3;
+                animation: bounce 2s ease-in-out infinite;
+            }
+
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+
             /* Section Headers */
             .section-header {
                 display: flex;
@@ -587,9 +704,10 @@
             /* Event Grid */
             .event-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
                 gap: 2rem;
                 margin-bottom: 3rem;
+                justify-content: center;
             }
 
             .event-card {
@@ -646,6 +764,18 @@
                 color: var(--text-muted);
                 font-size: 0.9rem;
                 margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 0.75rem;
+                background: rgba(102, 122, 255, 0.1);
+                border-radius: 6px;
+                border-left: 3px solid var(--primary);
+            }
+
+            .event-location::before {
+                content: "📍";
+                font-size: 1rem;
             }
 
             .event-description {
@@ -1121,7 +1251,6 @@
                     <ul class="nav-links" id="navLinks">
                         <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
                         <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
-                        <li><a href="#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
                         <li><a href="${pageContext.request.contextPath}/support"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
                     </ul>
                 </div>
@@ -1168,8 +1297,12 @@
                                 </div>
                                 <div class="user-dropdown" id="userDropdown">
                                     <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
+<<<<<<< HEAD
                                     <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="dropdown-item">🎫 Vé đã mua</a>
                                     <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
+=======
+                                    <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
+>>>>>>> df9d735869f39527c88688ac8ec0fc056a9d2438
                                     <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
                                     <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
                                     <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
@@ -1216,6 +1349,29 @@
                 </div>
             </div>
 
+            <!-- Banner Section -->
+            <div class="banner-section">
+                <div class="banner-container" style="background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                    <div class="banner-overlay"></div>
+                    <div class="banner-content">
+                        <div class="banner-text">
+                            <h3>🎉 Ưu đãi đặc biệt!</h3>
+                            <p>Giảm giá lên đến 50% cho các sự kiện âm nhạc và văn hóa. Đặt vé ngay hôm nay!</p>
+                            <div class="banner-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>📍 Tại các địa điểm: Hà Nội, TP.HCM, Đà Nẵng, Nha Trang</span>
+                            </div>
+                        </div>
+                        <div class="banner-action">
+                            <a href="#events" class="btn btn-primary">Khám phá ngay</a>
+                        </div>
+                    </div>
+                    <div class="banner-decoration">
+                        <div class="banner-icon">🎵</div>
+                    </div>
+                </div>
+            </div>
+
             <% if (events == null || events.isEmpty()) { %>
             <div class="no-events">
                 <h2>Không có sự kiện nào!</h2>
@@ -1251,7 +1407,7 @@
                             🗓️ Thời gian không xác định
                             <% }%>
                         </div>
-                        <div class="event-location">📍 <%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
+                        <div class="event-location"><%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
                         <div class="event-description">
                             <%= event.getDescription() != null ? event.getDescription() : ""%>
                         </div>

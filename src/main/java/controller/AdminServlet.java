@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,10 @@ import models.SupportItem;
 import models.SupportAttachment;
 
 @WebServlet(name = "AdminServlet", urlPatterns = { "/admin-servlet/*" })
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
+        maxFileSize = 1024 * 1024 * 10, // 10MB
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
+)
 public class AdminServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(AdminServlet.class.getName());
@@ -71,29 +76,21 @@ public class AdminServlet extends HttpServlet {
             return;
         }
 
-
-        // --- Bắt đầu kiểm tra quyền admin ---
         UserDTO loggedInUser = null;
         if (session != null) {
             loggedInUser = (UserDTO) session.getAttribute("user");
         }
 
-        // Kiểm tra xem người dùng đã đăng nhập chưa và có phải là admin không
         if (loggedInUser == null || !("admin".equalsIgnoreCase(loggedInUser.getRole()))) {
-            logger.warning("Truy cập trái phép vào AdminServlet. User: " + 
-                           (loggedInUser != null ? loggedInUser.getEmail() + " (Role: " + loggedInUser.getRole() + ")" : "Không đăng nhập"));
-            
-            // Chuyển hướng về trang đăng nhập hoặc trang lỗi quyền truy cập
-            response.sendRedirect(request.getContextPath() + "/login"); // Hoặc một trang lỗi/thông báo không có quyền
-            return; // Ngừng xử lý yêu cầu
+            logger.warning("Truy cập trái phép vào AdminServlet. User: " +
+                    (loggedInUser != null ? loggedInUser.getEmail() + " (Role: " + loggedInUser.getRole() + ")"
+                            : "Không đăng nhập"));
+
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
-        // --- Kết thúc kiểm tra quyền admin ---
 
         logger.info("Processing admin request for path: " + pathInfo);
-        
-        // ủy quyền yêu cầu và phản hồi cho các Servlet con.
-        // Các Servlet con cần có phương thức handleRequest(HttpServletRequest, HttpServletResponse)
-        // hoặc bạn phải gọi trực tiếp doGet/doPost của chúng.
         try {
             if (pathInfo == null || pathInfo.equals("/") || pathInfo.equals("/dashboard")) {
                 dashboardServlet.handleRequest(request, response);
@@ -116,20 +113,24 @@ public class AdminServlet extends HttpServlet {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Lỗi khi xử lý yêu cầu quản trị cho path: " + pathInfo, e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               "Không thể xử lý yêu cầu: " + e.getMessage());
+                    "Không thể xử lý yêu cầu: " + e.getMessage());
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        logger.info("POST request received, delegating to doGet");
-        // Đối với AdminServlet, thường thì các hành động POST cũng được định tuyến bởi pathInfo.
-        // Do đó, delegating to doGet có thể không phải lúc nào cũng tối ưu, 
-        // tùy thuộc vào cách các servlet con xử lý POST.
-        // Nếu các servlet con có xử lý POST riêng, bạn nên điều chỉnh logic dưới đây.
-        
-        // Kiểm tra quyền admin trước khi ủy quyền cho POST requests
+        logger.info("Processing POST request with content-type: " + request.getContentType());
+        if (request.getContentType() != null &&
+                request.getContentType().startsWith("multipart/form-data")) {
+            try {
+                request = new MultipartRequestWrapper(request);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error processing multipart request", e);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
+            }
+        }
         HttpSession session = request.getSession(false);
         UserDTO loggedInUser = null;
         if (session != null) {
@@ -137,8 +138,9 @@ public class AdminServlet extends HttpServlet {
         }
 
         if (loggedInUser == null || !("admin".equalsIgnoreCase(loggedInUser.getRole()))) {
-            logger.warning("Truy cập POST trái phép vào AdminServlet. User: " + 
-                           (loggedInUser != null ? loggedInUser.getEmail() + " (Role: " + loggedInUser.getRole() + ")" : "Không đăng nhập"));
+            logger.warning("Truy cập POST trái phép vào AdminServlet. User: " +
+                    (loggedInUser != null ? loggedInUser.getEmail() + " (Role: " + loggedInUser.getRole() + ")"
+                            : "Không đăng nhập"));
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -149,13 +151,13 @@ public class AdminServlet extends HttpServlet {
         try {
             if (pathInfo != null) {
                 if (pathInfo.startsWith("/user-management")) {
-                    userManagementServlet.handleRequest(request, response); // hoặc .doPost(request, response)
+                    userManagementServlet.handleRequest(request, response);
                 } else if (pathInfo.startsWith("/event-management")) {
-                    eventManagementServlet.handleRequest(request, response); // hoặc .doPost(request, response)
+                    eventManagementServlet.handleRequest(request, response);
                 } else if (pathInfo.startsWith("/support-center")) {
                     adminSupportServlet.doPost(request, response);
-                } 
-                // Thêm các trường hợp xử lý POST cho các Servlet con khác
+                }
+
                 else {
                     logger.warning("Unknown POST path for admin: " + pathInfo);
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "Đường dẫn quản trị POST không hợp lệ.");
@@ -167,7 +169,7 @@ public class AdminServlet extends HttpServlet {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Lỗi khi xử lý yêu cầu POST quản trị", e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                               "Không thể xử lý yêu cầu: " + e.getMessage());
+                    "Không thể xử lý yêu cầu: " + e.getMessage());
         }
     }
 

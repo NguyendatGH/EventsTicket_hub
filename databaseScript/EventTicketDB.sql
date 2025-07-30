@@ -360,6 +360,7 @@ CREATE TABLE Refunds (
 -- Bảng supportItems
 CREATE TABLE SupportItems (
     SupportID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL,
     FromEmail NVARCHAR(255) NOT NULL,
     ToEmail NVARCHAR(255) NOT NULL,
     Subject NVARCHAR(255) NOT NULL,
@@ -372,7 +373,13 @@ CREATE TABLE SupportItems (
     CreatedDate DATE NOT NULL,
     LastModified DATE NOT NULL,
     AdminResponse NVARCHAR(MAX) NULL,
-    AssignedAdmin NVARCHAR(255) NULL
+    AssignedAdminID INT NULL,
+    EventID INT NULL,
+    OrderID INT NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(Id) ON DELETE CASCADE,
+    FOREIGN KEY (AssignedAdminID) REFERENCES Users(Id),
+    FOREIGN KEY (EventID) REFERENCES Events(EventID) ON DELETE SET NULL,
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE SET NULL
 );
 GO
 
@@ -450,6 +457,21 @@ CREATE INDEX IX_Refunds_AdminID ON Refunds(AdminID);
 CREATE INDEX IX_Refunds_RefundStatus ON Refunds(RefundStatus);
 CREATE INDEX IX_Refunds_CreatedAt ON Refunds(CreatedAt);
 CREATE INDEX IX_Refunds_IsDeleted ON Refunds(IsDeleted);
+
+-- Indexes cho bảng SupportItems
+CREATE INDEX IX_SupportItems_UserID ON SupportItems(UserID);
+CREATE INDEX IX_SupportItems_AssignedAdminID ON SupportItems(AssignedAdminID);
+CREATE INDEX IX_SupportItems_EventID ON SupportItems(EventID);
+CREATE INDEX IX_SupportItems_OrderID ON SupportItems(OrderID);
+CREATE INDEX IX_SupportItems_Status ON SupportItems(Status);
+CREATE INDEX IX_SupportItems_Priority ON SupportItems(Priority);
+CREATE INDEX IX_SupportItems_Category ON SupportItems(Category);
+CREATE INDEX IX_SupportItems_CreatedDate ON SupportItems(CreatedDate);
+
+-- Indexes cho bảng SupportAttachments
+CREATE INDEX IX_SupportAttachments_SupportID ON SupportAttachments(SupportID);
+CREATE INDEX IX_SupportAttachments_FileType ON SupportAttachments(FileType);
+CREATE INDEX IX_SupportAttachments_UploadDate ON SupportAttachments(UploadDate);
 GO
 
 go
@@ -854,7 +876,7 @@ VALUES
 (N'[Dốc Mộng Mơ] Hãy Để Anh Đi - Quốc Thiên & Bùi Công Nam', 'Music concert with popular artists', 'Ho Chi Minh City', '2025-09-01 12:30:00', '2025-09-01 14:30:00', 200, 1, 'active', 2, 3, 'haydeanhdi.jpg', 1, 0, '2025-06-06 14:00:00', '2025-06-06 14:00:00'),
 (N'ISAAC WITH LOVE - FANMEETING IN HO CHI MINH', 'Fan meeting with Isaac', 'Ho Chi Minh City', '2025-10-02 10:00:00', '2025-10-02 12:00:00', 200, 1, 'active', 4, 2, 'issacevent.jpg', 0, 0, '2025-06-07 15:00:00', '2025-06-07 15:00:00'),
 (N'LULULOLA SHOW HƯƠNG TRÀM | MỘT NỬA SỰ THẬT', 'Hương Tràm live performance', 'Ho Chi Minh City', '2025-11-03 10:30:00', '2025-11-03 12:30:00', 200, 1, 'active', 2, 3, 'lulula.jpeg', 1, 0, '2025-06-08 16:00:00', '2025-06-08 16:00:00'),
-(N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-12-04 11:00:00', '2025-12-04 13:00:00', 200, 1, 'active', 4, 2, 'amthucando.jpg', 0, 0, '2025-06-09 17:00:00', '2025-06-09 17:00:00'),
+(N'LỄ HỘI ẨM THỰC ẤN ĐỘ - INDIAN FOOD FESTIVAL AT BENARAS', 'Indian cultural food festival', 'Ho Chi Minh City', '2025-12-04 11:00:00', '2025-12-04 13:00:00', 200, 1, 'active', 4, 2, 'amthucando.jpg', 1, 0, '2025-06-09 17:00:00', '2025-06-09 17:00:00'),
 (N'[CONCERT] ANH TRAI VƯỢT NGÀN CHÔNG GAI DAY5, DAY6', 'Popular music concert', 'Ho Chi Minh City', '2025-08-05 11:00:00', '2025-08-05 13:00:00', 200, 1, 'active', 2, 3, 'antraivuotchonggai.jpg', 0, 0, '2025-06-10 18:00:00', '2025-06-10 18:00:00'),
 (N'SAXOPHONE FESTIVAL - SMOKE & SILK', 'Jazz saxophone event', 'Ho Chi Minh City', '2025-08-06 12:00:00', '2025-08-06 14:00:00', 200, 1, 'active', 1, 2, 'smok&silk.jpeg', 0, 0, '2025-06-11 19:00:00', '2025-06-11 19:00:00'),
 (N'Lion Championship 23 - 2025', 'MMA championship', 'Ho Chi Minh City', '2025-08-07 12:00:00', '2025-08-07 14:00:00', 200, 1, 'active', 3, 4, 'lionchampion.jpg', 0, 0, '2025-06-12 20:00:00', '2025-06-12 20:00:00'),

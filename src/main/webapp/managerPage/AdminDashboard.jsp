@@ -6,10 +6,21 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MasterTicket Admin</title>
+    <title>EventTicketHub Admin</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+    :root {
+       --primary-bg: #070a17;
+        --secondary-bg: rgba(15, 23, 42, 0.9);
+        --success-green: #28a745;
+        --error-red: #dc3545;
+        --text-primary: #ffffff;
+        --text-secondary: #94a3b8;
+        --border-dark: rgba(255, 255, 255, 0.1);
+        --border-light: rgba(255, 255, 255, 0.2);
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
       * {
         margin: 0;
         padding: 0;
@@ -17,73 +28,75 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         position: relative;
-        background-color: #070a17;
-        min-height: 100vh;
+            background-color: var(--primary-bg);
+        color: var(--text-primary);
         overflow-x: hidden;
       }
 
       .container {
         display: flex;
-        height: 100vh;
         position: relative;
         z-index: 1;
       }
 
       .sidebar {
-        width: 16%;
-        background: rgba(15, 23, 42, 0.9);
+        width: 280px;
+        background: var(--secondary-bg);
         backdrop-filter: blur(20px);
-        border-right: 1px solid #4d4d4d;
+        border-right: 1px solid var(--border-dark);
         padding: 2rem 0;
         transition: transform 0.3s ease;
+        position: fixed;
+        height: 100%;
         z-index: 1100;
       }
 
       .logo {
-        color: white;
-        font-size: 1.5rem;
+        color: var(--text-primary);
+        font-size: 1.75rem;
         font-weight: 700;
-        margin-bottom: 5rem;
+        margin-bottom: 3rem;
         padding: 0 2rem;
+        letter-spacing: 0.5px;
       }
 
       .admin-section {
-        padding: 0 2rem;
-        margin-bottom: 3rem;
+       padding: 0 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
       }
 
       .admin-avatar {
-        width: 120px;
-        height: 120px;
-        background: rgba(71, 85, 105, 0.8);
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.08);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 2rem;
+        margin: 0 auto 1.5rem;
+        box-shadow: var(--shadow);
       }
 
       .admin-avatar svg {
-        width: 80px;
-        height: 80px;
-        color: #94a3b8;
+        width: 60px;
+        height: 60px;
+        color: var(--text-secondary);
       }
 
       .admin-name {
-        color: white;
-        font-size: 24px;
+      color: var(--text-primary);
+        font-size: 1.25rem;
         font-weight: 600;
-        text-align: center;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
       }
 
       .admin-role {
-        color: #94a3b8;
+         color: var(--text-secondary);
         font-size: 0.875rem;
-        text-align: center;
+        font-weight: 400;
       }
 
 
@@ -93,13 +106,12 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       .nav-item {
-        border-bottom: 1px solid rgba(15, 23, 42, 0.14);
+         border-bottom: 1px solid var(--border-dark);
       }
 
       .nav-link {
         display: block;
-        color: white;
-        background-color: rgba(255, 255, 255, 0.18);
+        color: var(--text-secondary);
         text-decoration: none;
         padding: 1rem 2rem;
         font-weight: 500;
@@ -107,38 +119,34 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         position: relative;
       }
 
+      .nav-link:hover,
       .nav-link.active {
-        background: rgba(255, 255, 255, 0.05);
-        color: white;
-      }
-
-      .nav-link:hover {
-        color: white;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        box-shadow: inset 4px 0 0 #0f67ff;
       }
 
       .logout {
-        position: absolute;
+       position: fixed;
         bottom: 2rem;
         left: 2rem;
-        right: 2rem;
-        color: #94a3b8;
+        color: var(--text-secondary);
         text-decoration: none;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
         font-weight: 500;
         transition: color 0.3s ease;
       }
 
       .logout:hover {
-        color: white;
+        color: var(--text-primary);
       }
 
       .main-content {
         flex: 1;
-        padding: 0 94px;
-        padding-top: 2rem;
+        margin-left: 280px;
+        padding: 2rem 3rem;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -791,7 +799,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <div class="container">
       <div class="overlay"></div>
         <aside class="sidebar">
-        <div class="logo">MasterTicket</div>
+        <div class="logo">EventTicketHub</div>
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -801,7 +809,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </svg>
           </div>
           <div class="admin-name">Admin</div>
-          <div class="admin-role">Quản lý website MasterTicket</div>
+          <div class="admin-role">Quản lý website </div>
         </div>
         <nav>
           <ul class="nav-menu">
