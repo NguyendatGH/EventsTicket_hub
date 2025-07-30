@@ -626,8 +626,8 @@
             /* Event Grid */
             .event-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
-                gap: 2rem;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 280px));
+                gap: 1.5rem;
                 margin-bottom: 3rem;
                 justify-content: center;
             }
