@@ -454,11 +454,8 @@
             <button type="submit">Tìm kiếm</button>
         </form>
         <nav class="menu">
-            <a href="#" class="active">Trang Chủ</a>
-            <a href="#">Các sự kiện hot</a>
-            <a href="#">Săn voucher giảm giá</a>
-            <a href="#">Tạo sự kiện</a>
-            <a href="#">Hỗ trợ</a>
+            <a href="${pageContext.request.contextPath}/" class="active">Trang Chủ</a>
+
         </nav>
         <div class="auth-btns">
             <a href="${pageContext.request.contextPath}/authentication/register.jsp" class="signup">Đăng ký</a>

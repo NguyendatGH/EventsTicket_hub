@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đặt lại mật khẩu - MasterTicket</title>
+    <title>Đặt lại mật khẩu - EventTicketHub</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -305,11 +305,10 @@
         <div class="nav-container">
             <a href="${pageContext.request.contextPath}/" class="logo">
                 <i class="fas fa-ticket-alt"></i>
-                MasterTicket
+                EventTicketHub
             </a>
             <ul class="nav-menu">
                 <li><a href="${pageContext.request.contextPath}/">Trang chủ</a></li>
-                <li><a href="${pageContext.request.contextPath}/events">Sự kiện</a></li>
                 <li><a href="${pageContext.request.contextPath}/authentication/login.jsp">Đăng nhập</a></li>
                 <li><a href="${pageContext.request.contextPath}/authentication/register.jsp">Đăng ký</a></li>
             </ul>

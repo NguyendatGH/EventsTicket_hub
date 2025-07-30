@@ -420,11 +420,7 @@
             <a href="#" class="logo">MasterTicket</a>
             
             <div class="nav-menu">
-                <a href="#">Trang Chủ</a>
-                <a href="#">Các sự kiện hot</a>
-                <a href="#">Sân voucher giảm giá</a>
-                <a href="#">Tạo sự kiện</a>
-                <a href="#">Hỗ trợ</a>
+                <a href="${pageContext.request.contextPath}/">Trang Chủ</a>
             </div>
 
             <div class="search-container">
