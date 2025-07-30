@@ -172,7 +172,7 @@ public class SupportDAO {
     }
 
     public int getPendingSupportRequestsCount() {
-        String sql = "SELECT COUNT(*) FROM SupportItems WHERE Status = 'PENDING'";
+        String sql = "SELECT COUNT(*) FROM SupportItems WHERE Status = 'pending'";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -188,6 +188,30 @@ public class SupportDAO {
         }
         
         return 0;
+    }
+
+    public SupportItem getSupportById(int supportId) {
+        String sql = "SELECT * FROM SupportItems WHERE SupportID = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, supportId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                SupportItem item = mapRowToSupportItem(rs);
+                // Load attachments for this support item
+                loadAttachmentsForSupportItem(item);
+                return item;
+            }
+            
+        } catch (SQLException e) {
+            logger.severe("Error getting support by ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null;
     }
 
     private SupportItem mapRowToSupportItem(ResultSet rs) throws SQLException {

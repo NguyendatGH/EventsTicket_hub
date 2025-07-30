@@ -11,6 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.Map;
+import dao.UserDAO;
+import dao.RefundDAO;
+import models.Refund;
+import models.User;
 
 @ServerEndpoint("/websocket/notifications")
 public class NotificationWebSocket {
@@ -104,48 +108,90 @@ public class NotificationWebSocket {
     }
     
     public static void sendRefundNotification(int refundId, String refundAmount, String refundReason) {
-        Notification notification = new Notification();
-        notification.setUserID(1); // Admin ID
-        notification.setNotificationType("order");
-        notification.setTitle("Yêu cầu hoàn tiền mới");
-        notification.setContent("Có yêu cầu hoàn tiền mới từ khách hàng. Số tiền: " + refundAmount + " VNĐ. Lý do: " + refundReason + " - Yêu cầu hoàn tiền cần xử lý.");
-        notification.setRelatedID(refundId);
-        notification.setIsRead(false);
-        notification.setCreatedAt(java.time.LocalDateTime.now());
-        notification.setPriority("high");
-        
-        // Save to database
-        NotificationService notificationService = new NotificationService();
-        boolean saved = notificationService.insertNotification(notification);
-        
-        if (saved) {
-            sendNotificationToUser(1, notification);
-            LOGGER.info("✅ Refund notification created and sent to admin");
-        } else {
-            LOGGER.severe("❌ Failed to save refund notification to database");
+        try {
+            // Get user information for the refund request
+            UserDAO userDAO = new UserDAO();
+            RefundDAO refundDAO = new RefundDAO();
+            
+            // Get refund details to find the user
+            Refund refund = refundDAO.getRefundById(refundId);
+            if (refund == null) {
+                LOGGER.severe("❌ Refund not found for ID: " + refundId);
+                return;
+            }
+            
+            // Get user information
+            User user = userDAO.findWithID(refund.getUserId());
+            String senderName = user != null ? user.getName() : "Khách hàng";
+            String senderId = String.valueOf(refund.getUserId());
+            
+            Notification notification = new Notification();
+            notification.setUserID(1); // Admin ID
+            notification.setNotificationType("order");
+            notification.setTitle("Yêu cầu hoàn tiền mới");
+            notification.setContent("Người gửi: " + senderName + " (ID: " + senderId + ") | Lý do: " + refundReason + " | Số tiền: " + refundAmount + " VNĐ | Đơn hàng: #" + refund.getOrderId());
+            notification.setRelatedID(refundId);
+            notification.setIsRead(false);
+            notification.setCreatedAt(java.time.LocalDateTime.now());
+            notification.setPriority("high");
+            
+            // Save to database
+            NotificationService notificationService = new NotificationService();
+            boolean saved = notificationService.insertNotification(notification);
+            
+            if (saved) {
+                sendNotificationToUser(1, notification);
+                LOGGER.info("✅ Refund notification created and sent to admin");
+            } else {
+                LOGGER.severe("❌ Failed to save refund notification to database");
+            }
+        } catch (Exception e) {
+            LOGGER.severe("❌ Error creating refund notification: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
     public static void sendSupportNotification(int supportId, String supportSubject, String supportMessage) {
-        Notification notification = new Notification();
-        notification.setUserID(1); // Admin ID
-        notification.setNotificationType("system");
-        notification.setTitle("Yêu cầu hỗ trợ mới");
-        notification.setContent("Có yêu cầu hỗ trợ mới từ khách hàng. Chủ đề: " + supportSubject + ". Nội dung: " + supportMessage + " - Yêu cầu hỗ trợ cần xử lý.");
-        notification.setRelatedID(supportId);
-        notification.setIsRead(false);
-        notification.setCreatedAt(java.time.LocalDateTime.now());
-        notification.setPriority("medium");
-        
-        // Save to database
-        NotificationService notificationService = new NotificationService();
-        boolean saved = notificationService.insertNotification(notification);
-        
-        if (saved) {
-            sendNotificationToUser(1, notification);
-            LOGGER.info("✅ Support notification created and sent to admin");
-        } else {
-            LOGGER.severe("❌ Failed to save support notification to database");
+        try {
+            // Get user information for the support request
+            UserDAO userDAO = new UserDAO();
+            dao.SupportDAO supportDAO = new dao.SupportDAO();
+            
+            // Get support details to find the user
+            models.SupportItem support = supportDAO.getSupportById(supportId);
+            if (support == null) {
+                LOGGER.severe("❌ Support request not found for ID: " + supportId);
+                return;
+            }
+            
+            // Get user information
+            User user = userDAO.findWithID(support.getUserId());
+            String senderName = user != null ? user.getName() : "Khách hàng";
+            String senderId = String.valueOf(support.getUserId());
+            
+            Notification notification = new Notification();
+            notification.setUserID(1); // Admin ID
+            notification.setNotificationType("system");
+            notification.setTitle("Yêu cầu hỗ trợ mới");
+            notification.setContent("Người gửi: " + senderName + " (ID: " + senderId + ") | Lý do: " + supportSubject + " | Loại hỗ trợ: " + support.getCategory() + " | Mô tả: " + supportMessage);
+            notification.setRelatedID(supportId);
+            notification.setIsRead(false);
+            notification.setCreatedAt(java.time.LocalDateTime.now());
+            notification.setPriority("medium");
+            
+            // Save to database
+            NotificationService notificationService = new NotificationService();
+            boolean saved = notificationService.insertNotification(notification);
+            
+            if (saved) {
+                sendNotificationToUser(1, notification);
+                LOGGER.info("✅ Support notification created and sent to admin");
+            } else {
+                LOGGER.severe("❌ Failed to save support notification to database");
+            }
+        } catch (Exception e) {
+            LOGGER.severe("❌ Error creating support notification: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 } 

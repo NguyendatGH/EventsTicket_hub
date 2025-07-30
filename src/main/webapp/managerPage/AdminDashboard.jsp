@@ -759,8 +759,28 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         line-height: 1.4;
         margin-bottom: 8px;
         display: block;
+        word-wrap: break-word;
+        max-width: 100%;
       }
 
+      .notification-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+      
+      .notification-type {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      
       .notification-time {
         color: rgba(255, 255, 255, 0.6);
         font-size: 11px;
@@ -785,9 +805,8 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           transform: translateY(0);
         }
       }
-       }
 
-       .popup-header {
+      .popup-header {
          display: flex;
          justify-content: space-between;
          align-items: center;
@@ -914,24 +933,24 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       <main class="main-content">
         <header class="header">
           <h1 class="page-title">Bảng điều khiển</h1>
-          <div style="display: flex; align-items: center; gap: 24px;">
-            <!-- Simple Notification Bell -->
+          <div class="control-panel">
             <div class="notification-container">
-              <div class="notification-bell" id="notificationBell">
+              <button class="notification-bell" id="notificationBell">
                 <i class="fas fa-bell"></i>
                 <span class="notification-badge" id="notificationBadge">0</span>
-              </div>
+              </button>
               <div class="notification-dropdown" id="notificationDropdown">
                 <div class="notification-header">
                   <h3>Thông báo</h3>
-                  <button class="mark-all-read" id="markAllRead">Đánh dấu tất cả</button>
+                  <button class="mark-all-read" id="markAllRead">Đánh dấu tất cả đã đọc</button>
                 </div>
                 <div class="notification-list" id="notificationList">
-                  <!-- Notifications will be loaded here -->
+                  <div class="notification-loading">Đang tải...</div>
                 </div>
               </div>
             </div>
-            <div class="control-panel">Tổng quan</div>
+            <button id="testNotificationBtn" style="margin-left: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Notification</button>
+            <button id="testParsingBtn" style="margin-left: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Parsing</button>
           </div>
         </header>
         <section class="stats-grid">
@@ -1176,6 +1195,8 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       const notificationList = document.getElementById('notificationList');
       const notificationBadge = document.getElementById('notificationBadge');
       const markAllRead = document.getElementById('markAllRead');
+      const testNotificationBtn = document.getElementById('testNotificationBtn');
+      const testParsingBtn = document.getElementById('testParsingBtn');
 
       // WebSocket connection
       let adminNotificationSocket = null;
@@ -1244,6 +1265,68 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         }
       });
 
+      // Test parsing function
+      function testParsing() {
+        console.log('🧪 Testing parsing logic...');
+        
+        // Test refund notification content
+        const refundContent = "Người gửi: Nguyễn Văn A (ID: 15) | Lý do: Vé bị hủy do sự kiện bị hoãn | Số tiền: 500,000 VNĐ | Đơn hàng: #123";
+        console.log('🧪 Testing refund content:', refundContent);
+        
+        const senderMatch1 = refundContent.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+        if (senderMatch1) {
+          console.log('✅ Refund sender parsed:', senderMatch1[1].trim());
+        } else {
+          console.log('❌ Failed to parse refund sender');
+        }
+        
+        const reasonMatch1 = refundContent.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+        if (reasonMatch1) {
+          console.log('✅ Refund reason parsed:', reasonMatch1[1].trim());
+        } else {
+          console.log('❌ Failed to parse refund reason');
+        }
+        
+        const amountMatch1 = refundContent.match(/Số tiền: ([^|]+?)(?=\s*\|\s*Đơn hàng:)/);
+        if (amountMatch1) {
+          console.log('✅ Refund amount parsed:', amountMatch1[1].trim());
+        } else {
+          console.log('❌ Failed to parse refund amount');
+        }
+        
+        const orderMatch1 = refundContent.match(/Đơn hàng: #(\d+)/);
+        if (orderMatch1) {
+          console.log('✅ Refund order ID parsed:', orderMatch1[1]);
+        } else {
+          console.log('❌ Failed to parse refund order ID');
+        }
+        
+        // Test support notification content
+        const supportContent = "Người gửi: Trần Thị B (ID: 23) | Lý do: Không thể thanh toán qua PayOS | Loại hỗ trợ: Thanh toán | Mô tả: Lỗi khi nhập thông tin thẻ";
+        console.log('🧪 Testing support content:', supportContent);
+        
+        const senderMatch2 = supportContent.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+        if (senderMatch2) {
+          console.log('✅ Support sender parsed:', senderMatch2[1].trim());
+        } else {
+          console.log('❌ Failed to parse support sender');
+        }
+        
+        const reasonMatch2 = supportContent.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+        if (reasonMatch2) {
+          console.log('✅ Support reason parsed:', reasonMatch2[1].trim());
+        } else {
+          console.log('❌ Failed to parse support reason');
+        }
+        
+        const supportTypeMatch2 = supportContent.match(/Loại hỗ trợ: ([^|]+?)(?=\s*\|\s*Mô tả:)/);
+        if (supportTypeMatch2) {
+          console.log('✅ Support type parsed:', supportTypeMatch2[1].trim());
+        } else {
+          console.log('❌ Failed to parse support type');
+        }
+      }
+
       // Load notifications from server
       function loadNotifications() {
         fetch('${pageContext.request.contextPath}/admin-notifications')
@@ -1309,10 +1392,99 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           
           const timeAgo = formatTimeAgo(notification.createdAt);
           
+          // Ensure we have proper content
+          const title = notification.title || 'Không có tiêu đề';
+          const content = notification.content || 'Không có nội dung';
+          const type = notification.notificationType || 'system';
+          const notificationId = notification.notificationID || 'N/A';
+          const priority = notification.priority || 'normal';
+          const relatedId = notification.relatedID || null;
+          
+          console.log(`📋 Final display values - Title: "${title}", Content: "${content}", Type: "${type}", ID: "${notificationId}", Priority: "${priority}", RelatedID: "${relatedId}"`);
+          
+          // Add more detailed logging
+          if (!title || title === 'null' || title === 'undefined') {
+            console.warn(`⚠️ Notification ${index + 1} has invalid title:`, title);
+          }
+          if (!content || content === 'null' || content === 'undefined') {
+            console.warn(`⚠️ Notification ${index + 1} has invalid content:`, content);
+          }
+          
+          // Parse content to extract sender and reason
+          let sender = 'Không xác định';
+          let reason = 'Không có lý do';
+          let amount = '';
+          let orderId = '';
+          
+          if (content && content !== 'null' && content !== 'undefined') {
+            console.log('🔍 Parsing content:', content);
+            
+            // Parse content for sender and reason
+            const senderMatch = content.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+            if (senderMatch) {
+              sender = senderMatch[1].trim();
+              console.log('✅ Parsed sender:', sender);
+            } else {
+              console.log('❌ Failed to parse sender from:', content);
+            }
+            
+            const reasonMatch = content.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+            if (reasonMatch) {
+              reason = reasonMatch[1].trim();
+              console.log('✅ Parsed reason:', reason);
+            } else {
+              console.log('❌ Failed to parse reason from:', content);
+            }
+            
+            // Try to parse amount (for refund notifications)
+            const amountMatch = content.match(/Số tiền: ([^|]+?)(?=\s*\|\s*Đơn hàng:)/);
+            if (amountMatch) {
+              amount = amountMatch[1].trim();
+              console.log('✅ Parsed amount:', amount);
+            } else {
+              console.log('❌ Failed to parse amount from:', content);
+            }
+            
+            // Try to parse order ID (for refund notifications)
+            const orderMatch = content.match(/Đơn hàng: #(\d+)/);
+            if (orderMatch) {
+              orderId = orderMatch[1];
+              console.log('✅ Parsed orderId:', orderId);
+            } else {
+              console.log('❌ Failed to parse orderId from:', content);
+            }
+            
+            // Try to parse support type (for support notifications)
+            const supportTypeMatch = content.match(/Loại hỗ trợ: ([^|]+?)(?=\s*\|\s*Mô tả:)/);
+            if (supportTypeMatch) {
+              const supportType = supportTypeMatch[1].trim();
+              console.log('✅ Parsed support type:', supportType);
+              // Add support type to the display if it's a support notification
+              if (content.includes('Loại hỗ trợ:')) {
+                reason += ' (' + supportType + ')';
+              }
+            }
+          }
+          
           notificationItem.innerHTML = `
-            <div class="notification-title">${notification.title || 'Không có tiêu đề'}</div>
-            <div class="notification-content">${notification.content || 'Không có nội dung'}</div>
-            <div class="notification-time">${timeAgo}</div>
+            <div class="notification-title">${title}</div>
+            <div class="notification-content">
+              <div style="margin-bottom: 8px;">
+                <strong>Người gửi:</strong> ${sender}
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong>Lý do:</strong> ${reason}
+              </div>
+                          ${amount ? '<div style="margin-bottom: 8px;"><strong>Số tiền:</strong> ' + amount + '</div>' : ''}
+            ${orderId ? '<div style="margin-bottom: 8px;"><strong>Đơn hàng:</strong> #' + orderId + '</div>' : ''}
+            </div>
+            <div class="notification-meta">
+              <span class="notification-type">${type}</span>
+              <span class="notification-time">${timeAgo}</span>
+            </div>
+            <div class="notification-details" style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px;">
+              ID: ${notificationId} | Priority: ${priority} ${relatedId ? '| Related ID: ' + relatedId : ''}
+            </div>
           `;
           
           notificationItem.addEventListener('click', () => {
@@ -1340,10 +1512,99 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         
         const timeAgo = formatTimeAgo(notification.createdAt);
         
+        // Ensure we have proper content
+        const title = notification.title || 'Không có tiêu đề';
+        const content = notification.content || 'Không có nội dung';
+        const type = notification.notificationType || 'system';
+        const notificationId = notification.notificationID || 'N/A';
+        const priority = notification.priority || 'normal';
+        const relatedId = notification.relatedID || null;
+        
+        console.log(`📋 Adding new notification - Title: "${title}", Content: "${content}", Type: "${type}", ID: "${notificationId}", Priority: "${priority}", RelatedID: "${relatedId}"`);
+        
+        // Add more detailed logging
+        if (!title || title === 'null' || title === 'undefined') {
+          console.warn(`⚠️ New notification has invalid title:`, title);
+        }
+        if (!content || content === 'null' || content === 'undefined') {
+          console.warn(`⚠️ New notification has invalid content:`, content);
+        }
+        
+        // Parse content to extract sender and reason
+        let sender = 'Không xác định';
+        let reason = 'Không có lý do';
+        let amount = '';
+        let orderId = '';
+        
+        if (content && content !== 'null' && content !== 'undefined') {
+          console.log('🔍 Parsing content for new notification:', content);
+          
+          // Parse content for sender and reason
+          const senderMatch = content.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+          if (senderMatch) {
+            sender = senderMatch[1].trim();
+            console.log('✅ Parsed sender for new notification:', sender);
+          } else {
+            console.log('❌ Failed to parse sender from new notification:', content);
+          }
+          
+          const reasonMatch = content.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+          if (reasonMatch) {
+            reason = reasonMatch[1].trim();
+            console.log('✅ Parsed reason for new notification:', reason);
+          } else {
+            console.log('❌ Failed to parse reason from new notification:', content);
+          }
+          
+          // Try to parse amount (for refund notifications)
+          const amountMatch = content.match(/Số tiền: ([^|]+?)(?=\s*\|\s*Đơn hàng:)/);
+          if (amountMatch) {
+            amount = amountMatch[1].trim();
+            console.log('✅ Parsed amount for new notification:', amount);
+          } else {
+            console.log('❌ Failed to parse amount from new notification:', content);
+          }
+          
+          // Try to parse order ID (for refund notifications)
+          const orderMatch = content.match(/Đơn hàng: #(\d+)/);
+          if (orderMatch) {
+            orderId = orderMatch[1];
+            console.log('✅ Parsed orderId for new notification:', orderId);
+          } else {
+            console.log('❌ Failed to parse orderId from new notification:', content);
+          }
+          
+          // Try to parse support type (for support notifications)
+          const supportTypeMatch = content.match(/Loại hỗ trợ: ([^|]+?)(?=\s*\|\s*Mô tả:)/);
+          if (supportTypeMatch) {
+            const supportType = supportTypeMatch[1].trim();
+            console.log('✅ Parsed support type for new notification:', supportType);
+            // Add support type to the display if it's a support notification
+            if (content.includes('Loại hỗ trợ:')) {
+              reason += ' (' + supportType + ')';
+            }
+          }
+        }
+        
         notificationItem.innerHTML = `
-          <div class="notification-title">${notification.title || 'Không có tiêu đề'}</div>
-          <div class="notification-content">${notification.content || 'Không có nội dung'}</div>
-          <div class="notification-time">${timeAgo}</div>
+          <div class="notification-title">${title}</div>
+          <div class="notification-content">
+            <div style="margin-bottom: 8px;">
+              <strong>Người gửi:</strong> ${sender}
+            </div>
+            <div style="margin-bottom: 8px;">
+              <strong>Lý do:</strong> ${reason}
+            </div>
+            ${amount ? '<div style="margin-bottom: 8px;"><strong>Số tiền:</strong> ' + amount + '</div>' : ''}
+            ${orderId ? '<div style="margin-bottom: 8px;"><strong>Đơn hàng:</strong> #' + orderId + '</div>' : ''}
+          </div>
+          <div class="notification-meta">
+            <span class="notification-type">${type}</span>
+            <span class="notification-time">${timeAgo}</span>
+          </div>
+          <div class="notification-details" style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px;">
+            ID: ${notificationId} | Priority: ${priority} ${relatedId ? '| Related ID: ' + relatedId : ''}
+          </div>
         `;
         
         notificationItem.addEventListener('click', () => {
@@ -1371,6 +1632,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       // Update notification badge
       function updateNotificationBadge(notifications) {
         const unreadCount = notifications.filter(n => !n.isIsRead).length;
+        console.log('🔢 Updating badge count:', unreadCount, 'from', notifications.length, 'notifications');
         notificationBadge.textContent = unreadCount;
         if (unreadCount > 0) {
           notificationBadge.classList.add('show');
@@ -1382,12 +1644,15 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       // Update badge from WebSocket
       function updateNotificationBadgeFromWebSocket() {
         const currentCount = parseInt(notificationBadge.textContent || '0');
-        notificationBadge.textContent = currentCount + 1;
+        const newCount = currentCount + 1;
+        console.log('🔢 WebSocket badge update:', currentCount, '->', newCount);
+        notificationBadge.textContent = newCount;
         notificationBadge.classList.add('show');
       }
 
       // Mark notification as read
       function markNotificationAsRead(notificationId) {
+        console.log('📝 Marking notification as read:', notificationId);
         fetch('${pageContext.request.contextPath}/notification-servlet', {
           method: 'POST',
           headers: {
@@ -1399,6 +1664,10 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .then(data => {
           if (data.message) {
             console.log('✅ Notification marked as read');
+            // Reload notifications to update the badge count
+            loadNotifications();
+          } else {
+            console.error('❌ Failed to mark notification as read:', data.error);
           }
         })
         .catch(error => {
@@ -1408,6 +1677,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
       // Mark all notifications as read
       markAllRead.addEventListener('click', function() {
+        console.log('📝 Marking all notifications as read');
         fetch('${pageContext.request.contextPath}/notification-servlet', {
           method: 'POST',
           headers: {
@@ -1419,7 +1689,10 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         .then(data => {
           if (data.message) {
             console.log('✅ All notifications marked as read');
+            // Reload notifications to update the badge count
             loadNotifications();
+          } else {
+            console.error('❌ Failed to mark all notifications as read:', data.error);
           }
         })
         .catch(error => {
@@ -1479,6 +1752,108 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         };
         console.log('🧪 Test notification:', testNotification);
         console.log('🧪 Test notification keys:', Object.keys(testNotification));
+        
+        // Test parsing function
+        testParsing();
+
+        // Test notification button
+        testNotificationBtn.addEventListener('click', function() {
+          console.log('🧪 Simulating WebSocket notification...');
+          
+          // First, let's load the actual notifications and see what we get
+          fetch('${pageContext.request.contextPath}/admin-notifications')
+            .then(response => response.json())
+            .then(data => {
+              console.log('📋 Actual notifications loaded:', data);
+              
+              if (Array.isArray(data) && data.length > 0) {
+                console.log('📋 First notification content:', data[0].content);
+                console.log('📋 First notification title:', data[0].title);
+                console.log('📋 First notification type:', data[0].notificationType);
+                console.log('📋 First notification isRead:', data[0].isIsRead);
+                
+                // Test parsing the first notification
+                const firstNotification = data[0];
+                if (firstNotification.content) {
+                  console.log('🧪 Testing parsing for first notification...');
+                  const content = firstNotification.content;
+                  console.log('🧪 Raw content:', content);
+                  
+                  const senderMatch = content.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+                  if (senderMatch) {
+                    console.log('✅ Sender parsed:', senderMatch[1].trim());
+                  } else {
+                    console.log('❌ Failed to parse sender from:', content);
+                  }
+                  
+                  const reasonMatch = content.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+                  if (reasonMatch) {
+                    console.log('✅ Reason parsed:', reasonMatch[1].trim());
+                  } else {
+                    console.log('❌ Failed to parse reason from:', content);
+                  }
+                }
+              }
+            })
+            .catch(error => {
+              console.error('❌ Error loading notifications:', error);
+            });
+          
+          const newNotification = {
+            notificationID: Date.now(), // Unique ID
+            userID: 1, // Admin ID
+            title: "Test Notification",
+            content: "This is a test notification content. It can be a refund request, support request, or any other type. It should be parsed correctly.",
+            notificationType: "test", // Custom type for testing
+            isIsRead: false,
+            isRead: false,
+            createdAt: new Date().toISOString()
+          };
+          console.log('🧪 New notification to add:', newNotification);
+          addNotificationToDropdown(newNotification);
+          updateNotificationBadgeFromWebSocket(); // Update badge from WebSocket
+        });
+
+        // Test parsing button
+        testParsingBtn.addEventListener('click', function() {
+          console.log('🧪 Simulating parsing test...');
+          testParsing();
+          
+          // Also test with the exact content that should be generated
+          console.log('🧪 Testing with exact content format...');
+          const testContent = "Người gửi: DEBUG User (ID: 999) | Lý do: This is a debug test | Số tiền: 999,999 VNĐ | Đơn hàng: #999";
+          console.log('🧪 Test content:', testContent);
+          
+          const senderMatch = testContent.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+          if (senderMatch) {
+            console.log('✅ Test sender parsed:', senderMatch[1].trim());
+          } else {
+            console.log('❌ Test failed to parse sender');
+          }
+          
+          const reasonMatch = testContent.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+          if (reasonMatch) {
+            console.log('✅ Test reason parsed:', reasonMatch[1].trim());
+          } else {
+            console.log('❌ Test failed to parse reason');
+          }
+          
+          const amountMatch = testContent.match(/Số tiền: ([^|]+?)(?=\s*\|\s*Đơn hàng:)/);
+          if (amountMatch) {
+            console.log('✅ Test amount parsed:', amountMatch[1].trim());
+          } else {
+            console.log('❌ Test failed to parse amount');
+          }
+          
+          const orderMatch = testContent.match(/Đơn hàng: #(\d+)/);
+          if (orderMatch) {
+            console.log('✅ Test order ID parsed:', orderMatch[1]);
+          } else {
+            console.log('❌ Test failed to parse order ID');
+          }
+          
+          alert('Parsing test completed. Check console for results.');
+        });
       });
      </script>
    </body>
