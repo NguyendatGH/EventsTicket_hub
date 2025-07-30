@@ -71,20 +71,20 @@ public class SubmitRefundServlet extends HttpServlet {
             }
 
             // Lấy thông tin đơn hàng để tính số tiền hoàn
-            BigDecimal orderAmount = orderDAO.getOrderAmount(orderId);
-            if (orderAmount == null) {
-                request.setAttribute("errorMessage", "Không tìm thấy thông tin đơn hàng.");
-                request.setAttribute("orderId", orderId);
-                request.setAttribute("refundReason", refundReason);
-                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
-                return;
-            }
+//            BigDecimal orderAmount = orderDAO.getOrderAmount(orderId);
+//            if (orderAmount == null) {
+//                request.setAttribute("errorMessage", "Không tìm thấy thông tin đơn hàng.");
+//                request.setAttribute("orderId", orderId);
+//                request.setAttribute("refundReason", refundReason);
+//                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+//                return;
+//            }
 
             // Tạo yêu cầu hoàn tiền
             Refund refund = new Refund();
             refund.setOrderId(orderId);
             refund.setUserId(currentUser.getId());
-            refund.setRefundAmount(orderAmount);
+//            refund.setRefundAmount(orderAmount);
             refund.setRefundReason(refundReason.trim());
             refund.setRefundStatus("pending");
             refund.setRefundRequestDate(LocalDateTime.now());
