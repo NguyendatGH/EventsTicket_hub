@@ -69,6 +69,119 @@
         .alert-error { background: rgba(255, 51, 51, 0.1); border: 1px solid #ff3333; color: #ff3333; }
         .empty-state { text-align: center; padding: 3rem; color: #8b949e; }
         .empty-state i { font-size: 3rem; margin-bottom: 1rem; color: #667aff; }
+        
+        /* File upload styles */
+        .file-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            background: #161b22;
+            color: #e6edf3;
+            font-size: 1rem;
+        }
+
+        .file-info {
+            margin-top: 0.5rem;
+            color: #8b949e;
+            font-size: 0.875rem;
+        }
+
+        .file-info small {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .file-list {
+            margin-top: 1rem;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-item-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .file-icon {
+            font-size: 1.25rem;
+            color: #667aff;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            color: #e6edf3;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .file-size {
+            color: #8b949e;
+            font-size: 0.875rem;
+        }
+
+        .file-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.3s;
+        }
+
+        .file-remove:hover {
+            background: #c82333;
+        }
+
+        .attachment-list {
+            margin-top: 1rem;
+        }
+
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: #161b22;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .attachment-icon {
+            color: #667aff;
+            font-size: 1rem;
+        }
+
+        .attachment-name {
+            color: #e6edf3;
+            font-size: 0.875rem;
+        }
+
+        .attachment-download {
+            color: #667aff;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .attachment-download:hover {
+            text-decoration: underline;
+        }
+        
         @media (max-width: 768px) { .sidebar { transform: translateX(-100%); transition: transform 0.3s; } .main-content { margin-left: 0; } }
     </style>
 </head>
@@ -123,7 +236,7 @@
             <div id="new-request" class="tab-content active">
                 <div class="support-form">
                     <h2><i class="fas fa-edit"></i> Gửi yêu cầu hỗ trợ</h2>
-                    <form action="${pageContext.request.contextPath}/support-owner" method="post">
+                    <form action="${pageContext.request.contextPath}/support-owner" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="submit-request">
                         <div class="form-group">
                             <label for="subject">Tiêu đề *</label>
@@ -153,7 +266,20 @@
                             <label for="content">Nội dung *</label>
                             <textarea id="content" name="content" required placeholder="Mô tả chi tiết vấn đề của bạn..."></textarea>
                         </div>
-                        <button type="submit" class="submit-btn">Gửi yêu cầu</button>
+                        <div class="form-group">
+                            <label for="attachments">Tệp đính kèm</label>
+                            <input type="file" id="attachments" name="attachments" multiple 
+                                   accept=".jpg,.jpeg,.png,.gif,.bmp,.pdf,.doc,.docx,.txt,.zip,.rar,.exe"
+                                   class="file-input">
+                            <div class="file-info">
+                                <small>Hỗ trợ: Ảnh (JPG, PNG, GIF), Tài liệu (PDF, DOC, DOCX, TXT), Nén (ZIP, RAR), Thực thi (EXE)</small>
+                                <small>Tối đa 5 file, mỗi file tối đa 10MB</small>
+                            </div>
+                            <div id="file-list" class="file-list"></div>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i> Gửi yêu cầu
+                        </button>
                     </form>
                 </div>
             </div>
@@ -182,6 +308,24 @@
                                         <span><i class="fas fa-flag"></i> ${request.priority}</span>
                                     </div>
                                     <div class="request-content">${request.content}</div>
+
+                                    <!-- Hiển thị file đính kèm -->
+                                    <c:if test="${not empty request.attachments}">
+                                        <div class="attachment-list">
+                                            <h4><i class="fas fa-paperclip"></i> Tệp đính kèm:</h4>
+                                            <c:forEach var="attachment" items="${request.attachments}">
+                                                <div class="attachment-item">
+                                                    <i class="attachment-icon ${attachment.iconClass}"></i>
+                                                    <span class="attachment-name">${attachment.originalFileName}</span>
+                                                    <a href="${pageContext.request.contextPath}/support-owner?action=download&fileId=${attachment.attachmentId}" 
+                                                       class="attachment-download">
+                                                        <i class="fas fa-download"></i> Tải xuống
+                                                    </a>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </c:if>
+
                                     <c:if test="${not empty request.adminResponse}">
                                         <div class="admin-response">
                                             <h4><i class="fas fa-reply"></i> Phản hồi từ Admin</h4>
@@ -213,6 +357,113 @@
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
         }
+
+        // File upload handling
+        document.getElementById('attachments').addEventListener('change', function(e) {
+            console.log('File input changed');
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+            
+            const files = e.target.files;
+            console.log('Number of files selected:', files.length);
+            
+            if (files.length > 5) {
+                alert('Chỉ được chọn tối đa 5 file!');
+                e.target.value = '';
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                console.log('Processing file:', file.name, 'Size:', file.size);
+                
+                // Check file size (10MB = 10 * 1024 * 1024 bytes)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`File ${file.name} quá lớn! Kích thước tối đa là 10MB.`);
+                    continue;
+                }
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                const fileIcon = getFileIcon(file.name);
+                const fileSize = formatFileSize(file.size);
+                
+                fileItem.innerHTML = `
+                    <div class="file-item-info">
+                        <i class="file-icon ${fileIcon}"></i>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${fileSize}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="file-remove" onclick="removeFile(${i})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                fileList.appendChild(fileItem);
+                console.log('File item added to list');
+            }
+        });
+
+        function getFileIcon(fileName) {
+            const extension = fileName.split('.').pop().toLowerCase();
+            switch (extension) {
+                case 'jpg':
+                case 'jpeg':
+                case 'png':
+                case 'gif':
+                case 'bmp':
+                    return 'fas fa-image';
+                case 'pdf':
+                    return 'fas fa-file-pdf';
+                case 'doc':
+                case 'docx':
+                    return 'fas fa-file-word';
+                case 'txt':
+                    return 'fas fa-file-alt';
+                case 'zip':
+                case 'rar':
+                    return 'fas fa-file-archive';
+                case 'exe':
+                    return 'fas fa-cog';
+                default:
+                    return 'fas fa-file';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function removeFile(index) {
+            const input = document.getElementById('attachments');
+            const dt = new DataTransfer();
+            const { files } = input;
+            
+            for (let i = 0; i < files.length; i++) {
+                if (i !== index) {
+                    dt.items.add(files[i]);
+                }
+            }
+            
+            input.files = dt.files;
+            input.dispatchEvent(new Event('change'));
+        }
+
+        // Load user requests when page loads
+        window.onload = function() {
+            console.log('Page loaded');
+            const fileInput = document.getElementById('attachments');
+            const fileList = document.getElementById('file-list');
+            console.log('File input found:', fileInput);
+            console.log('File list found:', fileList);
+        };
     </script>
 </body>
 </html> 

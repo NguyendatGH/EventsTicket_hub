@@ -83,14 +83,12 @@ public class SupportCenterServlet extends HttpServlet {
     private void submitSupportRequest(HttpServletRequest request, HttpServletResponse response, UserDTO user) 
             throws ServletException, IOException {
         
-        System.out.println("Debug: Starting submitSupportRequest...");
         
         String subject = request.getParameter("subject");
         String content = request.getParameter("content");
         String category = request.getParameter("category");
         String priority = request.getParameter("priority");
 
-        System.out.println("Debug: Form data - Subject: " + subject + ", Category: " + category + ", Priority: " + priority);
 
         // Validate input
         if (subject == null || subject.trim().isEmpty() || 
@@ -112,14 +110,8 @@ public class SupportCenterServlet extends HttpServlet {
         // Handle file uploads
         List<SupportAttachment> attachments = new ArrayList<>();
         String uploadPath = getServletContext().getRealPath("/uploads/support_attachments");
-        
-        System.out.println("Debug: Processing file uploads...");
-        System.out.println("Debug: Upload path: " + uploadPath);
-        
         // Kiểm tra và tạo thư mục upload
         File uploadDir = new File(uploadPath);
-        System.out.println("Debug: Upload directory exists: " + uploadDir.exists());
-        System.out.println("Debug: Upload directory can write: " + uploadDir.canWrite());
         
         if (!uploadDir.exists()) {
             boolean created = uploadDir.mkdirs();
@@ -130,9 +122,8 @@ public class SupportCenterServlet extends HttpServlet {
         }
         
         try {
-            System.out.println("Debug: Getting parts from request...");
             Collection<Part> parts = request.getParts();
-            System.out.println("Debug: Total parts found: " + parts.size());
+
             
             // Debug tất cả các parts
             for (Part part : parts) {
@@ -228,7 +219,6 @@ public class SupportCenterServlet extends HttpServlet {
                     out.write(buffer, 0, bytesRead);
                 }
             }
-
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file ID");
         } catch (Exception e) {
