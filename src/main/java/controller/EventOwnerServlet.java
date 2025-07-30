@@ -119,7 +119,6 @@ public class EventOwnerServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         if (session.getAttribute("user") == null) {
-            logger.info("User not logged in, redirecting to login page");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -181,7 +180,7 @@ public class EventOwnerServlet extends HttpServlet {
                 currentPage = Integer.parseInt(pageParam);
                 System.out.println("CURRENT PAGE: " +currentPage);
             } catch (NumberFormatException e) {
-                logger.warning("Invalid page parameter: " + pageParam);
+                System.out.println("Invalid page parameter: " + pageParam);
             }
         }
 
@@ -241,7 +240,6 @@ public class EventOwnerServlet extends HttpServlet {
             throws ServletException, IOException {
         List<Genre> genres = genreDAO.getAllGenres();
         request.setAttribute("genres", genres);
-        logger.info("Genres for CreateEvent.jsp: " + (genres != null ? genres.size() : "null"));
         request.getRequestDispatcher("/eventOwner/createEvent/CreateEvent.jsp").forward(request, response);
     }
 
@@ -299,8 +297,8 @@ public class EventOwnerServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/organizer-servlet?action=createMap");
             return;
         }
-        logger.info("Session ID in showPreviewMapForm: " + session.getId());
-        logger.info("Retrieved seatMapData from session: " + seatMapData);
+        System.out.println("Session ID in showPreviewMapForm: " + session.getId());
+        System.out.println("Retrieved seatMapData from session: " + seatMapData);
         List<Zone> zones = new ArrayList<>();
         try {
             JSONObject json = new JSONObject(seatMapData);
@@ -311,9 +309,9 @@ public class EventOwnerServlet extends HttpServlet {
             request.setAttribute("zones", zones);
             request.setAttribute("seatMapData", seatMapData);
             request.setAttribute("event", event);
-            logger.info("Zones set as attribute: " + zones.size());
+            System.out.println("Zones set as attribute: " + zones.size());
         } catch (Exception e) {
-            logger.severe("Error parsing seatMapData in showPreviewMapForm: " + e.getMessage());
+            System.out.println("Error parsing seatMapData in showPreviewMapForm: " + e.getMessage());
             request.setAttribute("errorMessage", "Invalid seating chart data: " + e.getMessage());
         }
 
