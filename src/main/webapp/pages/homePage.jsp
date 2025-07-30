@@ -1258,8 +1258,7 @@
                         <div class="event-location"><%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
                         <div class="event-description">
                             <%= event.getDescription() != null ? event.getDescription() : ""%>
-                        </div>
-                        <div class="event-price">Từ 150,000 VNĐ</div>
+                        </div>  
                     </div>
                 </div>
                 <% } %>
