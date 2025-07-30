@@ -77,7 +77,6 @@ public class SubmitFeedbackServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Kiểm tra session và người dùng đăng nhập
             UserDTO user = (UserDTO) request.getSession().getAttribute("user");
             if (user == null) {
                 response.sendRedirect("login.jsp");
@@ -85,33 +84,32 @@ public class SubmitFeedbackServlet extends HttpServlet {
             }
 
             int userID = user.getId();
-
-            // Lấy các tham số từ form
             String eventIDRaw = request.getParameter("eventId");
             String orderIDRaw = request.getParameter("orderId");
             String ratingRaw = request.getParameter("rating");
             String content = request.getParameter("content");
 
-            System.out.println("SubmitFeedbackServlet doPost:");
-            System.out.println("eventId = " + orderIDRaw);
-            System.out.println("orderId = " + eventIDRaw);
+            System.out.println("eventId = " + eventIDRaw);
+            System.out.println("orderId = " + orderIDRaw);
             System.out.println("rating = " + ratingRaw);
             System.out.println("content = " + content);
-            // Kiểm tra null hoặc rỗng
-            if (eventIDRaw == null || eventIDRaw.isEmpty()
-                    || orderIDRaw == null || orderIDRaw.isEmpty()
-                    || ratingRaw == null || ratingRaw.equals("0")
-                    || 
-                    content == null || content.trim().isEmpty()) {
+
+            if (eventIDRaw == null || orderIDRaw == null || ratingRaw == null || content == null
+                    || eventIDRaw.isEmpty() || orderIDRaw.isEmpty() || ratingRaw.equals("0") || content.trim().isEmpty()) {
                 request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin đánh giá.");
                 request.getRequestDispatcher("/pages/FeedbackForm.jsp").forward(request, response);
                 return;
             }
 
-            // Ép kiểu an toàn
             int eventID = Integer.parseInt(eventIDRaw);
             int orderID = Integer.parseInt(orderIDRaw);
             int rating = Integer.parseInt(ratingRaw);
+
+            if (rating < 1 || rating > 5) {
+                request.setAttribute("error", "Điểm đánh giá phải từ 1 đến 5.");
+                request.getRequestDispatcher("/pages/FeedbackForm.jsp").forward(request, response);
+                return;
+            }
 
             LocalDateTime now = LocalDateTime.now();
             Feedback feedback = new Feedback(0, userID, eventID, orderID, rating, content, false, null, now, now);
@@ -120,7 +118,7 @@ public class SubmitFeedbackServlet extends HttpServlet {
             boolean success = dao.insertFeedback(feedback);
 
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/pages/FeedbackResult.jsp");
+                response.sendRedirect(request.getContextPath() + "/pages/FeedbackResult.jsp?eventId=" + eventID);
             } else {
                 request.setAttribute("error", "Không thể gửi phản hồi. Vui lòng thử lại.");
                 request.getRequestDispatcher("/pages/FeedbackForm.jsp").forward(request, response);

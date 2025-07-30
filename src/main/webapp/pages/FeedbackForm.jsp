@@ -626,12 +626,12 @@
             ratingText.textContent = ratingTexts[rating];
             ratingText.classList.add('show');
             
-            // Add validation feedback
+
             const ratingContainer = document.querySelector('.rating-container');
             ratingContainer.style.borderColor = 'var(--success)';
         }
 
-        // Add keyboard support for star rating
+
         document.querySelectorAll('.rating-stars i').forEach((star, index) => {
             star.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -641,7 +641,6 @@
             });
         });
 
-        // Character counter for textarea
         const textarea = document.getElementById('content');
         const maxLength = 1000;
         const charCounter = document.getElementById('charCounter');
@@ -651,7 +650,7 @@
             const remaining = maxLength - textarea.value.length;
             charCount.textContent = remaining + ' ký tự còn lại';
             
-            // Update counter color based on remaining characters
+
             charCounter.classList.remove('warning', 'danger');
             if (remaining < 50) {
                 charCounter.classList.add('danger');
@@ -661,22 +660,20 @@
         }
         
         textarea.addEventListener('input', updateCounter);
-        updateCounter(); // Initial call
+        updateCounter(); 
 
-        // Auto-resize textarea
+
         textarea.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.max(150, this.scrollHeight) + 'px';
         });
 
-        // Form submission with loading state
         document.getElementById('feedbackForm').addEventListener('submit', function(e) {
             const rating = document.getElementById('rating').value;
             const content = document.getElementById('content').value.trim();
             const submitBtn = document.getElementById('submitBtn');
             const btnText = document.getElementById('btnText');
-            
-            // Validation
+
             if (rating === '0') {
                 e.preventDefault();
                 alert('Vui lòng chọn số sao đánh giá!');
@@ -689,28 +686,25 @@
                 return;
             }
             
-            // Show loading state
+
             submitBtn.disabled = true;
             btnText.innerHTML = '<span class="loading"></span>Đang gửi...';
         });
 
-        // Add keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Ctrl/Cmd + Enter to submit
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 document.getElementById('feedbackForm').dispatchEvent(new Event('submit'));
             }
         });
 
-        // Add focus management
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Focus on first star when page loads
             setTimeout(() => {
                 document.querySelector('.rating-stars i').focus();
             }, 500);
         });
 
-        // Add hover effects for stars
+
         document.querySelectorAll('.rating-stars i').forEach((star, index) => {
             star.addEventListener('mouseenter', function() {
                 const stars = document.querySelectorAll('.rating-stars i');

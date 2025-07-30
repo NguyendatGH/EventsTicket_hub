@@ -106,9 +106,9 @@ public class ChatDAO {
 
     // Create a new conversation
     public Conversation createConversation(int customerId, int eventOwnerId, int eventId, int createdBy) {
-        String sql = "INSERT INTO Conversations (CustomerID, EventOwnerID, EventID, CreatedBy, Subject, Status, CreatedAt, UpdatedAt) "
+         String sql = "INSERT INTO Conversations (CustomerID, EventOwnerID, EventID, CreatedBy, Subject, Status, CreatedAt, UpdatedAt) "
                 +
-                "VALUES (?, ?, ?, ?, ?, 'active', GETDATE(), GETDATE()); " +
+                "VALUES (?, ?, ?, ?, ?, 'active', DATEADD(HOUR, 7, GETUTCDATE()), DATEADD(HOUR, 7, GETUTCDATE())); " +
                 "SELECT SCOPE_IDENTITY() AS ConversationID;";
 
         try (Connection conn = DBConnection.getConnection();
@@ -173,7 +173,7 @@ public class ChatDAO {
     public int saveMessage(Message message, int conversationId) {
         String sql = "INSERT INTO Messages (ConversationID, SenderID, MessageContent, MessageType, IsRead, CreatedAt, UpdatedAt) "
                 +
-                "VALUES (?, ?, ?, ?, 0, GETDATE(), GETDATE()); " +
+                "VALUES (?, ?, ?, ?, 0, DATEADD(HOUR, 7, GETUTCDATE()), DATEADD(HOUR, 7, GETUTCDATE())); " +
                 "SELECT SCOPE_IDENTITY() AS MessageID;";
 
         try (Connection conn = DBConnection.getConnection();
@@ -229,10 +229,7 @@ public class ChatDAO {
                     List<FileAttachment> attachments = getAttachmentsByMessageId(message.getMessageID());
                     message.setAttachments(attachments);
                     messages.add(message);
-                    // debug
-                    // LOGGER.info("Fetched message: MessageID=" + message.getMessageID() + " for
-                    // ConversationID="
-                    // + conversationId);
+                    
                 }
             }
         } catch (SQLException e) {
@@ -245,7 +242,7 @@ public class ChatDAO {
     public FileAttachment saveFileAttachment(FileAttachment attachment) {
         String sql = "INSERT INTO FileAttachments (MessageID, OriginalFilename, StoredFilename, FilePath, FileSize, MimeType, UploadedAt) "
                 +
-                "VALUES (?, ?, ?, ?, ?, ?, GETDATE()); " +
+                "VALUES (?, ?, ?, ?, ?, ?, DATEADD(HOUR, 7, GETUTCDATE())); " +
                 "SELECT SCOPE_IDENTITY() AS AttachmentID;";
 
         try (Connection conn = DBConnection.getConnection();
@@ -308,7 +305,7 @@ public class ChatDAO {
     }
 
     private void updateLastMessageAt(int conversationId) {
-        String sql = "UPDATE Conversations SET LastMessageAt = GETDATE(), UpdatedAt = GETDATE() WHERE ConversationID = ?";
+       String sql = "UPDATE Conversations SET LastMessageAt = DATEADD(HOUR, 7, GETUTCDATE()), UpdatedAt = DATEADD(HOUR, 7, GETUTCDATE()) WHERE ConversationID = ?";
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {

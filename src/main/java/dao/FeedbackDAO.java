@@ -6,6 +6,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 public class FeedbackDAO {
 
@@ -15,7 +16,7 @@ public class FeedbackDAO {
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            System.out.println("Insert Feedback: " + feedback.toString()); // Debug feedback trước khi insert
+            System.out.println("Insert Feedback: " + feedback.toString());
 
             ps.setInt(1, feedback.getUserID());
             ps.setInt(2, feedback.getEventID());
@@ -34,11 +35,11 @@ public class FeedbackDAO {
             ps.setTimestamp(9, Timestamp.valueOf(feedback.getUpdatedAt()));
 
             int rowsAffected = ps.executeUpdate();
-            System.out.println("Rows inserted: " + rowsAffected); // Debug số dòng insert thành công
+            System.out.println("Rows inserted: " + rowsAffected);
 
             return rowsAffected > 0;
         } catch (SQLException e) {
-            e.printStackTrace(); // In lỗi chi tiết
+            e.printStackTrace();
             return false;
         }
     }
@@ -58,7 +59,7 @@ public class FeedbackDAO {
 
     public List<Feedback> getFeedbackByUser(int userID) {
         List<Feedback> list = new ArrayList<>();
-        String sql = "SELECT * FROM Feedback WHERE UserID = ?";
+        String sql = "SELECT f.*, u.FullName AS UserName FROM Feedback f JOIN Users u ON f.UserID = u.Id WHERE f.UserID = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userID);
             ResultSet rs = ps.executeQuery();
@@ -73,8 +74,9 @@ public class FeedbackDAO {
                         rs.getBoolean("IsApproved"),
                         rs.getString("AdminResponse"),
                         rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                        rs.getTimestamp("UpdatedAt").toLocalDateTime()
-                );
+                        rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                        rs.getString("UserName"));
+
                 list.add(fb);
             }
         } catch (SQLException e) {
@@ -83,51 +85,59 @@ public class FeedbackDAO {
         return list;
     }
 
-    public List<Feedback> getFeedbackByEventId(int eventId) {
+    public List<Feedback> getApprovedFeedbackByEvent(int eventId) {
         List<Feedback> list = new ArrayList<>();
-        String sql = "SELECT f.*, u.Username FROM Feedback f JOIN Users u ON f.UserID = u.Id WHERE f.EventID = ?";
+        String sql = "SELECT f.*, u.Username AS UserName "
+                + "FROM Feedback f "
+                + "JOIN Users u ON f.UserID = u.Id "
+                + "WHERE f.EventID = ? AND f.IsApproved = 1 "
+                + "ORDER BY f.CreatedAt DESC";
+
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, eventId);
             ResultSet rs = ps.executeQuery();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
             while (rs.next()) {
+                LocalDateTime createdAt = rs.getTimestamp("CreatedAt").toLocalDateTime();
+                LocalDateTime updatedAt = rs.getTimestamp("UpdatedAt").toLocalDateTime();
+
                 Feedback fb = new Feedback(
-                    rs.getInt("FeedbackID"),
-                    rs.getInt("UserID"),
-                    rs.getInt("EventID"),
-                    rs.getInt("OrderID"),
-                    rs.getInt("Rating"),
-                    rs.getString("Content"),
-                    rs.getBoolean("IsApproved"),
-                    rs.getString("AdminResponse"),
-                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
-                );
-                fb.setUserName(rs.getString("Username"));
+                        rs.getInt("FeedbackID"),
+                        rs.getInt("UserID"),
+                        rs.getInt("EventID"),
+                        rs.getInt("OrderID"),
+                        rs.getInt("Rating"),
+                        rs.getString("Content"),
+                        rs.getBoolean("IsApproved"),
+                        rs.getString("AdminResponse"),
+                        createdAt,
+                        updatedAt,
+                        rs.getString("UserName"));
+
+                // Thêm ngày định dạng sẵn
+                fb.setFormattedDate(createdAt.format(formatter));
+
                 list.add(fb);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return list;
     }
 
-    public static void main(String[] args) {
-        FeedbackDAO dao = new FeedbackDAO();
-        int testEventId = 1; // Thay bằng EventID bạn muốn test
-        System.out.println("--- Test getFeedbackByEventId(" + testEventId + ") ---");
-        List<Feedback> feedbacks = dao.getFeedbackByEventId(testEventId);
-        for (Feedback fb : feedbacks) {
-            System.out.println("FeedbackID: " + fb.getFeedbackID()
-                + ", UserID: " + fb.getUserID()
-                + ", EventID: " + fb.getEventID()
-                + ", Rating: " + fb.getRating()
-                + ", Content: " + fb.getContent()
-                + ", CreatedAt: " + fb.getCreatedAt());
-        }
-        if (feedbacks.isEmpty()) {
-            System.out.println("Không có feedback nào cho event này.");
+    public boolean approveAllFeedback() {
+        String sql = "UPDATE Feedback SET IsApproved = 1 WHERE IsApproved = 0";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            int updated = ps.executeUpdate();
+            System.out.println("Updated " + updated + " feedback(s) to approved.");
+            return updated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
-    // Bạn có thể viết thêm: getFeedbackByOrderID, approveFeedback, respondToFeedback,...
 }

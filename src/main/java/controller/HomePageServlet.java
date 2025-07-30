@@ -25,7 +25,7 @@ public class HomePageServlet extends HttpServlet {
 
     private EventDAO eventDAO;
     private NotificationService notificationService;
-    private static final int RECORDS_PER_PAGE = 10; 
+    private static final int RECORDS_PER_PAGE = 12; 
 
     @Override
     public void init() throws ServletException {

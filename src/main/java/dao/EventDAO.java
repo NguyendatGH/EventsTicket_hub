@@ -25,18 +25,11 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import models.TicketType;
 
 public class EventDAO {
 
     private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
 
-    /**
-     * Gets the total count of approved and non-deleted events.
-     * Connection is managed via try-with-resources.
-     * 
-     * @return The total count of events.
-     */
     public int getTotalApprovedEventsCount() {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM Events WHERE IsApproved = 1 AND IsDeleted = 0";
