@@ -15,6 +15,7 @@ public class Feedback {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String userName;
+    private String formattedDate;
 
     public Feedback() {
     }
@@ -138,14 +139,14 @@ public class Feedback {
         this.userName = userName;
     }
 
-    
-    public java.util.Date getCreatedAtDate() {
-        return java.sql.Timestamp.valueOf(this.createdAt);
+    public String getFormattedDate() {
+        return formattedDate;
     }
-    public java.util.Date getUpdatedAtDate() {
-        return java.sql.Timestamp.valueOf(this.updatedAt);
+
+    public void setFormattedDate(String formattedDate) {
+        this.formattedDate = formattedDate;
     }
-    
+
     @Override
     public String toString() {
         return "Feedback{"

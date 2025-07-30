@@ -762,6 +762,14 @@
                     <button><i class="fas fa-search"></i></button>
                 </div>
                 <div class="actions">
+                    <button class="primary-btn">
+                        <i class="fas fa-plus"></i>
+                        Tạo sự kiện
+                    </button>
+<!--                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
+                        <i class="fas fa-history"></i>
+                        Vé đã mua
+                    </a>-->
                     <div class="account">
                         <a href="${pageContext.request.contextPath}/updateProfile" class="link">
                             <i class="fas fa-user"></i>
@@ -931,7 +939,7 @@
                         </c:if>
                     </div>
 
-                    <%-- <div class="section-card">
+                    <div class="section-card">
                         <h2 class="section-title">
                             <i class="fas fa-comments"></i>
                             Phản hồi từ người tham dự
@@ -940,20 +948,30 @@
                         <c:choose>
                             <c:when test="${not empty feedbackList}">
                                 <c:forEach var="fb" items="${feedbackList}">
-                                    <div class="feedback-item">
-                                        <p class="feedback-text">"${fb.content}"</p>
-                                        <div class="feedback-meta">
+                                    <div class="feedback-item" style="margin-bottom: 1.5rem;">
+                                        <!-- Nội dung feedback -->
+                                        <p class="feedback-text" style="margin: 0 0 0.5rem 0; font-weight: 500;">
+                                            ${fb.content}
+                                        </p>
+
+                                        <!-- Số sao + người gửi + ngày -->
+                                        <div class="feedback-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                                            <!-- Số sao -->
+                                            <div class="feedback-stars">
+                                                <c:forEach begin="1" end="5" var="i">
+                                                    <i class="${i <= fb.rating ? 'fas' : 'far'} fa-star"
+                                                       style="color: ${i <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>
+                                                </c:forEach>
+                                            </div>
+
+                                            <!-- Người gửi -->
                                             <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
-                                                <i class="fas fa-user-circle"></i>
                                                 ${fb.userName}
                                             </span>
-                                            <span class="feedback-date" style="color: var(--text-muted);">
-                                                • <fmt:formatDate value="${fb.createdAt}" pattern="dd/MM/yyyy"/>
-                                            </span>
-                                            <span class="feedback-stars">
-                                                <c:forEach begin="1" end="5" var="i">
-                                                    <i class="${i <= fb.rating ? 'fas' : 'far'} fa-star" style="color: ${i <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>
-                                                </c:forEach>
+
+                                            <!-- Ngày gửi -->
+                                            <span class="feedback-date" style="color: var(--text-muted); font-size: 0.95em;">
+                                                (${fb.formattedDate})
                                             </span>
                                         </div>
                                     </div>
@@ -965,16 +983,8 @@
                                 </p>
                             </c:otherwise>
                         </c:choose>
-                    </div> --%>
+                    </div>
 
-                </div>
-            </c:if>
-
-            <c:if test="${empty event}">
-                <div style="text-align: center; padding: 4rem; color: var(--danger);">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; margin-bottom: 2rem; display: block;"></i>
-                    <h2 style="font-size: 2rem; margin-bottom: 1rem;">Không tìm thấy sự kiện</h2>
-                    <p style="font-size: 1.1rem;">Vui lòng kiểm tra lại đường dẫn hoặc thử tìm kiếm sự kiện khác.</p>
                 </div>
             </c:if>
         </div>
@@ -1041,14 +1051,13 @@
             var contextPath = '${pageContext.request.contextPath}';
 
             function handleBuyTickets(eventId, hasSeatingChartStr) {
-                console.log("clicked")
                 console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
                 console.log("  - eventId nhận được:", eventId, "(kiểu:", typeof eventId, ")");
                 console.log("  - hasSeatingChartStr nhận được:", hasSeatingChartStr, "(kiểu:", typeof hasSeatingChartStr, ")");
 
                 if (hasSeatingChartStr === 'true') {
                     console.log("  - KẾT LUẬN: CÓ sơ đồ ghế. Chuyển hướng tới BookChairServlet.");
-                    window.location.href = contextPath + '/BookSeatServlet?eventId=' + eventId;
+                    window.location.href = contextPath + '/BookChairServlet?eventId=' + eventId;
                 } else {
                     console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
                     window.location.href = contextPath + '/TicketInfoServlet?eventId=' + eventId;
@@ -1060,7 +1069,7 @@
                 window.location.href = contextPath + '/init-chat?eventId=' + eventId;
             }
 
-            // Star rating functionality
+
             document.addEventListener('DOMContentLoaded', function () {
                 const stars = document.querySelectorAll('.rating .fa-star');
                 stars.forEach((star, index) => {
