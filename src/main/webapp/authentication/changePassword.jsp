@@ -420,11 +420,7 @@
             <a href="#" class="logo">MasterTicket</a>
             
             <div class="nav-menu">
-                <a href="#">Trang Chủ</a>
-                <a href="#">Các sự kiện hot</a>
-                <a href="#">Sân voucher giảm giá</a>
-                <a href="#">Tạo sự kiện</a>
-                <a href="#">Hỗ trợ</a>
+                <a href="${pageContext.request.contextPath}/">Trang Chủ</a>
             </div>
 
             <div class="search-container">
@@ -437,10 +433,7 @@
                         👤 Xin chào, <%= user.getEmail() %> <span style="margin-left: 0.5rem;">▼</span>
                     </div>
                     <div class="user-dropdown" id="userDropdown">
-                        <a href="updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
-                        <a href="#tickets" class="dropdown-item">🎫 Vé đã mua</a>
-                        <a href="#favorites" class="dropdown-item">❤️ Sự kiện yêu thích</a>
-                        <a href="#settings" class="dropdown-item">⚙️ Cài đặt</a>
+                        <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
                         <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 0.5rem 0;">
                         <a href="LogoutServlet" class="dropdown-item" style="color: #ff6b6b;">🚪 Đăng xuất</a>
                     </div>

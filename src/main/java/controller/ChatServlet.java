@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.Date;
+import java.util.HashMap;
 
 @WebServlet({ "/chat/*", "/init-chat" })
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
@@ -238,7 +239,6 @@ public class ChatServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // LOGGER.info("Received POST request to /chat"); debug
         response.setContentType("application/json");
         HttpSession session = request.getSession(false);
         UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
@@ -267,7 +267,7 @@ public class ChatServlet extends HttpServlet {
             return;
         }
 
-        // Create message
+        // Create message object
         Message message = new Message();
         message.setSenderID(user.getId());
         message.setConversationID(conversationId);
@@ -276,6 +276,50 @@ public class ChatServlet extends HttpServlet {
         message.setCreatedAt(new Date());
         message.setUpdatedAt(new Date());
 
+        // Process file uploads
+        List<FileAttachment> attachments = new ArrayList<>();
+        String applicationPath = request.getServletContext().getRealPath("");
+        String uploadPath = applicationPath + File.separator + UPLOAD_DIR;
+        File uploadDir = new File(uploadPath);
+
+        // Create upload directory if it doesn't exist
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        // Process each file part
+        for (Part part : request.getParts()) {
+            if (part.getName().equals("attachment") && part.getSize() > 0) {
+                String originalFilename = part.getSubmittedFileName();
+                String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String storedFilename = UUID.randomUUID().toString() + fileExtension;
+                String filePath = "/" + UPLOAD_DIR + "/" + storedFilename;
+
+                // Validate file size
+                if (part.getSize() > 10 * 1024 * 1024) { // 10MB limit
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter()
+                            .write("{\"status\": \"error\", \"message\": \"File size exceeds 10MB limit\"}");
+                    return;
+                }
+
+                // Save file to server
+                part.write(uploadPath + File.separator + storedFilename);
+
+                // Create attachment object
+                FileAttachment attachment = new FileAttachment();
+                attachment.setOriginalFilename(originalFilename);
+                attachment.setStoredFilename(storedFilename);
+                attachment.setFilePath(filePath);
+                attachment.setFileSize(part.getSize());
+                attachment.setMimeType(part.getContentType());
+                attachment.setUploadedAt(new Date());
+
+                attachments.add(attachment);
+            }
+        }
+
+        // Save message to database
         int messageId = chatService.saveMessage(message, conversationId);
         if (messageId == -1) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -284,50 +328,46 @@ public class ChatServlet extends HttpServlet {
         }
         message.setMessageID(messageId);
 
-        List<FileAttachment> attachments = new ArrayList<>();
-        String applicationPath = request.getServletContext().getRealPath("");
-        String uploadPath = applicationPath + File.separator + UPLOAD_DIR;
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
-        }
-
-        for (Part part : request.getParts()) {
-            if (part.getName().equals("attachment") && part.getSize() > 0) {
-                String originalFilename = part.getSubmittedFileName();
-                String storedFilename = UUID.randomUUID().toString() + "_" + originalFilename;
-                String filePath = "/" + UPLOAD_DIR + "/" + storedFilename;
-
-                part.write(uploadPath + File.separator + storedFilename);
-
-                FileAttachment attachment = new FileAttachment();
-                attachment.setMessageID(messageId);
-                attachment.setOriginalFilename(originalFilename);
-                attachment.setStoredFilename(storedFilename);
-                attachment.setFilePath(filePath);
-                attachment.setFileSize(part.getSize());
-                attachment.setMimeType(part.getContentType());
-                attachment.setUploadedAt(new Date());
-
-                FileAttachment savedAttachment = chatService.saveFileAttachment(attachment);
-                if (savedAttachment != null) {
-                    attachments.add(savedAttachment);
-                }
+        // Save attachments to database
+        List<FileAttachment> savedAttachments = new ArrayList<>();
+        for (FileAttachment attachment : attachments) {
+            attachment.setMessageID(messageId);
+            FileAttachment savedAttachment = chatService.saveFileAttachment(attachment);
+            if (savedAttachment != null) {
+                savedAttachments.add(savedAttachment);
             }
         }
-
-        message.setAttachments(attachments);
+        message.setAttachments(savedAttachments);
 
         try {
+            // Broadcast message to WebSocket
             ChatWebSocket.broadcastMessage(message, conversationId);
-            response.getWriter().write("{\"status\": \"success\", \"message\": \"Message sent\"}");
+
+            // Prepare response
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("status", "success");
+            responseData.put("message", "Message sent successfully");
+            responseData.put("messageId", messageId);
+
+            if (!savedAttachments.isEmpty()) {
+                List<Map<String, Object>> attachmentsData = new ArrayList<>();
+                for (FileAttachment attachment : savedAttachments) {
+                    Map<String, Object> attachmentData = new HashMap<>();
+                    attachmentData.put("originalFilename", attachment.getOriginalFilename());
+                    attachmentData.put("filePath", attachment.getFilePath());
+                    attachmentData.put("fileSize", attachment.getFileSize());
+                    attachmentData.put("mimeType", attachment.getMimeType());
+                    attachmentsData.add(attachmentData);
+                }
+                responseData.put("attachments", attachmentsData);
+            }
+
+            response.getWriter().write(objectMapper.writeValueAsString(responseData));
         } catch (Exception e) {
             LOGGER.severe("Error broadcasting message: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"status\": \"error\", \"message\": \"Failed to broadcast message\"}");
         }
-        String broadcastMessage = objectMapper.writeValueAsString(message);
-        LOGGER.info("broadcasting json:" + broadcastMessage);
     }
 
 }

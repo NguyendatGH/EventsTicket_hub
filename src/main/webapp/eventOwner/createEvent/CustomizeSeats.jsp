@@ -356,57 +356,32 @@
 </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo">MasterTicket</div>
-            <div class="nav-links">
-                <a href="${pageContext.request.contextPath}/">Home</a>
-                <a href="${pageContext.request.contextPath}/shows">Shows</a>
-                <a href="${pageContext.request.contextPath}/offers">Offers & Discount</a>
-                <a href="${pageContext.request.contextPath}/events/create">Create Event</a>
-            </div>
-            <c:choose>
-                <c:when test="${not empty sessionScope.user}">
-                    <a href="${pageContext.request.contextPath}/logout" class="btn-primary">Logout</a>
-                </c:when>
-                <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/login" class="btn-primary">Login</a>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
+    
     <div class="progress-bar">
         <div class="progress-content">
             <div class="progress-step">
                 <div class="step-number completed">1</div>
-                <span>Information</span>
+                <span>Thông tin</span>
             </div>
             <div class="step-connector completed"></div>
             <div class="progress-step">
                 <div class="step-number completed">2</div>
-                <span>Time & Type</span>
+                <span>Thời gian & Địa điểm</span>
             </div>
             <div class="step-connector completed"></div>
             <div class="progress-step">
                 <div class="step-number active">3</div>
-                <span>Settings</span>
+                <span>Cài đặt</span>
             </div>
             <div class="step-connector"></div>
             <div class="progress-step">
                 <div class="step-number inactive">4</div>
-                <span>TicketInfo</span>
+                <span>Thông tin vé</span>
             </div>
         </div>
     </div>
     <div class="container">
-        <div class="sidebar">
-            <h3>🎟️ MasterTicket</h3>
-            <ul class="sidebar-menu">
-                <li><a href="${pageContext.request.contextPath}/events" class="active">📅 My event</a></li>
-                <li><a href="${pageContext.request.contextPath}/reports">📊 Manage Report</a></li>
-                <li><a href="${pageContext.request.contextPath}/rules">⚙️ Rules</a></li>
-            </ul>
-        </div>
+
         <div class="main-content">
             <h1 class="page-title">Customize Seat Tickets</h1>
             <p class="page-subtitle">Assign a ticket name for all seats in each zone</p>

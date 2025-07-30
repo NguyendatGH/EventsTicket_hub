@@ -754,18 +754,17 @@
         <div class="header-container">
             <header class="header">
                 <div class="logo">
-                    <i class="fas fa-ticket-alt"></i>
-                    MasterTicket
+                   <a href="/OnlineSellingTicketEvents/home" class="logo">MasterTicket</a>                   
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm...">
                     <button><i class="fas fa-search"></i></button>
                 </div>
                 <div class="actions">
-                    <button class="primary-btn">
+                    <a class="primary-btn" href="${pageContext.request.contextPath}/TicketOrderHistoryServlet">
                         <i class="fas fa-plus"></i>
-                        Tạo sự kiện
-                    </button>
+                        Vé đã mua 
+                    </a>
 <!--                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
                         <i class="fas fa-history"></i>
                         Vé đã mua

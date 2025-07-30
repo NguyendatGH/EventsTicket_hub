@@ -562,7 +562,7 @@
     </button>
     <div class="container">
       <div class="overlay"></div>
-      <aside class="sidebar">
+        <aside class="sidebar">
         <div class="logo">EventTicketHub</div>
         <div class="admin-section">
           <div class="admin-avatar">
@@ -580,7 +580,7 @@
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/admin-servlet/dashboard"
-                class="nav-link"
+                class="nav-link active"
                 >Bảng điều khiển</a
               >
             </li>
@@ -601,8 +601,15 @@
             <li class="nav-item">
               <a
                 href="${pageContext.request.contextPath}/admin-servlet/transaction-management"
-                class="nav-link active"
+                class="nav-link"
                 >Danh sách giao dịch</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin/refund"
+                class="nav-link"
+                >Quản lý hoàn tiền</a
               >
             </li>
             <li class="nav-item">

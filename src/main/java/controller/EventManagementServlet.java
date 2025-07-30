@@ -54,7 +54,7 @@ public class EventManagementServlet implements AdminSubServlet {
     public void handleRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        logger.info("Handling GET request with action: " + action);
+        System.out.println("Handling GET request with action: " + action);
         if ("edit-event".equals(action)) {
             handleEditEvent(request, response);
         } else if ("delete".equals(action)) {

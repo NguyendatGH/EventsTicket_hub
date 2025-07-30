@@ -301,6 +301,41 @@ CREATE TABLE Promotions(
     )
 );
 
+
+
+
+
+-- 1. SUMMER25 áp dụng cho EventID = 15 (Indian Food Festival - diễn ra ngày 2025-12-04)
+UPDATE Promotions
+SET EndTime = '2025-12-03 23:59:59'
+WHERE PromotionCode = 'SUMMER25';
+
+-- 2. EARLY10 áp dụng cho EventID = 19 (VBA Match - diễn ra ngày 2025-09-08)
+UPDATE Promotions
+SET EndTime = '2025-09-07 23:59:59'
+WHERE PromotionCode = 'EARLY10';
+
+-- 3. CONCERT50K áp dụng cho EventID = 20 (Cải lương CÂU THƠ YÊN NGỰA - diễn ra ngày 2025-09-09)
+UPDATE Promotions
+SET EndTime = '2025-09-08 23:59:59'
+WHERE PromotionCode = 'CONCERT50K';
+
+-- 4. THEATER20 áp dụng cho EventID = 7 (12 Bà Mụ - diễn ra ngày 2025-08-25)
+UPDATE Promotions
+SET EndTime = '2025-08-24 23:59:59'
+WHERE PromotionCode = 'THEATER20';
+
+-- 5. ISLAND30K áp dụng cho EventID = 8 (The Island and The Bay - diễn ra ngày 2025-09-27)
+UPDATE Promotions
+SET EndTime = '2025-09-26 23:59:59'
+WHERE PromotionCode = 'ISLAND30K';
+
+-- 6. CONCERT15 áp dụng cho EventID = 16 (Anh Trai concert - diễn ra ngày 2025-08-05)
+UPDATE Promotions
+SET EndTime = '2025-08-04 23:59:59'
+WHERE PromotionCode = 'CONCERT15';
+
+
 -- Bảng Notifications (mới)
 CREATE TABLE Notifications (
     NotificationID INT IDENTITY(1,1) PRIMARY KEY,
@@ -357,6 +392,7 @@ CREATE TABLE Refunds (
     CONSTRAINT FK_Refunds_PaymentMethod FOREIGN KEY (PaymentMethodID) REFERENCES PaymentMethod(PaymentMethodID),
  
 );
+
 -- Bảng supportItems
 CREATE TABLE SupportItems (
     SupportID INT IDENTITY(1,1) PRIMARY KEY,
@@ -848,8 +884,7 @@ VALUES
 (N'Rock', N'Nhạc Rock và Metal'),
 (N'Hài kịch', N'Chương trình hài kịch'),
 (N'Thể thao', N'Các sự kiện thể thao'),
-(N'Hội nghị', N'Hội nghị và seminar'),
-('Others', 'Miscellaneous events');
+(N'Hội nghị', N'Hội nghị và seminar');
 
 -- select * from Genres;
 
@@ -967,8 +1002,10 @@ VALUES
 (9, 'TKT000000122025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
 (10, 'TKT000000132025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
---select * from Ticket
 
+-- select * from PaymentMethod
+-- delete from PaymentMethod
+-- DBCC PaymentMethod ('PaymentMethod', RESEED, 0);
 -- Insert into PaymentMethod
 INSERT INTO PaymentMethod (MethodName, PromotionCode, Description, IsActive)
 VALUES
@@ -1136,27 +1173,3 @@ SET LastLoginAt = CASE Id
     ELSE LastLoginAt
 END
 WHERE Id BETWEEN 1 AND 25;
-
--- Update all qualifying events to 'pending'
-UPDATE e
-SET Status = 'pending',
-    UpdatedAt = GETDATE()
-FROM Events e
-JOIN TicketInfo ti ON e.EventID = ti.EventID
-JOIN TicketInventory tinv ON ti.TicketInfoID = tinv.TicketInfoID
-WHERE e.Status = 'active'
-  AND e.IsDeleted = 0
-  AND tinv.SoldQuantity = 0;
-
-  update Events set status = 'active' where Name = N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI'
-
-SELECT c.ConversationID, c.CustomerID, c.EventOwnerID, c.EventID, c.Subject, c.Status,
-                 c.LastMessageAt, c.CreatedBy, c.CreatedAt, c.UpdatedAt, e.Name AS EventName, u.Username AS CustomerName
-                 FROM Conversations c 
-                 LEFT JOIN Events e ON c.EventID = e.EventID 
-                 LEFT JOIN Users u ON c.CustomerID = u.Id 
-                 WHERE c.EventOwnerID = 2 AND e.Status = 'active'
-
--- select * from OrderItems
-
-
