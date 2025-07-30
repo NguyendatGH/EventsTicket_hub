@@ -27,6 +27,8 @@ public class Refund {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isDeleted;
+    private String userName;
+    private String orderNumber;
 
     public Refund() {
     }
@@ -160,5 +162,19 @@ public class Refund {
         this.isDeleted = isDeleted;
     }
 
-    
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
+    }
 }

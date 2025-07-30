@@ -5,79 +5,116 @@
 
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import dao.RefundDAO;
+import dao.OrderDAO;
+import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import models.Refund;
+import models.Notification;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-/**
- *
- * @author admin
- */
-@WebServlet(name="SubmitRefundServlet", urlPatterns={"/SubmitRefundServlet"})
+
+@WebServlet("/SubmitRefundServlet")
 public class SubmitRefundServlet extends HttpServlet {
    
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet SubmitRefundServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet SubmitRefundServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
+    private final RefundDAO refundDAO = new RefundDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
-
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+            throws ServletException, IOException {
+        response.sendRedirect(request.getContextPath() + "/pages/TicketOrderHistory.jsp");
     }
 
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
     @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        UserDTO currentUser = (UserDTO) session.getAttribute("user");
+        
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
+        String orderIdParam = request.getParameter("orderId");
+        String refundReason = request.getParameter("refundReason");
+
+        // Validate input
+        if (orderIdParam == null || orderIdParam.trim().isEmpty() || 
+            refundReason == null || refundReason.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin!");
+            request.setAttribute("orderId", orderIdParam);
+            request.setAttribute("refundReason", refundReason);
+            request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+            return;
+        }
+
+        try {
+            int orderId = Integer.parseInt(orderIdParam);
+            
+            // Kiểm tra xem có thể hoàn tiền không
+            if (!refundDAO.checkCanRefund(orderId, currentUser.getId())) {
+                request.setAttribute("errorMessage", "Vé đã quá hạn hoàn trả hoặc không hợp lệ.");
+                request.setAttribute("orderId", orderId);
+                request.setAttribute("refundReason", refundReason);
+                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+                return;
+            }
+
+            // Lấy thông tin đơn hàng để tính số tiền hoàn
+            BigDecimal orderAmount = orderDAO.getOrderAmount(orderId);
+            if (orderAmount == null) {
+                request.setAttribute("errorMessage", "Không tìm thấy thông tin đơn hàng.");
+                request.setAttribute("orderId", orderId);
+                request.setAttribute("refundReason", refundReason);
+                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+                return;
+            }
+
+            // Tạo yêu cầu hoàn tiền
+            Refund refund = new Refund();
+            refund.setOrderId(orderId);
+            refund.setUserId(currentUser.getId());
+            refund.setRefundAmount(orderAmount);
+            refund.setRefundReason(refundReason.trim());
+            refund.setRefundStatus("pending");
+            refund.setRefundRequestDate(LocalDateTime.now());
+            refund.setCreatedAt(LocalDateTime.now());
+            refund.setUpdatedAt(LocalDateTime.now());
+
+            boolean success = refundDAO.insertRefund(refund);
+
+            if (success) {
+                // Thông báo đã được tạo tự động trong RefundDAO.insertRefund()
+                session.setAttribute("flashMessage_success", "Yêu cầu hoàn tiền đã được gửi thành công! Chúng tôi sẽ xử lý trong thời gian sớm nhất.");
+                response.sendRedirect(request.getContextPath() + "/pages/TicketOrderHistory.jsp");
+            } else {
+                request.setAttribute("errorMessage", "Có lỗi xảy ra khi gửi yêu cầu hoàn tiền. Vui lòng thử lại!");
+                request.setAttribute("orderId", orderId);
+                request.setAttribute("refundReason", refundReason);
+                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+            }
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Mã đơn hàng không hợp lệ.");
+            request.setAttribute("orderId", orderIdParam);
+            request.setAttribute("refundReason", refundReason);
+            request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Có lỗi xảy ra. Vui lòng thử lại sau!");
+            request.setAttribute("orderId", orderIdParam);
+            request.setAttribute("refundReason", refundReason);
+            request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+        }
+    }
 }

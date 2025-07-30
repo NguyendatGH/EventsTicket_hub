@@ -14,15 +14,47 @@ import java.io.IOException;
 
 @WebServlet("/signupOption")
 public class SignupOptionServlet extends HttpServlet {
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("=== SignupOptionServlet doGet called ===");
+        System.out.println("Request Method: " + request.getMethod());
+        System.out.println("Request URI: " + request.getRequestURI());
+        
+        // Handle GET requests by redirecting to the register page
+        response.sendRedirect(request.getContextPath() + "/authentication/register.jsp");
+    }
+    
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String role = request.getParameter("role");
+        try {
+            System.out.println("=== SignupOptionServlet doPost called ===");
+            System.out.println("Request Method: " + request.getMethod());
+            System.out.println("Request URI: " + request.getRequestURI());
+            System.out.println("Context Path: " + request.getContextPath());
+            
+            String role = request.getParameter("role");
+            System.out.println("Role parameter: " + role);
 
-        if ("user".equals(role)) {
-            response.sendRedirect("authentication/registerUser.jsp");
-        } else if ("organizer".equals(role)) {
-            response.sendRedirect("authentication/registerOrganizer.jsp");
-        } else {
-            response.sendRedirect("authentication/register.jsp");
+            if ("user".equals(role)) {
+                String redirectUrl = request.getContextPath() + "/authentication/registerUser.jsp";
+                System.out.println("Redirecting to: " + redirectUrl);
+                response.sendRedirect(redirectUrl);
+            } else if ("organizer".equals(role)) {
+                String redirectUrl = request.getContextPath() + "/authentication/registerOrganizer.jsp";
+                System.out.println("Redirecting to: " + redirectUrl);
+                response.sendRedirect(redirectUrl);
+            } else {
+                // Invalid role, redirect back to register page
+                String redirectUrl = request.getContextPath() + "/authentication/register.jsp";
+                System.out.println("Invalid role, redirecting to: " + redirectUrl);
+                response.sendRedirect(redirectUrl);
+            }
+        } catch (Exception e) {
+            System.err.println("Error in SignupOptionServlet: " + e.getMessage());
+            e.printStackTrace();
+            // Redirect to register page on error
+            response.sendRedirect(request.getContextPath() + "/authentication/register.jsp");
         }
     }
 }

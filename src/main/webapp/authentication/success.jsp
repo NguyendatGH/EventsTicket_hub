@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
@@ -85,6 +86,7 @@
                 border-radius: 20px;
                 cursor: pointer;
                 transition: all 0.3s ease;
+                display: inline-block;
             }
 
             .btn-register {
@@ -95,6 +97,7 @@
                 border-radius: 20px;
                 cursor: pointer;
                 transition: all 0.3s ease;
+                display: inline-block;
             }
 
             .btn-login:hover, .btn-register:hover {
@@ -378,7 +381,7 @@
     <body>
         <!-- Navbar -->
         <nav class="navbar">
-            <div class="logo">MasterTicket</div>
+            <a href="${pageContext.request.contextPath}/" class="logo" style="text-decoration: none; color: #fff;">MasterTicket</a>
             <div class="nav-search">
                 <div class="search-container">
                     <input type="text" class="search-input" placeholder="Bạn tìm gì hôm nay ?">
@@ -386,18 +389,18 @@
                 </div>
             </div>
             <div class="auth-buttons">
-                <button class="btn-login">Đăng ký</button>
-                <button class="btn-register">Đăng nhập</button>
+                <a href="${pageContext.request.contextPath}/authentication/register.jsp" class="btn-login" style="text-decoration: none;">Đăng ký</a>
+                <a href="${pageContext.request.contextPath}/authentication/login.jsp" class="btn-register" style="text-decoration: none;">Đăng nhập</a>
             </div>
         </nav>
 
         <!-- Sub Navigation -->
         <nav class="sub-nav">
-            <a href="#" class="active">Trang Chủ</a>
-            <a href="#">Các sự kiện hot</a>
-            <a href="#">Săn voucher giảm giá</a>
-            <a href="#">Tạo sự kiện</a>
-            <a href="#">Hỗ trợ</a>
+            <a href="${pageContext.request.contextPath}/" class="active">Trang Chủ</a>
+            <a href="${pageContext.request.contextPath}/pages/homePage.jsp">Các sự kiện hot</a>
+            <a href="${pageContext.request.contextPath}/pages/homePage.jsp">Săn voucher giảm giá</a>
+            <a href="${pageContext.request.contextPath}/eventOwner/createEvent/CreateEvent.jsp">Tạo sự kiện</a>
+            <a href="${pageContext.request.contextPath}/supportCenter/supportCenter.jsp">Hỗ trợ</a>
         </nav>
 
         <!-- Main Content -->
@@ -409,7 +412,7 @@
                     Tài khoản của bạn đã được tạo thành công.<br>
                     Khám phá ngay các sự kiện hấp dẫn!
                 </p>
-                <a href="${pageContext.request.contextPath}/login" class="explore-btn">Khám Phá Ngay</a>
+                <a href="${pageContext.request.contextPath}/" class="explore-btn">Khám Phá Ngay</a>
             </div>
         </main>
 
