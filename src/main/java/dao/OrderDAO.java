@@ -347,7 +347,6 @@ public class OrderDAO {
 
     public List<Map<String, Object>> getSimpleOrdersByUserId(int userId) {
         List<Map<String, Object>> list = new ArrayList<>();
-<<<<<<< HEAD
 
         String sql = "SELECT o.OrderID, SUM(oi.Quantity) AS TotalQuantity, o.TotalAmount, o.CreatedAt, "
                 + "MIN(e.EventID) AS EventID, MIN(e.Name) AS EventName, "
@@ -362,17 +361,6 @@ public class OrderDAO {
                 + "GROUP BY o.OrderID, o.TotalAmount, o.CreatedAt "
                 + "ORDER BY o.CreatedAt DESC";
 
-=======
-        String sql = "SELECT o.OrderID, SUM(oi.Quantity) AS TotalQuantity, o.TotalAmount, o.CreatedAt, "
-                + "MIN(e.EventID) AS EventID, MIN(e.Name) AS EventName, "
-                + "MIN(e.StartTime) AS StartTime, MIN(e.PhysicalLocation) AS PhysicalLocation "
-                + "FROM Orders o "
-                + "JOIN OrderItems oi ON o.OrderID = oi.OrderID "
-                + "JOIN Events e ON oi.EventID = e.EventID "
-                + "WHERE o.UserID = ? "
-                + "GROUP BY o.OrderID, o.TotalAmount, o.CreatedAt "
-                + "ORDER BY o.CreatedAt DESC";
->>>>>>> 5d8bf82a4efcd1bff391ea16cbd48a0fc40a8407
 
         try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
