@@ -402,60 +402,34 @@
 </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo">MasterTicket</div>
-            <div class="nav-links">
-                <a href="${pageContext.request.contextPath}/">Home</a>
-                <a href="${pageContext.request.contextPath}/shows">Shows</a>
-                <a href="${pageContext.request.contextPath}/offers">Offers & Discount</a>
-                <a href="${pageContext.request.contextPath}/events/create">Create Event</a>
-            </div>
-            <c:choose>
-                <c:when test="${not empty sessionScope.user}">
-                    <a href="${pageContext.request.contextPath}/logout" class="btn-primary">Logout</a>
-                </c:when>
-                <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/login" class="btn-primary">Login</a>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
     <div class="progress-bar">
         <div class="progress-content">
             <div class="progress-step">
                 <div class="step-number completed">1</div>
-                <span>Information</span>
+                <span>Thông tin</span>
             </div>
             <div class="step-connector completed"></div>
             <div class="progress-step">
                 <div class="step-number completed">2</div>
-                <span>Time & Type</span>
+                <span>Thời gian & Thể loại</span>
             </div>
             <div class="step-connector completed"></div>
             <div class="progress-step">
                 <div class="step-number completed">3</div>
-                <span>Settings</span>
+                <span>Cài đặt</span>
             </div>
             <div class="step-connector completed"></div>
             <div class="progress-step">
                 <div class="step-number active">4</div>
-                <span>TicketInfo</span>
+                <span>Thông tin vé</span>
             </div>
         </div>
     </div>
     <div class="container">
-        <div class="sidebar">
-            <h3>🎟️ MasterTicket</h3>
-            <ul class="sidebar-menu">
-                <li><a href="${pageContext.request.contextPath}/events" class="active">📅 My event</a></li>
-                <li><a href="${pageContext.request.contextPath}/reports">📊 Manage Report</a></li>
-                <li><a href="${pageContext.request.contextPath}/rules">⚙️ Rules</a></li>
-            </ul>
-        </div>
+
         <div class="main-content">
-            <h1 class="page-title">Ticket Info Settings</h1>
-            <p class="page-subtitle">Review and confirm ticket information</p>
+            <h1 class="page-title">Cài đặt thông tin vé</h1>
+            
             <c:if test="${not empty errorMessage}">
                 <div class="alert">
                     <span>${errorMessage}</span>
@@ -471,7 +445,7 @@
             <form action="${pageContext.request.contextPath}/organizer-servlet" method="post" id="ticketForm">
                 <input type="hidden" name="action" value="create"/>
                 <div class="form-section">
-                    <h3 class="section-title">Ticket Information</h3>
+
                     <c:choose>
                         <c:when test="${event.hasSeatingChart}">
                             <p>Total Tickets: ${event.totalTicketCount}</p>
@@ -502,22 +476,22 @@
                         </c:when>
                         <c:otherwise>
                             <div class="form-group">
-                                <label class="form-label">Total Ticket Count *</label>
+                                <label class="form-label">Tổng số lượng vé *</label>
                                 <input type="number" class="form-input" name="totalTicketCount" value="${event.totalTicketCount != null ? event.totalTicketCount : ''}" required>
                             </div>
                             <div id="ticketTypes">
                                 <div class="ticket-type">
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label class="form-label">Ticket Name *</label>
+                                            <label class="form-label">Tên vé *</label>
                                             <input type="text" class="form-input" name="ticketName[]" required>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">Price (VND) *</label>
+                                            <label class="form-label">Giá tiền (VND) *</label>
                                             <input type="number" step="0.01" class="form-input" name="ticketPrice[]" required>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">Quantity *</label>
+                                            <label class="form-label">Số lượng *</label>
                                             <input type="number" class="form-input" name="ticketQuantity[]" required>
                                         </div>
                                         <button type="button" class="btn-secondary remove-ticket">Remove</button>

@@ -761,10 +761,10 @@
                     <button><i class="fas fa-search"></i></button>
                 </div>
                 <div class="actions">
-                    <button class="primary-btn">
+                    <a class="primary-btn" href="${pageContext.request.contextPath}/TicketOrderHistoryServlet">
                         <i class="fas fa-plus"></i>
-                        Tạo sự kiện
-                    </button>
+                        Vé đã mua 
+                    </a>
 <!--                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
                         <i class="fas fa-history"></i>
                         Vé đã mua

@@ -1,3 +1,4 @@
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
@@ -5,9 +6,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xem trước Sơ đồ Ghế</title>
+  <title>Xem trước Sơ Đồ Ghế</title>
   <style>
-    /* Base Styles */
     * {
         margin: 0;
         padding: 0;
@@ -121,9 +121,7 @@
         border: 1px solid rgba(255,255,255,0.1);
         display: none;
     }
-    .ZoneInfo {
-        background-color: black;
-    }
+
     .zone-details p {
         margin: 8px 0;
         color: rgba(255,255,255,0.8);
@@ -142,8 +140,10 @@
         border: 1px solid rgba(244, 67, 54, 0.3);
         text-align: center;
     }
+    .color{
+        background-color: gray;
+    }
 
-    /* Responsive Design */
     @media (max-width: 768px) {
         .container {
             flex-direction: column;
@@ -157,20 +157,20 @@
             height: 400px;
         }
     }
-</style>
+  </style>
 </head>
 <body>
-  <h1>Xem trước Sơ đồ Ghế</h1>
+  <h1>Xem trước Sơ Đồ Ghế</h1>
   <c:if test="${not empty errorMessage}">
     <div class="error">${errorMessage}</div>
   </c:if>
   <div class="container">
-    <div class="info ">
+    <div class="info">
       <h3>Thông tin Zone</h3>
-      <select  id="zoneSelect" onchange="displayZoneDetails()">
-        <option class ="ZoneInfo" value="-1">Chọn Zone</option>
-        <c:forEach  var="zone" items="${zones}">
-          <option class ="ZoneInfo" value="${zone.id}">${zone.name} (${zone.shape}, ${zone.totalSeats} ghế, ${zone.ticketPrice} VND)</option>
+      <select id="zoneSelect" onchange="displayZoneDetails()">
+          <option class="color" value="-1">Chọn Zone</option>
+        <c:forEach var="zone" items="${zones}">
+          <option class="color" value="${zone.id}">${zone.name} (Đa giác, ${zone.totalSeats} ghế, ${zone.ticketPrice} VND)</option>
         </c:forEach>
       </select>
       <div id="zoneDetails" class="zone-details">
@@ -196,66 +196,108 @@
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = 800;
-    canvas.height = 500;
 
-    const zones = ${requestScope.seatMapData};
+    // Khởi tạo kích thước canvas
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth - 40; // Trừ padding
+      canvas.height = window.innerWidth <= 768 ? 400 : 500;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Dữ liệu zones từ server
+    const zones = ${requestScope.seatMapData != null ? requestScope.seatMapData : '{}'};
     const seats = [];
     let selectedZoneId = -1;
 
-    // Generate seats for each zone (for submission, not display)
-     zones.zones.forEach(zone => {
-      const seatWidth = zone.shape === 'rectangle' ? 
-        (Math.max(...zone.vertices.map(v => v.x)) - Math.min(...zone.vertices.map(v => v.x))) / zone.seatsPerRow :
-        zone.radiusX * 2 / zone.seatsPerRow;
-      const seatHeight = zone.shape === 'rectangle' ? 
-        (Math.max(...zone.vertices.map(v => v.y)) - Math.min(...zone.vertices.map(v => v.y))) / zone.rows :
-        zone.radiusY * 2 / zone.rows;
+    // Tạo ghế cho mỗi zone
+    if (zones.zones) {
+      zones.zones.forEach(zone => {
+        if (zone.isStage) return; // Bỏ qua sân khấu
+        const seatWidth = (Math.max(...zone.vertices.map(v => v.x)) - Math.min(...zone.vertices.map(v => v.x))) / zone.seatsPerRow;
+        const seatHeight = (Math.max(...zone.vertices.map(v => v.y)) - Math.min(...zone.vertices.map(v => v.y))) / zone.rows;
 
-      for (let row = 0; row < zone.rows; row++) {
-        for (let col = 0; col < zone.seatsPerRow; col++) {
-          const seat = {
-            zoneId: zone.id,
-            label: `S${row + 1}-${col + 1}`,
-            color: zone.color,
-            price: zone.ticketPrice,
-            x: zone.x + col * seatWidth + seatWidth / 2,
-            y: zone.y + row * seatHeight + seatHeight / 2,
-            relativeX: (col + 0.5) / zone.seatsPerRow,
-            relativeY: (row + 0.5) / zone.rows,
-            status: 'available'
-          };
-          seats.push(seat);
+        for (let row = 0; row < zone.rows; row++) {
+          for (let col = 0; col < zone.seatsPerRow; col++) {
+            const seat = {
+              zoneId: zone.id,
+              label: `S${row + 1}-${col + 1}`,
+              color: zone.color,
+              price: zone.ticketPrice,
+              x: zone.x + col * seatWidth + seatWidth / 2,
+              y: zone.y + row * seatHeight + seatHeight / 2,
+              relativeX: (col + 0.5) / zone.seatsPerRow,
+              relativeY: (row + 0.5) / zone.rows,
+              status: 'available'
+            };
+            seats.push(seat);
+          }
         }
-      }
-    });
+      });
+    } else {
+      console.error('No zones data available');
+    }
 
     function drawCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      zones.zones.forEach(zone => {
-        ctx.fillStyle = zone.color;
+
+      // Vẽ sân khấu
+      const stage = zones.zones && zones.zones.find(z => z.isStage);
+      if (stage) {
+        ctx.fillStyle = stage.color;
         ctx.beginPath();
-        if (zone.shape === 'rectangle') {
+        ctx.moveTo(stage.x + stage.vertices[0].x, stage.y + stage.vertices[0].y);
+        for (let i = 1; i < stage.vertices.length; i++) {
+          ctx.lineTo(stage.x + stage.vertices[i].x, stage.y + stage.vertices[i].y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 14px Arial';
+        ctx.fillText(stage.name, stage.x, stage.y + 15);
+      }
+
+      // Vẽ các zone
+      if (zones.zones) {
+        zones.zones.forEach(zone => {
+          if (zone.isStage) return; // Bỏ qua sân khấu
+          ctx.fillStyle = zone.color;
+          ctx.beginPath();
           ctx.moveTo(zone.x + zone.vertices[0].x, zone.y + zone.vertices[0].y);
           for (let i = 1; i < zone.vertices.length; i++) {
             ctx.lineTo(zone.x + zone.vertices[i].x, zone.y + zone.vertices[i].y);
           }
           ctx.closePath();
           ctx.fill();
-        } else {
-          ctx.ellipse(zone.x, zone.y, zone.radiusX, zone.radiusY, 0, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.fillStyle = '#000';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(zone.name, zone.x, zone.y);
-        if (zone.id === selectedZoneId) {
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-      });
+
+          // Vẽ tên zone ở chính giữa (centroid)
+          ctx.fillStyle = '#000';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.font = 'bold 14px Arial';
+          let textX = zone.x;
+          let textY = zone.y;
+          if (zone.shape === 'polygon') {
+            const sumX = zone.vertices.reduce((sum, v) => sum + v.x, 0);
+            const sumY = zone.vertices.reduce((sum, v) => sum + v.y, 0);
+            const count = zone.vertices.length;
+            textX = zone.x + sumX / count;
+            textY = zone.y + sumY / count;
+          }
+          ctx.fillText(zone.name, textX, textY);
+
+          if (zone.id === selectedZoneId) {
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+        });
+      } else {
+        console.error('No zones found in seatMapData');
+      }
     }
 
     function displayZoneDetails() {
@@ -266,16 +308,15 @@
       if (zoneId === -1) {
         zoneDetails.style.display = 'none';
       } else {
-        const zone = zones.zones.find(z => z.id === zoneId);
+        const zone = zones.zones && zones.zones.find(z => z.id === zoneId);
         if (zone) {
           document.getElementById('zoneName').textContent = zone.name;
-          document.getElementById('zoneShape').textContent = zone.shape === 'rectangle' ? 'Hình chữ nhật' : 'Hình tròn';
+          document.getElementById('zoneShape').textContent = 'Đa giác';
           document.getElementById('zoneColor').innerHTML = `<span style="color: ${zone.color};">${zone.color}</span>`;
           document.getElementById('zoneRows').textContent = zone.rows;
           document.getElementById('zoneSeatsPerRow').textContent = zone.seatsPerRow;
           document.getElementById('zoneTotalSeats').textContent = zone.totalSeats;
-          document.getElementById('zoneTicketPrice').textContent = zone.ticketPrice;
-          textContent = zone.ticketPrice.toLocaleString('vi-VN');
+          document.getElementById('zoneTicketPrice').textContent = zone.ticketPrice.toLocaleString('vi-VN');
           zoneDetails.style.display = 'block';
         }
       }
@@ -283,44 +324,46 @@
     }
 
     function isPointInZone(x, y, zone) {
-      if (zone.shape === 'rectangle') {
-        let inside = false;
-        const vertices = zone.vertices;
-        for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
-          const xi = zone.x + vertices[i].x, yi = zone.y + vertices[i].y;
-          const xj = zone.x + vertices[j].x, yj = zone.y + vertices[j].y;
-          const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-          if (intersect) inside = !inside;
-        }
-        return inside;
-      } else {
-        const dx = (x - zone.x) / zone.radiusX;
-        const dy = (y - zone.y) / zone.radiusY;
-        return dx * dx + dy * dy <= 1;
+      if (zone.isStage) return false;
+      let inside = false;
+      const vertices = zone.vertices;
+      for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+        const xi = zone.x + vertices[i].x, yi = zone.y + vertices[i].y;
+        const xj = zone.x + vertices[j].x, yj = zone.y + vertices[j].y;
+        const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
       }
+      return inside;
     }
 
     canvas.addEventListener('click', (e) => {
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      for (let i = zones.zones.length - 1; i >= 0; i--) {
-        if (isPointInZone(x, y, zones.zones[i])) {
-          selectedZoneId = zones.zones[i].id;
-          document.getElementById('zoneSelect').value = selectedZoneId;
-          displayZoneDetails();
-          break;
+      if (zones.zones) {
+        for (let i = zones.zones.length - 1; i >= 0; i--) {
+          if (isPointInZone(x, y, zones.zones[i])) {
+            selectedZoneId = zones.zones[i].id;
+            document.getElementById('zoneSelect').value = selectedZoneId;
+            displayZoneDetails();
+            break;
+          }
         }
       }
     });
 
     function confirmLayout() {
+      if (!zones.zones || zones.zones.length === 0) {
+        alert('Không có zone nào để xác nhận.');
+        return;
+      }
       const seatMapData = JSON.stringify({ zones: zones.zones, seats: seats });
       console.log('Confirming seatMapData:', seatMapData);
       document.getElementById('seatMapData').value = seatMapData;
       document.getElementById('seatMapForm').submit();
     }
 
+    // Vẽ canvas ban đầu
     drawCanvas();
   </script>
 </body>

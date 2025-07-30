@@ -805,6 +805,7 @@
             <header class="header">
                 <div class="logo">
                     <a href="/OnlineSellingTicketEvents/home" class="logo">MasterTicket</a>                   
+
                 </div>
                 <div class="actions">
                     <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">

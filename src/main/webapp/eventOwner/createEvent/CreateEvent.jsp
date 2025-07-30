@@ -301,7 +301,7 @@
                     <input type="text" id="name" name="name" class="form-control" value="${event.name}" required maxlength="100">
                 </div>
                 <div class="form-group">
-                    <label for="physicalLocation">Physical Location (Tỉnh/Thành phố)</label>
+                    <label for="physicalLocation">Địa điểm (Tỉnh/Thành phố)</label>
                     <select id="physicalLocation" name="physicalLocation" class="form-control">
                         <option value="" class="select-css">-- Chọn Tỉnh/Thành phố --</option>
                         <option class="select-css" value="An Giang" ${event.physicalLocation == 'An Giang' ? 'selected' : ''}>An Giang</option>
@@ -343,7 +343,7 @@
                 <div class="form-group">
                     <label for="genreID">Nhập thể loại sự kiện *</label>
                     <select id="genreID" name="genreID" class="form-control" required>
-                        <option value="" class="select-css">Select a genre</option>
+                        <option value="" class="select-css">Chọn thể loại</option>
                         <c:forEach var="genre" items="${genres}">
                             <option class="select-css" value="${genre.genreID}" ${event.genreID eq genre.genreID ? 'selected' : ''}>${genre.genreName}</option>
                         </c:forEach>
@@ -354,7 +354,7 @@
                     <textarea id="description" name="description" class="form-control">${event.description}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="imageFile">Ảnh sự kiện *</label>
+                    <label for="imageFile">Ảnh sự kiện(không quá 5MB) *</label>
                     <img id="imagePreview" src="${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg" alt="Hình ảnh sự kiện" class="image-preview" />
                     <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/jpeg,image/jpg,image/png,image/gif" required />
                 </div>
