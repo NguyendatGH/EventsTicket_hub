@@ -26,67 +26,10 @@
             padding: 20px;
         }
         
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 250px;
-            height: 100vh;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            z-index: 1000;
-        }
-        
-        .sidebar .brand {
-            color: #4CAF50;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
-        }
-        
-        .sidebar-menu li {
-            margin-bottom: 15px;
-        }
-        
-        .sidebar-menu a {
-            color: #d8cbcb;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-        
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
-            transform: translateX(5px);
-        }
-        
-        .main-content {
-            margin-left: 270px;
-            padding: 20px;
-        }
-        
-        /* Progress Bar */
         .progress-bar {
-            background: rgba(0,0,0,0.3);
-            padding: 1rem 2rem;
+            background: rgba(26, 26, 46, 0.9);
+            padding: 1.5rem 2rem;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            margin-bottom: 30px;
         }
         
         .progress-content {
@@ -94,26 +37,28 @@
             margin: 0 auto;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 2rem;
         }
         
         .progress-step {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.8);
+            gap: 0.8rem;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.7);
         }
         
         .step-number {
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 1rem;
+            transition: all 0.3s;
         }
         
         .step-number.completed {
@@ -124,7 +69,7 @@
         .step-number.active {
             background: #8b5fbf;
             color: white;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 0 15px rgba(139, 95, 191, 0.5);
         }
         
         .step-number.inactive {
@@ -133,7 +78,7 @@
         }
         
         .step-connector {
-            width: 40px;
+            width: 60px;
             height: 2px;
             background: rgba(255,255,255,0.1);
         }
@@ -142,10 +87,20 @@
             background: #4CAF50;
         }
         
-        /* Form Styles */
+        /* Main Content Styles */
+        .main-content {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
         .page-title {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
             background: linear-gradient(45deg, #4CAF50, #45a049);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -158,13 +113,9 @@
             font-size: 1rem;
         }
         
+        /* Form Styles */
         .form-section {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 25px;
         }
         
         .section-title {
@@ -189,25 +140,25 @@
         .form-label {
             display: block;
             margin-bottom: 8px;
-            color: rgba(255,255,255,0.8);
-            font-size: 0.95rem;
+            color: #fff;
+            font-weight: 500;
         }
         
         .form-input {
             width: 100%;
-            padding: 12px 15px;
-            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
             color: #fff;
-            font-size: 0.95rem;
+            font-size: 1rem;
             transition: all 0.3s;
         }
         
         .form-input:focus {
             outline: none;
             border-color: #4CAF50;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
             background: rgba(76, 175, 80, 0.1);
         }
         
@@ -237,21 +188,23 @@
         }
         
         .btn {
-            padding: 12px 25px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            font-weight: 500;
             transition: all 0.3s;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
         
         .btn-secondary {
             background: rgba(255,255,255,0.1);
-            color: #fff;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
         }
         
         .btn-secondary:hover {
@@ -260,12 +213,12 @@
         }
         
         .btn-primary {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+            background: #4CAF50;
             color: white;
         }
         
         .btn-primary:hover {
-            background: linear-gradient(45deg, #45a049, #4CAF50);
+            background: #45a049;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
@@ -281,35 +234,22 @@
         }
         
         .error-message {
-            padding: 15px;
-            margin-top: 10px;
-            border-radius: 10px;
-            background-color: #f44336;
-            color: #fff;
-            display: none; /* Hidden by default */
-            border-left: 4px solid #d32f2f;
-            backdrop-filter: blur(5px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #ff5252;
+            color: #000;
+            display: none;
+            border-left: 4px solid #ff0000;
+            font-weight: bold;
         }
         
         .error-message.show {
             display: block;
         }
-
+        
         /* Responsive */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
             .progress-content {
                 flex-wrap: wrap;
                 gap: 1rem;
@@ -318,51 +258,57 @@
             .step-connector {
                 display: none;
             }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="brand">🎟️ MasterTicket</div>
-        <ul class="sidebar-menu">
-            <li><a href="${pageContext.request.contextPath}/events" class="active">📅 My Events</a></li>
-            <li><a href="${pageContext.request.contextPath}/reports">📊 Manage Reports</a></li>
-            <li><a href="${pageContext.request.contextPath}/rules">📋 Rules</a></li>
-            <li><a href="#">⚙️ Settings</a></li>
-            <li><a href="#">📈 Analytics</a></li>
-        </ul>
-    </div>
-
-    <div class="main-content">
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="progress-content">
-                <div class="progress-step">
-                    <div class="step-number completed">1</div>
-                    <span>Information</span>
-                </div>
-                <div class="step-connector completed"></div>
-                <div class="progress-step">
-                    <div class="step-number active">2</div>
-                    <span>Time & Type</span>
-                </div>
-                <div class="step-connector"></div>
-                <div class="progress-step">
-                    <div class="step-number inactive">3</div>
-                    <span>Settings</span>
-                </div>
-                <div class="step-connector"></div>
-                <div class="progress-step">
-                    <div class="step-number inactive">4</div>
-                    <span>TicketInfo</span>
-                </div>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-content">
+            <div class="progress-step">
+                <div class="step-number completed">1</div>
+                <span>Thông tin</span>
+            </div>
+            <div class="step-connector completed"></div>
+            <div class="progress-step">
+                <div class="step-number active">2</div>
+                <span>Thời gian & Thể loại</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="progress-step">
+                <div class="step-number inactive">3</div>
+                <span>Cài đặt</span>
+            </div>
+            <div class="step-connector"></div>
+            <div class="progress-step">
+                <div class="step-number inactive">4</div>
+                <span>Thông tin vé</span>
             </div>
         </div>
+    </div>
 
-        <!-- Main Form Content -->
-        <h1 class="page-title">Time & Type</h1>
-        <p class="page-subtitle">Set up your event schedule</p>
+    <!-- Main Form Content -->
+    <div class="main-content">
+        <h1 class="page-title">Thời gian & Thể loại</h1>
+        <p class="page-subtitle">Thiết lập thời gian cho sự kiện của bạn!</p>
         
         <div id="toast-container" class="toast-container"></div>
         <c:if test="${not empty errorMessage}">
@@ -373,10 +319,10 @@
             <input type="hidden" name="action" value="step2"/>
             
             <div class="form-section">
-                <h3 class="section-title">📅 Event Schedule</h3>
+                <h3 class="section-title">📅 Lịch trình sự kiện</h3>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Start Date & Time *</label>
+                        <label class="form-label">Thời gian bắt đầu *</label>
                         <input type="datetime-local" class="form-input" name="startTime" 
                                value="${event.startTime != null ? event.startTime.toInstant().toString().substring(0, 16) : ''}" required>
                         <div class="time-zone-selector">
@@ -384,7 +330,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">End Date & Time *</label>
+                        <label class="form-label">Thời gian kết thúc *</label>
                         <input type="datetime-local" class="form-input" name="endTime" 
                                value="${event.endTime != null ? event.endTime.toInstant().toString().substring(0, 16) : ''}" required>
                         <div class="time-zone-selector">
@@ -395,10 +341,10 @@
                 <div id="error-message" class="error-message"></div>
             </div>
             
-            <div class="action-buttons">
-                <a href="${pageContext.request.contextPath}/organizer-servlet?action=step1" class="btn btn-secondary">← Back</a>
-                <button type="submit" class="btn btn-primary">Continue →</button>
-            </div>
+           <div class="action-buttons">
+    <a href="${pageContext.request.contextPath}/organizer-servlet?action=step1" class="btn btn-secondary" style="text-decoration: none;">← Back</a>
+    <button type="submit" class="btn btn-primary">Continue →</button>
+</div>
         </form>
     </div>
 
@@ -444,4 +390,4 @@
         });
     </script>
 </body>
-</html>
+</html> 

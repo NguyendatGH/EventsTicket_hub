@@ -309,7 +309,6 @@
             </a>
             <ul class="nav-menu">
                 <li><a href="${pageContext.request.contextPath}/">Trang chủ</a></li>
-                <li><a href="${pageContext.request.contextPath}/events">Sự kiện</a></li>
                 <li><a href="${pageContext.request.contextPath}/authentication/login.jsp">Đăng nhập</a></li>
                 <li><a href="${pageContext.request.contextPath}/authentication/register.jsp">Đăng ký</a></li>
             </ul>

@@ -96,22 +96,7 @@ public class AdminNotificationServlet extends HttpServlet {
                 System.out.println("✅ Created " + notifications.size() + " test notifications");
             }
             
-            // Always create a fresh test notification for debugging
-            System.out.println("🧪 Creating fresh test notification for debugging...");
-            Notification debugNotification = new Notification();
-            debugNotification.setUserID(1);
-            debugNotification.setNotificationType("order");
-            debugNotification.setTitle("DEBUG: Test Notification");
-            debugNotification.setContent("Người gửi: DEBUG User (ID: 999) | Lý do: This is a debug test | Số tiền: 999,999 VNĐ | Đơn hàng: #999");
-            debugNotification.setRelatedID(999);
-            debugNotification.setIsRead(false);
-            debugNotification.setCreatedAt(LocalDateTime.now());
-            debugNotification.setPriority("high");
-
-            notificationDAO.insertNotification(debugNotification);
-            notifications.add(0, debugNotification); // Add to beginning of list
             
-            System.out.println("✅ Added debug notification to the beginning of the list");
             
             for (int i = 0; i < notifications.size(); i++) {
                 Notification n = notifications.get(i);

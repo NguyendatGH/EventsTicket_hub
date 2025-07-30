@@ -1037,7 +1037,6 @@ function initWebSocket(conversationId, userId, currentUserName, otherUserName, i
     
     return socket;
 }
-
 function sendMessageWithFiles(conversationId, userId, userName) {
     const content = document.getElementById('messageInput').value.trim();
     const fileInput = document.getElementById('fileInput');
@@ -1067,6 +1066,7 @@ function sendMessageWithFiles(conversationId, userId, userName) {
             fileInput.value = '';
             document.getElementById('messageInput').placeholder = "Nhập tin nhắn...";
             
+            // Hiển thị tin nhắn ngay lập tức (bao gồm cả file đính kèm nếu có)
             if (content || selectedFiles.length > 0) {
                 addMessage(
                     userId, 
@@ -1075,7 +1075,7 @@ function sendMessageWithFiles(conversationId, userId, userName) {
                     new Date().toISOString(), 
                     conversationId, 
                     true, 
-                    []
+                    data.attachments || [] // Sử dụng attachments từ response
                 );
             }
             resetUnreadCount(conversationId);
@@ -1121,14 +1121,16 @@ function addMessage(userId, username, content, timestamp, msgConversationId, isC
     if (attachments && attachments.length > 0) {
         const attachmentDiv = document.createElement('div');
         attachmentDiv.className = 'attachments';
+        
         attachments.forEach(attachment => {
             const attachmentLink = document.createElement('a');
             attachmentLink.href = '${pageContext.request.contextPath}' + attachment.filePath;
-            attachmentLink.textContent = '📎 ' + attachment.originalFilename + ' (' + attachment.formattedFileSize + ')';
+            attachmentLink.textContent = '📎 ' + attachment.originalFilename + ' (' + formatFileSize(attachment.fileSize) + ')';
             attachmentLink.target = '_blank';
             attachmentLink.className = 'attachment-link';
             attachmentDiv.appendChild(attachmentLink);
         });
+        
         messageContent.appendChild(attachmentDiv);
     }
     
@@ -1148,6 +1150,15 @@ function addMessage(userId, username, content, timestamp, msgConversationId, isC
     scrollToBottom();
     updateSearchResults();
 }
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
 
 function scrollToBottom() {
     const messagesContainer = document.getElementById('messagesContainer');

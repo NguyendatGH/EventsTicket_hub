@@ -120,7 +120,7 @@ public class ApplyPromotionServlet extends HttpServlet {
                 order.setDiscountAmount(discount);
                 order.setTotalAmount(newTotal);
                 session.setAttribute("currentOrder", order);
-
+                promotionDAO.incrementUsageCount(promoCode);
                 // Trả về kết quả thành công
                 result.put("valid", true);
                 result.put("alreadyApplied", false);
@@ -210,7 +210,7 @@ public class ApplyPromotionServlet extends HttpServlet {
 
             return formatted;
         } catch (Exception e) {
-            System.err.println("❌ Lỗi format tiền tệ: " + e.getMessage());
+            System.err.println(" Lỗi format tiền tệ: " + e.getMessage());
             return amount.toString() + " ₫";
         }
     }

@@ -193,4 +193,22 @@ public class PromotionDAO {
         return discount;
     }
 
+    public void incrementUsageCount(String promotionCode) {
+        String sql = "UPDATE Promotions SET CurrentUsageCount = CurrentUsageCount + 1 "
+                + "WHERE UPPER(RTRIM(LTRIM(PromotionCode))) = ? AND IsActive = 1";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, promotionCode.trim().toUpperCase());
+            int rows = pstmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("✅ [incrementUsageCount] Tăng CurrentUsageCount thành công cho mã: " + promotionCode);
+            } else {
+                System.out.println("⚠️ [incrementUsageCount] Không thể tăng lượt sử dụng. Mã không tồn tại hoặc bị vô hiệu.");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ [incrementUsageCount] Lỗi khi tăng lượt sử dụng: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }
