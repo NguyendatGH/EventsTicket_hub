@@ -23,7 +23,7 @@ public class RefundTicketServlet extends HttpServlet {
 
         if (orderIdParam == null || currentUser == null) {
             session.setAttribute("flashMessage_fail", "Không đủ thông tin để hoàn vé.");
-            response.sendRedirect(request.getContextPath() + "/purchased-tickets");
+            response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
             return;
         }
 
@@ -33,7 +33,7 @@ public class RefundTicketServlet extends HttpServlet {
 
             if (!refundDAO.checkCanRefund(orderId, currentUser.getId())) {
                 session.setAttribute("flashMessage_fail", "Vé đã quá hạn hoàn trả hoặc không hợp lệ.");
-                response.sendRedirect(request.getContextPath() + "/purchased-tickets");
+                response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
                 return;
             }
 
@@ -42,7 +42,7 @@ public class RefundTicketServlet extends HttpServlet {
 
         } catch (NumberFormatException e) {
             session.setAttribute("flashMessage_error", "Mã đơn hàng không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "/purchased-tickets");
+            response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
         }
     }
 }
