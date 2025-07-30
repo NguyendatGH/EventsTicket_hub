@@ -98,6 +98,8 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         font-weight: 400;
       }
 
+
+
       .nav-menu {
         list-style: none;
       }
@@ -694,6 +696,13 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </li>
             <li class="nav-item">
               <a
+                href="${pageContext.request.contextPath}/admin/refund"
+                class="nav-link"
+                >Quản lý hoàn tiền</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
                 href="${pageContext.request.contextPath}/admin-servlet/support-center"
                 class="nav-link"
                 >Hỗ trợ khách hàng</a
@@ -713,15 +722,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <header class="header">
           <h1 class="page-title">Bảng điều khiển</h1>
           <div style="display: flex; align-items: center; gap: 24px;">
-            <div id="notification-bell" style="position: relative; cursor: pointer;">
-              <svg width="28" height="28" fill="white" viewBox="0 0 24 24">
-                <path d="M12 2C9.243 2 7 4.243 7 7v2.071C7 10.13 6.37 11.09 5.44 11.58A1 1 0 0 0 5 12.5V17l-1 1v1h16v-1l-1-1v-4.5a1 1 0 0 0-.44-.92C17.63 11.09 17 10.13 17 9.071V7c0-2.757-2.243-5-5-5zm0 18c-1.104 0-2-.896-2-2h4c0 1.104-.896 2-2 2z"/>
-              </svg>
-              <span id="notification-badge" style="position: absolute; top: 0; right: 0; background: #ff3333; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; display: none;">0</span>
-              <div id="notification-popup" style="display: none; position: absolute; right: 0; top: 36px; background: #222; color: white; min-width: 300px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 9999;">
-                <div id="notification-list" style="max-height: 300px; overflow-y: auto;"></div>
-              </div>
-            </div>
+
             <div class="control-panel">Tổng quan</div>
           </div>
         </header>
@@ -760,6 +761,17 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 ${totalRevenue} vnđ
               </div>
             </span>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Yêu cầu hoàn tiền chờ xử lý</div>
+            <div class="stat-content">
+              <img
+                src="${pageContext.request.contextPath}/asset/image/Property1=Done.svg"
+                alt=""
+                class="stat-icon"
+              />
+              <div class="stat-value">${pendingRefundsCount}</div>
+            </div>
           </div>
         </section>
         <section class="content-grid">
@@ -948,60 +960,10 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       const ctx = document.getElementById("revenueChart").getContext("2d");
       const revenueChart = new Chart(ctx, config);
 
-      // Notification Bell WebSocket
-      const notificationBell = document.getElementById('notification-bell');
-      const notificationBadge = document.getElementById('notification-badge');
-      const notificationPopup = document.getElementById('notification-popup');
-      const notificationList = document.getElementById('notification-list');
-      let notificationCount = 0;
-      let notifications = [];
-
-      notificationBell.addEventListener('click', function() {
-        if (notificationPopup.style.display === 'none' || notificationPopup.style.display === '') {
-          notificationPopup.style.display = 'block';
-          notificationBadge.style.display = 'none';
-          notificationCount = 0;
-          // Hiển thị thông báo hoặc "Không có thông báo nào cả"
-          renderNotificationList();
-        } else {
-          notificationPopup.style.display = 'none';
-        }
+      // Simple page initialization
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('Admin Dashboard page loaded successfully');
       });
-
-      function renderNotificationList() {
-        notificationList.innerHTML = '';
-        // Lọc chỉ thông báo khi eventowner tạo event mới
-        const eventNotifications = notifications.filter(n => n.notificationType === 'event');
-        if (eventNotifications.length === 0) {
-          notificationList.innerHTML = '<div style="padding: 16px; color: #aaa; text-align: center;">Không có thông báo nào cả</div>';
-        } else {
-          eventNotifications.forEach(notification => addNotificationToList(notification));
-        }
-      }
-
-      function addNotificationToList(notification) {
-        const div = document.createElement('div');
-        div.style.padding = '12px';
-        div.style.borderBottom = '1px solid #333';
-        div.innerHTML = '<b>' + notification.title + '</b><br>' +
-          "<span style='font-size: 13px;'>" + notification.content + '</span><br>' +
-          "<span style='font-size: 11px; color: #aaa;'>" + new Date(notification.createdAt).toLocaleString('vi-VN') + '</span>';
-        notificationList.appendChild(div);
-      }
-
-      // WebSocket connection
-      const ws = new WebSocket("ws://" + window.location.host + "${pageContext.request.contextPath}/websocket/admin-notification");
-      ws.onmessage = function(event) {
-        const notification = JSON.parse(event.data);
-        notifications.unshift(notification);
-        notificationCount++;
-        notificationBadge.textContent = notificationCount;
-        notificationBadge.style.display = 'block';
-        // Nếu popup đang mở, cập nhật lại danh sách
-        if (notificationPopup.style.display === 'block') {
-          renderNotificationList();
-        }
-      };
     </script>
   </body>
 </html>

@@ -21,9 +21,8 @@ public class NotificationDAO {
     // Fetches all notifications for a specific user, ordered by creation date
     public List<Notification> getNotificationsByUserId(int userId) {
         List<Notification> notifications = new ArrayList<>();
-        // Note: GETDATE() is SQL Server specific. Use CURRENT_TIMESTAMP for standard SQL, or NOW() for MySQL.
-        // Also added check for expired notifications
-        String sql = "SELECT * FROM Notifications WHERE UserID = ? AND (ExpiresAt IS NULL OR ExpiresAt > GETDATE()) ORDER BY CreatedAt DESC";
+        // Simplified query without GETDATE() to avoid compatibility issues
+        String sql = "SELECT * FROM Notifications WHERE UserID = ? ORDER BY CreatedAt DESC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -44,7 +43,7 @@ public class NotificationDAO {
     // Gets the count of unread notifications for a user
     public int getUnreadNotificationCount(int userId) {
         int count = 0;
-        String sql = "SELECT COUNT(*) FROM Notifications WHERE UserID = ? AND IsRead = 0 AND (ExpiresAt IS NULL OR ExpiresAt > GETDATE())";
+        String sql = "SELECT COUNT(*) FROM Notifications WHERE UserID = ? AND IsRead = 0";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -57,6 +56,44 @@ public class NotificationDAO {
             }
         } catch (SQLException e) {
             System.err.println("Error fetching unread notification count for user " + userId + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    // Lấy tất cả notifications từ database (không phân biệt user)
+    public List<Notification> getAllNotifications() {
+        List<Notification> notifications = new ArrayList<>();
+        String sql = "SELECT * FROM Notifications ORDER BY CreatedAt DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                notifications.add(mapRowToNotification(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching all notifications: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return notifications;
+    }
+
+    // Lấy tổng số notifications
+    public int getTotalNotificationCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM Notifications";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching total notification count: " + e.getMessage());
             e.printStackTrace();
         }
         return count;
@@ -104,7 +141,14 @@ public class NotificationDAO {
             ps.setInt(1, notification.getUserID());
             ps.setString(2, notification.getTitle());
             ps.setString(3, notification.getContent());
-            ps.setString(4, notification.getNotificationType());
+            
+            // Đảm bảo NotificationType hợp lệ
+            String notificationType = notification.getNotificationType();
+            if (notificationType == null || !isValidNotificationType(notificationType)) {
+                notificationType = "system"; // Default to system if invalid
+            }
+            ps.setString(4, notificationType);
+            
             if (notification.getRelatedID() != null) {
                 ps.setInt(5, notification.getRelatedID());
             } else {
@@ -113,12 +157,22 @@ public class NotificationDAO {
             ps.setBoolean(6, notification.isIsRead());
             ps.setTimestamp(7, java.sql.Timestamp.valueOf(notification.getCreatedAt()));
             ps.setString(8, notification.getPriority());
-            return ps.executeUpdate() > 0;
+            
+            int result = ps.executeUpdate();
+            System.out.println("Insert notification result: " + result);
+            return result > 0;
         } catch (SQLException e) {
             System.err.println("Error inserting notification: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
+    }
+    
+    // Kiểm tra NotificationType có hợp lệ không
+    private boolean isValidNotificationType(String type) {
+        return type != null && (type.equals("order") || type.equals("event") || 
+                               type.equals("promotion") || type.equals("system") || 
+                               type.equals("message"));
     }
 
     // Helper method to map a ResultSet row to a Notification object

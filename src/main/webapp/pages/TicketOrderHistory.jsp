@@ -870,6 +870,10 @@
                     <input type="text" class="search-input" placeholder="Tìm kiếm sự kiện, vé đã mua...">
                 </div>
                 <div class="header-actions">
+                    <a href="${pageContext.request.contextPath}/customer/refund-history" class="btn btn-outline">
+                        <i class="fas fa-undo-alt"></i>
+                        Lịch sử hoàn tiền
+                    </a>
                     <a href="#" class="btn btn-outline">
                         <i class="fas fa-plus"></i>
                         Tạo sự kiện
