@@ -120,7 +120,7 @@ public class ApplyPromotionServlet extends HttpServlet {
                 order.setDiscountAmount(discount);
                 order.setTotalAmount(newTotal);
                 session.setAttribute("currentOrder", order);
-
+                promotionDAO.incrementUsageCount(promoCode);
                 // Trả về kết quả thành công
                 result.put("valid", true);
                 result.put("alreadyApplied", false);

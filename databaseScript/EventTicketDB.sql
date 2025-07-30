@@ -301,6 +301,41 @@ CREATE TABLE Promotions(
     )
 );
 
+
+
+
+
+-- 1. SUMMER25 áp dụng cho EventID = 15 (Indian Food Festival - diễn ra ngày 2025-12-04)
+UPDATE Promotions
+SET EndTime = '2025-12-03 23:59:59'
+WHERE PromotionCode = 'SUMMER25';
+
+-- 2. EARLY10 áp dụng cho EventID = 19 (VBA Match - diễn ra ngày 2025-09-08)
+UPDATE Promotions
+SET EndTime = '2025-09-07 23:59:59'
+WHERE PromotionCode = 'EARLY10';
+
+-- 3. CONCERT50K áp dụng cho EventID = 20 (Cải lương CÂU THƠ YÊN NGỰA - diễn ra ngày 2025-09-09)
+UPDATE Promotions
+SET EndTime = '2025-09-08 23:59:59'
+WHERE PromotionCode = 'CONCERT50K';
+
+-- 4. THEATER20 áp dụng cho EventID = 7 (12 Bà Mụ - diễn ra ngày 2025-08-25)
+UPDATE Promotions
+SET EndTime = '2025-08-24 23:59:59'
+WHERE PromotionCode = 'THEATER20';
+
+-- 5. ISLAND30K áp dụng cho EventID = 8 (The Island and The Bay - diễn ra ngày 2025-09-27)
+UPDATE Promotions
+SET EndTime = '2025-09-26 23:59:59'
+WHERE PromotionCode = 'ISLAND30K';
+
+-- 6. CONCERT15 áp dụng cho EventID = 16 (Anh Trai concert - diễn ra ngày 2025-08-05)
+UPDATE Promotions
+SET EndTime = '2025-08-04 23:59:59'
+WHERE PromotionCode = 'CONCERT15';
+
+
 -- Bảng Notifications (mới)
 CREATE TABLE Notifications (
     NotificationID INT IDENTITY(1,1) PRIMARY KEY,

@@ -754,8 +754,7 @@
         <div class="header-container">
             <header class="header">
                 <div class="logo">
-                    <i class="fas fa-ticket-alt"></i>
-                    MasterTicket
+                   <a href="/OnlineSellingTicketEvents/home" class="logo">MasterTicket</a>                   
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm...">
