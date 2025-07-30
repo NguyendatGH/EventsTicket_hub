@@ -61,7 +61,7 @@ public class AdminSupportServlet extends HttpServlet {
         HttpSession session = request.getSession();
         UserDTO user = (UserDTO) session.getAttribute("user");
         
-        if (user == null || !"ADMIN".equals(user.getRole())) {
+        if (user == null || !"admin".equals(user.getRole())) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }

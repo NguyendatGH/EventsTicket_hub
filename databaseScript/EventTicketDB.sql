@@ -360,6 +360,7 @@ CREATE TABLE Refunds (
 -- Bảng supportItems
 CREATE TABLE SupportItems (
     SupportID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL,
     FromEmail NVARCHAR(255) NOT NULL,
     ToEmail NVARCHAR(255) NOT NULL,
     Subject NVARCHAR(255) NOT NULL,
@@ -372,7 +373,13 @@ CREATE TABLE SupportItems (
     CreatedDate DATE NOT NULL,
     LastModified DATE NOT NULL,
     AdminResponse NVARCHAR(MAX) NULL,
-    AssignedAdmin NVARCHAR(255) NULL
+    AssignedAdminID INT NULL,
+    EventID INT NULL,
+    OrderID INT NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(Id) ON DELETE CASCADE,
+    FOREIGN KEY (AssignedAdminID) REFERENCES Users(Id),
+    FOREIGN KEY (EventID) REFERENCES Events(EventID) ON DELETE SET NULL,
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE SET NULL
 );
 GO
 
@@ -450,6 +457,21 @@ CREATE INDEX IX_Refunds_AdminID ON Refunds(AdminID);
 CREATE INDEX IX_Refunds_RefundStatus ON Refunds(RefundStatus);
 CREATE INDEX IX_Refunds_CreatedAt ON Refunds(CreatedAt);
 CREATE INDEX IX_Refunds_IsDeleted ON Refunds(IsDeleted);
+
+-- Indexes cho bảng SupportItems
+CREATE INDEX IX_SupportItems_UserID ON SupportItems(UserID);
+CREATE INDEX IX_SupportItems_AssignedAdminID ON SupportItems(AssignedAdminID);
+CREATE INDEX IX_SupportItems_EventID ON SupportItems(EventID);
+CREATE INDEX IX_SupportItems_OrderID ON SupportItems(OrderID);
+CREATE INDEX IX_SupportItems_Status ON SupportItems(Status);
+CREATE INDEX IX_SupportItems_Priority ON SupportItems(Priority);
+CREATE INDEX IX_SupportItems_Category ON SupportItems(Category);
+CREATE INDEX IX_SupportItems_CreatedDate ON SupportItems(CreatedDate);
+
+-- Indexes cho bảng SupportAttachments
+CREATE INDEX IX_SupportAttachments_SupportID ON SupportAttachments(SupportID);
+CREATE INDEX IX_SupportAttachments_FileType ON SupportAttachments(FileType);
+CREATE INDEX IX_SupportAttachments_UploadDate ON SupportAttachments(UploadDate);
 GO
 
 go
