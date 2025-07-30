@@ -25,10 +25,12 @@ public class NotificationDAO {
             ps.setTimestamp(8, Timestamp.valueOf(notification.getCreatedAt()));
             ps.setObject(9, notification.getExpiresAt() != null ? Timestamp.valueOf(notification.getExpiresAt()) : null);
 
-            return ps.executeUpdate() > 0;
+            int result = ps.executeUpdate();
+            System.out.println("✅ Notification inserted successfully: " + (result > 0));
+            return result > 0;
 
         } catch (SQLException e) {
-            System.err.println("Error inserting notification: " + e.getMessage());
+            System.err.println("❌ Error inserting notification: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -280,6 +282,8 @@ public class NotificationDAO {
 
     public boolean markAsRead(int notificationId, int userId) {
         String sql = "UPDATE Notifications SET IsRead = 1, ReadAt = ? WHERE NotificationID = ? AND UserID = ?";
+        
+        System.out.println("🔍 Marking notification as read - ID: " + notificationId + ", UserID: " + userId);
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -287,10 +291,16 @@ public class NotificationDAO {
             ps.setInt(2, notificationId);
             ps.setInt(3, userId);
 
-            return ps.executeUpdate() > 0;
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("📊 Rows affected: " + rowsAffected);
+            
+            boolean success = rowsAffected > 0;
+            System.out.println("✅ Mark as read result: " + success);
+            
+            return success;
 
         } catch (SQLException e) {
-            System.err.println("Error marking notification as read: " + e.getMessage());
+            System.err.println("❌ Error marking notification as read: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -356,20 +366,29 @@ public class NotificationDAO {
      */
     private Notification mapResultSetToNotification(ResultSet rs) throws SQLException {
         Notification notification = new Notification();
-        notification.setNotificationID(rs.getInt("NotificationID"));
-        notification.setUserID(rs.getInt("UserID"));
-        notification.setTitle(rs.getString("Title"));
-        notification.setContent(rs.getString("Content"));
-        notification.setNotificationType(rs.getString("NotificationType"));
-        notification.setRelatedID(rs.getObject("RelatedID") != null ? rs.getInt("RelatedID") : null);
-        notification.setIsRead(rs.getBoolean("IsRead"));
+        
+        int notificationId = rs.getInt("NotificationID");
+        int userId = rs.getInt("UserID");
+        String title = rs.getString("Title");
+        String content = rs.getString("Content");
+        String notificationType = rs.getString("NotificationType");
+        Integer relatedId = rs.getObject("RelatedID") != null ? rs.getInt("RelatedID") : null;
+        boolean isRead = rs.getBoolean("IsRead");
+        String priority = rs.getString("Priority");
+        
+        notification.setNotificationID(notificationId);
+        notification.setUserID(userId);
+        notification.setTitle(title);
+        notification.setContent(content);
+        notification.setNotificationType(notificationType);
+        notification.setRelatedID(relatedId);
+        notification.setIsRead(isRead);
+        notification.setPriority(priority);
 
         Timestamp readAt = rs.getTimestamp("ReadAt");
         if (readAt != null) {
             notification.setReadAt(readAt.toLocalDateTime());
         }
-
-        notification.setPriority(rs.getString("Priority"));
 
         Timestamp createdAt = rs.getTimestamp("CreatedAt");
         if (createdAt != null) {
@@ -380,6 +399,14 @@ public class NotificationDAO {
         if (expiresAt != null) {
             notification.setExpiresAt(expiresAt.toLocalDateTime());
         }
+
+        System.out.println("📋 Mapped notification: ID=" + notificationId + 
+                          ", UserID=" + userId + 
+                          ", Title='" + title + "'" +
+                          ", Content='" + content + "'" +
+                          ", Type='" + notificationType + "'" +
+                          ", IsRead=" + isRead +
+                          ", CreatedAt=" + (createdAt != null ? createdAt.toLocalDateTime() : "null"));
 
         return notification;
     }

@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Refund;
 import models.Notification;
+import service.NotificationService;
+import controller.NotificationWebSocket;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -94,7 +96,25 @@ public class SubmitRefundServlet extends HttpServlet {
             boolean success = refundDAO.insertRefund(refund);
 
             if (success) {
-                // Thông báo đã được tạo tự động trong RefundDAO.insertRefund()
+                // Gửi thông báo real-time cho admin về refund request mới
+                try {
+                    System.out.println("🔔 Creating admin notification for refund request...");
+                    System.out.println("📝 Refund ID: " + refund.getRefundId());
+                    System.out.println("📝 Order ID: " + refund.getOrderId());
+                    System.out.println("📝 Refund Amount: " + refund.getRefundAmount());
+                    System.out.println("📝 Refund Reason: " + refund.getRefundReason());
+                    
+                    NotificationWebSocket.sendRefundNotification(
+                        refund.getRefundId(), 
+                        refund.getRefundAmount().toString(), 
+                        refund.getRefundReason()
+                    );
+                    System.out.println("✅ Refund notification sent to admin");
+                } catch (Exception ex) {
+                    System.err.println("❌ Error creating admin notification: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+                
                 session.setAttribute("flashMessage_success", "Yêu cầu hoàn tiền đã được gửi thành công! Chúng tôi sẽ xử lý trong thời gian sớm nhất.");
                 response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
             } else {

@@ -439,6 +439,8 @@
                 background-color: rgba(255, 51, 51, 0.2);
             }
 
+                    /* Đã xóa Toast Notification Styles theo yêu cầu */
+
             .notification-title {
                 font-size: 0.95rem;
                 color: var(--text-light);
@@ -1661,11 +1663,18 @@
 
                 // Check for "null" string as well, because JSP might render null as string "null"
                 if (notificationType === 'order' && relatedID !== null && relatedID !== 'null') {
-                    redirectUrl = contextPath + '/order-details?orderId=' + relatedID;
+                    redirectUrl = contextPath + '/TicketOrderHistoryServlet';
                 } else if (notificationType === 'event' && relatedID !== null && relatedID !== 'null') {
                     redirectUrl = contextPath + '/EventServlet?id=' + relatedID;
                 } else if (notificationType === 'promotion') {
                     redirectUrl = contextPath + '/promotions';
+                } else if (notificationType === 'order' && relatedID !== null && relatedID !== 'null') {
+                    // Kiểm tra nội dung để phân biệt refund và order thông thường
+                    if (notificationContent && notificationContent.includes('hoàn tiền')) {
+                        redirectUrl = contextPath + '/refund-history';
+                    } else {
+                        redirectUrl = contextPath + '/TicketOrderHistoryServlet';
+                    }
                 }
 
                 if (redirectUrl) {
@@ -1680,30 +1689,64 @@
             }
 
             function markNotificationAsRead(notificationID) {
+                console.log('🔍 Marking notification as read:', notificationID);
                 fetch('${pageContext.request.contextPath}/notification-servlet?action=markRead&notificationID=' + notificationID, {
                     method: 'POST'
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('📡 Response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('📋 Response data:', data);
                     if (data.success) {
-                        const notificationItem = document.querySelector(`.notification-item[onclick*='${notificationID}']`);
+                        // Tìm notification item bằng nhiều cách khác nhau
+                        let notificationItem = document.querySelector(`.notification-item[onclick*='${notificationID}']`);
+                        if (!notificationItem) {
+                            // Thử tìm bằng data attribute
+                            notificationItem = document.querySelector(`[data-notification-id="${notificationID}"]`);
+                        }
+                        if (!notificationItem) {
+                            // Thử tìm tất cả notification items và kiểm tra onclick
+                            const allItems = document.querySelectorAll('.notification-item');
+                            for (let item of allItems) {
+                                const onclick = item.getAttribute('onclick');
+                                if (onclick && onclick.includes(notificationID.toString())) {
+                                    notificationItem = item;
+                                    break;
+                                }
+                            }
+                        }
+                        
                         if (notificationItem) {
                             notificationItem.classList.remove('unread');
+                            console.log('✅ Notification item updated in UI');
+                        } else {
+                            console.warn('⚠️ Could not find notification item in UI for ID:', notificationID);
                         }
+                        
+                        // Cập nhật badge
                         const badge = document.getElementById('notificationBadge');
-                        let currentCount = parseInt(badge.textContent || '0');
-                        if (currentCount > 0) {
-                            currentCount--;
-                            badge.textContent = currentCount > 0 ? currentCount : '';
-                            if (currentCount === 0) {
+                        if (badge) {
+                            const unreadItems = document.querySelectorAll('.notification-item.unread');
+                            const unreadCount = unreadItems.length;
+                            console.log('📊 Unread count after update:', unreadCount);
+                            
+                            if (unreadCount > 0) {
+                                badge.textContent = unreadCount;
+                                badge.classList.add('show');
+                            } else {
+                                badge.textContent = '';
                                 badge.classList.remove('show');
                             }
                         }
                     } else {
-                        console.error('Failed to mark notification as read:', data.message);
+                        console.error('❌ Failed to mark notification as read:', data.message);
                     }
                 })
-                .catch(error => console.error('Error marking notification as read:', error));
+                .catch(error => {
+                    console.error('❌ Error marking notification as read:', error);
+                });
             }
 
             function markAllNotificationsAsRead() {
@@ -1725,6 +1768,166 @@
                 })
                 .catch(error => console.error('Error marking all notifications as read:', error));
             }
+
+            // --- Real-time Notification WebSocket ---
+            function initNotificationWebSocket() {
+                const userId = <%= user != null ? user.getId() : 0 %>;
+                console.log('Initializing WebSocket for user ID:', userId);
+                
+                if (userId <= 0) {
+                    console.log('User not logged in, skipping WebSocket initialization');
+                    return null;
+                }
+
+                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = wsProtocol + "//" + window.location.host + '<%= request.getContextPath() %>/websocket/notifications?user_id=' + userId;
+                console.log('Connecting to Notification WebSocket:', wsUrl);
+
+                const socket = new WebSocket(wsUrl);
+
+                socket.onopen = function(event) {
+                    console.log('✅ Notification WebSocket connection opened for UserID:', userId);
+                };
+
+                socket.onmessage = function(event) {
+                    console.log('📨 Received notification:', event.data);
+                    try {
+                        const notification = JSON.parse(event.data);
+                        console.log('📋 Parsed notification:', notification);
+                        
+                        // Thêm thông báo mới vào dropdown
+                        addNotificationToDropdown(notification);
+                        
+                        // Cập nhật số thông báo chưa đọc
+                        updateNotificationBadge();
+                        
+                        // Đã xóa toast notification theo yêu cầu
+                        
+                    } catch (e) {
+                        console.error('❌ Error parsing notification:', e);
+                    }
+                };
+
+                socket.onerror = function(error) {
+                    console.error('❌ Notification WebSocket Error:', error);
+                };
+
+                socket.onclose = function(event) {
+                    console.log('🔌 Notification WebSocket connection closed:', event.code, event.reason);
+                    // Thử kết nối lại sau 5 giây
+                    setTimeout(() => {
+                        console.log('🔄 Attempting to reconnect...');
+                        initNotificationWebSocket();
+                    }, 5000);
+                };
+
+                return socket;
+            }
+
+            function addNotificationToDropdown(notification) {
+                const dropdown = document.getElementById('notificationDropdown');
+                if (!dropdown) return;
+
+                const notificationItem = document.createElement('div');
+                notificationItem.className = 'notification-item unread';
+                notificationItem.setAttribute('data-notification-id', notification.notificationID);
+                notificationItem.onclick = () => handleNotificationClick(notification.notificationID, notification.notificationType, notification.relatedID);
+
+                const timeAgo = getTimeAgo(new Date(notification.createdAt));
+                
+                notificationItem.innerHTML = `
+                    <div class="notification-content">
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-text">${notification.content}</div>
+                        <div class="notification-time">${timeAgo}</div>
+                    </div>
+                `;
+
+                // Thêm vào đầu danh sách
+                const firstItem = dropdown.querySelector('.notification-item');
+                if (firstItem) {
+                    dropdown.insertBefore(notificationItem, firstItem);
+                } else {
+                    dropdown.appendChild(notificationItem);
+                }
+            }
+
+            // Đã xóa function showToastNotification theo yêu cầu
+
+            function getTimeAgo(date) {
+                const now = new Date();
+                const diffInSeconds = Math.floor((now - date) / 1000);
+                
+                if (diffInSeconds < 60) return 'Vừa xong';
+                if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' phút trước';
+                if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' giờ trước';
+                return Math.floor(diffInSeconds / 86400) + ' ngày trước';
+            }
+
+            function updateNotificationBadge() {
+                const badge = document.getElementById('notificationBadge');
+                if (badge) {
+                    const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount;
+                        badge.classList.add('show');
+                    } else {
+                        badge.textContent = '';
+                        badge.classList.remove('show');
+                    }
+                }
+            }
+
+            // Khởi tạo WebSocket khi trang load
+            let notificationSocket = null;
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('🚀 DOM Content Loaded - Initializing notification system...');
+                
+                notificationSocket = initNotificationWebSocket();
+                
+                // Đã xóa test toast notification
+            
+            // Thêm button test vào console
+            console.log('🧪 To test toast notification manually, run: showToastNotification("Test", "Hello World!")');
+            
+            // Đã xóa test function
+            
+            window.testWebSocket = function() {
+                if (notificationSocket && notificationSocket.readyState === WebSocket.OPEN) {
+                    console.log('✅ WebSocket is connected');
+                } else {
+                    console.log('❌ WebSocket is not connected. State:', notificationSocket ? notificationSocket.readyState : 'null');
+                }
+            };
+            
+            // Test WebSocket connection after 3 seconds
+            setTimeout(() => {
+                console.log('🔍 Testing WebSocket connection...');
+                window.testWebSocket();
+            }, 3000);
+            
+            // Thêm test button vào trang (chỉ hiển thị khi debug)
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                const testButton = document.createElement('button');
+                testButton.textContent = 'Test Notification';
+                testButton.style.cssText = 'position:fixed;top:10px;left:10px;z-index:9999;background:#667aff;color:white;border:none;padding:10px;border-radius:5px;cursor:pointer;';
+                testButton.onclick = function() {
+                    console.log('🧪 Manual test button clicked');
+                    fetch('${pageContext.request.contextPath}/test-notification')
+                        .then(response => response.text())
+                        .then(result => {
+                            console.log('✅ Test result:', result);
+                            alert('Test notification sent! Check console for details.');
+                        })
+                        .catch(error => {
+                            console.error('❌ Test error:', error);
+                            alert('Test failed! Check console for details.');
+                        });
+                };
+                document.body.appendChild(testButton);
+                console.log('🔧 Test button added to page');
+            }
+        });
         </script>
 
         <%-- Flash messages --%>

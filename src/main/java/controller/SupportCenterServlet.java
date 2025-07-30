@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.io.File;
+import controller.NotificationWebSocket;
 
 @WebServlet("/support")
 @MultipartConfig(
@@ -174,6 +175,20 @@ public class SupportCenterServlet extends HttpServlet {
         System.out.println("Debug: Support ID: " + supportItem.getSupportId());
 
         if (success) {
+            // Gửi thông báo real-time cho admin về support request mới
+            try {
+                System.out.println("🔔 Creating admin notification for support request...");
+                NotificationWebSocket.sendSupportNotification(
+                    supportItem.getSupportId(), 
+                    supportItem.getSubject(), 
+                    supportItem.getContent()
+                );
+                System.out.println("✅ Support notification sent to admin");
+            } catch (Exception ex) {
+                System.err.println("❌ Error creating admin notification: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+            
             request.setAttribute("success", "Yêu cầu hỗ trợ đã được gửi thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.");
         } else {
             request.setAttribute("error", "Có lỗi xảy ra khi gửi yêu cầu hỗ trợ. Vui lòng thử lại!");

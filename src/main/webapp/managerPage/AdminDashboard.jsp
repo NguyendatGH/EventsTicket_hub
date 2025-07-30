@@ -621,7 +621,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         }
       }
 
-      /* Notification Styles */
+      /* Simple Notification Styles */
       .notification-container {
         position: relative;
       }
@@ -659,7 +659,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         border-radius: 50%;
         width: 20px;
         height: 20px;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
         font-size: 12px;
@@ -667,12 +667,16 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         min-width: 20px;
       }
 
+      .notification-badge.show {
+        display: flex;
+      }
+
       .notification-dropdown {
         position: absolute;
         top: 100%;
         right: 0;
-        width: 400px;
-        max-height: 500px;
+        width: 350px;
+        max-height: 400px;
         background: rgba(15, 23, 42, 0.95);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -718,7 +722,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       .notification-list {
-        max-height: 400px;
+        max-height: 300px;
         overflow-y: auto;
       }
 
@@ -743,27 +747,30 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
       .notification-title {
         color: white;
-        font-size: 14px;
         font-weight: 600;
+        font-size: 14px;
         margin-bottom: 4px;
+        display: block;
       }
 
       .notification-content {
-        color: #94a3b8;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 12px;
         line-height: 1.4;
         margin-bottom: 8px;
+        display: block;
       }
 
       .notification-time {
-        color: #64748b;
+        color: rgba(255, 255, 255, 0.6);
         font-size: 11px;
+        display: block;
       }
 
       .notification-empty {
-        padding: 40px 20px;
+        padding: 20px;
         text-align: center;
-        color: #94a3b8;
+        color: rgba(255, 255, 255, 0.6);
         font-size: 14px;
       }
 
@@ -778,6 +785,45 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           transform: translateY(0);
         }
       }
+       }
+
+       .popup-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 8px;
+       }
+
+       .popup-header strong {
+         font-size: 14px;
+         font-weight: 600;
+       }
+
+       .popup-close {
+         background: none;
+         border: none;
+         color: white;
+         font-size: 18px;
+         cursor: pointer;
+         padding: 0;
+         width: 20px;
+         height: 20px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 50%;
+         transition: background-color 0.2s;
+       }
+
+       .popup-close:hover {
+         background-color: rgba(255, 255, 255, 0.2);
+       }
+
+       .popup-body {
+         font-size: 13px;
+         line-height: 1.4;
+         opacity: 0.9;
+       }
     </style>
   </head>
   <body>
@@ -869,7 +915,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <header class="header">
           <h1 class="page-title">Bảng điều khiển</h1>
           <div style="display: flex; align-items: center; gap: 24px;">
-            <!-- Notification Bell -->
+            <!-- Simple Notification Bell -->
             <div class="notification-container">
               <div class="notification-bell" id="notificationBell">
                 <i class="fas fa-bell"></i>
@@ -1005,162 +1051,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         });
       });
 
-      // Notification System
-      const notificationBell = document.getElementById('notificationBell');
-      const notificationDropdown = document.getElementById('notificationDropdown');
-      const notificationList = document.getElementById('notificationList');
-      const notificationBadge = document.getElementById('notificationBadge');
-      const markAllRead = document.getElementById('markAllRead');
-
-      // Toggle notification dropdown
-      notificationBell.addEventListener('click', function(e) {
-        e.stopPropagation();
-        notificationDropdown.classList.toggle('show');
-        if (notificationDropdown.classList.contains('show')) {
-          loadNotifications();
-        }
-      });
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', function(e) {
-        if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
-          notificationDropdown.classList.remove('show');
-        }
-      });
-
-      // Load notifications
-      function loadNotifications() {
-        fetch('${pageContext.request.contextPath}/admin-notifications')
-          .then(response => {
-            console.log('Response status:', response.status);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Loaded notifications:', data);
-            
-            // Check if data is an array
-            if (Array.isArray(data)) {
-              displayNotifications(data);
-              updateNotificationBadge(data);
-            } else if (data.error) {
-              console.error('Server error:', data.error);
-              notificationList.innerHTML = '<div class="notification-empty">Lỗi: ' + data.error + '</div>';
-            } else {
-              console.error('Unexpected data format:', data);
-              notificationList.innerHTML = '<div class="notification-empty">Dữ liệu không đúng định dạng</div>';
-            }
-          })
-          .catch(error => {
-            console.error('Error loading notifications:', error);
-            notificationList.innerHTML = '<div class="notification-empty">Không thể tải thông báo: ' + error.message + '</div>';
-          });
-      }
-
-      // Display notifications
-      function displayNotifications(notifications) {
-        if (!notifications || notifications.length === 0) {
-          notificationList.innerHTML = '<div class="notification-empty">Không có thông báo nào</div>';
-          return;
-        }
-
-        notificationList.innerHTML = '';
-        notifications.forEach(notification => {
-          const notificationItem = document.createElement('div');
-          notificationItem.className = `notification-item ${!notification.isRead ? 'unread' : ''}`;
-          
-          const timeAgo = formatTimeAgo(notification.createdAt);
-          
-          notificationItem.innerHTML = `
-            <div class="notification-title">${notification.title}</div>
-            <div class="notification-content">${notification.content}</div>
-            <div class="notification-time">${timeAgo}</div>
-          `;
-          
-          notificationItem.addEventListener('click', () => {
-            markNotificationAsRead(notification.notificationID);
-            notificationItem.classList.remove('unread');
-          });
-          
-          notificationList.appendChild(notificationItem);
-        });
-      }
-
-      // Update notification badge
-      function updateNotificationBadge(notifications) {
-        const unreadCount = notifications.filter(n => !n.isRead).length;
-        notificationBadge.textContent = unreadCount;
-        notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
-      }
-
-      // Mark notification as read
-      function markNotificationAsRead(notificationId) {
-        fetch('${pageContext.request.contextPath}/admin-notifications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: `action=markAsRead&notificationId=${notificationId}`
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            console.log('Notification marked as read');
-          }
-        })
-        .catch(error => {
-          console.error('Error marking notification as read:', error);
-        });
-      }
-
-      // Mark all notifications as read
-      markAllRead.addEventListener('click', function() {
-        fetch('${pageContext.request.contextPath}/admin-notifications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: 'action=markAllAsRead'
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            console.log('All notifications marked as read');
-            loadNotifications();
-          }
-        })
-        .catch(error => {
-          console.error('Error marking all notifications as read:', error);
-        });
-      });
-
-      // Format time ago
-      function formatTimeAgo(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - date) / 1000);
-        
-        if (diffInSeconds < 60) {
-          return 'Vừa xong';
-        } else if (diffInSeconds < 3600) {
-          const minutes = Math.floor(diffInSeconds / 60);
-          return `${minutes} phút trước`;
-        } else if (diffInSeconds < 86400) {
-          const hours = Math.floor(diffInSeconds / 3600);
-          return `${hours} giờ trước`;
-        } else {
-          const days = Math.floor(diffInSeconds / 86400);
-          return `${days} ngày trước`;
-        }
-      }
-
-      // Load notifications on page load
-      document.addEventListener('DOMContentLoaded', function() {
-        loadNotifications();
-      });
-
       document.addEventListener("click", (e) => {
         if (
           window.innerWidth <= 992 &&
@@ -1182,7 +1072,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
       animateEllipses();
 
-            const organizerNames = [
+      const organizerNames = [
         <c:forEach var="organizer" items="${topEventOrganizers}" varStatus="loop">
           "${organizer.name}"${loop.last ? '' : ','}
         </c:forEach>
@@ -1278,10 +1168,318 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       const ctx = document.getElementById("revenueChart").getContext("2d");
       const revenueChart = new Chart(ctx, config);
 
-      // Simple page initialization
+            // ===== SIMPLE NOTIFICATION SYSTEM =====
+      
+      // Notification elements
+      const notificationBell = document.getElementById('notificationBell');
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      const notificationList = document.getElementById('notificationList');
+      const notificationBadge = document.getElementById('notificationBadge');
+      const markAllRead = document.getElementById('markAllRead');
+
+      // WebSocket connection
+      let adminNotificationSocket = null;
+
+      // Initialize WebSocket
+      function initAdminNotificationWebSocket() {
+        const adminId = 1; // Admin ID
+        console.log('🔌 Initializing Admin WebSocket for Admin ID:', adminId);
+        
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = wsProtocol + "//" + window.location.host + '${pageContext.request.contextPath}/websocket/notifications?userId=' + adminId;
+        console.log('🔗 Connecting to Admin Notification WebSocket:', wsUrl);
+
+        adminNotificationSocket = new WebSocket(wsUrl);
+
+        adminNotificationSocket.onopen = function(event) {
+          console.log('✅ Admin WebSocket connection opened');
+        };
+
+        adminNotificationSocket.onmessage = function(event) {
+          console.log('📨 Admin received notification:', event.data);
+          try {
+            const notification = JSON.parse(event.data);
+            console.log('📋 Parsed notification:', notification);
+            
+            // Add to dropdown if open
+            if (notificationDropdown.classList.contains('show')) {
+              addNotificationToDropdown(notification);
+            }
+            
+            // Update badge
+            updateNotificationBadgeFromWebSocket();
+            
+          } catch (e) {
+            console.error('❌ Error parsing notification:', e);
+          }
+        };
+
+        adminNotificationSocket.onerror = function(error) {
+          console.error('❌ Admin WebSocket Error:', error);
+        };
+
+        adminNotificationSocket.onclose = function(event) {
+          console.log('🔌 Admin WebSocket connection closed');
+          // Reconnect after 5 seconds
+          setTimeout(() => {
+            console.log('🔄 Attempting to reconnect...');
+            initAdminNotificationWebSocket();
+          }, 5000);
+        };
+      }
+
+      // Toggle notification dropdown
+      notificationBell.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationDropdown.classList.toggle('show');
+        if (notificationDropdown.classList.contains('show')) {
+          loadNotifications();
+        }
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
+          notificationDropdown.classList.remove('show');
+        }
+      });
+
+      // Load notifications from server
+      function loadNotifications() {
+        fetch('${pageContext.request.contextPath}/admin-notifications')
+          .then(response => {
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response headers:', response.headers);
+            return response.text();
+          })
+          .then(text => {
+            console.log('📡 Raw response text:', text);
+            try {
+              const data = JSON.parse(text);
+              console.log('📋 Parsed notifications:', data);
+              console.log('📋 Data type:', typeof data);
+              console.log('📋 Is array:', Array.isArray(data));
+              if (Array.isArray(data)) {
+                console.log('📋 Number of notifications:', data.length);
+                if (data.length > 0) {
+                  console.log('📋 First notification:', data[0]);
+                  console.log('📋 First notification keys:', Object.keys(data[0]));
+                  console.log('📋 First notification title:', data[0].title);
+                  console.log('📋 First notification content:', data[0].content);
+                  console.log('📋 First notification isIsRead:', data[0].isIsRead);
+                }
+                displayNotifications(data);
+                updateNotificationBadge(data);
+              } else {
+                console.log('📋 Data is not an array:', data);
+              }
+            } catch (e) {
+              console.error('❌ Error parsing JSON:', e);
+              console.error('❌ Raw text was:', text);
+            }
+          })
+          .catch(error => {
+            console.error('❌ Error loading notifications:', error);
+          });
+      }
+
+      // Display notifications in dropdown
+      function displayNotifications(notifications) {
+        console.log('🔍 Displaying notifications:', notifications);
+        
+        if (!notifications || notifications.length === 0) {
+          notificationList.innerHTML = '<div class="notification-empty">Không có thông báo nào</div>';
+          return;
+        }
+
+        notificationList.innerHTML = '';
+        notifications.forEach((notification, index) => {
+          console.log(`📋 Notification ${index + 1}:`, notification);
+          console.log(`📋 All keys:`, Object.keys(notification));
+          console.log(`📋 isIsRead:`, notification.isIsRead);
+          console.log(`📋 isRead:`, notification.isRead);
+          console.log(`📋 title:`, notification.title);
+          console.log(`📋 content:`, notification.content);
+          console.log(`📋 notificationID:`, notification.notificationID);
+          console.log(`📋 userID:`, notification.userID);
+          console.log(`📋 notificationType:`, notification.notificationType);
+          
+          const notificationItem = document.createElement('div');
+          notificationItem.className = `notification-item ${!notification.isIsRead ? 'unread' : ''}`;
+          
+          const timeAgo = formatTimeAgo(notification.createdAt);
+          
+          notificationItem.innerHTML = `
+            <div class="notification-title">${notification.title || 'Không có tiêu đề'}</div>
+            <div class="notification-content">${notification.content || 'Không có nội dung'}</div>
+            <div class="notification-time">${timeAgo}</div>
+          `;
+          
+          notificationItem.addEventListener('click', () => {
+            markNotificationAsRead(notification.notificationID);
+            notificationItem.classList.remove('unread');
+            
+            // Handle redirect based on notification type
+            if (notification.notificationType === 'order') {
+              if (notification.content && notification.content.includes('hoàn tiền')) {
+                window.location.href = '${pageContext.request.contextPath}/admin/refund';
+              } else {
+                window.location.href = '${pageContext.request.contextPath}/AdminEventManagement.jsp';
+              }
+            }
+          });
+          
+          notificationList.appendChild(notificationItem);
+        });
+      }
+
+      // Add new notification to dropdown
+      function addNotificationToDropdown(notification) {
+        const notificationItem = document.createElement('div');
+        notificationItem.className = 'notification-item unread';
+        
+        const timeAgo = formatTimeAgo(notification.createdAt);
+        
+        notificationItem.innerHTML = `
+          <div class="notification-title">${notification.title || 'Không có tiêu đề'}</div>
+          <div class="notification-content">${notification.content || 'Không có nội dung'}</div>
+          <div class="notification-time">${timeAgo}</div>
+        `;
+        
+        notificationItem.addEventListener('click', () => {
+          markNotificationAsRead(notification.notificationID);
+          notificationItem.classList.remove('unread');
+          
+          if (notification.notificationType === 'order') {
+            if (notification.content && notification.content.includes('hoàn tiền')) {
+              window.location.href = '${pageContext.request.contextPath}/admin/refund';
+            } else {
+              window.location.href = '${pageContext.request.contextPath}/AdminEventManagement.jsp';
+            }
+          }
+        });
+        
+        // Add to beginning of list
+        const firstItem = notificationList.querySelector('.notification-item');
+        if (firstItem) {
+          notificationList.insertBefore(notificationItem, firstItem);
+        } else {
+          notificationList.appendChild(notificationItem);
+        }
+      }
+
+      // Update notification badge
+      function updateNotificationBadge(notifications) {
+        const unreadCount = notifications.filter(n => !n.isIsRead).length;
+        notificationBadge.textContent = unreadCount;
+        if (unreadCount > 0) {
+          notificationBadge.classList.add('show');
+        } else {
+          notificationBadge.classList.remove('show');
+        }
+      }
+
+      // Update badge from WebSocket
+      function updateNotificationBadgeFromWebSocket() {
+        const currentCount = parseInt(notificationBadge.textContent || '0');
+        notificationBadge.textContent = currentCount + 1;
+        notificationBadge.classList.add('show');
+      }
+
+      // Mark notification as read
+      function markNotificationAsRead(notificationId) {
+        fetch('${pageContext.request.contextPath}/notification-servlet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `action=markRead&notificationId=${notificationId}&userId=1`
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            console.log('✅ Notification marked as read');
+          }
+        })
+        .catch(error => {
+          console.error('❌ Error marking notification as read:', error);
+        });
+      }
+
+      // Mark all notifications as read
+      markAllRead.addEventListener('click', function() {
+        fetch('${pageContext.request.contextPath}/notification-servlet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'action=markAllRead&userId=1'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            console.log('✅ All notifications marked as read');
+            loadNotifications();
+          }
+        })
+        .catch(error => {
+          console.error('❌ Error marking all notifications as read:', error);
+        });
+      });
+
+      // Format time ago
+      function formatTimeAgo(dateString) {
+        if (!dateString) return 'Không xác định';
+        
+        try {
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) return 'Không xác định';
+          
+          const now = new Date();
+          const diffInSeconds = Math.floor((now - date) / 1000);
+          
+          if (diffInSeconds < 60) {
+            return 'Vừa xong';
+          } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} phút trước`;
+          } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} giờ trước`;
+          } else {
+            const days = Math.floor(diffInSeconds / 86400);
+            return `${days} ngày trước`;
+          }
+        } catch (e) {
+          return 'Không xác định';
+        }
+      }
+
+      // Initialize everything
       document.addEventListener('DOMContentLoaded', function() {
         console.log('Admin Dashboard page loaded successfully');
+        
+        // Initialize WebSocket
+        initAdminNotificationWebSocket();
+        
+        // Load initial notifications
+        loadNotifications();
+        
+        // Test notification object
+        console.log('🧪 Testing notification object structure...');
+        const testNotification = {
+          notificationID: 1,
+          userID: 1,
+          title: "Test Title",
+          content: "Test Content",
+          notificationType: "order",
+          isIsRead: false,
+          isRead: false,
+          createdAt: "2024-01-01T00:00:00"
+        };
+        console.log('🧪 Test notification:', testNotification);
+        console.log('🧪 Test notification keys:', Object.keys(testNotification));
       });
-    </script>
-  </body>
-</html>
+     </script>
+   </body>
+ </html>
