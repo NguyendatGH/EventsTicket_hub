@@ -27,7 +27,9 @@ public class OrderDAO {
     private final OrderItemDAO orderItemDAO = new OrderItemDAO();
 
     /**
-     * Creates Ticket records, reserves seats, and updates ticket inventory in a single transaction.
+     * Creates Ticket records, reserves seats, and updates ticket inventory in a
+     * single transaction.
+     *
      * @param ticketInfoId The ID of the TicketInfo for the tickets
      * @param seats The list of seats to reserve
      * @param conn The database connection (must be in a transaction)
@@ -37,17 +39,17 @@ public class OrderDAO {
     public List<Integer> createTicketsAndReserveSeats(int ticketInfoId, List<Seat> seats, Connection conn) throws SQLException {
         List<Integer> ticketIds = new ArrayList<>();
         try {
-            String ticketSql = "INSERT INTO Ticket (TicketInfoID, TicketCode, Status, SeatID, CreatedAt, UpdatedAt) " +
-                              "VALUES (?, ?, 'reserved', ?, GETDATE(), GETDATE())";
+            String ticketSql = "INSERT INTO Ticket (TicketInfoID, TicketCode, Status, SeatID, CreatedAt, UpdatedAt) "
+                    + "VALUES (?, ?, 'reserved', ?, GETDATE(), GETDATE())";
             for (Seat seat : seats) {
                 String ticketCode = generateUniqueTicketCode();
-                try (PreparedStatement ps = conn.prepareStatement(ticketSql, Statement.RETURN_GENERATED_KEYS)) {
+                try ( PreparedStatement ps = conn.prepareStatement(ticketSql, Statement.RETURN_GENERATED_KEYS)) {
                     ps.setInt(1, ticketInfoId);
                     ps.setString(2, ticketCode);
                     ps.setInt(3, seat.getSeatId());
                     ps.executeUpdate();
 
-                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                    try ( ResultSet rs = ps.getGeneratedKeys()) {
                         if (rs.next()) {
                             ticketIds.add(rs.getInt(1));
                         }
@@ -72,6 +74,7 @@ public class OrderDAO {
 
     /**
      * Generates a unique ticket code.
+     *
      * @return A unique ticket code
      */
     private String generateUniqueTicketCode() {
@@ -80,6 +83,7 @@ public class OrderDAO {
 
     /**
      * Creates an Order and OrderItems, linking each OrderItem to a TicketID.
+     *
      * @param order The Order object to create
      * @param ticketIdsByOrderItem List of TicketIDs for each OrderItem
      * @param conn The database connection (must be in a transaction)
@@ -102,7 +106,7 @@ public class OrderDAO {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false);
 
-            try (PreparedStatement psOrder = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
+            try ( PreparedStatement psOrder = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
                 psOrder.setString(1, order.getOrderNumber());
                 psOrder.setInt(2, order.getUserId());
                 psOrder.setInt(3, order.getTotalQuantity());
@@ -119,7 +123,7 @@ public class OrderDAO {
                 psOrder.setString(14, order.getTransactionId());
                 psOrder.executeUpdate();
 
-                try (ResultSet rs = psOrder.getGeneratedKeys()) {
+                try ( ResultSet rs = psOrder.getGeneratedKeys()) {
                     if (rs.next()) {
                         generatedOrderId = rs.getInt(1);
                     } else {
@@ -128,7 +132,7 @@ public class OrderDAO {
                 }
             }
 
-            try (PreparedStatement psTicket = conn.prepareStatement(insertTicketSQL, Statement.RETURN_GENERATED_KEYS); PreparedStatement psItem = conn.prepareStatement(insertOrderItemSQL)) {
+            try ( PreparedStatement psTicket = conn.prepareStatement(insertTicketSQL, Statement.RETURN_GENERATED_KEYS);  PreparedStatement psItem = conn.prepareStatement(insertOrderItemSQL)) {
 
                 for (OrderItem item : order.getItems()) {
                     for (int i = 0; i < item.getQuantity(); i++) {
@@ -139,7 +143,7 @@ public class OrderDAO {
                         psTicket.executeUpdate();
 
                         int generatedTicketId = -1;
-                        try (ResultSet rsTicket = psTicket.getGeneratedKeys()) {
+                        try ( ResultSet rsTicket = psTicket.getGeneratedKeys()) {
                             if (rsTicket.next()) {
                                 generatedTicketId = rsTicket.getInt(1);
                             } else {
@@ -186,14 +190,14 @@ public class OrderDAO {
     }
 
     public int createOrder(Order order, List<List<Integer>> ticketIdsByOrderItem, Connection conn) throws SQLException {
-        String insertOrderSQL = "INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, DeliveryMethod, ContactPhone, ContactEmail, Notes, CreatedAt, UpdatedAt) " +
-                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+        String insertOrderSQL = "INSERT INTO Orders (OrderNumber, UserID, TotalQuantity, SubtotalAmount, DiscountAmount, TotalAmount, PaymentStatus, OrderStatus, DeliveryMethod, ContactPhone, ContactEmail, Notes, CreatedAt, UpdatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
         int generatedOrderId = -1;
 
         try {
             // Insert Order
-            try (PreparedStatement psOrder = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
+            try ( PreparedStatement psOrder = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
                 psOrder.setString(1, order.getOrderNumber());
                 psOrder.setInt(2, order.getUserId());
                 psOrder.setInt(3, order.getTotalQuantity());
@@ -208,7 +212,7 @@ public class OrderDAO {
                 psOrder.setString(12, order.getNotes());
                 psOrder.executeUpdate();
 
-                try (ResultSet rs = psOrder.getGeneratedKeys()) {
+                try ( ResultSet rs = psOrder.getGeneratedKeys()) {
                     if (rs.next()) {
                         generatedOrderId = rs.getInt(1);
                     } else {
@@ -242,7 +246,9 @@ public class OrderDAO {
     }
 
     /**
-     * Creates tickets, reserves seats, updates inventory, and creates order in a single transaction.
+     * Creates tickets, reserves seats, updates inventory, and creates order in
+     * a single transaction.
+     *
      * @param order The Order object to create
      * @param seatsByTicketInfo Map of TicketInfoID to list of seats
      * @return The generated OrderID
@@ -290,7 +296,7 @@ public class OrderDAO {
 
     public boolean updatePaymentStatus(int orderId, String paymentStatus) {
         String sql = "UPDATE Orders SET PaymentStatus = ?, UpdatedAt = GETDATE() WHERE OrderID = ?";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, paymentStatus);
             ps.setInt(2, orderId);
             return ps.executeUpdate() > 0;
@@ -302,12 +308,12 @@ public class OrderDAO {
 
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> orderList = new ArrayList<>();
-        String sql = "SELECT o.OrderID, o.OrderNumber, o.TotalAmount, o.OrderStatus, o.CreatedAt " +
-                    "FROM Orders o WHERE o.UserID = ? ORDER BY o.CreatedAt DESC";
+        String sql = "SELECT o.OrderID, o.OrderNumber, o.TotalAmount, o.OrderStatus, o.CreatedAt "
+                + "FROM Orders o WHERE o.UserID = ? ORDER BY o.CreatedAt DESC";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Order order = new Order();
                     order.setOrderId(rs.getInt("OrderID"));
@@ -337,17 +343,17 @@ public class OrderDAO {
 
     public List<Map<String, Object>> getSimpleOrdersByUserId(int userId) {
         List<Map<String, Object>> list = new ArrayList<>();
-        String sql = "SELECT o.OrderID, SUM(oi.Quantity) AS TotalQuantity, o.TotalAmount, o.CreatedAt, " +
-                     "MIN(e.EventID) AS EventID, MIN(e.Name) AS EventName, " +
-                     "MIN(e.StartTime) AS StartTime, MIN(e.PhysicalLocation) AS PhysicalLocation " +
-                     "FROM Orders o " +
-                     "JOIN OrderItems oi ON o.OrderID = oi.OrderID " +
-                     "JOIN Events e ON oi.EventID = e.EventID " +
-                     "WHERE o.UserID = ? " +
-                     "GROUP BY o.OrderID, o.TotalAmount, o.CreatedAt " +
-                     "ORDER BY o.CreatedAt DESC";
+        String sql = "SELECT o.OrderID, SUM(oi.Quantity) AS TotalQuantity, o.TotalAmount, o.CreatedAt, "
+                + "MIN(e.EventID) AS EventID, MIN(e.Name) AS EventName, "
+                + "MIN(e.StartTime) AS StartTime, MIN(e.PhysicalLocation) AS PhysicalLocation "
+                + "FROM Orders o "
+                + "JOIN OrderItems oi ON o.OrderID = oi.OrderID "
+                + "JOIN Events e ON oi.EventID = e.EventID "
+                + "WHERE o.UserID = ? "
+                + "GROUP BY o.OrderID, o.TotalAmount, o.CreatedAt "
+                + "ORDER BY o.CreatedAt DESC";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
 
@@ -385,7 +391,7 @@ public class OrderDAO {
 
     public BigDecimal getOrderTotalAmount(int orderId) {
         String sql = "SELECT TotalAmount FROM Orders WHERE OrderID = ?";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -395,5 +401,19 @@ public class OrderDAO {
             e.printStackTrace();
         }
         return BigDecimal.ZERO;
+    }
+
+    public BigDecimal getOrderAmount(int orderId) {
+        String sql = "SELECT TotalAmount FROM Orders WHERE OrderID = ?";
+        try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getBigDecimal("TotalAmount");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
