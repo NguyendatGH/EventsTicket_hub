@@ -45,9 +45,9 @@
             padding: 1rem 2rem;
             position: sticky;
             top: 0;
-            z-index: 100;
             border-bottom: 1px solid var(--border-color);
             overflow: visible;
+            z-index: 1;
         }
 
         /* Ensure all content has lower z-index than dropdown */

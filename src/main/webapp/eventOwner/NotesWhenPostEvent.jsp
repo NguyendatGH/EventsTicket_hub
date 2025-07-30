@@ -416,10 +416,11 @@
             <nav>
                 <ul class="nav-menu">
                     <li><a href="${pageContext.request.contextPath}/home">Trang chủ</a></li>
-                    <li><a href="${pageContext.request.contextPath}/buy">Các sự kiện hot</a></li>
-                    <li><a href="${pageContext.request.contextPath}/shows">Săn voucher giảm giá</a></li>
-                    <li><a href="${pageContext.request.contextPath}/create-event" class="create-event">Tạo sự kiện</a></li>
-                    <li><a href="${pageContext.request.contextPath}/offers">Hỗ trợ</a></li>
+                   
+                    <li><a href="${pageContext.request.contextPath}/support-owner">Hỗ trợ</a></li>
+                    <button class="chat-btn" onclick="window.location.href = '${pageContext.request.contextPath}/chat'">
+                    💬 Chat với chúng tôi
+                </button>
                 </ul>
             </nav>
          <a href="${pageContext.request.contextPath}/organizer-servlet?action=createForm" class="create-event-btn">
@@ -442,14 +443,7 @@
                         <i class="fas fa-calendar"></i>
                         <span> Sự kiện của tôi</span>
                     </li>
-                    <li>
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Quản lí báo cáo</span>
-                    </li>
-                    <li>
-                        <i class="fas fa-cog"></i>
-                        <span>Điều khoản</span>
-                    </li>
+                    
                 </ul>
             </aside>
 

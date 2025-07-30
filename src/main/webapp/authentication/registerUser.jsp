@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -297,7 +298,43 @@
                 color: #a259f7;
                 text-decoration: none;
                 font-weight: 600;
-                transition: all 0.3s ease;
+            }
+
+            /* Password Requirements */
+            .password-requirements {
+                margin-top: 8px;
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .password-requirements small {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 12px;
+                display: block;
+                margin-bottom: 8px;
+            }
+
+            .password-requirements ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .password-requirements li {
+                font-size: 11px;
+                color: rgba(255, 255, 255, 0.6);
+                margin-bottom: 4px;
+                transition: color 0.3s ease;
+            }
+
+            .password-requirements li.valid {
+                color: #4facfe;
+            }
+
+            .password-requirements li.invalid {
+                color: #ff6b6b;
             }
 
             .login-link a:hover {
@@ -495,7 +532,12 @@
                     <div class="error-message">${error}</div>
                 </c:if>
 
-                <form action="register" method="post" class="register-form">
+                <form action="${pageContext.request.contextPath}/register" method="post" class="register-form">
+                    <div class="form-group">
+                        <label for="name">Họ và tên</label>
+                        <input type="text" id="name" name="name" placeholder="Vui lòng nhập họ và tên" required>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" placeholder="Vui lòng nhập email" required>
@@ -513,6 +555,14 @@
                     <div class="form-group">
                         <label for="password">Mật khẩu</label>
                         <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
+                        <div class="password-requirements">
+                            <small>Mật khẩu phải có:</small>
+                            <ul>
+                                <li id="length-check">❌ Ít nhất 8 ký tự</li>
+                                <li id="uppercase-check">❌ Ít nhất 1 ký tự viết hoa</li>
+                                <li id="special-check">❌ Ít nhất 1 ký tự đặc biệt</li>
+                            </ul>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -538,6 +588,11 @@
                     <div class="form-group">
                         <label for="language">Ngôn ngữ</label>
                         <input type="text" id="language" name="language" placeholder="Nhập ngôn ngữ" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Địa chỉ</label>
+                        <input type="text" id="address" name="address" placeholder="Nhập địa chỉ" required>
                     </div>
 
                     <div class="submit-section">
@@ -592,5 +647,93 @@
                 </div>
             </div>
         </footer>
+
+        <script>
+            // Password validation
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            function validatePassword(password) {
+                const lengthCheck = document.getElementById('length-check');
+                const uppercaseCheck = document.getElementById('uppercase-check');
+                const specialCheck = document.getElementById('special-check');
+                
+                // Length check
+                if (password.length >= 8) {
+                    lengthCheck.textContent = '✅ Ít nhất 8 ký tự';
+                    lengthCheck.className = 'valid';
+                } else {
+                    lengthCheck.textContent = '❌ Ít nhất 8 ký tự';
+                    lengthCheck.className = 'invalid';
+                }
+                
+                // Uppercase check
+                if (/[A-Z]/.test(password)) {
+                    uppercaseCheck.textContent = '✅ Ít nhất 1 ký tự viết hoa';
+                    uppercaseCheck.className = 'valid';
+                } else {
+                    uppercaseCheck.textContent = '❌ Ít nhất 1 ký tự viết hoa';
+                    uppercaseCheck.className = 'invalid';
+                }
+                
+                // Special character check
+                if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                    specialCheck.textContent = '✅ Ít nhất 1 ký tự đặc biệt';
+                    specialCheck.className = 'valid';
+                } else {
+                    specialCheck.textContent = '❌ Ít nhất 1 ký tự đặc biệt';
+                    specialCheck.className = 'invalid';
+                }
+            }
+            
+            function validateConfirmPassword() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    confirmPasswordInput.setCustomValidity('Mật khẩu xác nhận không khớp');
+                } else {
+                    confirmPasswordInput.setCustomValidity('');
+                }
+            }
+            
+            // Event listeners
+            passwordInput.addEventListener('input', function() {
+                validatePassword(this.value);
+            });
+            
+            confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+            
+            // Form validation
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                // Check password requirements
+                if (password.length < 8) {
+                    e.preventDefault();
+                    alert('Mật khẩu phải có ít nhất 8 ký tự');
+                    return;
+                }
+                
+                if (!/[A-Z]/.test(password)) {
+                    e.preventDefault();
+                    alert('Mật khẩu phải có ít nhất 1 ký tự viết hoa');
+                    return;
+                }
+                
+                if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                    e.preventDefault();
+                    alert('Mật khẩu phải có ít nhất 1 ký tự đặc biệt');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Mật khẩu xác nhận không khớp');
+                    return;
+                }
+            });
+        </script>
     </body>
 </html>
