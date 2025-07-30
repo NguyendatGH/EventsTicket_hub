@@ -1255,28 +1255,19 @@
             <div class="hero-carousel">
                 <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
                     <div class="carousel-content">
-                        <div class="welcome-section">
-                            <div class="welcome-images">
-                                <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Concert" class="welcome-img">
-                                <img src="https://images.unsplash.com/photo-1505373877845-8c2aace4d817?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Theater" class="welcome-img">
-                                <img src="https://images.unsplash.com/photo-1607962837350-ed6062031177?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Art" class="welcome-img">
-                            </div>
-                            <div class="welcome-text">
-                                <h2>Chào mừng đến với MasterTicket</h2>
-                                <p>Khám phá hàng ngàn sự kiện thú vị và đặt vé ngay hôm nay!</p>
-                                <a href="#events" class="btn btn-primary">Khám phá ngay</a>
-                            </div>
-                        </div>
+                        <h2>Chào mừng đến với MasterTicket</h2>
+                        <p>Khám phá hàng ngàn sự kiện thú vị và đặt vé ngay hôm nay!</p>
+                        <a href="#events" class="btn btn-primary">Khám phá ngay</a>
                     </div>
                 </div>
-                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1505373877845-8c2aace4d817?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
                     <div class="carousel-content">
                         <h2>Sự kiện âm nhạc đỉnh cao</h2>
                         <p>Đừng bỏ lỡ những đêm nhạc sống động với các nghệ sĩ hàng đầu!</p>
                         <a href="#events" class="btn btn-primary">Xem chi tiết</a>
                     </div>
                 </div>
-                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1607962837350-ed6062031177?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
                     <div class="carousel-content">
                         <h2>Sự kiện văn hóa và nghệ thuật</h2>
                         <p>Đắm chìm vào thế giới nghệ thuật với các triển lãm và biểu diễn độc đáo.</p>
