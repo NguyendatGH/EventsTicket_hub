@@ -415,6 +415,34 @@
             .header, .footer-content { padding-left: 10px; padding-right: 10px; }
             .login-box { width: 98vw; padding: 24px 6vw; }
         }
+
+        /* Error message styling */
+        .error-message {
+            background: rgba(255, 107, 129, 0.1);
+            border: 1px solid #ff6b81;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            color: #ff6b81;
+            font-size: 0.9rem;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .error-message .error-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message i {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
@@ -446,7 +474,12 @@
         <div class="login-box">
             <h2>Login</h2>
             <c:if test="${not empty error}">
-                <p style="color: #ff6b81; margin-bottom: 10px;">${error}</p>
+                <div class="error-message">
+                    <div class="error-content">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        <span>${error}</span>
+                    </div>
+                </div>
             </c:if>
             <form action="${pageContext.request.contextPath}/login" method="post">
                 <label>Email</label>
@@ -471,9 +504,9 @@
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" />
                 </a>
                 <a href="#" title="Sign in with Zalo">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" onclick="alert('soon!')"/>
                 </a>
-                <a href="#" title="Sign in with Facebook">
+                <a href="#" title="Sign in with Facebook" onclick="alert('soon!')">
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" />
                 </a>
             </div>
@@ -494,6 +527,9 @@
                 </ul>
                 <div style="margin-top: 10px;">
                     Email: <a href="mailto:support@masterTicket.vn" style="color:#7fffd4;"><i class="fa fa-envelope"></i> support@masterTicket.vn</a>
+                </div>
+                <div style="margin-top: 8px;">
+                    Hotline: <a href="tel:1900xxxx" style="color:#7fffd4;"><i class="fa fa-phone"></i> 1900-xxxx</a>
                 </div>
             </div>
             <div class="footer-col">
