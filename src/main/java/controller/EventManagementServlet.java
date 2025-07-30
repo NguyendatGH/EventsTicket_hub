@@ -69,16 +69,26 @@ public class EventManagementServlet implements AdminSubServlet {
 
     private void setEventToJsp(HttpServletRequest request, HttpServletResponse response) {
         List<Event> activeEvents = eventServices.getActiveEvents();
+        // for (Event e : activeEvents) {
+        //     System.out.println("active event: " + e);
+        // }
         List<Event> nonActiveEvents = eventServices.getNonActiveEvents();
+        // for (Event e : nonActiveEvents) {
+        //     System.out.println("non active event: " + e);
+        // }
+        List<Event> getPendingEvents = eventServices.getPendingEvents();
+        // for (Event e : getPendingEvents) {
+        //     System.out.println("pending event: " + e);
+        // }
         List<TopEventOwner> topOrganizers = userDAO.getTopEventOwner(5);
         Map<String, Integer> statusStats = eventServices.getEventByStatus();
         Map<String, Integer> genreStats = eventServices.getEventStatsByGenre();
         List<Map<String, Object>> monthlyStats = eventServices.getMonthlyEventStats();
-
         ObjectMapper mapper = new ObjectMapper();
         try {
             request.setAttribute("activeEvents", activeEvents != null ? activeEvents : new ArrayList<>());
             request.setAttribute("nonActiveEvents", nonActiveEvents != null ? nonActiveEvents : new ArrayList<>());
+            request.setAttribute("pendingEvent", getPendingEvents != null ? getPendingEvents : new ArrayList<>());
             request.setAttribute("topOrganizers", topOrganizers != null ? topOrganizers : new ArrayList<>());
             request.setAttribute("statusStatsJson",
                     mapper.writeValueAsString(statusStats != null ? statusStats : new HashMap<>()));
@@ -205,6 +215,7 @@ public class EventManagementServlet implements AdminSubServlet {
         event.setName(request.getParameter("name"));
         event.setDescription(request.getParameter("description"));
         event.setPhysicalLocation(request.getParameter("physicalLocation"));
+        // event.setIsApproved(true);
         event.setStatus(request.getParameter("status"));
         event.setUpdatedAt(new Date());
         if (imageFileName != null) {

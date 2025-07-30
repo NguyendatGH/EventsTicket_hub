@@ -681,6 +681,22 @@
                             </tr>
                         </thead>
                         <tbody>
+                        <c:forEach var="event" items="${pendingEvent}" varStatus="status">
+                                    <tr>
+                                        <td>${status.count}</td>
+                                        <td><c:out value="${event.name}" /></td>
+                                        <td><fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy" /> - <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" /></td>
+                                        <td><span class="status-tag warning">Đang chờ duyệt</span></td>
+                                        <td class="actions">
+                                            <button class="action-btn edit-btn" onclick="handleEditEvent(${event.eventID})">
+                                                <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt="Edit" />
+                                            </button>
+                                            <button class="action-btn delete-btn" onclick="handleDeleteEvent(${event.eventID})">
+                                                <img src="${pageContext.request.contextPath}/asset/image/Trash.svg" alt="Delete" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
                             <c:if test="${not empty activeEvents}">
                                 <c:forEach var="event" items="${activeEvents}" varStatus="status">
                                     <tr>
@@ -719,6 +735,7 @@
                                     </tr>
                                 </c:forEach>
                             </c:if>
+                            
                             <c:if test="${empty activeEvents && empty nonActiveEvents}">
                                 <tr>
                                     <td colspan="5">Không có sự kiện nào.</td>
