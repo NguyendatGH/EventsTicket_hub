@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
+
 package context;
 
 import java.sql.Connection;
@@ -13,11 +10,10 @@ import java.util.logging.Logger;
 public class DBConnection {
 
     private static final String DRIVER_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-
-
     private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=EventTicketDB;encrypt=true;trustServerCertificate=true";
     private static final String USER_DB = "sa"; 
     private static final String PASS_DB = "12345"; 
+
   
     private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 

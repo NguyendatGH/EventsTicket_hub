@@ -179,6 +179,7 @@ public class EventOwnerServlet extends HttpServlet {
         if (pageParam != null && !pageParam.isEmpty()) {
             try {
                 currentPage = Integer.parseInt(pageParam);
+                System.out.println("CURRENT PAGE: " +currentPage);
             } catch (NumberFormatException e) {
                 logger.warning("Invalid page parameter: " + pageParam);
             }
@@ -187,7 +188,7 @@ public class EventOwnerServlet extends HttpServlet {
         // Lấy danh sách sự kiện của người dùng
         List<Event> myEvents = eventDao.getAllMyEvent(userID);
         
-        System.out.println("event of owner2: " +myEvents);
+//        System.out.println("event of owner2: " +myEvents);
         // Tính toán phân trang
         int totalEvents = myEvents.size();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
@@ -203,13 +204,17 @@ public class EventOwnerServlet extends HttpServlet {
         int start = (currentPage - 1) * pageSize;
         int end = Math.min(start + pageSize, totalEvents);
         List<Event> eventsForPage = myEvents.subList(start, end);
-        System.out.println("eventsForPage" +eventsForPage);
+        session.setAttribute("eventsForPage", eventsForPage);
+        for(Event e: eventsForPage){
+            System.out.println("" + e);
+        }
+                
         // Lấy danh sách thể loại
         List<Genre> genres = genreDAO.getAllGenres();
 
         // Lấy thống kê sự kiện
         int totalTicketsSold = eventDao.getTotalTicketsSoldByOwner(userID);
-        BigDecimal totalRevenue = eventDao.getTotalRevenueByOwner(userID);
+//        BigDecimal totalRevenue = eventDao.getTotalRevenueByOwner(userID);
 
         // Đặt các thuộc tính để hiển thị trên JSP
         session.setAttribute("genres", genres);
@@ -219,7 +224,7 @@ public class EventOwnerServlet extends HttpServlet {
         session.setAttribute("myEventsPageSize", pageSize);
         session.setAttribute("totalEvents", totalEvents);
         session.setAttribute("totalTicketsSold", totalTicketsSold);
-        session.setAttribute("totalRevenue", totalRevenue);
+        session.setAttribute("totalRevenue", 123);
 
         // Xử lý thông báo thành công
         String successMessage = (String) session.getAttribute("successMessage");

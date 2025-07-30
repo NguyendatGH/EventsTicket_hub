@@ -657,7 +657,7 @@
                 </button>
             </div>
             <div class="user-info">
-                <span>Welcome, Event Manager</span>
+                <span>Chào mừng, Event Manager</span>
                 
                 <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">Đăng xuất</a>
             </div>
@@ -671,51 +671,51 @@
             </div>
 
             <div class="event-list">
-                <c:choose>
-                    <c:when test="${not empty myEvents}">
-                        <c:forEach var="event" items="${myEvents}" begin="${(myEventsCurrentPage-1)*myEventsPageSize}" end="${myEventsCurrentPage*myEventsPageSize-1}">
-                            <div class="event-item">
-                                <div class="event-info">
-                                    <h3><c:out value="${event.name}" /></h3>
-                                    <p>
-                                        <c:if test="${not empty event.physicalLocation}">
-                                            📍 <c:out value="${event.physicalLocation}" /> • 
-                                        </c:if>
-                                        📅 <fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy" /> - 
-                                        <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" />
-                                        <c:if test="${not empty event.totalTicketCount}">
-                                            • 🎫 <c:out value="${event.totalTicketCount}" /> tickets
-                                        </c:if>
-                                    </p>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div class="event-status 
-                                         <c:choose>
-                                             <c:when test="${event.status eq 'active'}">status-active</c:when>
-                                             <c:when test="${event.status eq 'pending'}">status-pending</c:when>
-                                             <c:otherwise>status-ended</c:otherwise>
-                                         </c:choose>">
-                                        <c:choose>
-                                            <c:when test="${event.status eq 'active'}">Active</c:when>
-                                            <c:when test="${event.status eq 'pending'}">Pending</c:when>
-                                            <c:otherwise>Ended</c:otherwise>
-                                        </c:choose>
-                                    </div>
-                                    <div class="event-actions">
-                                        <button class="btn-edit" onclick="editEvent(${event.eventID})">Edit</button>
-                                        <button class="btn-delete" onclick="deleteEvent(${event.eventID})">Delete</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="event-item" style="text-align: center;">
-                            <p style="color: #9ca3af;">Bạn chưa tạo sự kiện nào!</p>
+    <c:choose>
+        <c:when test="${not empty eventsForPage}">
+            <c:forEach var="event" items="${eventsForPage}">
+                <div class="event-item">
+                    <div class="event-info">
+                        <h3><c:out value="${event.name}" /></h3>
+                        <p>
+                            <c:if test="${not empty event.physicalLocation}">
+                                📍 <c:out value="${event.physicalLocation}" /> • 
+                            </c:if>
+                            📅 <fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy" /> - 
+                            <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" />
+                            <c:if test="${not empty event.totalTicketCount}">
+                                • 🎫 <c:out value="${event.totalTicketCount}" /> tickets
+                            </c:if>
+                        </p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="event-status 
+                             <c:choose>
+                                 <c:when test="${event.status eq 'active'}">status-active</c:when>
+                                 <c:when test="${event.status eq 'pending'}">status-pending</c:when>
+                                 <c:otherwise>status-ended</c:otherwise>
+                             </c:choose>">
+                            <c:choose>
+                                <c:when test="${event.status eq 'active'}">Active</c:when>
+                                <c:when test="${event.status eq 'pending'}">Pending</c:when>
+                                <c:otherwise>Ended</c:otherwise>
+                            </c:choose>
                         </div>
-                    </c:otherwise>
-                </c:choose>
+                        <div class="event-actions">
+                            <button class="btn-edit" onclick="editEvent(${event.eventID})">Edit</button>
+                            <button class="btn-delete" onclick="deleteEvent(${event.eventID})">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </c:forEach>
+        </c:when>
+        <c:otherwise>
+            <div class="event-item" style="text-align: center;">
+                <p style="color: #9ca3af;">Bạn chưa tạo sự kiện nào!</p>
             </div>
+        </c:otherwise>
+    </c:choose>
+</div>
 
             <!-- Pagination for My Events -->
             <div class="pagination">
@@ -747,16 +747,12 @@
                 <div class="number">${totalEvents}</div>
                 <div class="label">Total Events</div>
             </div>
-            <div class="stat-card">
-                <div class="icon">👥</div>
-                <div class="number">${totalTicketsSold}</div>
-                <div class="label">Total Attendees</div>
-            </div>
-            <div class="stat-card">
+            
+<!--            <div class="stat-card">
                 <div class="icon">💰</div>
                 <div class="number">$${totalRevenue}</div>
                 <div class="label">Total Revenue</div>
-            </div>
+            </div>-->
         </div>
 
         <!-- Quick Actions -->
@@ -770,26 +766,8 @@
                     <span>📝</span>
                     Create Event
                 </a>
-                <a href="#" class="action-btn">
-                    <span>📊</span>
-                    View Reports
-                </a>
-                <a href="#" class="action-btn">
-                    <span>🎫</span>
-                    Manage Tickets
-                </a>
-                <a href="#" class="action-btn">
-                    <span>💬</span>
-                    Customer Support
-                </a>
-                <a href="#" class="action-btn">
-                    <span>📈</span>
-                    Analytics
-                </a>
-                <a href="#" class="action-btn">
-                    <span>⚙️</span>
-                    Settings
-                </a>
+                <a href="${pageContext.request.contextPath}/support-owner" class="action-btn">🎧 Hỗ trợ</a>
+                
             </div>
         </div>
     </div>

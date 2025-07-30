@@ -462,6 +462,12 @@
                     <button class="alert-dismiss">✕</button>
                 </div>
             </c:if>
+            <c:if test="${not empty successMessage}">
+                <script>
+                    alert('Đã tạo sự kiện thành công');
+                    window.location.href = '${pageContext.request.contextPath}/events';
+                </script>
+            </c:if>
             <form action="${pageContext.request.contextPath}/organizer-servlet" method="post" id="ticketForm">
                 <input type="hidden" name="action" value="create"/>
                 <div class="form-section">
@@ -524,7 +530,12 @@
                 </div>
                 <div class="action-buttons">
                     <a href="${pageContext.request.contextPath}/organizer-servlet?action=${event.hasSeatingChart ? 'customizeSeats' : 'step3'}" class="btn-secondary">← Back</a>
-                    <button type="submit" class="btn-primary" id="createEventBtn">Create Event →</button>
+                    <c:if test="${empty successMessage}">
+                        <button type="submit" class="btn-primary">Create Event →</button>
+                    </c:if>
+                    <c:if test="${not empty successMessage}">
+                        <a href="${pageContext.request.contextPath}/events" class="btn-primary">View My Events →</a>
+                    </c:if>
                 </div>
             </form>
         </div>
@@ -561,51 +572,26 @@
             }
         });
 
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('alert-dismiss')) {
-                e.target.closest('.alert, .alert-success').remove();
-            }
-        });
-
-        document.getElementById('ticketForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        document.getElementById('ticketForm')?.addEventListener('submit', function(e) {
             if (!${event.hasSeatingChart}) {
                 const totalTicketCount = parseInt(document.querySelector('input[name="totalTicketCount"]').value);
                 const quantities = Array.from(document.querySelectorAll('input[name="ticketQuantity[]"]')).map(input => parseInt(input.value) || 0);
                 const totalQuantity = quantities.reduce((sum, qty) => sum + qty, 0);
                 if (totalQuantity !== totalTicketCount) {
+                    e.preventDefault();
+                    const mainContent = document.querySelector('.main-content');
                     const errorAlert = document.createElement('div');
                     errorAlert.className = 'alert';
                     errorAlert.innerHTML = '<span>Sum of ticket quantities must equal total ticket count</span><button class="alert-dismiss">✕</button>';
-                    document.querySelector('.main-content').insertBefore(errorAlert, document.querySelector('.form-section'));
-                    return;
+                    mainContent.insertBefore(errorAlert, mainContent.firstChild);
                 }
             }
+        });
 
-            const form = this;
-            const formData = new FormData(form);
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Đã tạo sự kiện thành công');
-                    window.location.href = '${pageContext.request.contextPath}/events';
-                } else {
-                    const errorAlert = document.createElement('div');
-                    errorAlert.className = 'alert';
-                    errorAlert.innerHTML = `<span>${data.error || 'An error occurred while creating the event'}</span><button class="alert-dismiss">✕</button>`;
-                    document.querySelector('.main-content').insertBefore(errorAlert, document.querySelector('.form-section'));
-                }
-            })
-            .catch(error => {
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert';
-                errorAlert.innerHTML = '<span>An error occurred while creating the event</span><button class="alert-dismiss">✕</button>';
-                document.querySelector('.main-content').insertBefore(errorAlert, document.querySelector('.form-section'));
-            });
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('alert-dismiss')) {
+                e.target.closest('.alert, .alert-success').remove();
+            }
         });
     </script>
 </body>
