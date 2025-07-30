@@ -318,7 +318,7 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="forgot-password-container">
+    <div class="forgot-password-container">
             <h2><i class="fas fa-key"></i> Quên mật khẩu</h2>
             <p class="form-description">
                 Nhập email đã đăng ký để nhận mã xác nhận đặt lại mật khẩu

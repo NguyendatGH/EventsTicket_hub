@@ -8,6 +8,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MasterTicket Admin</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
       * {
         margin: 0;
@@ -612,6 +613,152 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         }
       }
 
+      /* Notification Styles */
+      .notification-container {
+        position: relative;
+      }
+
+      .notification-bell {
+        position: relative;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+      }
+
+      .notification-bell:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+      }
+
+      .notification-bell i {
+        color: white;
+        font-size: 18px;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ff4757;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        min-width: 20px;
+      }
+
+      .notification-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 400px;
+        max-height: 500px;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        display: none;
+        overflow: hidden;
+      }
+
+      .notification-dropdown.show {
+        display: block;
+      }
+
+      .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .notification-header h3 {
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .mark-all-read {
+        background: none;
+        border: none;
+        color: #64f3ff;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      .mark-all-read:hover {
+        background: rgba(100, 243, 255, 0.1);
+      }
+
+      .notification-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .notification-item {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .notification-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .notification-item.unread {
+        background: rgba(100, 243, 255, 0.1);
+      }
+
+      .notification-item.unread:hover {
+        background: rgba(100, 243, 255, 0.15);
+      }
+
+      .notification-title {
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .notification-content {
+        color: #94a3b8;
+        font-size: 12px;
+        line-height: 1.4;
+        margin-bottom: 8px;
+      }
+
+      .notification-time {
+        color: #64748b;
+        font-size: 11px;
+      }
+
+      .notification-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 14px;
+      }
+
       @keyframes float {
         0% {
           transform: translateY(0);
@@ -714,7 +861,22 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <header class="header">
           <h1 class="page-title">Bảng điều khiển</h1>
           <div style="display: flex; align-items: center; gap: 24px;">
-
+            <!-- Notification Bell -->
+            <div class="notification-container">
+              <div class="notification-bell" id="notificationBell">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge">0</span>
+              </div>
+              <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                  <h3>Thông báo</h3>
+                  <button class="mark-all-read" id="markAllRead">Đánh dấu tất cả</button>
+                </div>
+                <div class="notification-list" id="notificationList">
+                  <!-- Notifications will be loaded here -->
+                </div>
+              </div>
+            </div>
             <div class="control-panel">Tổng quan</div>
           </div>
         </header>
@@ -833,6 +995,162 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             overlay.classList.remove("active");
           }
         });
+      });
+
+      // Notification System
+      const notificationBell = document.getElementById('notificationBell');
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      const notificationList = document.getElementById('notificationList');
+      const notificationBadge = document.getElementById('notificationBadge');
+      const markAllRead = document.getElementById('markAllRead');
+
+      // Toggle notification dropdown
+      notificationBell.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationDropdown.classList.toggle('show');
+        if (notificationDropdown.classList.contains('show')) {
+          loadNotifications();
+        }
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
+          notificationDropdown.classList.remove('show');
+        }
+      });
+
+      // Load notifications
+      function loadNotifications() {
+        fetch('${pageContext.request.contextPath}/admin-notifications')
+          .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Loaded notifications:', data);
+            
+            // Check if data is an array
+            if (Array.isArray(data)) {
+              displayNotifications(data);
+              updateNotificationBadge(data);
+            } else if (data.error) {
+              console.error('Server error:', data.error);
+              notificationList.innerHTML = '<div class="notification-empty">Lỗi: ' + data.error + '</div>';
+            } else {
+              console.error('Unexpected data format:', data);
+              notificationList.innerHTML = '<div class="notification-empty">Dữ liệu không đúng định dạng</div>';
+            }
+          })
+          .catch(error => {
+            console.error('Error loading notifications:', error);
+            notificationList.innerHTML = '<div class="notification-empty">Không thể tải thông báo: ' + error.message + '</div>';
+          });
+      }
+
+      // Display notifications
+      function displayNotifications(notifications) {
+        if (!notifications || notifications.length === 0) {
+          notificationList.innerHTML = '<div class="notification-empty">Không có thông báo nào</div>';
+          return;
+        }
+
+        notificationList.innerHTML = '';
+        notifications.forEach(notification => {
+          const notificationItem = document.createElement('div');
+          notificationItem.className = `notification-item ${!notification.isRead ? 'unread' : ''}`;
+          
+          const timeAgo = formatTimeAgo(notification.createdAt);
+          
+          notificationItem.innerHTML = `
+            <div class="notification-title">${notification.title}</div>
+            <div class="notification-content">${notification.content}</div>
+            <div class="notification-time">${timeAgo}</div>
+          `;
+          
+          notificationItem.addEventListener('click', () => {
+            markNotificationAsRead(notification.notificationID);
+            notificationItem.classList.remove('unread');
+          });
+          
+          notificationList.appendChild(notificationItem);
+        });
+      }
+
+      // Update notification badge
+      function updateNotificationBadge(notifications) {
+        const unreadCount = notifications.filter(n => !n.isRead).length;
+        notificationBadge.textContent = unreadCount;
+        notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+      }
+
+      // Mark notification as read
+      function markNotificationAsRead(notificationId) {
+        fetch('${pageContext.request.contextPath}/admin-notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `action=markAsRead&notificationId=${notificationId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log('Notification marked as read');
+          }
+        })
+        .catch(error => {
+          console.error('Error marking notification as read:', error);
+        });
+      }
+
+      // Mark all notifications as read
+      markAllRead.addEventListener('click', function() {
+        fetch('${pageContext.request.contextPath}/admin-notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'action=markAllAsRead'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log('All notifications marked as read');
+            loadNotifications();
+          }
+        })
+        .catch(error => {
+          console.error('Error marking all notifications as read:', error);
+        });
+      });
+
+      // Format time ago
+      function formatTimeAgo(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+        
+        if (diffInSeconds < 60) {
+          return 'Vừa xong';
+        } else if (diffInSeconds < 3600) {
+          const minutes = Math.floor(diffInSeconds / 60);
+          return `${minutes} phút trước`;
+        } else if (diffInSeconds < 86400) {
+          const hours = Math.floor(diffInSeconds / 3600);
+          return `${hours} giờ trước`;
+        } else {
+          const days = Math.floor(diffInSeconds / 86400);
+          return `${days} ngày trước`;
+        }
+      }
+
+      // Load notifications on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        loadNotifications();
       });
 
       document.addEventListener("click", (e) => {
