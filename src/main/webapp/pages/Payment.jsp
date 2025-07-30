@@ -1194,5 +1194,4 @@ function styleMessage(el, type) {
                     });
                 </script>
             </body>
-
             </html>
