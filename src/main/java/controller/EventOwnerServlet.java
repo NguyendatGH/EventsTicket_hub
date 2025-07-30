@@ -52,7 +52,7 @@ public class EventOwnerServlet extends HttpServlet {
     private EventDAO eventDao;
     private GenreDAO genreDAO;
     private EventService eventService;
-    private static final String UPLOAD_DIR = "uploads/event_banners";
+    private static final String UPLOAD_DIR = "Uploads/event_banners";
     private static final Logger logger = Logger.getLogger(EventOwnerServlet.class.getName());
 
     @Override
@@ -105,6 +105,7 @@ public class EventOwnerServlet extends HttpServlet {
                     break;
                 case "customizeSeats":
                     showCustomizeSeatsForm(request, response);
+                    break;
                 case "step4":
                     showStep4Form(request, response);
                     break;
@@ -169,54 +170,41 @@ public class EventOwnerServlet extends HttpServlet {
             return;
         }
 
-        // Lấy userID của người dùng hiện tại
         int userID = user.getId();
 
-        // Lấy tham số phân trang từ request
-        int pageSize = 5; // Số lượng sự kiện mỗi trang
+        int pageSize = 5;
         int currentPage = 1;
         String pageParam = request.getParameter("myEventsPage");
         if (pageParam != null && !pageParam.isEmpty()) {
             try {
                 currentPage = Integer.parseInt(pageParam);
-                System.out.println("CURRENT PAGE: " +currentPage);
+                System.out.println("CURRENT PAGE: " + currentPage);
             } catch (NumberFormatException e) {
                 logger.warning("Invalid page parameter: " + pageParam);
             }
         }
 
-        // Lấy danh sách sự kiện của người dùng
         List<Event> myEvents = eventDao.getAllMyEvent(userID);
-        
-//        System.out.println("event of owner2: " +myEvents);
-        // Tính toán phân trang
         int totalEvents = myEvents.size();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
 
-        // Đảm bảo currentPage hợp lệ
         if (currentPage < 1) {
             currentPage = 1;
         } else if (currentPage > totalPages && totalPages > 0) {
             currentPage = totalPages;
         }
 
-        // Lấy danh sách sự kiện cho trang hiện tại
         int start = (currentPage - 1) * pageSize;
         int end = Math.min(start + pageSize, totalEvents);
         List<Event> eventsForPage = myEvents.subList(start, end);
         session.setAttribute("eventsForPage", eventsForPage);
-        for(Event e: eventsForPage){
+        for (Event e : eventsForPage) {
             System.out.println("" + e);
         }
-                
-        // Lấy danh sách thể loại
+
         List<Genre> genres = genreDAO.getAllGenres();
-
-        // Lấy thống kê sự kiện
         int totalTicketsSold = eventDao.getTotalTicketsSoldByOwner(userID);
-//        BigDecimal totalRevenue = eventDao.getTotalRevenueByOwner(userID);
 
-        // Đặt các thuộc tính để hiển thị trên JSP
         session.setAttribute("genres", genres);
         session.setAttribute("myEvents", eventsForPage);
         session.setAttribute("myEventsCurrentPage", currentPage);
@@ -226,14 +214,12 @@ public class EventOwnerServlet extends HttpServlet {
         session.setAttribute("totalTicketsSold", totalTicketsSold);
         session.setAttribute("totalRevenue", 123);
 
-        // Xử lý thông báo thành công
         String successMessage = (String) session.getAttribute("successMessage");
         if (successMessage != null) {
             request.setAttribute("successMessage", successMessage);
             session.removeAttribute("successMessage");
         }
 
-        // Chuyển hướng đến trang dashboard
         request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
     }
 
@@ -288,7 +274,6 @@ public class EventOwnerServlet extends HttpServlet {
     private void showPreviewMapForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-
         Event event = (Event) session.getAttribute("event");
         if (event == null || !event.getHasSeatingChart()) {
             response.sendRedirect(request.getContextPath() + "/organizer-servlet?action=step3");
@@ -316,7 +301,6 @@ public class EventOwnerServlet extends HttpServlet {
             logger.severe("Error parsing seatMapData in showPreviewMapForm: " + e.getMessage());
             request.setAttribute("errorMessage", "Invalid seating chart data: " + e.getMessage());
         }
-
         request.getRequestDispatcher("/eventOwner/createEvent/previewMapEvent.jsp").forward(request, response);
     }
 
@@ -341,7 +325,6 @@ public class EventOwnerServlet extends HttpServlet {
             for (int i = 0; i < zonesArray.length(); i++) {
                 zones.add(new Zone(zonesArray.getJSONObject(i)));
             }
-
             request.setAttribute("zones", zones);
             request.setAttribute("event", event);
         } catch (Exception e) {
@@ -361,8 +344,6 @@ public class EventOwnerServlet extends HttpServlet {
             return;
         }
         String seatMapData = (String) session.getAttribute("seatMapData");
-
-        // Check for required session attributes first
         if (event.getHasSeatingChart()) {
             if (seatMapData == null) {
                 logger.warning("seatMapData is null, redirecting to createMap");
@@ -377,13 +358,11 @@ public class EventOwnerServlet extends HttpServlet {
                 return;
             }
         }
-
-        // Process seatMapData only after validation
         if (event.getHasSeatingChart()) {
             try {
                 JSONObject json = new JSONObject(seatMapData);
                 JSONArray zonesArray = json.getJSONArray("zones");
-                JSONArray ticketNames = (JSONArray) session.getAttribute("ticketNames"); // Already checked for null
+                JSONArray ticketNames = (JSONArray) session.getAttribute("ticketNames");
                 if (ticketNames.isEmpty()) {
                     logger.info("ticketNames is empty");
                 }
@@ -428,8 +407,50 @@ public class EventOwnerServlet extends HttpServlet {
             return;
         }
         event.setDescription(request.getParameter("description"));
-        String eventURL = request.getParameter("imageURL");
-        event.setImageURL(eventURL);
+
+        // Process image upload
+        String imageFileName = null;
+        try {
+            Part filePart = request.getPart("imageFile");
+            if (filePart != null && filePart.getSize() > 0) {
+                String contentType = filePart.getContentType();
+                if (!contentType.equals("image/jpeg") && !contentType.equals("image/jpg") &&
+                    !contentType.equals("image/png") && !contentType.equals("image/gif") &&
+                    !contentType.equals("image/svg+xml")) {
+                    request.setAttribute("errorMessage", "Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF hoặc SVG");
+                    showStep1Form(request, response);
+                    return;
+                }
+
+                String uploadPath = getUploadPath(request);
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                String originalFileName = getFileName(filePart);
+                String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+
+                File file = new File(uploadPath + File.separator + uniqueFileName);
+                try (InputStream fileContent = filePart.getInputStream()) {
+                    Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                imageFileName = uniqueFileName;
+                event.setImageURL(imageFileName); // Set imageURL in Event object
+            } else {
+                request.setAttribute("errorMessage", "Vui lòng tải lên ảnh cho sự kiện");
+                showStep1Form(request, response);
+                return;
+            }
+        } catch (Exception e) {
+            logger.severe("Error uploading file in step1: " + e.getMessage());
+            request.setAttribute("errorMessage", "Lỗi khi tải lên ảnh: " + e.getMessage());
+            showStep1Form(request, response);
+            return;
+        }
+
         session.setAttribute("event", event);
         response.sendRedirect(request.getContextPath() + "/organizer-servlet?action=step2");
     }
@@ -542,7 +563,6 @@ public class EventOwnerServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/organizer-servlet?action=createMap");
                 return;
             }
-
             showPreviewMapForm(request, response);
             return;
         }
@@ -641,7 +661,6 @@ public class EventOwnerServlet extends HttpServlet {
             session.setAttribute("ticketNames", ticketNamesArray);
             logger.info("Successfully set ticketNames: " + ticketNamesArray.toString());
             logger.info("current seat map data: " + seatMapData);
-
             response.sendRedirect(request.getContextPath() + "/organizer-servlet?action=step4");
         } catch (Exception e) {
             logger.severe("Error processing ticket names: " + e.getMessage());
@@ -655,8 +674,58 @@ public class EventOwnerServlet extends HttpServlet {
         HttpSession session = request.getSession();
         UserDTO u = (UserDTO) session.getAttribute("user");
         Event event = (Event) session.getAttribute("event");
-        if (event == null)
+        if (event == null) {
             event = new Event();
+            request.setAttribute("errorMessage", "Event data is missing. Please start over.");
+            showStep1Form(request, response);
+            return;
+        }
+
+        // Use the imageURL from the Event object if it exists
+        String imageFileName = event.getImageURL();
+        if (imageFileName == null) {
+            // Optionally allow a new upload in Step 4
+            try {
+                Part filePart = request.getPart("imageFile");
+                if (filePart != null && filePart.getSize() > 0) {
+                    String contentType = filePart.getContentType();
+                    if (!contentType.equals("image/jpeg") && !contentType.equals("image/jpg") &&
+                        !contentType.equals("image/png") && !contentType.equals("image/gif") &&
+                        !contentType.equals("image/svg+xml")) {
+                        request.setAttribute("errorMessage", "Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF hoặc SVG");
+                        showStep4Form(request, response);
+                        return;
+                    }
+
+                    String uploadPath = getUploadPath(request);
+                    File uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                    }
+
+                    String originalFileName = getFileName(filePart);
+                    String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                    String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+
+                    File file = new File(uploadPath + File.separator + uniqueFileName);
+                    try (InputStream fileContent = filePart.getInputStream()) {
+                        Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+
+                    imageFileName = uniqueFileName;
+                } else {
+                    request.setAttribute("errorMessage", "Vui lòng tải lên ảnh cho sự kiện");
+                    showStep4Form(request, response);
+                    return;
+                }
+            } catch (Exception e) {
+                logger.severe("Error uploading file: " + e.getMessage());
+                request.setAttribute("errorMessage", "Lỗi khi tải lên ảnh: " + e.getMessage());
+                showStep4Form(request, response);
+                return;
+            }
+        }
+
         int totalTicketCount;
         try {
             totalTicketCount = Integer.parseInt(request.getParameter("totalTicketCount"));
@@ -701,8 +770,6 @@ public class EventOwnerServlet extends HttpServlet {
                     return;
                 }
             }
-            for (TicketInfo t : ticketInfos)
-                System.out.println("ticket infor: " + t);
             if (totalQuantity != totalTicketCount) {
                 request.setAttribute("errorMessage", "Sum of ticket quantities must equal total ticket count");
                 showStep4Form(request, response);
@@ -756,6 +823,7 @@ public class EventOwnerServlet extends HttpServlet {
         event.setCreatedAt(new Date());
         event.setUpdatedAt(new Date());
         event.setRanking(0L);
+        event.setImageURL(imageFileName);
 
         logger.info("Creating event with details: " +
                 "name=" + event.getName() +
@@ -805,18 +873,15 @@ public class EventOwnerServlet extends HttpServlet {
             return;
         }
         if (result.isSuccess()) {
-            // Gửi notification cho admin khi có event mới
             try {
-                // Giả sử admin có userID = 1 (hoặc lấy danh sách admin từ DB nếu cần gửi cho
-                // nhiều admin)
                 int adminUserId = 1;
                 models.Notification notification = new models.Notification();
                 notification.setUserID(adminUserId);
-                notification.setTitle("🎫 Sự kiện mới được tạo");
-                notification.setContent("Event Owner: " + u.getName() + 
-                                    " | Sự kiện: " + event.getName() + 
-                                    " | Địa điểm: " + event.getPhysicalLocation() + 
-                                    " | Thời gian: " + event.getStartTime());
+                notification.setTitle("🔔 Sự kiện mới được tạo");
+                notification.setContent("Event Owner: " + u.getName() +
+                        " | Sự kiện: " + event.getName() +
+                        " | Địa điểm: " + event.getPhysicalLocation() +
+                        " | Thời gian: " + event.getStartTime());
                 notification.setNotificationType("event");
                 notification.setRelatedID(result.getEventId());
                 notification.setIsRead(false);
@@ -824,8 +889,6 @@ public class EventOwnerServlet extends HttpServlet {
                 notification.setPriority("high");
                 dao.NotificationDAO notificationDAO = new dao.NotificationDAO();
                 notificationDAO.insertNotification(notification);
-                
-
             } catch (Exception ex) {
                 logger.warning("Không thể gửi notification cho admin: " + ex.getMessage());
             }
@@ -846,7 +909,7 @@ public class EventOwnerServlet extends HttpServlet {
         logger.info("Processing update event request");
         if (!request.getContentType().startsWith("multipart/form-data")) {
             request.setAttribute("error", "Invalid form content type");
-            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
             return;
         }
         String eventIDStr = request.getParameter("eventID");
@@ -857,27 +920,42 @@ public class EventOwnerServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             request.setAttribute("error", "ID sự kiện không hợp lệ");
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
             return;
         }
 
-        String imageFileName = null;
+        Event existingEvent = eventService.getEventById(eventID);
+        if (existingEvent == null) {
+            request.setAttribute("error", "Sự kiện không tồn tại");
+            request.setAttribute("editMode", true);
+            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
+            return;
+        }
+
+        String imageFileName = existingEvent.getImageURL();
         try {
             Part filePart = request.getPart("imageFile");
             if (filePart != null && filePart.getSize() > 0) {
-                // Tạo thư mục upload nếu chưa tồn tại
+                String contentType = filePart.getContentType();
+                if (!contentType.equals("image/jpeg") && !contentType.equals("image/jpg") &&
+                    !contentType.equals("image/png") && !contentType.equals("image/gif") &&
+                    !contentType.equals("image/svg+xml")) {
+                    request.setAttribute("error", "Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF hoặc SVG");
+                    request.setAttribute("editMode", true);
+                    request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
+                    return;
+                }
+
                 String uploadPath = getUploadPath(request);
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) {
                     uploadDir.mkdirs();
                 }
 
-                // Tạo tên file duy nhất
                 String originalFileName = getFileName(filePart);
                 String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
                 String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
 
-                // Lưu file
                 File file = new File(uploadPath + File.separator + uniqueFileName);
                 try (InputStream fileContent = filePart.getInputStream()) {
                     Files.copy(fileContent, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -888,7 +966,8 @@ public class EventOwnerServlet extends HttpServlet {
         } catch (Exception e) {
             logger.severe("Error uploading file: " + e.getMessage());
             request.setAttribute("error", "Lỗi khi tải lên ảnh: " + e.getMessage());
-            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            request.setAttribute("editMode", true);
+            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
             return;
         }
 
@@ -897,11 +976,9 @@ public class EventOwnerServlet extends HttpServlet {
         event.setName(request.getParameter("name"));
         event.setDescription(request.getParameter("description"));
         event.setPhysicalLocation(request.getParameter("physicalLocation"));
-        event.setStatus(request.getParameter("status"));
+        event.setStatus(existingEvent.getStatus());
         event.setUpdatedAt(new Date());
-        if (imageFileName != null) {
-            event.setImageURL(imageFileName);
-        }
+        event.setImageURL(imageFileName);
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
@@ -911,7 +988,7 @@ public class EventOwnerServlet extends HttpServlet {
             request.setAttribute("error", "Định dạng thời gian không hợp lệ");
             request.setAttribute("event", event);
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
             return;
         }
 
@@ -921,7 +998,7 @@ public class EventOwnerServlet extends HttpServlet {
             request.setAttribute("error", "Số lượng vé không hợp lệ");
             request.setAttribute("event", event);
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
             return;
         }
 
@@ -930,14 +1007,14 @@ public class EventOwnerServlet extends HttpServlet {
         ToggleEvent updateResult = eventService.updateEvent(event);
         if (updateResult.isSuccess()) {
             request.setAttribute("success", updateResult.getMessage());
-            request.setAttribute("event", eventService.getEventById(eventID)); // Refresh event data
+            request.setAttribute("event", eventService.getEventById(eventID));
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
         } else {
             request.setAttribute("error", updateResult.getMessage());
             request.setAttribute("event", event);
             request.setAttribute("editMode", true);
-            request.getRequestDispatcher("/eventOwner/dashBoard.jsp").forward(request, response);
+            request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
         }
     }
 
@@ -967,7 +1044,6 @@ public class EventOwnerServlet extends HttpServlet {
         System.out.println("event to edit " + event);
 
         request.setAttribute("event", event);
-        // request.setAttribute("editMode", true);
         request.getRequestDispatcher("/eventOwner/EditEventPage.jsp").forward(request, response);
     }
 
@@ -987,7 +1063,6 @@ public class EventOwnerServlet extends HttpServlet {
         }
 
         int eventID;
-
         try {
             eventID = Integer.parseInt(eventIDStr);
             System.out.println("eventid :" + eventID);
@@ -1015,9 +1090,7 @@ public class EventOwnerServlet extends HttpServlet {
     }
 
     private String getUploadPath(HttpServletRequest request) {
-        // Lấy đường dẫn tuyệt đối đến thư mục gốc của webapp
         String appPath = request.getServletContext().getRealPath("");
-        // Trả về đường dẫn đến thư mục upload
         return appPath + File.separator + UPLOAD_DIR;
     }
 
