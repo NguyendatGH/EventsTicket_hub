@@ -123,14 +123,14 @@ public class SupportDAO {
     }
 
     public boolean updateSupportRequest(SupportItem supportItem) {
-        String sql = "UPDATE SupportItems SET Status = ?, AdminResponse = ?, AssignedAdmin = ?, LastModified = ? WHERE SupportID = ?";
+        String sql = "UPDATE SupportItems SET Status = ?, AdminResponse = ?, AssignedAdminID = ?, LastModified = ? WHERE SupportID = ?";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setString(1, supportItem.getStatus());
             ps.setString(2, supportItem.getAdminResponse());
-            ps.setString(3, supportItem.getAssignedAdmin());
+            ps.setObject(3, supportItem.getAssignedAdminId() > 0 ? supportItem.getAssignedAdminId() : null);
             ps.setDate(4, supportItem.getLastModified());
             ps.setInt(5, supportItem.getSupportId());
             
@@ -205,12 +205,18 @@ public class SupportDAO {
             rs.getDate("CreatedDate"),
             rs.getDate("LastModified"),
             rs.getString("AdminResponse"),
-            rs.getString("AssignedAdmin")
+            null // AssignedAdmin will be set separately
         );
         
         // Set new fields
         item.setUserId(rs.getInt("UserID"));
-        item.setAssignedAdminId(rs.getInt("AssignedAdminID"));
+        
+        // Handle AssignedAdminID (can be null)
+        Integer assignedAdminId = rs.getObject("AssignedAdminID") != null ? rs.getInt("AssignedAdminID") : null;
+        item.setAssignedAdminId(assignedAdminId != null ? assignedAdminId : 0);
+        
+        // Set assignedAdmin to null since we don't store it as string in database
+        item.setAssignedAdmin(null);
         
         // Handle nullable fields
         Integer eventId = rs.getObject("EventID") != null ? rs.getInt("EventID") : null;
