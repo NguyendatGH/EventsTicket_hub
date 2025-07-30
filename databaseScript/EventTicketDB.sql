@@ -357,6 +357,7 @@ CREATE TABLE Refunds (
     CONSTRAINT FK_Refunds_PaymentMethod FOREIGN KEY (PaymentMethodID) REFERENCES PaymentMethod(PaymentMethodID),
  
 );
+
 -- Bảng supportItems
 CREATE TABLE SupportItems (
     SupportID INT IDENTITY(1,1) PRIMARY KEY,
@@ -848,8 +849,7 @@ VALUES
 (N'Rock', N'Nhạc Rock và Metal'),
 (N'Hài kịch', N'Chương trình hài kịch'),
 (N'Thể thao', N'Các sự kiện thể thao'),
-(N'Hội nghị', N'Hội nghị và seminar'),
-('Others', 'Miscellaneous events');
+(N'Hội nghị', N'Hội nghị và seminar');
 
 -- select * from Genres;
 
@@ -967,8 +967,10 @@ VALUES
 (9, 'TKT000000122025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
 (10, 'TKT000000132025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
---select * from Ticket
 
+-- select * from PaymentMethod
+-- delete from PaymentMethod
+-- DBCC PaymentMethod ('PaymentMethod', RESEED, 0);
 -- Insert into PaymentMethod
 INSERT INTO PaymentMethod (MethodName, PromotionCode, Description, IsActive)
 VALUES
@@ -1136,27 +1138,3 @@ SET LastLoginAt = CASE Id
     ELSE LastLoginAt
 END
 WHERE Id BETWEEN 1 AND 25;
-
--- Update all qualifying events to 'pending'
-UPDATE e
-SET Status = 'pending',
-    UpdatedAt = GETDATE()
-FROM Events e
-JOIN TicketInfo ti ON e.EventID = ti.EventID
-JOIN TicketInventory tinv ON ti.TicketInfoID = tinv.TicketInfoID
-WHERE e.Status = 'active'
-  AND e.IsDeleted = 0
-  AND tinv.SoldQuantity = 0;
-
-  update Events set status = 'active' where Name = N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI'
-
-SELECT c.ConversationID, c.CustomerID, c.EventOwnerID, c.EventID, c.Subject, c.Status,
-                 c.LastMessageAt, c.CreatedBy, c.CreatedAt, c.UpdatedAt, e.Name AS EventName, u.Username AS CustomerName
-                 FROM Conversations c 
-                 LEFT JOIN Events e ON c.EventID = e.EventID 
-                 LEFT JOIN Users u ON c.CustomerID = u.Id 
-                 WHERE c.EventOwnerID = 2 AND e.Status = 'active'
-
--- select * from OrderItems
-
-
