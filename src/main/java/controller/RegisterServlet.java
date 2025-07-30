@@ -51,14 +51,57 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
         
+        // Email validation
         if (email == null || email.trim().isEmpty()) {
             request.setAttribute("error", "Email không được để trống.");
             request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
             return;
         }
         
+        // Email format validation
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        if (!email.matches(emailRegex)) {
+            request.setAttribute("error", "Email không đúng định dạng.");
+            request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
+            return;
+        }
+        
+        // Check if email already exists
+        try {
+            if (userDAO.isEmailTaken(email.trim())) {
+                request.setAttribute("error", "Email này đã được sử dụng. Vui lòng chọn email khác.");
+                request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
+                return;
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking email existence: " + e.getMessage());
+            request.setAttribute("error", "Có lỗi xảy ra khi kiểm tra email. Vui lòng thử lại.");
+            request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
+            return;
+        }
+        
+        // Password validation
         if (password == null || password.trim().isEmpty()) {
             request.setAttribute("error", "Mật khẩu không được để trống.");
+            request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
+            return;
+        }
+        
+        // Password strength validation
+        if (password.length() < 8) {
+            request.setAttribute("error", "Mật khẩu phải có ít nhất 8 ký tự.");
+            request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
+            return;
+        }
+        
+        if (!password.matches(".*[A-Z].*")) {
+            request.setAttribute("error", "Mật khẩu phải có ít nhất 1 ký tự viết hoa.");
+            request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
+            return;
+        }
+        
+        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
+            request.setAttribute("error", "Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%^&*()_+-=[]{}|;:,.<>?).");
             request.getRequestDispatcher("authentication/registerUser.jsp").forward(request, response);
             return;
         }
