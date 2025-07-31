@@ -50,11 +50,17 @@ public class SupportCenterServlet extends HttpServlet {
             return;
         }
 
-        // Luôn lấy danh sách yêu cầu hỗ trợ của người dùng
-        List<SupportItem> userRequests = supportService.getSupportRequestsByUserEmail(user.getEmail());
-        request.setAttribute("supportRequests", userRequests);
+        String action = request.getParameter("action");
         
-        request.getRequestDispatcher("/supportCenter/supportCenter.jsp").forward(request, response);
+        if ("download".equals(action)) {
+            downloadAttachment(request, response, user);
+        } else {
+            // Luôn lấy danh sách yêu cầu hỗ trợ của người dùng
+            List<SupportItem> userRequests = supportService.getSupportRequestsByUserEmail(user.getEmail());
+            request.setAttribute("supportRequests", userRequests);
+            
+            request.getRequestDispatcher("/supportCenter/supportCenter.jsp").forward(request, response);
+        }
     }
 
     @Override

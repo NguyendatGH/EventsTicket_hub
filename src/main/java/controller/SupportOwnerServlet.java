@@ -41,10 +41,17 @@ public class SupportOwnerServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        // Load all support requests by owner email
-        List<SupportItem> ownerRequests = supportService.getSupportRequestsByUserEmail(user.getEmail());
-        request.setAttribute("supportRequests", ownerRequests);
-        request.getRequestDispatcher("/supportCenter/supportCenter_owner.jsp").forward(request, response);
+        
+        String action = request.getParameter("action");
+        
+        if ("download".equals(action)) {
+            downloadAttachment(request, response, user);
+        } else {
+            // Load all support requests by owner email
+            List<SupportItem> ownerRequests = supportService.getSupportRequestsByUserEmail(user.getEmail());
+            request.setAttribute("supportRequests", ownerRequests);
+            request.getRequestDispatcher("/supportCenter/supportCenter_owner.jsp").forward(request, response);
+        }
     }
 
     @Override
