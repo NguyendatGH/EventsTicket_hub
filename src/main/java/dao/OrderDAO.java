@@ -313,7 +313,7 @@ public class OrderDAO {
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> orderList = new ArrayList<>();
         String sql = "SELECT o.OrderID, o.OrderNumber, o.TotalAmount, o.OrderStatus, o.CreatedAt "
-                + "FROM Orders o WHERE o.UserID = ? ORDER BY o.CreatedAt DESC";
+                + "FROM Orders o WHERE o.UserID = ? AND o.PaymentStatus = 'paid' ORDER BY o.CreatedAt DESC";
 
         try ( Connection conn = DBConnection.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -360,7 +360,7 @@ public class OrderDAO {
                 + "JOIN OrderItems oi ON o.OrderID = oi.OrderID "
                 + "JOIN Events e ON oi.EventID = e.EventID "
                 + "LEFT JOIN Refunds r ON o.OrderID = r.OrderID AND r.IsDeleted = 0 "
-                + "WHERE o.UserID = ? "
+                + "WHERE o.UserID = ? AND o.PaymentStatus = 'paid' "
                 + "GROUP BY o.OrderID, o.TotalAmount, o.CreatedAt "
                 + "ORDER BY o.CreatedAt DESC";
 

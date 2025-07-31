@@ -155,9 +155,60 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
       .header {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        gap: 1rem;
         margin-bottom: 2rem;
+      }
+      
+      .header-top {
+        display: flex;
+        justify-content: flex-start;
+      }
+      
+      .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: rgba(255, 255, 255, 0.18);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        border: none;
+      }
+      
+      .btn-back:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+      
+      .btn-refresh {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: rgba(255, 255, 255, 0.18);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        border: none;
+      }
+      
+      .btn-refresh:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       }
 
       .page-title {
@@ -932,25 +983,18 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       </aside>
       <main class="main-content">
         <header class="header">
+          <div class="header-top">
+            <button onclick="history.back()" class="btn-back">
+              <i class="fas fa-arrow-left"></i>
+              Quay lại
+            </button>
+          </div>
           <h1 class="page-title">Bảng điều khiển</h1>
           <div class="control-panel">
-            <div class="notification-container">
-              <button class="notification-bell" id="notificationBell">
-                <i class="fas fa-bell"></i>
-                <span class="notification-badge" id="notificationBadge">0</span>
-              </button>
-              <div class="notification-dropdown" id="notificationDropdown">
-                <div class="notification-header">
-                  <h3>Thông báo</h3>
-                  <button class="mark-all-read" id="markAllRead">Đánh dấu tất cả đã đọc</button>
-                </div>
-                <div class="notification-list" id="notificationList">
-                  <div class="notification-loading">Đang tải...</div>
-                </div>
-              </div>
-            </div>
-            <button id="testNotificationBtn" style="margin-left: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Notification</button>
-            <button id="testParsingBtn" style="margin-left: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Parsing</button>
+            <button onclick="refreshDashboard()" class="btn-refresh">
+              <i class="fas fa-sync-alt"></i>
+              Làm mới
+            </button>
           </div>
         </header>
         <section class="stats-grid">
@@ -1752,6 +1796,15 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         };
         console.log('🧪 Test notification:', testNotification);
         console.log('🧪 Test notification keys:', Object.keys(testNotification));
+        
+        // Function to refresh dashboard
+        function refreshDashboard() {
+          console.log('🔄 Refreshing dashboard...');
+          window.location.reload();
+        }
+        
+        // Auto-refresh dashboard every 30 seconds
+        setInterval(refreshDashboard, 30000);
         
         // Test parsing function
         testParsing();

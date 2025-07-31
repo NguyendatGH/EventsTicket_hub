@@ -300,6 +300,35 @@
                 transform: translateX(-3px);
                 color: var(--accent);
             }
+            
+            .header-top {
+                display: flex;
+                justify-content: flex-start;
+                margin-bottom: 1rem;
+            }
+            
+            .btn-back {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                background: var(--glass-bg);
+                color: var(--text-light);
+                text-decoration: none;
+                border-radius: 12px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--border-color);
+                cursor: pointer;
+                border: none;
+            }
+            
+            .btn-back:hover {
+                background: var(--card-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            }
 
             /* Main Content */
             .main-container {
