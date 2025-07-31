@@ -1,3 +1,4 @@
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
@@ -53,7 +54,7 @@
                 flex: 2;
                 background: rgba(255, 255, 255, 0.1);
                 backdrop-filter: blur(10px);
-                padding: 25px;
+                padding: 0;
                 border-radius: 15px;
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -61,7 +62,7 @@
 
             canvas {
                 border: 1px solid rgba(255, 255, 255, 0.2);
-                width: 100%;
+                width: 800px;
                 height: 500px;
                 background: rgba(255, 255, 255, 0.05);
                 border-radius: 10px;
@@ -182,7 +183,6 @@
                 border-left: 3px solid #4CAF50;
             }
 
-            /* Scrollbar styling */
             #zoneList::-webkit-scrollbar {
                 width: 6px;
             }
@@ -200,14 +200,13 @@
             #zoneList::-webkit-scrollbar-thumb:hover {
                 background: rgba(76, 175, 80, 0.7);
             }
-            /* Thêm vào cuối phần CSS */
+
             .stage-label {
                 font-weight: bold;
                 text-transform: uppercase;
                 letter-spacing: 1px;
             }
 
-            /* Responsive design */
             @media (max-width: 992px) {
                 .container {
                     flex-direction: column;
@@ -218,6 +217,7 @@
                 }
 
                 canvas {
+                    width: 100%;
                     height: 400px;
                 }
             }
@@ -236,7 +236,6 @@
                 }
             }
         </style>
-
     </head>
     <body>
         <h1>Thiết kế Sơ đồ Ghế</h1>
@@ -244,26 +243,19 @@
             <div class="controls">
                 <div class="form-group">
                     <label>Tên Zone:</label>
-                    <input type="text" id="zoneName" value="Zone${zones.length + 1}">
+                    <input type="text" id="zoneName" value="Zone1">
                 </div>
                 <div class="form-group">
                     <label>Loại hình khối:</label>
                     <select id="shapeType">
-                        <option value="rectangle">Hình chữ nhật</option>
-                        <%-- <option value="circle">Hình tròn</option> --%>
+                        <option value="polygon">Đa giác</option>
                     </select>
                 </div>
-                <div id="rectangleInputs" class="form-group">
+                <div id="polygonInputs" class="form-group">
                     <label>Chiều rộng (px):</label>
                     <input type="number" id="width" value="100">
                     <label>Chiều cao (px):</label>
                     <input type="number" id="height" value="100">
-                </div>
-                <div id="circleInputs" class="form-group" style="display: none;">
-                    <label>Bán kính X (px):</label>
-                    <input type="number" id="radiusX" value="50">
-                    <label>Bán kính Y (px):</label>
-                    <input type="number" id="radiusY" value="50">
                 </div>
                 <div class="form-group">
                     <label>Màu sắc:</label>
@@ -300,6 +292,8 @@
         <script>
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
+
+            // Khởi tạo kích thước canvas
             canvas.width = 800;
             canvas.height = 500;
 
@@ -312,15 +306,13 @@
             let resizingCorner = -1;
             let lastWidth = 100;
             let lastHeight = 100;
-            let lastRadiusX = 50;
-            let lastRadiusY = 50;
             let lastMouseX = 0;
             let lastMouseY = 0;
 
             const stage = {
                 id: 0,
                 name: "Stage",
-                shape: "rectangle",
+                shape: "polygon",
                 color: "#333333",
                 rows: 1,
                 seatsPerRow: 1,
@@ -338,22 +330,39 @@
                 ]
             };
 
-            document.getElementById('shapeType').addEventListener('change', function () {
-                const shape = this.value;
-                document.getElementById('rectangleInputs').style.display = shape === 'rectangle' ? 'block' : 'none';
-                document.getElementById('circleInputs').style.display = shape === 'circle' ? 'block' : 'none';
-            });
-
+            // Điều chỉnh kích thước canvas khi thay đổi kích thước cửa sổ
+            function resizeCanvas() {
+                const container = canvas.parentElement;
+                if (window.innerWidth <= 992) {
+                    canvas.width = container.clientWidth;
+                    canvas.height = 400;
+                } else {
+                    canvas.width = 800;
+                    canvas.height = 500;
+                }
+                stage.x = canvas.width / 2; // Cập nhật vị trí sân khấu
+                drawCanvas();
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
 
             function addZone() {
                 const shape = document.getElementById('shapeType').value;
                 const name = document.getElementById('zoneName').value.trim() || `Zone${zones.length + 1}`;
+                if (zones.some(zone => zone.name.toLowerCase() === name.toLowerCase())) {
+                    alert('Tên zone đã tồn tại. Vui lòng chọn tên khác.');
+                    return;
+                }
                 const color = document.getElementById('zoneColor').value;
                 const rows = parseInt(document.getElementById('rows').value);
                 const seatsPerRow = parseInt(document.getElementById('seatsPerRow').value);
                 const totalSeats = rows * seatsPerRow;
                 const ticketPrice = parseFloat(document.getElementById('ticketPrice').value);
 
+                if (isNaN(rows) || rows <= 0 || isNaN(seatsPerRow) || seatsPerRow <= 0) {
+                    alert('Số hàng và số ghế mỗi hàng phải lớn hơn 0.');
+                    return;
+                }
                 if (isNaN(ticketPrice) || ticketPrice <= 0) {
                     alert('Vui lòng nhập giá vé hợp lệ (lớn hơn 0).');
                     return;
@@ -373,21 +382,21 @@
                     ticketPrice: ticketPrice
                 };
 
-
-                if (shape === 'rectangle') {
+                if (shape === 'polygon') {
+                    const width = parseInt(document.getElementById('width').value);
+                    const height = parseInt(document.getElementById('height').value);
+                    if (isNaN(width) || width <= 0 || isNaN(height) || height <= 0) {
+                        alert('Chiều rộng và chiều cao phải lớn hơn 0.');
+                        return;
+                    }
                     zone.vertices = [
-                        {x: 0, y: 0},
-                        {x: parseInt(document.getElementById('width').value), y: 0},
-                        {x: parseInt(document.getElementById('width').value), y: parseInt(document.getElementById('height').value)},
-                        {x: 0, y: parseInt(document.getElementById('height').value)}
+                        {x: -width / 2, y: -height / 2},
+                        {x: width / 2, y: -height / 2},
+                        {x: width / 2, y: height / 2},
+                        {x: -width / 2, y: height / 2}
                     ];
-                    lastWidth = parseInt(document.getElementById('width').value);
-                    lastHeight = parseInt(document.getElementById('height').value);
-                } else {
-                    zone.radiusX = parseInt(document.getElementById('radiusX').value);
-                    zone.radiusY = parseInt(document.getElementById('radiusY').value);
-                    lastRadiusX = zone.radiusX;
-                    lastRadiusY = zone.radiusY;
+                    lastWidth = width;
+                    lastHeight = height;
                 }
 
                 zones.push(zone);
@@ -397,38 +406,45 @@
             }
 
             function updateZone() {
-                if (selectedZoneIndex === -1)
-                    return;
-
+                if (selectedZoneIndex === -1) return;
                 const zone = zones[selectedZoneIndex];
-                zone.name = document.getElementById('zoneName').value.trim() || `Zone${selectedZoneIndex + 1}`;
+                const newName = document.getElementById('zoneName').value.trim() || `Zone${selectedZoneIndex + 1}`;
+                if (zones.some((z, index) => index !== selectedZoneIndex && z.name.toLowerCase() === newName.toLowerCase())) {
+                    alert('Tên zone đã tồn tại. Vui lòng chọn tên khác.');
+                    return;
+                }
+                zone.name = newName;
                 zone.color = document.getElementById('zoneColor').value;
                 zone.rows = parseInt(document.getElementById('rows').value);
                 zone.seatsPerRow = parseInt(document.getElementById('seatsPerRow').value);
                 zone.totalSeats = zone.rows * zone.seatsPerRow;
                 zone.ticketPrice = parseInt(document.getElementById('ticketPrice').value);
 
-                if (zone.shape === 'rectangle') {
+                if (isNaN(zone.rows) || zone.rows <= 0 || isNaN(zone.seatsPerRow) || zone.seatsPerRow <= 0) {
+                    alert('Số hàng và số ghế mỗi hàng phải lớn hơn 0.');
+                    return;
+                }
+                if (isNaN(zone.ticketPrice) || zone.ticketPrice <= 0) {
+                    alert('Vui lòng nhập giá vé hợp lệ (lớn hơn 0).');
+                    return;
+                }
+
+                if (zone.shape === 'polygon') {
                     const newWidth = parseInt(document.getElementById('width').value);
                     const newHeight = parseInt(document.getElementById('height').value);
+                    if (isNaN(newWidth) || newWidth <= 0 || isNaN(newHeight) || newHeight <= 0) {
+                        alert('Chiều rộng và chiều cao phải lớn hơn 0.');
+                        return;
+                    }
                     if (newWidth !== lastWidth || newHeight !== lastHeight) {
                         zone.vertices = [
-                            {x: 0, y: 0},
-                            {x: newWidth, y: 0},
-                            {x: newWidth, y: newHeight},
-                            {x: 0, y: newHeight}
+                            {x: -newWidth / 2, y: -newHeight / 2},
+                            {x: newWidth / 2, y: -newHeight / 2},
+                            {x: newWidth / 2, y: newHeight / 2},
+                            {x: -newWidth / 2, y: newHeight / 2}
                         ];
                         lastWidth = newWidth;
                         lastHeight = newHeight;
-                    }
-                } else {
-                    const newRadiusX = parseInt(document.getElementById('radiusX').value);
-                    const newRadiusY = parseInt(document.getElementById('radiusY').value);
-                    if (newRadiusX !== lastRadiusX || newRadiusY !== lastRadiusY) {
-                        zone.radiusX = newRadiusX;
-                        zone.radiusY = newRadiusY;
-                        lastRadiusX = newRadiusX;
-                        lastRadiusY = newRadiusY;
                     }
                 }
 
@@ -438,8 +454,7 @@
             }
 
             function deleteZone() {
-                if (selectedZoneIndex === -1)
-                    return;
+                if (selectedZoneIndex === -1) return;
                 zones.splice(selectedZoneIndex, 1);
                 selectedZoneIndex = -1;
                 draggedZoneIndex = -1;
@@ -457,14 +472,12 @@
                     div.className = 'zone-item';
                     div.textContent = `${zone.name} (${zone.shape}, ${zone.totalSeats} ghế, ${zone.color}, ${zone.ticketPrice} VND)`;
                     div.onclick = () => selectZone(index);
-                    if (index === selectedZoneIndex)
-                        div.classList.add('selected');
+                    if (index === selectedZoneIndex) div.classList.add('selected');
                     zoneList.appendChild(div);
                 });
                 document.getElementById('updateButton').disabled = selectedZoneIndex === -1;
                 document.getElementById('deleteButton').disabled = selectedZoneIndex === -1;
             }
-            // document.getElementById('ticketPrice').value = zone.ticketPrice;
 
             function selectZone(index) {
                 selectedZoneIndex = index;
@@ -476,21 +489,15 @@
                 document.getElementById('seatsPerRow').value = zone.seatsPerRow;
                 document.getElementById('ticketPrice').value = zone.ticketPrice;
 
-                document.getElementById('rectangleInputs').style.display = zone.shape === 'rectangle' ? 'block' : 'none';
-                document.getElementById('circleInputs').style.display = zone.shape === 'circle' ? 'block' : 'none';
+                document.getElementById('polygonInputs').style.display = zone.shape === 'polygon' ? 'block' : 'none';
 
-                if (zone.shape === 'rectangle') {
+                if (zone.shape === 'polygon') {
                     const width = Math.max(...zone.vertices.map(v => v.x)) - Math.min(...zone.vertices.map(v => v.x));
                     const height = Math.max(...zone.vertices.map(v => v.y)) - Math.min(...zone.vertices.map(v => v.y));
                     document.getElementById('width').value = width;
                     document.getElementById('height').value = height;
                     lastWidth = width;
                     lastHeight = height;
-                } else {
-                    document.getElementById('radiusX').value = zone.radiusX;
-                    document.getElementById('radiusY').value = zone.radiusY;
-                    lastRadiusX = zone.radiusX;
-                    lastRadiusY = zone.radiusY;
                 }
 
                 updateZoneList();
@@ -499,6 +506,8 @@
 
             function drawCanvas() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Vẽ sân khấu
                 ctx.fillStyle = stage.color;
                 ctx.beginPath();
                 ctx.moveTo(stage.x + stage.vertices[0].x, stage.y + stage.vertices[0].y);
@@ -510,105 +519,82 @@
                 ctx.fillStyle = '#fff';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.font = 'bold 14px Arial'; // Thiết lập font chữ
-                ctx.fillText(stage.name, stage.x, stage.y + 15); // Vẽ text
+                ctx.font = 'bold 14px Arial';
+                ctx.fillText(stage.name, stage.x, stage.y + 15);
+
+                // Vẽ các zone
                 zones.forEach((zone, index) => {
                     ctx.fillStyle = zone.color;
                     ctx.beginPath();
-                    if (zone.shape === 'rectangle') {
-                        ctx.moveTo(zone.x + zone.vertices[0].x, zone.y + zone.vertices[0].y);
-                        for (let i = 1; i < zone.vertices.length; i++) {
-                            ctx.lineTo(zone.x + zone.vertices[i].x, zone.y + zone.vertices[i].y);
-                        }
-                        ctx.closePath();
-                        ctx.fill();
-                    } else {
-                        ctx.ellipse(zone.x, zone.y, zone.radiusX, zone.radiusY, 0, 0, Math.PI * 2);
-                        ctx.fill();
+                    ctx.moveTo(zone.x + zone.vertices[0].x, zone.y + zone.vertices[0].y);
+                    for (let i = 1; i < zone.vertices.length; i++) {
+                        ctx.lineTo(zone.x + zone.vertices[i].x, zone.y + zone.vertices[i].y);
                     }
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Vẽ tên zone ở chính giữa (centroid)
                     ctx.fillStyle = '#000';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(zone.name, zone.x, zone.y);
+                    ctx.font = 'bold 14px Arial';
+                    let textX = zone.x;
+                    let textY = zone.y;
+                    if (zone.shape === 'polygon') {
+                        const sumX = zone.vertices.reduce((sum, v) => sum + v.x, 0);
+                        const sumY = zone.vertices.reduce((sum, v) => sum + v.y, 0);
+                        const count = zone.vertices.length;
+                        textX = zone.x + sumX / count;
+                        textY = zone.y + sumY / count;
+                    }
+                    ctx.fillText(zone.name, textX, textY);
+
+                    // Vẽ viền và điểm điều khiển
                     if (index === selectedZoneIndex || index === draggedZoneIndex) {
                         ctx.strokeStyle = '#000';
                         ctx.lineWidth = 2;
                         ctx.stroke();
                         if (index === selectedZoneIndex) {
-                            if (zone.shape === 'rectangle') {
-                                zone.vertices.forEach((v, i) => {
-                                    ctx.beginPath();
-                                    ctx.arc(zone.x + v.x, zone.y + v.y, 8, 0, Math.PI * 2);
-                                    ctx.fillStyle = isPointNearControlPoint(zone, i, canvas) ? '#ff0000' : '#000';
-                                    ctx.fill();
-                                });
-                            } else {
+                            zone.vertices.forEach((v, i) => {
                                 ctx.beginPath();
-                                ctx.arc(zone.x - zone.radiusX, zone.y, 8, 0, Math.PI * 2);
-                                ctx.fillStyle = isPointNearControlPoint(zone, 4, canvas) ? '#ff0000' : '#000';
+                                ctx.arc(zone.x + v.x, zone.y + v.y, 8, 0, Math.PI * 2);
+                                ctx.fillStyle = isPointNearControlPoint(zone, i) ? '#ff0000' : '#000';
                                 ctx.fill();
-                                ctx.beginPath();
-                                ctx.arc(zone.x, zone.y - zone.radiusY, 8, 0, Math.PI * 2);
-                                ctx.fillStyle = isPointNearControlPoint(zone, 5, canvas) ? '#ff0000' : '#000';
-                                ctx.fill();
-                            }
+                            });
                         }
                     }
                 });
             }
 
             function isPointInZone(x, y, zone) {
-                if (zone.isStage)
-                    return false;
-                if (zone.shape === 'rectangle') {
-                    let inside = false;
-                    const vertices = zone.vertices;
-                    for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
-                        const xi = zone.x + vertices[i].x, yi = zone.y + vertices[i].y;
-                        const xj = zone.x + vertices[j].x, yj = zone.y + vertices[j].y;
-                        const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-                        if (intersect)
-                            inside = !inside;
-                    }
-                    return inside;
-                } else {
-                    const dx = (x - zone.x) / zone.radiusX;
-                    const dy = (y - zone.y) / zone.radiusY;
-                    return dx * dx + dy * dy <= 1;
+                if (zone.isStage) return false;
+                let inside = false;
+                const vertices = zone.vertices;
+                for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+                    const xi = zone.x + vertices[i].x, yi = zone.y + vertices[i].y;
+                    const xj = zone.x + vertices[j].x, yj = zone.y + vertices[j].y;
+                    const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
                 }
+                return inside;
             }
 
-            function isPointNearControlPoint(zone, cornerIndex, canvasElement) {
-                const rect = canvasElement.getBoundingClientRect();
-                const x = (event.clientX || lastMouseX) - rect.left;
-                const y = (event.clientY || lastMouseY) - rect.top;
-                if (zone.shape === 'rectangle') {
-                    const vx = zone.x + zone.vertices[cornerIndex].x;
-                    const vy = zone.y + zone.vertices[cornerIndex].y;
-                    return Math.hypot(x - vx, y - vy) < 15;
-                } else {
-                    if (cornerIndex === 4)
-                        return Math.hypot(x - (zone.x - zone.radiusX), y - zone.y) < 15;
-                    if (cornerIndex === 5)
-                        return Math.hypot(x - zone.x, y - (zone.y - zone.radiusY)) < 15;
-                }
-                return false;
+            function isPointNearControlPoint(zone, cornerIndex) {
+                const rect = canvas.getBoundingClientRect();
+                const x = lastMouseX - rect.left;
+                const y = lastMouseY - rect.top;
+                const vx = zone.x + zone.vertices[cornerIndex].x;
+                const vy = zone.y + zone.vertices[cornerIndex].y;
+                return Math.hypot(x - vx, y - vy) < 15;
             }
 
             function getControlPoint(x, y, zone) {
-                if (zone.shape === 'rectangle') {
-                    for (let i = 0; i < zone.vertices.length; i++) {
-                        const vx = zone.x + zone.vertices[i].x;
-                        const vy = zone.y + zone.vertices[i].y;
-                        if (Math.hypot(x - vx, y - vy) < 15) {
-                            return i;
-                        }
+                for (let i = 0; i < zone.vertices.length; i++) {
+                    const vx = zone.x + zone.vertices[i].x;
+                    const vy = zone.y + zone.vertices[i].y;
+                    if (Math.hypot(x - vx, y - vy) < 15) {
+                        return i;
                     }
-                } else {
-                    if (Math.hypot(x - (zone.x - zone.radiusX), y - zone.y) < 15)
-                        return 4;
-                    if (Math.hypot(x - zone.x, y - (zone.y - zone.radiusY)) < 15)
-                        return 5;
                 }
                 return -1;
             }
@@ -617,6 +603,8 @@
                 const rect = canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
 
                 for (let i = zones.length - 1; i >= 0; i--) {
                     if (i === selectedZoneIndex) {
@@ -645,50 +633,40 @@
 
             canvas.addEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
-                lastMouseX = e.clientX;
-                lastMouseY = e.clientY;
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
                 let cursor = 'default';
 
                 for (let i = zones.length - 1; i >= 0; i--) {
                     if (i === selectedZoneIndex) {
-                        const zone = zones[i];
-                        if (zone.shape === 'rectangle') {
-                            for (let j = 0; j < zone.vertices.length; j++) {
-                                if (isPointNearControlPoint(zone, j, canvas)) {
-                                    cursor = 'crosshair';
-                                    break;
-                                }
-                            }
-                        } else {
-                            if (isPointNearControlPoint(zone, 4, canvas) || isPointNearControlPoint(zone, 5, canvas)) {
+                        for (let j = 0; j < zones[i].vertices.length; j++) {
+                            if (isPointNearControlPoint(zones[i], j)) {
                                 cursor = 'crosshair';
+                                break;
                             }
                         }
                     }
                     if (cursor === 'default' && isPointInZone(x, y, zones[i])) {
                         cursor = 'pointer';
                     }
-                    if (cursor !== 'default')
-                        break;
+                    if (cursor !== 'default') break;
                 }
                 canvas.className = cursor === 'crosshair' ? 'resizable' : cursor === 'pointer' ? 'draggable' : '';
-                if (!isDragging)
-                    drawCanvas();
+                if (!isDragging) drawCanvas();
 
                 if (isDragging && draggedZoneIndex !== -1) {
                     const zone = zones[draggedZoneIndex];
                     if (resizingCorner !== -1) {
-                        if (zone.shape === 'rectangle') {
-                            zone.vertices[resizingCorner].x = x - zone.x;
-                            zone.vertices[resizingCorner].y = y - zone.y;
-                        } else {
-                            if (resizingCorner === 4)
-                                zone.radiusX = Math.abs(zone.x - x);
-                            if (resizingCorner === 5)
-                                zone.radiusY = Math.abs(zone.y - y);
-                        }
+                        // Kéo tự do đỉnh được chọn
+                        zone.vertices[resizingCorner].x = x - zone.x;
+                        zone.vertices[resizingCorner].y = y - zone.y;
+                        // Cập nhật input width/height dựa trên giới hạn bao quanh
+                        document.getElementById('width').value = Math.max(...zone.vertices.map(v => v.x)) - Math.min(...zone.vertices.map(v => v.x));
+                        document.getElementById('height').value = Math.max(...zone.vertices.map(v => v.y)) - Math.min(...zone.vertices.map(v => v.y));
+                        lastWidth = document.getElementById('width').value;
+                        lastHeight = document.getElementById('height').value;
                     } else {
                         zone.x = x - dragOffsetX;
                         zone.y = y - dragOffsetY;
@@ -718,6 +696,12 @@
                     alert('Vui lòng thêm ít nhất một zone trước khi tiếp tục.');
                     return;
                 }
+                const zoneNames = zones.map(zone => zone.name.toLowerCase());
+                const uniqueNames = new Set(zoneNames);
+                if (uniqueNames.size !== zoneNames.length) {
+                    alert('Có các zone trùng tên. Vui lòng đảm bảo mỗi zone có tên duy nhất.');
+                    return;
+                }
                 const json = JSON.stringify({zones: zones});
                 console.log('Submitting seatMapData:', json);
                 document.getElementById('seatMapData').value = json;
@@ -734,6 +718,9 @@
                 updateZoneList();
                 drawCanvas();
             }
+
+            // Vẽ canvas ban đầu
+            drawCanvas();
         </script>
     </body>
 </html>

@@ -2,11 +2,14 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page buffer="128kb" autoFlush="true" %>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Chat Room - Modern Chat App</title>
+    <title>Chat Room - EventTicketHub Chat Discussion</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #667aff;
@@ -796,7 +799,22 @@
                 border-bottom: none;
                 border-right: 1px solid var(--border-color);
             }
-        }
+}
+.delete-conversation-btn{
+    background: transparent;
+}
+        .fa-trash {
+  color: red; /* Màu xám bình thường */
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.fa-trash:hover {
+  color: red; /* Màu đỏ khi hover */
+  transform: scale(1.2);
+   box-shadow: 0 2px 6px rgba(255, 0, 0, 0.4); 
+}
     </style>
 </head>
 <body>
@@ -819,26 +837,29 @@
                     </div>
                 </c:if>
 
-                <c:forEach items="${conversations}" var="conv">
-                    <div class="conversation ${conv.conversationID == currentConversationId ? 'active' : ''}"
-                         onclick="window.location.href='${pageContext.request.contextPath}/chat?conversation_id=${conv.conversationID}&eventId=${conv.eventID}'"
-                         data-conversation-id="${conv.conversationID}"
-                         data-unread-count="0">
-                        <div class="conversation-avatar">
-                            ${conv.subject != null ? conv.subject.substring(0,1).toUpperCase() : 'C'}
-                        </div>
-                        <div class="conversation-info">
-                            <div class="conversation-name">
-                                ${conv.subject != null ? conv.subject : 'Conversation ' + conv.conversationID}
-                            </div>
-                            <div class="conversation-preview">Bấm để xem tin nhắn...</div>
-                        </div>
-                        <div class="conversation-meta">
-                            <div class="conversation-time" data-last-message-at="${conv.lastMessageAt}"></div>
-                            <div class="conversation-badge hidden">0</div>
-                        </div>
-                    </div>
-                </c:forEach>
+              <c:forEach items="${conversations}" var="conv">
+    <div class="conversation ${conv.conversationID == currentConversationId ? 'active' : ''}"
+         onclick="window.location.href='${pageContext.request.contextPath}/chat?conversation_id=${conv.conversationID}&eventId=${conv.eventID}'"
+         data-conversation-id="${conv.conversationID}"
+         data-unread-count="0">
+        <div class="conversation-avatar">
+            ${conv.subject != null ? conv.subject.substring(0,1).toUpperCase() : 'C'}
+        </div>
+        <div class="conversation-info">
+            <div class="conversation-name">
+                ${conv.subject != null ? conv.subject : 'Conversation ' + conv.conversationID}
+            </div>
+            <div class="conversation-preview">Bấm để xem tin nhắn...</div>
+        </div>
+        <div class="conversation-meta">
+            <div class="conversation-time" data-last-message-at="${conv.lastMessageAt}"></div>
+            <div class="conversation-badge hidden">0</div>
+            <div class="delete-conversation-btn" onclick="deleteConversation(${conv.conversationID}, event)">
+            <i class="fa fa-trash" aria-hidden="true"></i>
+            </div>
+        </div>
+    </div>
+</c:forEach>
             </div>
         </div>
 
@@ -986,6 +1007,44 @@
     </div>
  
 <script>
+function deleteConversation(conversationId, event) {
+    event.stopPropagation(); // Prevent triggering the conversation click event
+    if (!confirm('Bạn có chắc chắn muốn xóa đoạn chat này? Nó sẽ vẫn hiển thị với người còn lại.')) {
+        return;
+    }
+
+    fetch('${pageContext.request.contextPath}/chat?conversation_id=' + conversationId, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Remove the conversation from the UI
+            const conversationElement = document.querySelector(`.conversation[data-conversation-id="${conversationId}"]`);
+            if (conversationElement) {
+                conversationElement.remove();
+            }
+            // If the deleted conversation is the current one, clear the chat area
+            if (conversationId.toString() === '${currentConversationId}') {
+                document.getElementById('messagesContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <p>Đoạn chat đã được xóa!</p>
+                        <small>Chọn một đoạn chat khác để tiếp tục.</small>
+                    </div>`;
+                document.getElementById('messageInput').disabled = true;
+                document.getElementById('sendButton').disabled = true;
+            }
+        } else {
+            alert('Xóa đoạn chat thất bại: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting conversation:', error);
+        alert('Đã xảy ra lỗi khi xóa đoạn chat.');
+    });
+}
+// Update initWebSocket to handle system messages
 function initWebSocket(conversationId, userId, currentUserName, otherUserName, isOwner = false) {
     let socket = null;
     
@@ -1006,7 +1065,18 @@ function initWebSocket(conversationId, userId, currentUserName, otherUserName, i
                 const message = JSON.parse(event.data);
                 const isCurrentUser = message.senderID == userId;
 
-                if (!isCurrentUser) {
+                if (message.messageType === 'system') {
+                    // Display system message about deletion
+                    addMessage(
+                        message.senderID,
+                        isCurrentUser ? currentUserName : otherUserName,
+                        message.messageContent,
+                        message.createdAt,
+                        message.conversationID,
+                        isCurrentUser,
+                        []
+                    );
+                } else if (!isCurrentUser) {
                     addMessage(
                         message.senderID,
                         isCurrentUser ? currentUserName : otherUserName,
@@ -1037,7 +1107,6 @@ function initWebSocket(conversationId, userId, currentUserName, otherUserName, i
     
     return socket;
 }
-
 function sendMessageWithFiles(conversationId, userId, userName) {
     const content = document.getElementById('messageInput').value.trim();
     const fileInput = document.getElementById('fileInput');
@@ -1067,6 +1136,7 @@ function sendMessageWithFiles(conversationId, userId, userName) {
             fileInput.value = '';
             document.getElementById('messageInput').placeholder = "Nhập tin nhắn...";
             
+            // Hiển thị tin nhắn ngay lập tức (bao gồm cả file đính kèm nếu có)
             if (content || selectedFiles.length > 0) {
                 addMessage(
                     userId, 
@@ -1075,7 +1145,7 @@ function sendMessageWithFiles(conversationId, userId, userName) {
                     new Date().toISOString(), 
                     conversationId, 
                     true, 
-                    []
+                    data.attachments || [] // Sử dụng attachments từ response
                 );
             }
             resetUnreadCount(conversationId);
@@ -1121,14 +1191,16 @@ function addMessage(userId, username, content, timestamp, msgConversationId, isC
     if (attachments && attachments.length > 0) {
         const attachmentDiv = document.createElement('div');
         attachmentDiv.className = 'attachments';
+        
         attachments.forEach(attachment => {
             const attachmentLink = document.createElement('a');
             attachmentLink.href = '${pageContext.request.contextPath}' + attachment.filePath;
-            attachmentLink.textContent = '📎 ' + attachment.originalFilename + ' (' + attachment.formattedFileSize + ')';
+            attachmentLink.textContent = '📎 ' + attachment.originalFilename + ' (' + formatFileSize(attachment.fileSize) + ')';
             attachmentLink.target = '_blank';
             attachmentLink.className = 'attachment-link';
             attachmentDiv.appendChild(attachmentLink);
         });
+        
         messageContent.appendChild(attachmentDiv);
     }
     
@@ -1148,6 +1220,15 @@ function addMessage(userId, username, content, timestamp, msgConversationId, isC
     scrollToBottom();
     updateSearchResults();
 }
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
 
 function scrollToBottom() {
     const messagesContainer = document.getElementById('messagesContainer');

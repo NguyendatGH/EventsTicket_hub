@@ -287,9 +287,7 @@
             <ul class="nav-links" id="navLinks">
                 <li><a href="${pageContext.request.contextPath}/home"><i class="fas fa-home"></i> Trang chủ</a></li>
                 <li><a href="#hot-events"><i class="fas fa-fire"></i> Sự kiện hot</a></li>
-                <li><a href="#vouchers"><i class="fas fa-tags"></i> Săn voucher</a></li>
-                <li><a href="#contact"><i class="fas fa-question-circle"></i> Hỗ trợ</a></li>
-                <li><a href="${pageContext.request.contextPath}/tickets">🎫 Vé đã mua</a></li>
+                <li><a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet">🎫 Vé đã mua</a></li>
                 <li><a href="${pageContext.request.contextPath}/support">Hỗ trợ</a></li>
             </ul>
         </div>

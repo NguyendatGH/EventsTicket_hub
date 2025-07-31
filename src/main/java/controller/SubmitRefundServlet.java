@@ -30,7 +30,7 @@ public class SubmitRefundServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "/pages/TicketOrderHistory.jsp");
+        response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
     }
 
     @Override
@@ -71,20 +71,20 @@ public class SubmitRefundServlet extends HttpServlet {
             }
 
             // Lấy thông tin đơn hàng để tính số tiền hoàn
-            BigDecimal orderAmount = orderDAO.getOrderAmount(orderId);
-            if (orderAmount == null) {
-                request.setAttribute("errorMessage", "Không tìm thấy thông tin đơn hàng.");
-                request.setAttribute("orderId", orderId);
-                request.setAttribute("refundReason", refundReason);
-                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
-                return;
-            }
+//            BigDecimal orderAmount = orderDAO.getOrderAmount(orderId);
+//            if (orderAmount == null) {
+//                request.setAttribute("errorMessage", "Không tìm thấy thông tin đơn hàng.");
+//                request.setAttribute("orderId", orderId);
+//                request.setAttribute("refundReason", refundReason);
+//                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+//                return;
+//            }
 
             // Tạo yêu cầu hoàn tiền
             Refund refund = new Refund();
             refund.setOrderId(orderId);
             refund.setUserId(currentUser.getId());
-            refund.setRefundAmount(orderAmount);
+//            refund.setRefundAmount(orderAmount);
             refund.setRefundReason(refundReason.trim());
             refund.setRefundStatus("pending");
             refund.setRefundRequestDate(LocalDateTime.now());
@@ -96,7 +96,7 @@ public class SubmitRefundServlet extends HttpServlet {
             if (success) {
                 // Thông báo đã được tạo tự động trong RefundDAO.insertRefund()
                 session.setAttribute("flashMessage_success", "Yêu cầu hoàn tiền đã được gửi thành công! Chúng tôi sẽ xử lý trong thời gian sớm nhất.");
-                response.sendRedirect(request.getContextPath() + "/pages/TicketOrderHistory.jsp");
+                response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
             } else {
                 request.setAttribute("errorMessage", "Có lỗi xảy ra khi gửi yêu cầu hoàn tiền. Vui lòng thử lại!");
                 request.setAttribute("orderId", orderId);

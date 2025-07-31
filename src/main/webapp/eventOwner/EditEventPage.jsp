@@ -704,7 +704,7 @@
             reader.readAsDataURL(file);
             } else {
                 const preview = document.getElementById('imagePreview');
-            i f (preview) {
+            if (preview) {
                 preview.src = '${pageContext.request.contextPath}/asset/image/MayLangThangAvt.svg';
             }
             }

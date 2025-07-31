@@ -448,17 +448,15 @@
 </head>
 <body>
     <div class="header">
-        <div class="logo">MasterTicket</div>
+        <div class="logo">
+            <a href="${pageContext.request.contextPath}/home" style="color: inherit; text-decoration: none;">MasterTicket</a>
+        </div>
         <form class="search-bar" action="#" method="get">
             <input type="text" placeholder="Bạn tìm gì hôm nay ?" />
             <button type="submit">Tìm kiếm</button>
         </form>
         <nav class="menu">
-            <a href="#" class="active">Trang Chủ</a>
-            <a href="#">Các sự kiện hot</a>
-            <a href="#">Săn voucher giảm giá</a>
-            <a href="#">Tạo sự kiện</a>
-            <a href="#">Hỗ trợ</a>
+            <a href="${pageContext.request.contextPath}/" class="active">Trang Chủ</a>
         </nav>
         <div class="auth-btns">
             <a href="${pageContext.request.contextPath}/authentication/register.jsp" class="signup">Đăng ký</a>

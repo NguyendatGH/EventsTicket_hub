@@ -1,14 +1,13 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import models.Message;
+import models.FileAttachment;
 import service.ChatService;
 import dto.UserDTO;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,21 +29,17 @@ public class ChatWebSocket {
             String conversationIdStr = getQueryParam(session, "conversation_id");
             String userIdStr = getQueryParam(session, "user_id");
 
-         
-            if (userIdStr.isEmpty() || userIdStr == null) {
+            if (userIdStr == null || userIdStr.isEmpty()) {
                 LOGGER.warning("Missing current userId params");
                 session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "User not logged in"));
                 return;
             }
 
-            LOGGER.info(
-                    "WebSocket onOpen - conversation_id: " + (conversationIdStr != null ? conversationIdStr : "null"));
+            LOGGER.info("WebSocket onOpen - conversation_id: " + (conversationIdStr != null ? conversationIdStr : "null"));
 
             if (conversationIdStr == null || conversationIdStr.isEmpty()) {
-                LOGGER.warning("Missing or empty conversation_id "
-                        + conversationIdStr);
-                session.close(
-                        new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Missing conversation_id or user_id"));
+                LOGGER.warning("Missing or empty conversation_id " + conversationIdStr);
+                session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Missing conversation_id"));
                 return;
             }
 
@@ -53,18 +48,15 @@ public class ChatWebSocket {
 
             session.getUserProperties().put("conversation_id", conversationId);
             session.getUserProperties().put("user_id", userId);
-            // session.getUserProperties().put("username", user.getName());
 
             conversationSessions.computeIfAbsent(conversationId, k -> new CopyOnWriteArraySet<>()).add(session);
 
             LOGGER.info("WebSocket connection opened for user " + userId + " in conversation " + conversationId);
-            LOGGER.info("Total sessions for conversation " + conversationId + ": "
-                    + conversationSessions.get(conversationId).size());
+            LOGGER.info("Total sessions for conversation " + conversationId + ": " + conversationSessions.get(conversationId).size());
         } catch (NumberFormatException e) {
             LOGGER.severe("Invalid format for conversation_id or user_id: " + e.getMessage());
             try {
-                session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE,
-                        "Invalid conversation_id or user_id format"));
+                session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Invalid conversation_id or user_id format"));
             } catch (IOException ex) {
                 LOGGER.severe("Error closing session: " + ex.getMessage());
             }
@@ -84,7 +76,6 @@ public class ChatWebSocket {
             Message message = objectMapper.readValue(messageJson, Message.class);
             Integer conversationId = (Integer) session.getUserProperties().get("conversation_id");
             Integer userId = (Integer) session.getUserProperties().get("user_id");
-            // String username = (String) session.getUserProperties().get("username");
 
             if (conversationId == null || userId == null) {
                 LOGGER.warning("Missing conversation_id or user_id in session");
@@ -93,15 +84,12 @@ public class ChatWebSocket {
             message.setSenderID(userId);
             message.setConversationID(conversationId);
             message.setCreatedAt(new Date());
-            // String username = chatService.getConversationName(conversationId, userId);
-            // message.setUsername(username);
 
             HttpSession httpSession = (HttpSession) session.getUserProperties().get("jakarta.servlet.http.HttpSession");
-            UserDTO user = (UserDTO) httpSession.getAttribute("user");
+            UserDTO user = (httpSession != null) ? (UserDTO) httpSession.getAttribute("user") : null;
+            String username = user != null ? user.getName() : "Unknown";
 
-            String username = user != null ? user.getName() : "unknow";
-            LOGGER.info("Received message from user " + userId + " in conversation " + conversationId + ": "
-                    + message.getMessageContent());
+            LOGGER.info("Received message from user " + userId + " in conversation " + conversationId + ": " + message.getMessageContent());
 
             int messageId = chatService.saveMessage(message, conversationId);
             if (messageId == -1) {
@@ -111,10 +99,17 @@ public class ChatWebSocket {
 
             message.setMessageID(messageId);
             Map<String, Object> messagePayload = new HashMap<>();
-            messagePayload.put("message", message);
+            messagePayload.put("senderID", message.getSenderID());
+            messagePayload.put("conversationID", message.getConversationID());
+            messagePayload.put("messageContent", message.getMessageContent());
+            messagePayload.put("messageType", message.getMessageType());
+            messagePayload.put("createdAt", message.getCreatedAt().toString());
             messagePayload.put("username", username);
-            
-            broadcastMessage(message, conversationId);
+            if (message.getAttachments() != null && !message.getAttachments().isEmpty()) {
+                messagePayload.put("attachments", message.getAttachments());
+            }
+
+            broadcastMessage(messagePayload, conversationId);
         } catch (Exception e) {
             LOGGER.severe("Error processing message: " + e.getMessage());
             e.printStackTrace();
@@ -126,7 +121,6 @@ public class ChatWebSocket {
         try {
             Integer conversationId = (Integer) session.getUserProperties().get("conversation_id");
             Integer userId = (Integer) session.getUserProperties().get("user_id");
-            if(userId == null ) System.out.println("user id null");
             if (conversationId != null) {
                 CopyOnWriteArraySet<Session> sessions = conversationSessions.get(conversationId);
                 if (sessions != null) {
@@ -149,6 +143,37 @@ public class ChatWebSocket {
         throwable.printStackTrace();
     }
 
+    public static void broadcastMessage(Map<String, Object> message, Integer conversationId) {
+        CopyOnWriteArraySet<Session> sessions = conversationSessions.get(conversationId);
+        if (sessions != null) {
+            sessions.forEach(session -> {
+                if (session.isOpen()) {
+                    try {
+                        synchronized (session) {
+                            session.getBasicRemote().sendText(objectMapper.writeValueAsString(message));
+                        }
+                    } catch (IOException e) {
+                        LOGGER.severe("Error broadcasting message to session: " + e.getMessage());
+                    }
+                }
+            });
+        }
+    }
+
+    public static void broadcastMessage(Message message, Integer conversationId) {
+        Map<String, Object> messagePayload = new HashMap<>();
+        messagePayload.put("senderID", message.getSenderID());
+        messagePayload.put("conversationID", message.getConversationID());
+        messagePayload.put("messageContent", message.getMessageContent());
+        messagePayload.put("messageType", message.getMessageType());
+        messagePayload.put("createdAt", message.getCreatedAt().toString());
+        messagePayload.put("messageID", message.getMessageID());
+        if (message.getAttachments() != null && !message.getAttachments().isEmpty()) {
+            messagePayload.put("attachments", message.getAttachments());
+        }
+        broadcastMessage(messagePayload, conversationId);
+    }
+
     private String getQueryParam(Session session, String paramName) {
         String queryString = session.getQueryString();
         if (queryString != null) {
@@ -161,28 +186,5 @@ public class ChatWebSocket {
             }
         }
         return null;
-    }
-
-    public static void broadcastMessage(Message message, int conversationId) throws IOException {
-        CopyOnWriteArraySet<Session> sessions = conversationSessions.get(conversationId);
-        if (sessions != null) {
-            String broadcastMessage = objectMapper.writeValueAsString(message);
-            for (Session clientSession : sessions) {
-                if (clientSession.isOpen()) {
-                    try {
-                        clientSession.getBasicRemote().sendText(broadcastMessage);
-                        LOGGER.info("Broadcasted message to session: " + clientSession.getId());
-                    } catch (IOException e) {
-                        LOGGER.warning(
-                                "Error broadcasting to session " + clientSession.getId() + ": " + e.getMessage());
-                        sessions.remove(clientSession);
-                    }
-                } else {
-                    sessions.remove(clientSession);
-                }
-            }
-        } else {
-            LOGGER.warning("No sessions found for conversationId: " + conversationId);
-        }
     }
 }

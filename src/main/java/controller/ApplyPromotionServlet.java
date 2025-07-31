@@ -31,7 +31,7 @@ public class ApplyPromotionServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
         Order order = (Order) session.getAttribute("currentOrder");
-
+                 
         System.out.println("\n========== [APPLY PROMOTION SERVLET] ==========");
         System.out.println("🎫 Mã nhập vào: [" + promoCode + "]");
         System.out.println("📝 Order trong session: " + (order != null ? "CÓ" : "KHÔNG"));

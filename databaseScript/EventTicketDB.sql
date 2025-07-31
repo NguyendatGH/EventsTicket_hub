@@ -1,4 +1,6 @@
 create database EventTicketDB
+use EventTicketDB
+
 
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -218,6 +220,7 @@ CREATE TABLE Report (
     CONSTRAINT FK_Report_Admin FOREIGN KEY (AdminID) REFERENCES Users(Id)
 );
 
+
 -- Bảng ConversationTable 
 CREATE TABLE Conversations (
     ConversationID INT IDENTITY(1,1) PRIMARY KEY,
@@ -230,6 +233,9 @@ CREATE TABLE Conversations (
     CreatedBy INT NOT NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
+    IsDeletedByCustomer BIT DEFAULT 0,
+    IsDeletedByOwner BIT DEFAULT 0,
+    DeletedAt DATETIME NULL,
     CONSTRAINT FK_Conversations_Customer FOREIGN KEY (CustomerID) REFERENCES Users(Id),
     CONSTRAINT FK_Conversations_EventOwner FOREIGN KEY (EventOwnerID) REFERENCES Users(Id),
     CONSTRAINT FK_Conversations_Event FOREIGN KEY (EventID) REFERENCES Events(EventID),
@@ -357,6 +363,7 @@ CREATE TABLE Refunds (
     CONSTRAINT FK_Refunds_PaymentMethod FOREIGN KEY (PaymentMethodID) REFERENCES PaymentMethod(PaymentMethodID),
  
 );
+
 -- Bảng supportItems
 CREATE TABLE SupportItems (
     SupportID INT IDENTITY(1,1) PRIMARY KEY,
@@ -848,8 +855,7 @@ VALUES
 (N'Rock', N'Nhạc Rock và Metal'),
 (N'Hài kịch', N'Chương trình hài kịch'),
 (N'Thể thao', N'Các sự kiện thể thao'),
-(N'Hội nghị', N'Hội nghị và seminar'),
-('Others', 'Miscellaneous events');
+(N'Hội nghị', N'Hội nghị và seminar');
 
 -- select * from Genres;
 
@@ -967,8 +973,10 @@ VALUES
 (9, 'TKT000000122025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
 (10, 'TKT000000132025', 'sold', NULL, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
---select * from Ticket
 
+-- select * from PaymentMethod
+-- delete from PaymentMethod
+-- DBCC PaymentMethod ('PaymentMethod', RESEED, 0);
 -- Insert into PaymentMethod
 INSERT INTO PaymentMethod (MethodName, PromotionCode, Description, IsActive)
 VALUES
@@ -1017,9 +1025,21 @@ VALUES
 (9, 9, 9, 11, 80000, 1, 80000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
 (10, 9, 9, 12, 80000, 1, 80000, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
+
+select * from Promotions
+
+SELECT TOP 1 *
+FROM Events
+ORDER BY EventID DESC;
+
+update Events
+set StartTime = '2025-08-03 17:07:00.000', EndTime ='2025-08-09 17:07:00.000'
+where EventID = 29
 -- Insert into Promotions 
 INSERT INTO Promotions (PromotionName, PromotionCode, Description, PromotionType, StartTime, EndTime, EventID, DiscountPercentage, DiscountAmount, MinOrderAmount, MaxDiscountAmount, MaxUsageCount, CurrentUsageCount, IsActive, CreatedBy, CreatedAt, UpdatedAt)
 VALUES
+(N'Concert Flash Sale', N'CONCERT152', N'15% off for Anh Trai saygex', N'percentage', '2025-07-31 17:07:00.000', '2025-07-31 23:59:00.000', 29, 15.00, NULL, 400000, 75000, 200, 0, 1, 3, '2025-06-01 09:00:00', '2025-06-01 09:00:00');
+
 (N'Summer Sale', N'SUMMER25', N'25% off for summer events', N'percentage', '2025-07-01 00:00:00', '2025-07-03 11:00:00', 15, 25.00, NULL, 500000, 100000, 100, 0, 1, 1, '2025-06-28 09:00:00', '2025-06-29 09:00:00'),
 (N'Early Bird', N'EARLY10', N'10% off for early bookings', N'percentage', '2025-07-01 00:00:00', '2025-07-07 12:30:00', 19, 10.00, NULL, 200000, 50000, 50, 0, 1, 2, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
 (N'Concert Discount', N'CONCERT50K', N'50,000 VND off for concerts', N'fixed_amount', '2025-07-01 00:00:00', '2025-07-09 10:00:00', 20, NULL, 50000, 300000, 50000, 200, 0, 1, 3, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
@@ -1083,7 +1103,7 @@ SET CreatedAt = CASE
             WHEN 10 THEN '2025-06-10 09:30:00'
             WHEN 11 THEN '2025-06-12 14:00:00'
             WHEN 12 THEN '2025-06-14 11:45:00'
-            WHEN 13 THEN '2025-06-15 05:31:00'  -- Current time
+            WHEN 13 THEN '2025-07-15 05:31:00'  -- Current time
         END
     ELSE 
         CASE Id
@@ -1103,6 +1123,7 @@ SET CreatedAt = CASE
 END
 WHERE Id BETWEEN 1 AND 25;
 
+select * from Users
 UPDATE Users
 SET LastLoginAt = CASE Id
     -- New Users (CreatedAt >= 2025-03-15, IDs 1–13)
@@ -1135,28 +1156,8 @@ SET LastLoginAt = CASE Id
     WHEN 26 THEN '2024-09-01 10:15:00' -- Trough (1 login in September)
     ELSE LastLoginAt
 END
+
 WHERE Id BETWEEN 1 AND 25;
 
--- Update all qualifying events to 'pending'
-UPDATE e
-SET Status = 'pending',
-    UpdatedAt = GETDATE()
-FROM Events e
-JOIN TicketInfo ti ON e.EventID = ti.EventID
-JOIN TicketInventory tinv ON ti.TicketInfoID = tinv.TicketInfoID
-WHERE e.Status = 'active'
-  AND e.IsDeleted = 0
-  AND tinv.SoldQuantity = 0;
-
-  update Events set status = 'active' where Name = N'SÂN KHẤU THIÊN ĐĂNG: XÓM VỊT TRỜI'
-
-SELECT c.ConversationID, c.CustomerID, c.EventOwnerID, c.EventID, c.Subject, c.Status,
-                 c.LastMessageAt, c.CreatedBy, c.CreatedAt, c.UpdatedAt, e.Name AS EventName, u.Username AS CustomerName
-                 FROM Conversations c 
-                 LEFT JOIN Events e ON c.EventID = e.EventID 
-                 LEFT JOIN Users u ON c.CustomerID = u.Id 
-                 WHERE c.EventOwnerID = 2 AND e.Status = 'active'
-
--- select * from OrderItems
-
-
+update Events
+set [Status] = 'active'
