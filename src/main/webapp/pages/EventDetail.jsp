@@ -754,7 +754,7 @@
         <div class="header-container">
             <header class="header">
                 <div class="logo">
-                   <a href="/OnlineSellingTicketEvents/home" class="logo">MasterTicket</a>                   
+                    <a href="/OnlineSellingTicketEvents/home" class="logo">MasterTicket</a>                   
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm...">
@@ -940,54 +940,72 @@
 
                     <div class="section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-comments"></i>
-                            Phản hồi từ người tham dự
+                            <i class="fas fa-comments"></i> Phản hồi từ người tham dự
                         </h2>
 
-                        <c:choose>
-                            <c:when test="${not empty feedbackList}">
-                                <c:forEach var="fb" items="${feedbackList}">
-                                    <div class="feedback-item" style="margin-bottom: 1.5rem;">
-                                        <!-- Nội dung feedback -->
-                                        <p class="feedback-text" style="margin: 0 0 0.5rem 0; font-weight: 500;">
-                                            ${fb.content}
-                                        </p>
+                        <!-- THÔNG BÁO MỨC SAO ĐANG XEM -->
+                        <p style="margin-bottom: 1rem;">
+                            Đang xem phản hồi với mức 
+                            <span style="font-weight: bold;">${currentStar}</span> 
+                            <i class="fas fa-star" style="color: var(--warning);"></i>
+                        </p>
 
-                                        <!-- Số sao + người gửi + ngày -->
-                                        <div class="feedback-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-                                            <!-- Số sao -->
-                                            <div class="feedback-stars">
-                                                <c:forEach begin="1" end="5" var="i">
-                                                    <i class="${i <= fb.rating ? 'fas' : 'far'} fa-star"
-                                                       style="color: ${i <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>
-                                                </c:forEach>
+                        <!-- DANH SÁCH FEEDBACK -->
+                        <div id="default-feedback-list">
+                            <c:choose>
+                                <c:when test="${not empty feedbackList}">
+                                    <c:forEach var="fb" items="${feedbackList}">
+                                        <div class="feedback-item" style="margin-bottom: 1.5rem;">
+                                            <p class="feedback-text" style="margin: 0 0 0.5rem 0; font-weight: 500;">
+                                                ${fb.content}
+                                            </p>
+                                            <div class="feedback-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                                                <div class="feedback-stars">
+                                                    <c:forEach begin="1" end="5" var="i">
+                                                        <i class="${i <= fb.rating ? 'fas' : 'far'} fa-star"
+                                                           style="color: ${i <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>
+                                                    </c:forEach>
+                                                </div>
+                                                <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
+                                                    ${fb.userName}
+                                                </span>
+                                                <span class="feedback-date" style="color: var(--text-muted); font-size: 0.95em;">
+                                                    (${fb.formattedDate})
+                                                </span>
                                             </div>
-
-                                            <!-- Người gửi -->
-                                            <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
-                                                ${fb.userName}
-                                            </span>
-
-                                            <!-- Ngày gửi -->
-                                            <span class="feedback-date" style="color: var(--text-muted); font-size: 0.95em;">
-                                                (${fb.formattedDate})
-                                            </span>
                                         </div>
-                                    </div>
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise>
-                                <p style="color: var(--text-muted); margin-top: 1rem;">
-                                    Hiện tại chưa có phản hồi nào cho sự kiện này.
-                                </p>
-                            </c:otherwise>
-                        </c:choose>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <p style="color: var(--text-muted);">Hiện tại chưa có phản hồi nào cho mức đánh giá này.</p>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <!-- PHÂN TRANG THEO SỐ SAO -->
+                        <div style="margin-top: 2rem; text-align: center;">
+                            <c:forEach begin="1" end="5" var="pageNum">
+                                <c:set var="starNum" value="${6 - pageNum}" />
+                                <c:choose>
+                                    <c:when test="${pageNum == currentPage}">
+                                        <span style="margin: 0 6px; font-weight: bold; color: var(--primary);">
+                                            ${starNum} <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a href="${pageContext.request.contextPath}/EventServlet?id=${eventId}&page=${pageNum}"
+                                           style="margin: 0 6px; text-decoration: none; color: inherit;">
+                                            ${starNum} <i class="fas fa-star"></i>
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                        </div>
                     </div>
 
                 </div>
             </c:if>
         </div>
-
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-container">
@@ -1048,7 +1066,7 @@
 
         <script type="text/javascript">
             var contextPath = '${pageContext.request.contextPath}';
-
+//            const contextPath = document.body.dataset.contextPath;
             function handleBuyTickets(eventId, hasSeatingChartStr) {
                 console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
                 console.log("  - eventId nhận được:", eventId, "(kiểu:", typeof eventId, ")");
@@ -1073,6 +1091,7 @@
                 const stars = document.querySelectorAll('.rating .fa-star');
                 stars.forEach((star, index) => {
                     star.addEventListener('click', function () {
+                         e.preventDefault();
                         stars.forEach((s, i) => {
                             if (i <= index) {
                                 s.classList.remove('far');
@@ -1103,6 +1122,70 @@
                     });
                 });
             });
+
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const starSelect = document.getElementById("star-filter");
+                const eventIdInput = document.getElementById("event-id-holder");
+                const defaultList = document.getElementById("default-feedback-list");
+                const container = document.getElementById("feedback-container");
+
+                const contextPath = document.body.dataset.contextPath;
+
+                if (!starSelect || !eventIdInput || !container || !defaultList || !contextPath) {
+                    console.error("Không tìm thấy phần tử DOM hoặc contextPath.");
+                    return;
+                }
+
+                starSelect.addEventListener("change", function () {
+                    const star = this.value;
+                    const eventId = eventIdInput.value;
+
+                    if (star === "") {
+                        defaultList.style.display = "block";
+                        container.innerHTML = "";
+                        return;
+                    }
+
+                    fetch(`${pageContext.request.contextPath}/FilterFeedbackServlet?eventId=${eventId}&star=${star}`)
+                                        .then(response => {
+                                            if (!response.ok)
+                                                throw new Error("Lỗi phản hồi từ server");
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            defaultList.style.display = "none";
+                                            container.innerHTML = "";
+
+                                            if (data.length === 0) {
+                                                container.innerHTML = "<p style='color: var(--text-muted);'>Hiện tại chưa có phản hồi nào cho mức đánh giá này.</p>";
+                                                return;
+                                            }
+
+                                            data.forEach(fb => {
+                                                const stars = Array.from({length: 5}, (_, i) =>
+                                                        `<i class="${i + 1 <= fb.rating ? 'fas' : 'far'} fa-star" style="color: ${i + 1 <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>`
+                                                ).join("");
+
+                                                const feedbackHtml = `
+                        <div class="feedback-item" style="margin-bottom: 1.5rem;">
+                            <p class="feedback-text" style="margin: 0 0 0.5rem 0; font-weight: 500;">${fb.content}</p>
+                            <div class="feedback-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                                <div class="feedback-stars">${stars}</div>
+                                <span class="feedback-author" style="color: var(--primary); font-weight: 600;">${fb.userName}</span>
+                                <span class="feedback-date" style="color: var(--text-muted); font-size: 0.95em;">(${fb.formattedDate})</span>
+                            </div>
+                        </div>`;
+                                                container.innerHTML += feedbackHtml;
+                                            });
+                                        })
+                                        .catch(error => {
+                                            console.error("Error fetching filtered feedback:", error);
+                                            container.innerHTML = "<p style='color: red;'>Không thể tải phản hồi từ máy chủ.</p>";
+                                        });
+                            });
+                        });
+
         </script>
     </body>
 </html>
