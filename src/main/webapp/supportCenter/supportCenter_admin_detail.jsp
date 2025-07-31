@@ -221,10 +221,14 @@
                       </div>
                     </div>
                     <div class="attachment-actions">
-                      <a href="${pageContext.request.contextPath}/admin/support?action=download&fileId=${attachment.attachmentId}" 
-                         class="attachment-btn download" title="Tải xuống">
-                        <i class="fas fa-download"></i>
-                      </a>
+                                                      <a href="${pageContext.request.contextPath}/admin/support?action=download&fileId=${attachment.attachmentId}"
+                                   class="attachment-btn download" 
+                                   title="Tải xuống"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   download="${attachment.originalFileName}">
+                                    <i class="fas fa-download"></i>
+                                </a>
                       <a href="${pageContext.request.contextPath}/admin/support?action=view&fileId=${attachment.attachmentId}" 
                          class="attachment-btn view" title="Xem file" target="_blank">
                         <i class="fas fa-eye"></i>

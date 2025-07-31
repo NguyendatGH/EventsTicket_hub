@@ -133,14 +133,8 @@
             font-size: 0.875rem;
         }
 
-        .file-actions {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .file-preview, .file-remove {
-            background: var(--primary);
+        .file-remove {
+            background: #dc3545;
             color: white;
             border: none;
             padding: 0.5rem;
@@ -148,14 +142,6 @@
             cursor: pointer;
             font-size: 0.875rem;
             transition: background 0.3s;
-        }
-
-        .file-preview:hover {
-            background: #5a6fd8;
-        }
-
-        .file-remove {
-            background: #dc3545;
         }
 
         .file-remove:hover {
@@ -196,62 +182,20 @@
             text-decoration: underline;
         }
 
-        /* File Preview Modal */
-        .file-preview-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+        .attachment-actions {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            gap: 0.5rem;
+            margin-left: auto;
         }
 
-        .file-preview-content {
-            background: var(--card-bg);
-            border-radius: 8px;
-            max-width: 90%;
-            max-height: 90%;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        .attachment-view {
+            color: #28a745;
+            text-decoration: none;
+            font-size: 0.875rem;
         }
 
-        .file-preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .file-preview-header h3 {
-            margin: 0;
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        .close-preview {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: color 0.3s;
-        }
-
-        .close-preview:hover {
-            color: var(--text-light);
-        }
-
-        .file-preview-body {
-            padding: 1.5rem;
-            max-height: 70vh;
-            overflow-y: auto;
+        .attachment-view:hover {
+            text-decoration: underline;
         }
         
         @media (max-width: 768px) { .sidebar { transform: translateX(-100%); transition: transform 0.3s; } .main-content { margin-left: 0; } }
@@ -389,10 +333,21 @@
                                                 <div class="attachment-item">
                                                     <i class="attachment-icon ${attachment.iconClass}"></i>
                                                     <span class="attachment-name">${attachment.originalFileName}</span>
-                                                    <a href="${pageContext.request.contextPath}/support-owner?action=download&fileId=${attachment.attachmentId}" 
-                                                       class="attachment-download">
-                                                        <i class="fas fa-download"></i> Tải xuống
-                                                    </a>
+                                                    <div class="attachment-actions">
+                                                        <a href="${pageContext.request.contextPath}/support-owner?action=download&fileId=${attachment.attachmentId}"
+                                                           class="attachment-download"
+                                                           target="_blank"
+                                                           rel="noopener noreferrer"
+                                                           download="${attachment.originalFileName}">
+                                                            <i class="fas fa-download"></i> Tải xuống
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/support-owner?action=view&fileId=${attachment.attachmentId}" 
+                                                           class="attachment-view"
+                                                           target="_blank"
+                                                           rel="noopener noreferrer">
+                                                            <i class="fas fa-eye"></i> Xem file
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </c:forEach>
                                         </div>
@@ -469,32 +424,13 @@
                             <div class="file-size">${fileSize}</div>
                         </div>
                     </div>
-                    <div class="file-actions">
-                        <button type="button" class="file-preview" data-index="${i}" title="Xem trước">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button type="button" class="file-remove" data-index="${i}" title="Xóa">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+                    <button type="button" class="file-remove" onclick="removeFile(${i})">
+                        <i class="fas fa-times"></i>
+                    </button>
                 `;
                 
                 fileList.appendChild(fileItem);
                 console.log('File item added to list');
-                
-                // Add event listeners for the buttons
-                const previewBtn = fileItem.querySelector('.file-preview');
-                const removeBtn = fileItem.querySelector('.file-remove');
-                
-                previewBtn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    previewFile(index);
-                });
-                
-                removeBtn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    removeFile(index);
-                });
             }
         });
 
@@ -547,85 +483,6 @@
             input.dispatchEvent(new Event('change'));
         }
 
-        function previewFile(index) {
-            const input = document.getElementById('attachments');
-            const file = input.files[index];
-            
-            if (!file) {
-                alert('Không tìm thấy file!');
-                return;
-            }
-
-            const fileType = file.type;
-            const fileName = file.name.toLowerCase();
-            
-            // Tạo modal preview
-            const modal = document.createElement('div');
-            modal.className = 'file-preview-modal';
-            modal.innerHTML = `
-                <div class="file-preview-content">
-                    <div class="file-preview-header">
-                        <h3>Xem trước: ${file.name}</h3>
-                        <button type="button" class="close-preview" onclick="closePreview()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="file-preview-body">
-                        <div id="preview-container"></div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Xử lý preview theo loại file
-            const previewContainer = document.getElementById('preview-container');
-            
-            if (fileType.startsWith('image/')) {
-                // Preview hình ảnh
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewContainer.innerHTML = `<img src="${e.target.result}" alt="${file.name}" style="max-width: 100%; max-height: 400px; object-fit: contain;">`;
-                };
-                reader.readAsDataURL(file);
-            } else if (fileType === 'application/pdf') {
-                // Preview PDF
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewContainer.innerHTML = `
-                        <iframe src="${e.target.result}" width="100%" height="400px" style="border: none;"></iframe>
-                    `;
-                };
-                reader.readAsDataURL(file);
-            } else if (fileType === 'text/plain' || fileName.endsWith('.txt')) {
-                // Preview text file
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewContainer.innerHTML = `
-                        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; max-height: 400px; overflow-y: auto; white-space: pre-wrap;">${e.target.result}</pre>
-                    `;
-                };
-                reader.readAsText(file);
-            } else {
-                // Không thể preview
-                previewContainer.innerHTML = `
-                    <div style="text-align: center; padding: 40px;">
-                        <i class="fas fa-file" style="font-size: 48px; color: #ccc;"></i>
-                        <p>Không thể xem trước loại file này</p>
-                        <p><small>File: ${file.name}</small></p>
-                        <p><small>Loại: ${fileType}</small></p>
-                    </div>
-                `;
-            }
-        }
-
-        function closePreview() {
-            const modal = document.querySelector('.file-preview-modal');
-            if (modal) {
-                modal.remove();
-            }
-        }
-
         // Load user requests when page loads
         window.onload = function() {
             console.log('Page loaded');
@@ -633,6 +490,15 @@
             const fileList = document.getElementById('file-list');
             console.log('File input found:', fileInput);
             console.log('File list found:', fileList);
+            
+            // Ensure download links work properly
+            const downloadLinks = document.querySelectorAll('.attachment-download');
+            downloadLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Allow the download to proceed normally
+                    console.log('Download link clicked:', this.href);
+                });
+            });
         };
     </script>
 </body>
