@@ -69,17 +69,8 @@ public class EventManagementServlet implements AdminSubServlet {
 
     private void setEventToJsp(HttpServletRequest request, HttpServletResponse response) {
         List<Event> activeEvents = eventServices.getActiveEvents();
-        // for (Event e : activeEvents) {
-        //     System.out.println("active event: " + e);
-        // }
         List<Event> nonActiveEvents = eventServices.getNonActiveEvents();
-        // for (Event e : nonActiveEvents) {
-        //     System.out.println("non active event: " + e);
-        // }
         List<Event> getPendingEvents = eventServices.getPendingEvents();
-        // for (Event e : getPendingEvents) {
-        //     System.out.println("pending event: " + e);
-        // }
         List<TopEventOwner> topOrganizers = userDAO.getTopEventOwner(5);
         Map<String, Integer> statusStats = eventServices.getEventByStatus();
         Map<String, Integer> genreStats = eventServices.getEventStatsByGenre();
@@ -215,11 +206,17 @@ public class EventManagementServlet implements AdminSubServlet {
         event.setName(request.getParameter("name"));
         event.setDescription(request.getParameter("description"));
         event.setPhysicalLocation(request.getParameter("physicalLocation"));
-        // event.setIsApproved(true);
         event.setStatus(request.getParameter("status"));
         event.setUpdatedAt(new Date());
+        
+        // Retain existing image if no new image is uploaded
         if (imageFileName != null) {
             event.setImageURL(imageFileName);
+        } else {
+            Event existingEvent = eventServices.getEventById(eventID);
+            if (existingEvent != null) {
+                event.setImageURL(existingEvent.getImageURL());
+            }
         }
 
         try {
@@ -291,9 +288,7 @@ public class EventManagementServlet implements AdminSubServlet {
     }
 
     private String getUploadPath(HttpServletRequest request) {
-        // Lấy đường dẫn tuyệt đối đến thư mục gốc của webapp
         String appPath = request.getServletContext().getRealPath("");
-        // Trả về đường dẫn đến thư mục upload
         return appPath + File.separator + UPLOAD_DIR;
     }
 

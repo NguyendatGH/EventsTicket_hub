@@ -1,3 +1,4 @@
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -162,6 +163,7 @@
             margin-bottom: 1.5rem;
         }
 
+恒
         .breadcrumb {
             display: flex;
             align-items: center;
@@ -833,7 +835,7 @@
                             </c:choose>
                             <div class="upload-section">
                                 <label for="imageFile" class="upload-label">Chọn ảnh từ máy tính</label>
-                                <input type="file" id="imageFile" name="imageFile" accept="image/*" class="upload-input" onchange="previewImage(this)" required>
+                                <input type="file" id="imageFile" name="imageFile" accept="image/*" class="upload-input" onchange="previewImage(this)">
                                 <div id="fileInfo" class="file-info">Định dạng: JPG, PNG, GIF | Tối đa: 5MB</div>
                             </div>
                         </div>
@@ -975,21 +977,18 @@
                 return false;
             }
 
-            if (!imageFile) {
-                Swal.fire('Lỗi', 'Vui lòng chọn ảnh cho sự kiện', 'error');
-                return false;
-            }
+            if (imageFile) {
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(imageFile.type)) {
+                    Swal.fire('Lỗi', 'Chỉ chấp nhận file ảnh định dạng JPG, PNG hoặc GIF', 'error');
+                    return false;
+                }
 
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            if (!validTypes.includes(imageFile.type)) {
-                Swal.fire('Lỗi', 'Chỉ chấp nhận file ảnh định dạng JPG, PNG hoặc GIF', 'error');
-                return false;
-            }
-
-            const maxSize = 5 * 1024 * 1024;
-            if (imageFile.size > maxSize) {
-                Swal.fire('Lỗi', 'Kích thước ảnh không được vượt quá 5MB', 'error');
-                return false;
+                const maxSize = 5 * 1024 * 1024;
+                if (imageFile.size > maxSize) {
+                    Swal.fire('Lỗi', 'Kích thước ảnh không được vượt quá 5MB', 'error');
+                    return false;
+                }
             }
 
             Swal.fire({
