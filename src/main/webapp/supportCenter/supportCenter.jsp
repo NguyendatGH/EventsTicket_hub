@@ -263,6 +263,35 @@
             box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.3);
         }
 
+        /* Back Button */
+        .back-button-container {
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--card-bg);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .back-button i {
+            font-size: 0.9rem;
+        }
+
         /* Main Content */
         .container {
             max-width: 1200px;
@@ -790,6 +819,13 @@
     </header>
 
     <div class="container">
+        <!-- Back Button -->
+        <div class="back-button-container">
+            <a href="${pageContext.request.contextPath}/home" class="back-button">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
         <div class="header">
             <h1><i class="fas fa-headset"></i> Trung tâm hỗ trợ</h1>
             <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7</p>

@@ -146,6 +146,35 @@
       .alert { padding: 1rem; border-radius: 6px; margin-bottom: 1rem; }
       .alert-success { background: rgba(0,204,102,0.1); border: 1px solid #00cc66; color: #00cc66; }
       .alert-error { background: rgba(255,51,51,0.1); border: 1px solid #ff3333; color: #ff3333; }
+
+      /* Back Button */
+      .back-button-container {
+        margin-bottom: 2rem;
+      }
+
+      .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #232b36;
+        color: #e6edf3;
+        text-decoration: none;
+        border-radius: 8px;
+        border: 1px solid #30363d;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .back-button:hover {
+        background: #667aff;
+        color: white;
+        transform: translateX(-5px);
+      }
+
+      .back-button i {
+        font-size: 0.9rem;
+      }
       @media (max-width: 700px) { .main-content { padding: 0 10px; } .card, .admin-response-form { padding: 1rem 0.5rem; } .header h1 { font-size: 1.1rem; } .row .label { width: 100px; } }
     </style>
 </head>
@@ -179,6 +208,13 @@
       </a>
     </aside>
     <main class="main-content">
+      <!-- Back Button -->
+      <div class="back-button-container">
+        <a href="${pageContext.request.contextPath}/admin-servlet/support-center" class="back-button">
+          <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        </a>
+      </div>
+
       <div class="header">
         <h1 class="page-title"><i class="fas fa-headset"></i> Chi tiết yêu cầu hỗ trợ</h1>
       </div>

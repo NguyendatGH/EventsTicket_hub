@@ -778,25 +778,7 @@
                 transform: scale(1.1);
             }
 
-            /* Flash Messages */
-            .flash-message {
-                padding: 15px;
-                margin: 0 auto 20px auto;
-                border-radius: 8px;
-                max-width: 1200px;
-                font-weight: 500;
-                text-align: center;
-            }
 
-            .flash-success {
-                background-color: #28a745;
-                color: white;
-            }
-
-            .flash-error, .flash-fail {
-                background-color: #dc3545;
-                color: white;
-            }
 
             /* Pagination Controls */
             .pagination-controls {
@@ -1395,44 +1377,7 @@
 
         </script>
 
-        <%-- Flash messages --%>
-        <% String flashMessageSuccess = (String)session.getAttribute("flashMessage_success"); %>
-        <% if (flashMessageSuccess != null && !flashMessageSuccess.isEmpty()) { %>
-        <div class="flash-message flash-success" id="successPopup">
-            <%= flashMessageSuccess %>
-        </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const popup = document.getElementById("successPopup");
-                if (popup) {
-                    popup.style.display = "flex";
-                    setTimeout(() => {
-                        popup.style.display = "none";
-                    }, 5000);
-                }
-            });
-        </script>
-        <% session.removeAttribute("flashMessage_success"); %>
-        <% } %>
 
-        <% String flashMessageError = (String)session.getAttribute("flashMessage_error"); %>
-        <% if (flashMessageError != null && !flashMessageError.isEmpty()) { %>
-        <div class="flash-message flash-error" id="errorPopup">
-            <%= flashMessageError %>
-        </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const popup = document.getElementById("errorPopup");
-                if (popup) {
-                    popup.style.display = "flex";
-                    setTimeout(() => {
-                        popup.style.display = "none";
-                    }, 5000);
-                }
-            });
-        </script>
-        <% session.removeAttribute("flashMessage_error"); %>
-        <% } %>
 
     </body>
 </html>

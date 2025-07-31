@@ -148,6 +148,35 @@
             background: #c82333;
         }
 
+        /* Back Button */
+        .back-button-container {
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #21262d;
+            color: #e6edf3;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: #667aff;
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .back-button i {
+            font-size: 0.9rem;
+        }
+
         .attachment-list {
             margin-top: 1rem;
         }
@@ -234,6 +263,13 @@
         </nav>
         <!-- Support Center Content -->
         <div class="container">
+            <!-- Back Button -->
+            <div class="back-button-container">
+                <a href="${pageContext.request.contextPath}/eventOwner/dashBoard" class="back-button">
+                    <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+                </a>
+            </div>
+
             <div class="header">
                 <h1><i class="fas fa-headset"></i> Hỗ trợ dành cho chủ sự kiện</h1>
                 <p>Gửi yêu cầu hỗ trợ tới admin nếu bạn gặp khó khăn khi quản lý sự kiện.</p>
