@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MasterTicket - Thanh toán</title>
+        <title>EventTicketHub - Thanh toán</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
@@ -922,19 +922,6 @@
                                 </span>
                             </div>
                         </c:forEach>
-                        <!--
-                                                <div class="mt-ticket-info-row" id="discount-row" style="display: none;">
-                                                    <span>
-                                                        <i class="fas fa-percentage"></i>
-                                                        Giảm giá:
-                                                    </span>
-                                                    <span>
-                                                        <span id="discount-amount">-</span>
-                                                        <span id="discount-extra"></span>
-                                                    </span>
-                                                </div>-->
-
-
                         <div class="mt-ticket-info-row mt-ticket-info-total" data-original-amount="${sessionScope.currentOrder.totalAmount}">
                             <span>
                                 <i class="fas fa-calculator"></i>
@@ -954,7 +941,7 @@
                         <div class="mt-methods-list">
                             <label class="mt-method-item">
                                 <input type="radio" name="paymethod" value="PAYOS" checked required>
-                                <img src="../asset/logo/PayOSLogo.png" alt="PayOS logo" />
+                                <img src="${pageContext.request.contextPath}/asset/logo/PayOSLogo.png" alt="PayOS logo" />
                                 <span>Thanh toán qua PayOS</span>
                             </label>
                         </div>
@@ -1002,50 +989,57 @@
             let promoAlreadyApplied = false;
             let previouslyAppliedCode = '';
 
-            document.getElementById('applyPromoBtn').addEventListener('click', () => {
-                const codeInput = document.getElementById('promoCodeInput');
-                const rawCode = codeInput.value.trim().toUpperCase();
+           document.getElementById('applyPromoBtn').addEventListener('click', () => {
+    const codeInput = document.getElementById('promoCodeInput');
+    if (!codeInput) {
+        console.error('Promo code input element not found!');
+        return;
+    }
 
-                console.log('Applying promo code:', rawCode);
-                clearPromotionMessage();
+    const rawCode = codeInput.value.trim().toUpperCase();
+    console.log('Raw code:', rawCode);
 
-                if (!rawCode) {
-                    showPromotionMessage('Vui lòng nhập mã khuyến mãi.', 'danger', 'fas fa-exclamation-circle');
-                    return;
-                }
+    if (!rawCode) {
+        showPromotionMessage('Vui lòng nhập mã khuyến mãi.', 'danger', 'fas fa-exclamation-circle');
+        return;
+    }
 
-                if (promoAlreadyApplied && rawCode === previouslyAppliedCode) {
-                    showPromotionMessage(`Mã <strong>${rawCode}</strong> đã được áp dụng trước đó.`, 'warning', 'fas fa-exclamation-triangle');
-                    return;
-                }
+    if (promoAlreadyApplied && rawCode === previouslyAppliedCode) {
+        showPromotionMessage(`Mã <strong>${rawCode}</strong> đã được áp dụng trước đó.`, 'warning', 'fas fa-exclamation-triangle');
+        return;
+    }
 
-                const applyBtn = document.getElementById('applyPromoBtn');
-                setButtonLoading(applyBtn, true);
+    const applyBtn = document.getElementById('applyPromoBtn');
+    setButtonLoading(applyBtn, true);
 
-                const encodedCode = encodeURIComponent(rawCode);
+    const encodedCode = encodeURIComponent(rawCode);
+    console.log('Encoded code:', encodedCode);
+    console.log('Fetch URL:', '${pageContext.request.contextPath}/ApplyPromotionServlet?promoCode=' + encodedCode);
 
-                fetch('/OnlineSellingTicketEvents/ApplyPromotionServlet?promoCode=' + encodedCode)
-                        .then(response => {
-                            if (!response.ok)
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.valid === true) {
-                                handlePromotionSuccess(data, rawCode);
-                                codeInput.value = '';
-                            } else {
-                                handlePromotionError(data);
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error applying promotion:", error);
-                            showPromotionMessage('Lỗi hệ thống khi áp dụng mã. Vui lòng thử lại.', 'danger', 'fas fa-exclamation-triangle');
-                        })
-                        .finally(() => {
-                            setButtonLoading(applyBtn, false);
-                        });
-            });
+    fetch('${pageContext.request.contextPath}/ApplyPromotionServlet?promoCode=' + encodedCode)
+        .then(response => {
+            console.log('Fetch response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.valid === true) {
+                handlePromotionSuccess(data, rawCode);
+                codeInput.value = '';
+            } else {
+                handlePromotionError(data);
+            }
+        })
+        .catch(error => {
+            console.error("Error applying promotion:", error);
+            showPromotionMessage('Lỗi hệ thống khi áp dụng mã. Vui lòng thử lại. Kiểm tra URL: ${pageContext.request.contextPath}/ApplyPromotionServlet', 'danger', 'fas fa-exclamation-triangle');
+        })
+        .finally(() => {
+            setButtonLoading(applyBtn, false);
+        });
+});
 
             function handlePromotionSuccess(data, promoCode) {
                 promoAlreadyApplied = true;

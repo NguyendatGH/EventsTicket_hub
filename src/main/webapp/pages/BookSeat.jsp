@@ -6,6 +6,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>EventTicketHub - Chọn ghế cho: ${event.name}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
             body {
                 margin: 0;
@@ -47,17 +49,33 @@
             .header-right .account:hover {
                 background: #3a3e5c;
             }
-            .back-link {
-                color: #1ed090;
+            .back-button-container {
+                position: relative;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 2rem;
+            }
+            .back-button {
+                position: absolute;
+                left: -16rem;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--border-color);
+                color: var(--text-light);
                 text-decoration: none;
-                font-size: 1rem;
-                margin-bottom: 20px;
-                display: inline-block;
-                transition: color 0.3s;
+                padding: 0.75rem 1.5rem;
+                border-radius: 50px;
+                font-size: 0.95rem;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                transition: all 0.3s ease;
+                z-index: 10;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                animation: backButtonSlideIn 0.6s ease 0.5s both;
             }
-            .back-link:hover {
-                color: #26f0a0;
-            }
+            
             .main-content {
                 display: flex;
                 justify-content: center;
@@ -214,11 +232,13 @@
                 <div class="account">${sessionScope.user.email}</div>
             </div>
         </div>
-        <a href="${pageContext.request.contextPath}/HomePageServlet" class="back-link">
-                <i class="fas fa-arrow-left"></i> 
-                Quay lại
-            </a>
         <div class="main-content">
+        <div class="back-button-container">
+            <a href="javascript:history.back()" class="back-button" title="Quay lại trang trước">
+                <i class="fas fa-arrow-left"></i>
+                <span>Quay lại</span>
+            </a>
+        </div>
             <div class="left-panel">
                 <div class="seating-area">
                     <div class="stage">SÂN KHẤU</div>
@@ -269,6 +289,7 @@
             const canvas = document.getElementById('event-map');
             const ctx = canvas.getContext('2d');
             let selectedSeats = [];
+            let selectedZoneId = null; // Lưu ID của zone được chọn
             const availableSeatsInfo = document.getElementById('available-seats-info');
             const selectedSeatsInfo = document.getElementById('selected-seats-info');
             const continueBtn = document.getElementById('continueBtn');
@@ -305,6 +326,25 @@
                 return { minX, maxX, minY, maxY };
             }
 
+            function isPointInPolygon(x, y, vertices, scale, zoneX, zoneY) {
+                let inside = false;
+                for (let i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+                    const xi = (vertices[i].x || 0) * scale + zoneX;
+                    const yi = (vertices[i].y || 0) * scale + zoneY;
+                    const xj = (vertices[j].x || 0) * scale + zoneX;
+                    const yj = (vertices[j].y || 0) * scale + zoneY;
+                    const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            function isPointInCircle(x, y, centerX, centerY, radiusX, radiusY, scale) {
+                const dx = x - centerX;
+                const dy = y - centerY;
+                return (dx * dx) / (radiusX * scale * radiusX * scale) + (dy * dy) / (radiusY * scale * radiusY * scale) <= 1;
+            }
+
             function drawEventMap() {
                 try {
                     console.log('[DEBUG-JS] Drawing event map');
@@ -325,14 +365,34 @@
                             console.error('[ERROR-JS] Invalid zone data at index', index, ':', JSON.stringify(zone));
                             return;
                         }
-                        ctx.fillStyle = zone.color;
-                        ctx.strokeStyle = '#fff';
-                        ctx.lineWidth = 1;
                         ctx.save();
                         ctx.translate(offsetX + zone.x * scale, offsetY + zone.y * scale);
                         ctx.rotate((zone.rotation * Math.PI) / 180);
 
-                        if (zone.shape === 'rectangle' && Array.isArray(zone.vertices) && zone.vertices.length >= 3) {
+                        // Tạo gradient cho hiệu ứng nổi khi zone được chọn
+                        if (selectedZoneId === zone.id) {
+                            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, (zone.radiusX || 50) * scale);
+                            gradient.addColorStop(0, 'rgba(111, 215, 247, 0.81)'); // Màu vàng sáng ở trung tâm
+                            gradient.addColorStop(1, zone.color || '#000'); // Chuyển về màu gốc ở viền
+                            ctx.fillStyle = gradient;
+                        } else {
+                            ctx.fillStyle = zone.color;
+                        }
+                        ctx.strokeStyle = selectedZoneId === zone.id ? '#ff0' : '#000000'; // Viền đen khi chọn
+                        ctx.lineWidth = selectedZoneId === zone.id ? 3 : 1;
+
+                        if (zone.shape === 'polygon' && Array.isArray(zone.vertices) && zone.vertices.length >= 3) {
+                            console.log('[DEBUG-JS] Drawing polygon zone with vertices:', JSON.stringify(zone.vertices));
+                            ctx.beginPath();
+                            const firstVertex = zone.vertices[0];
+                            ctx.moveTo((firstVertex.x || 0) * scale, (firstVertex.y || 0) * scale);
+                            for (let i = 1; i < zone.vertices.length; i++) {
+                                ctx.lineTo((zone.vertices[i].x || 0) * scale, (zone.vertices[i].y || 0) * scale);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.stroke();
+                        } else if (zone.shape === 'rectangle' && Array.isArray(zone.vertices) && zone.vertices.length >= 3) {
                             console.log('[DEBUG-JS] Drawing rectangle zone with vertices:', JSON.stringify(zone.vertices));
                             ctx.beginPath();
                             ctx.moveTo((zone.vertices[0].x || 0) * scale, (zone.vertices[0].y || 0) * scale);
@@ -350,11 +410,6 @@
                             ctx.stroke();
                         }
                         ctx.restore();
-
-                        ctx.fillStyle = '#fff';
-                        ctx.font = '14px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(zone.name || 'Unnamed', offsetX + zone.x * scale, offsetY + zone.y * scale - 10);
                     });
                     console.log('[DEBUG-JS] Finished drawing event map');
                 } catch (error) {
@@ -385,7 +440,7 @@
             }
 
             function assignSeats() {
-                const zoneId = parseInt(zoneSelect.value);
+                const zoneId = parseInt(zoneSelect.value) || selectedZoneId; // Sử dụng zoneId từ dropdown hoặc click
                 const quantity = parseInt(seatQuantityInput.value) || 1;
 
                 if (!zoneId || quantity <= 0) {
@@ -397,7 +452,7 @@
                 }
 
                 const availableSeats = seats.filter(seat => seat.zoneId === zoneId && seat.status === 'available');
-                availableSeats.sort((a, b) => a.seatId - b.seatId); // Sắp xếp theo seatId tăng dần
+                availableSeats.sort((a, b) => a.seatId - b.seatId);
                 if (availableSeats.length >= quantity) {
                     selectedSeats = availableSeats.slice(0, quantity);
                     let summaryHtml = '<ul>';
@@ -418,6 +473,7 @@
                     continueBtn.classList.remove('active');
                     continueBtn.onclick = null;
                 }
+                drawEventMap(); // Cập nhật bản đồ để phản ánh zone được chọn
             }
 
             function proceedToPayment() {
@@ -434,6 +490,43 @@
                     console.error('[ERROR-JS] Error in proceedToPayment:', error);
                 }
             }
+
+            // Thêm event listener cho click trên canvas
+            canvas.addEventListener('click', (event) => {
+                const rect = canvas.getBoundingClientRect(); // Sửa typo: getBoundingRect -> getBoundingClientRect
+                const bounds = calculateBounds();
+                const scale = Math.min(canvas.width / (bounds.maxX - bounds.minX || 1), canvas.height / (bounds.maxY - bounds.minY || 1)) * 0.9;
+                const offsetX = (canvas.width - (bounds.maxX - bounds.minX) * scale) / 2 - bounds.minX * scale;
+                const offsetY = (canvas.height - (bounds.maxY - bounds.minY) * scale) / 2 - bounds.minY * scale;
+                const mouseX = (event.clientX - rect.left - offsetX) / scale;
+                const mouseY = (event.clientY - rect.top - offsetY) / scale;
+
+                let clickedZoneId = null;
+                zones.forEach(zone => {
+                    ctx.save();
+                    ctx.translate(zone.x, zone.y);
+                    ctx.rotate((zone.rotation * Math.PI) / 180);
+                    let isInside = false;
+                    if (zone.shape === 'polygon' && Array.isArray(zone.vertices) && zone.vertices.length >= 3) {
+                        isInside = isPointInPolygon(mouseX - zone.x, mouseY - zone.y, zone.vertices, scale, 0, 0);
+                    } else if (zone.shape === 'rectangle' && Array.isArray(zone.vertices) && zone.vertices.length >= 3) {
+                        isInside = isPointInPolygon(mouseX - zone.x, mouseY - zone.y, zone.vertices, scale, 0, 0);
+                    } else if (zone.shape === 'circle') {
+                        isInside = isPointInCircle(mouseX - zone.x, mouseY - zone.y, 0, 0, zone.radiusX || 50, zone.radiusY || 50, scale);
+                    }
+                    ctx.restore();
+                    if (isInside) {
+                        clickedZoneId = zone.id;
+                    }
+                });
+
+                if (clickedZoneId !== null) {
+                    selectedZoneId = clickedZoneId;
+                    zoneSelect.value = selectedZoneId; // Cập nhật dropdown thành zone được chọn
+                    assignSeats(); // Cập nhật ghế và giao diện
+                }
+                drawEventMap(); // Vẽ lại bản đồ với hiệu ứng nổi
+            });
 
             // Initialize canvas and draw map
             try {
