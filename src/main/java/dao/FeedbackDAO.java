@@ -189,4 +189,44 @@ public class FeedbackDAO {
         return list;
     }
 
+    public Feedback getFeedbackById(int feedbackId) {
+        String sql = "SELECT * FROM Feedback WHERE FeedbackID = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, feedbackId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Feedback(
+                        rs.getInt("FeedbackID"),
+                        rs.getInt("UserID"),
+                        rs.getInt("EventID"),
+                        rs.getInt("OrderID"),
+                        rs.getInt("Rating"),
+                        rs.getString("Content"),
+                        rs.getBoolean("IsApproved"),
+                        rs.getString("AdminResponse"),
+                        rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                        rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                        null 
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updateFeedbackContentAndRating(int feedbackID, String newContent, int newRating, LocalDateTime updatedAt) {
+        String sql = "UPDATE Feedback SET Content = ?, Rating = ?, UpdatedAt = ? WHERE FeedbackID = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newContent);
+            ps.setInt(2, newRating);
+            ps.setTimestamp(3, Timestamp.valueOf(updatedAt));
+            ps.setInt(4, feedbackID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -8,6 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
         <title>MasterTicket - Chi tiết sự kiện</title>
         <style>
             :root {
@@ -681,6 +683,80 @@
                 transform: scale(1.1);
             }
 
+            /*Modal update rate*/
+            .custom-modal-overlay {
+                display: none;
+                position: fixed;
+                z-index: 9999;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                justify-content: center;
+                align-items: center;
+            }
+
+            .custom-modal-box {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                width: 95%;
+                max-width: 500px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            }
+
+            .custom-modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+
+            .custom-modal-header h3 {
+                margin: 0;
+                font-size: 1.2rem;
+            }
+
+            .close-modal {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #888;
+            }
+
+            .custom-modal-group {
+                margin-bottom: 1rem;
+            }
+
+            .custom-label {
+                font-weight: 600;
+                display: block;
+                margin-bottom: 0.5rem;
+            }
+
+            .custom-stars label {
+                display: inline-block;
+                margin-right: 10px;
+                cursor: pointer;
+            }
+
+            .custom-stars input[type="radio"] {
+                display: none;
+            }
+
+            .custom-stars .star {
+                font-size: 1.2rem;
+                color: gold;
+            }
+
+            .custom-modal-footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+
             /* Responsive Design */
             @media (max-width: 1024px) {
                 .event-hero {
@@ -943,6 +1019,12 @@
                             <i class="fas fa-comments"></i> Phản hồi từ người tham dự
                         </h2>
 
+                        <c:if test="${param.updated == 'true'}">
+                            <div style="background: #d4edda; color: #155724; padding: 10px; margin-bottom: 1rem; border-radius: 4px;">
+                                 Phản hồi của bạn đã được cập nhật thành công!
+                            </div>
+                        </c:if>
+
                         <!-- THÔNG BÁO MỨC SAO ĐANG XEM -->
                         <p style="margin-bottom: 1rem;">
                             Đang xem phản hồi với mức 
@@ -972,6 +1054,48 @@
                                                 <span class="feedback-date" style="color: var(--text-muted); font-size: 0.95em;">
                                                     (${fb.formattedDate})
                                                 </span>
+
+                                                <!-- NÚT CHỈNH SỬA -->
+                                                <c:if test="${not empty currentUser and currentUser.id == fb.userID}">
+                                                    <a href="${pageContext.request.contextPath}/pages/updateFeedback.jsp?feedbackId=${fb.feedbackID}" class="btn-edit-feedback">
+                                                        ✏️ Chỉnh sửa
+                                                    </a>
+
+
+                                                    <!-- MODAL -->
+                                                    <div id="edit-modal-${fb.feedbackID}" class="custom-modal-overlay">
+                                                        <div class="custom-modal-box">
+                                                            <div class="custom-modal-header">
+                                                                <h3>Chỉnh sửa phản hồi</h3>
+                                                                <button class="close-modal" onclick="closeModal('edit-modal-${fb.feedbackID}')">&times;</button>
+                                                            </div>
+                                                            <form method="post" action="${pageContext.request.contextPath}/UpdateFeedbackServlet">
+                                                                <input type="hidden" name="feedbackID" value="${fb.feedbackID}" />
+                                                                <div class="custom-modal-group">
+                                                                    <label class="custom-label">Mức đánh giá:</label>
+                                                                    <div class="custom-stars">
+                                                                        <c:forEach begin="1" end="5" var="i">
+                                                                            <label>
+                                                                                <input type="radio" name="rating" value="${i}" ${i == fb.rating ? "checked" : ""} />
+                                                                                <span class="star">&#9733;</span> ${i}
+                                                                            </label>
+                                                                        </c:forEach>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="custom-modal-group">
+                                                                    <label class="custom-label">Nội dung phản hồi:</label>
+                                                                    <textarea name="content" rows="4">${fb.content}</textarea>
+                                                                </div>
+
+                                                                <div class="custom-modal-footer">
+                                                                    <button type="button" onclick="closeModal('edit-modal-${fb.feedbackID}')">Hủy</button>
+                                                                    <button type="submit">Lưu</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </c:if>
                                             </div>
                                         </div>
                                     </c:forEach>
@@ -981,6 +1105,7 @@
                                 </c:otherwise>
                             </c:choose>
                         </div>
+
 
                         <!-- PHÂN TRANG THEO SỐ SAO -->
                         <div style="margin-top: 2rem; text-align: center;">
@@ -1087,11 +1212,33 @@
             }
 
 
+
+            function openModal(id) {
+                const modal = document.getElementById(id);
+                if (modal)
+                    modal.style.display = 'flex';
+            }
+
+            function closeModal(id) {
+                const modal = document.getElementById(id);
+                if (modal)
+                    modal.style.display = 'none';
+            }
+
+            window.onclick = function (event) {
+                document.querySelectorAll(".custom-modal-overlay").forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = "none";
+                    }
+                });
+            }
+
+
             document.addEventListener('DOMContentLoaded', function () {
                 const stars = document.querySelectorAll('.rating .fa-star');
                 stars.forEach((star, index) => {
                     star.addEventListener('click', function () {
-                         e.preventDefault();
+                        e.preventDefault();
                         stars.forEach((s, i) => {
                             if (i <= index) {
                                 s.classList.remove('far');

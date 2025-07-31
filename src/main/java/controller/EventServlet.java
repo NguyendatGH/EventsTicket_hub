@@ -3,6 +3,7 @@ package controller;
 import dao.EventDAO;
 import dao.FeedbackDAO;
 import dao.TicketInfoDAO;
+import dto.UserDTO;
 import models.Event;
 import models.Feedback;
 import models.TicketInfo;
@@ -35,6 +36,8 @@ public class EventServlet extends HttpServlet {
 
         String idParam = request.getParameter("id");
         String pageParam = request.getParameter("page");
+        UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+        request.setAttribute("currentUser", currentUser);
 
         if (idParam == null || idParam.isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Thiếu ID sự kiện.");
@@ -66,7 +69,6 @@ public class EventServlet extends HttpServlet {
             if (starFilter < 1 || starFilter > 5) {
                 starFilter = 5;
             }
-
 
             List<TicketInfo> ticketList = ticketInfoDAO.getTicketInfosByEventID(eventId);
             List<Event> suggestedEvents = eventDAO.getSuggestedEvents(eventId);
