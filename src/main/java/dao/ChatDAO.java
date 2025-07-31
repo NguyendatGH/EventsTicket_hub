@@ -106,7 +106,7 @@ public class ChatDAO {
 
     // Create a new conversation
     public Conversation createConversation(int customerId, int eventOwnerId, int eventId, int createdBy) {
-         String sql = "INSERT INTO Conversations (CustomerID, EventOwnerID, EventID, CreatedBy, Subject, Status, CreatedAt, UpdatedAt) "
+        String sql = "INSERT INTO Conversations (CustomerID, EventOwnerID, EventID, CreatedBy, Subject, Status, CreatedAt, UpdatedAt) "
                 +
                 "VALUES (?, ?, ?, ?, ?, 'active', DATEADD(HOUR, 7, GETUTCDATE()), DATEADD(HOUR, 7, GETUTCDATE())); " +
                 "SELECT SCOPE_IDENTITY() AS ConversationID;";
@@ -229,7 +229,7 @@ public class ChatDAO {
                     List<FileAttachment> attachments = getAttachmentsByMessageId(message.getMessageID());
                     message.setAttachments(attachments);
                     messages.add(message);
-                    
+
                 }
             }
         } catch (SQLException e) {
@@ -272,7 +272,6 @@ public class ChatDAO {
         return null;
     }
 
-    // Fetch attachments by message ID
     public List<FileAttachment> getAttachmentsByMessageId(int messageId) {
         List<FileAttachment> attachments = new ArrayList<>();
         String sql = "SELECT AttachmentID, MessageID, OriginalFilename, StoredFilename, FilePath, FileSize, MimeType, UploadedAt "
@@ -305,7 +304,7 @@ public class ChatDAO {
     }
 
     private void updateLastMessageAt(int conversationId) {
-       String sql = "UPDATE Conversations SET LastMessageAt = DATEADD(HOUR, 7, GETUTCDATE()), UpdatedAt = DATEADD(HOUR, 7, GETUTCDATE()) WHERE ConversationID = ?";
+        String sql = "UPDATE Conversations SET LastMessageAt = DATEADD(HOUR, 7, GETUTCDATE()), UpdatedAt = DATEADD(HOUR, 7, GETUTCDATE()) WHERE ConversationID = ?";
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -383,4 +382,27 @@ public class ChatDAO {
         }
         return -1;
     }
+    public boolean softDeleteConversation(int conversationId, int userId, boolean isCustomer) {
+    String sql = isCustomer
+            ? "UPDATE Conversations SET IsDeletedByCustomer = 1, DeletedAt = DATEADD(HOUR, 7, GETUTCDATE()), UpdatedAt = DATEADD(HOUR, 7, GETUTCDATE()) WHERE ConversationID = ? AND CustomerID = ?"
+            : "UPDATE Conversations SET IsDeletedByOwner = 1, DeletedAt = DATEADD(HOUR, 7, GETUTCDATE()), UpdatedAt = DATEADD(HOUR, 7, GETUTCDATE()) WHERE ConversationID = ? AND EventOwnerID = ?";
+
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, conversationId);
+        stmt.setInt(2, userId);
+        int rowsAffected = stmt.executeUpdate();
+        if (rowsAffected > 0) {
+            LOGGER.info("Soft deleted conversation ID: " + conversationId + " for user ID: " + userId + " (isCustomer: " + isCustomer + ")");
+            return true;
+        } else {
+            LOGGER.warning("No conversation found or user not authorized to delete conversation ID: " + conversationId);
+            return false;
+        }
+    } catch (SQLException e) {
+        LOGGER.severe("Error soft deleting conversation ID: " + conversationId + ": " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
+}
 }

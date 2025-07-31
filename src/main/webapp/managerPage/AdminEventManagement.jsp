@@ -547,12 +547,14 @@
     </button>
     <div class="overlay"></div>
     <div class="container">
-        <aside class="sidebar">
+         <aside class="sidebar">
         <div class="logo">EventTicketHub</div>
         <div class="admin-section">
           <div class="admin-avatar">
             <svg fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              />
             </svg>
           </div>
           <div class="admin-name">Admin</div>
@@ -561,19 +563,46 @@
         <nav>
           <ul class="nav-menu">
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet/dashboard" class="nav-link">Bảng điều khiển</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/dashboard"
+                class="nav-link active"
+                >Bảng điều khiển</a
+              >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet/event-management" class="nav-link active">Danh sách sự kiện</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/event-management"
+                class="nav-link"
+                >Danh sách sự kiện</a
+              >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet/user-management" class="nav-link ">Danh sách tài khoản</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/user-management"
+                class="nav-link"
+                >Danh sách tài khoản</a
+              >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet/transaction-management" class="nav-link">Danh sách giao dịch</a>
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/transaction-management"
+                class="nav-link"
+                >Danh sách giao dịch</a
+              >
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet/support-center" class="nav-link">Hỗ trợ khách hàng</a>
+              <a
+                href="${pageContext.request.contextPath}/admin/refund"
+                class="nav-link"
+                >Quản lý hoàn tiền</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                href="${pageContext.request.contextPath}/admin-servlet/support-center"
+                class="nav-link"
+                >Hỗ trợ khách hàng</a
+              >
             </li>
           </ul>
         </nav>
@@ -681,6 +710,22 @@
                             </tr>
                         </thead>
                         <tbody>
+                        <c:forEach var="event" items="${pendingEvent}" varStatus="status">
+                                    <tr>
+                                        <td>${status.count}</td>
+                                        <td><c:out value="${event.name}" /></td>
+                                        <td><fmt:formatDate value="${event.startTime}" pattern="dd/MM/yyyy" /> - <fmt:formatDate value="${event.endTime}" pattern="dd/MM/yyyy" /></td>
+                                        <td><span class="status-tag warning">Đang chờ duyệt</span></td>
+                                        <td class="actions">
+                                            <button class="action-btn edit-btn" onclick="handleEditEvent(${event.eventID})">
+                                                <img src="${pageContext.request.contextPath}/asset/image/Edit_fill.svg" alt="Edit" />
+                                            </button>
+                                            <button class="action-btn delete-btn" onclick="handleDeleteEvent(${event.eventID})">
+                                                <img src="${pageContext.request.contextPath}/asset/image/Trash.svg" alt="Delete" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
                             <c:if test="${not empty activeEvents}">
                                 <c:forEach var="event" items="${activeEvents}" varStatus="status">
                                     <tr>
@@ -719,6 +764,7 @@
                                     </tr>
                                 </c:forEach>
                             </c:if>
+                            
                             <c:if test="${empty activeEvents && empty nonActiveEvents}">
                                 <tr>
                                     <td colspan="5">Không có sự kiện nào.</td>

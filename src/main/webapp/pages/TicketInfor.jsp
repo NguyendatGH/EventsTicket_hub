@@ -613,8 +613,7 @@
         <div class="header-container">
             <header class="header">
                 <div class="logo">
-                    <i class="fas fa-ticket-alt"></i>
-                    MasterTicket
+                    <a href="/OnlineSellingTicketEvents/home" class="logo">MasterTicket</a>                   
                 </div>
                 <div class="actions">
                     <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">

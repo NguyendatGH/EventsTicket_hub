@@ -63,4 +63,8 @@ public class ChatService {
         }
         return userService.findDTOUserID(customerId);
     }
+
+    public boolean softDeleteConversation(int conversationId, int userId, boolean isCustomer) {
+        return chatDAO.softDeleteConversation(conversationId, userId, isCustomer);
+    }
 }

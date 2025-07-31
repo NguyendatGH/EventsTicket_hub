@@ -31,43 +31,6 @@
                 position: relative;
                 overflow-x: hidden;
             }
-
-            /* Background circles - static */
-            body::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: -1;
-                background: 
-                    radial-gradient(circle at 20% 20%, rgba(102, 122, 255, 0.08) 0%, transparent 60%),
-                    radial-gradient(circle at 80% 40%, rgba(224, 107, 206, 0.06) 0%, transparent 60%),
-                    radial-gradient(circle at 40% 80%, rgba(102, 122, 255, 0.05) 0%, transparent 60%),
-                    radial-gradient(circle at 90% 10%, rgba(224, 107, 206, 0.04) 0%, transparent 60%),
-                    radial-gradient(circle at 10% 90%, rgba(102, 122, 255, 0.06) 0%, transparent 60%),
-                    radial-gradient(circle at 70% 70%, rgba(224, 107, 206, 0.05) 0%, transparent 60%);
-                pointer-events: none;
-            }
-
-            /* Additional static background elements */
-            body::after {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: -2;
-                background: 
-                    radial-gradient(circle at 30% 60%, rgba(102, 122, 255, 0.04) 0%, transparent 40%),
-                    radial-gradient(circle at 85% 25%, rgba(224, 107, 206, 0.03) 0%, transparent 40%),
-                    radial-gradient(circle at 15% 75%, rgba(102, 122, 255, 0.03) 0%, transparent 40%);
-                pointer-events: none;
-            }
-
-            /* Color Scheme */
             :root {
                 --primary: #667aff;      /* Primary color */
                 --secondary: #e06bce;    /* Secondary color */
@@ -482,8 +445,6 @@
                 transform: scale(1.2);
             }
 
-
-
             /* Section Headers */
             .section-header {
                 display: flex;
@@ -511,6 +472,7 @@
 
             /* Event Grid */
             .event-grid {
+
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(250px, 280px));
                 gap: 1.5rem;
@@ -613,27 +575,6 @@
                 position: relative;
                 overflow: hidden;
             }
-
-            .ticket-section::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-                animation: rotate 20s linear infinite;
-            }
-
-            @keyframes rotate {
-                0% {
-                    transform: rotate(0deg);
-                }
-                100% {
-                    transform: rotate(360deg);
-                }
-            }
-
             .ticket-content {
                 position: relative;
                 z-index: 1;
@@ -648,7 +589,7 @@
             .ticket-subtitle {
                 font-size: clamp(1rem, 3vw, 1.2rem);
                 margin-bottom: 2rem;
-                color: var(--text-muted);
+                color: white;
             }
 
             /* No Events Message */
@@ -1088,8 +1029,7 @@
                                 </div>
                                 <div class="user-dropdown" id="userDropdown">
                                     <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
-                                    <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
-                                    <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
+                                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="dropdown-item">🎫 Vé đã mua</a>
                                     <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
                                     <a href="${pageContext.request.contextPath}/logout" class="dropdown-item" style="color: var(--danger);">🚪 Đăng xuất</a>
                                 </div>
@@ -1121,7 +1061,7 @@
                         <a href="#events" class="btn btn-primary">Xem chi tiết</a>
                     </div>
                 </div>
-                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
+                <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80');">
                     <div class="carousel-content">
                         <h2>Sự kiện văn hóa và nghệ thuật</h2>
                         <p>Đắm chìm vào thế giới nghệ thuật với các triển lãm và biểu diễn độc đáo.</p>
@@ -1134,8 +1074,6 @@
                     <div class="indicator"></div>
                 </div>
             </div>
-
-
 
             <% if (events == null || events.isEmpty()) { %>
             <div class="no-events">
@@ -1175,8 +1113,7 @@
                         <div class="event-location"><%= event.getPhysicalLocation() != null ? event.getPhysicalLocation() : "Địa điểm không xác định"%></div>
                         <div class="event-description">
                             <%= event.getDescription() != null ? event.getDescription() : ""%>
-                        </div>
-                        <div class="event-price">Từ 150,000 VNĐ</div>
+                        </div>  
                     </div>
                 </div>
                 <% } %>

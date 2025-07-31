@@ -67,13 +67,24 @@ public class TicketOrderHistoryServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         UserDTO currentUser = (session != null) ? (UserDTO) session.getAttribute("user") : null;
 
+        // Debug logging
+        System.out.println("=== TicketOrderHistoryServlet Debug ===");
+        System.out.println("Session exists: " + (session != null));
+        System.out.println("Current user: " + (currentUser != null ? currentUser.getEmail() : "null"));
+        
         if (currentUser == null) {
+            System.out.println("User not authenticated, redirecting to login");
             response.sendRedirect("login.jsp");
             return;
         }
 
+        System.out.println("User authenticated, fetching order history for user ID: " + currentUser.getId());
+        
         OrderDAO orderDAO = new OrderDAO();
         List<Map<String, Object>> simpleOrders = orderDAO.getSimpleOrdersByUserId(currentUser.getId());
+        
+        System.out.println("Found " + (simpleOrders != null ? simpleOrders.size() : 0) + " orders");
+        
         request.setAttribute("orderHistory", simpleOrders);
 
         request.getRequestDispatcher("/pages/TicketOrderHistory.jsp").forward(request, response);

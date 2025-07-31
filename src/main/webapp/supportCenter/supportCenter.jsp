@@ -772,7 +772,7 @@
                             </div>
                             <div class="user-dropdown" id="userDropdown">
                                 <a href="${pageContext.request.contextPath}/updateProfile" class="dropdown-item">👤 Thông tin cá nhân</a>
-                                <a href="${pageContext.request.contextPath}/myTickets" class="dropdown-item">🎫 Vé đã mua</a>
+                                <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="dropdown-item">🎫 Vé đã mua</a>
                                 <a href="${pageContext.request.contextPath}/favoriteEvents" class="dropdown-item">❤️ Sự kiện yêu thích</a>
                                 <a href="${pageContext.request.contextPath}/settings" class="dropdown-item">⚙️ Cài đặt</a>
                                 <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">

@@ -18,11 +18,12 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
-import java.util.Date;
+import java.util.HashMap;
 
 @WebServlet({ "/chat/*", "/init-chat" })
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
@@ -32,7 +33,7 @@ import java.util.Date;
 public class ChatServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(ChatServlet.class.getName());
     private ObjectMapper objectMapper = new ObjectMapper();
-    private static final String UPLOAD_DIR = "Uploads";
+    private static final String UPLOAD_DIR = "uploads/message_assets";
     private static final UserService userService = new UserService();
     private static final ChatService chatService = new ChatService();
     private static final EventService eventService = new EventService();
@@ -189,7 +190,6 @@ public class ChatServlet extends HttpServlet {
                     }
 
                     conversationId = conversation.getConversationID();
-                    // LOGGER.info("Created new conversation with ID: " + conversationId); debug
                 }
 
                 List<Message> messages = new ArrayList<>();
@@ -216,7 +216,6 @@ public class ChatServlet extends HttpServlet {
                 request.setAttribute("eventOwner", owner);
                 request.setAttribute("currentUserId", user.getId());
 
-                // Forward to chat page instead of redirecting
                 LOGGER.info("Forwarding to chat page with conversationId: " + conversationId
                         + ", userId: " + user.getId());
                 request.getRequestDispatcher("/pages/CustomerChat.jsp").forward(request, response);
@@ -238,7 +237,6 @@ public class ChatServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // LOGGER.info("Received POST request to /chat"); debug
         response.setContentType("application/json");
         HttpSession session = request.getSession(false);
         UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
@@ -267,7 +265,7 @@ public class ChatServlet extends HttpServlet {
             return;
         }
 
-        // Create message
+        // Create message object
         Message message = new Message();
         message.setSenderID(user.getId());
         message.setConversationID(conversationId);
@@ -276,6 +274,50 @@ public class ChatServlet extends HttpServlet {
         message.setCreatedAt(new Date());
         message.setUpdatedAt(new Date());
 
+        // Process file uploads
+        List<FileAttachment> attachments = new ArrayList<>();
+        String applicationPath = request.getServletContext().getRealPath("");
+        String uploadPath = applicationPath + File.separator + UPLOAD_DIR;
+        File uploadDir = new File(uploadPath);
+
+        // Create upload directory if it doesn't exist
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        // Process each file part
+        for (Part part : request.getParts()) {
+            if (part.getName().equals("attachment") && part.getSize() > 0) {
+                String originalFilename = part.getSubmittedFileName();
+                String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String storedFilename = UUID.randomUUID().toString() + fileExtension;
+                String filePath = "/" + UPLOAD_DIR.replace(File.separator, "/") + "/" + storedFilename;
+
+                // Validate file size
+                if (part.getSize() > 10 * 1024 * 1024) { // 10MB limit
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter()
+                            .write("{\"status\": \"error\", \"message\": \"File size exceeds 10MB limit\"}");
+                    return;
+                }
+
+                // Save file to server
+                part.write(uploadPath + File.separator + storedFilename);
+
+                // Create attachment object
+                FileAttachment attachment = new FileAttachment();
+                attachment.setOriginalFilename(originalFilename);
+                attachment.setStoredFilename(storedFilename);
+                attachment.setFilePath(filePath);
+                attachment.setFileSize(part.getSize());
+                attachment.setMimeType(part.getContentType());
+                attachment.setUploadedAt(new Date());
+
+                attachments.add(attachment);
+            }
+        }
+
+        // Save message to database
         int messageId = chatService.saveMessage(message, conversationId);
         if (messageId == -1) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -284,50 +326,109 @@ public class ChatServlet extends HttpServlet {
         }
         message.setMessageID(messageId);
 
-        List<FileAttachment> attachments = new ArrayList<>();
-        String applicationPath = request.getServletContext().getRealPath("");
-        String uploadPath = applicationPath + File.separator + UPLOAD_DIR;
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
-        }
-
-        for (Part part : request.getParts()) {
-            if (part.getName().equals("attachment") && part.getSize() > 0) {
-                String originalFilename = part.getSubmittedFileName();
-                String storedFilename = UUID.randomUUID().toString() + "_" + originalFilename;
-                String filePath = "/" + UPLOAD_DIR + "/" + storedFilename;
-
-                part.write(uploadPath + File.separator + storedFilename);
-
-                FileAttachment attachment = new FileAttachment();
-                attachment.setMessageID(messageId);
-                attachment.setOriginalFilename(originalFilename);
-                attachment.setStoredFilename(storedFilename);
-                attachment.setFilePath(filePath);
-                attachment.setFileSize(part.getSize());
-                attachment.setMimeType(part.getContentType());
-                attachment.setUploadedAt(new Date());
-
-                FileAttachment savedAttachment = chatService.saveFileAttachment(attachment);
-                if (savedAttachment != null) {
-                    attachments.add(savedAttachment);
-                }
+        // Save attachments to database
+        List<FileAttachment> savedAttachments = new ArrayList<>();
+        for (FileAttachment attachment : attachments) {
+            attachment.setMessageID(messageId);
+            FileAttachment savedAttachment = chatService.saveFileAttachment(attachment);
+            if (savedAttachment != null) {
+                savedAttachments.add(savedAttachment);
             }
         }
-
-        message.setAttachments(attachments);
+        message.setAttachments(savedAttachments);
 
         try {
+            // Broadcast message to WebSocket
             ChatWebSocket.broadcastMessage(message, conversationId);
-            response.getWriter().write("{\"status\": \"success\", \"message\": \"Message sent\"}");
+
+            // Prepare response
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("status", "success");
+            responseData.put("message", "Message sent successfully");
+            responseData.put("messageId", messageId);
+
+            if (!savedAttachments.isEmpty()) {
+                List<Map<String, Object>> attachmentsData = new ArrayList<>();
+                for (FileAttachment attachment : savedAttachments) {
+                    Map<String, Object> attachmentData = new HashMap<>();
+                    attachmentData.put("originalFilename", attachment.getOriginalFilename());
+                    attachmentData.put("filePath", attachment.getFilePath());
+                    attachmentData.put("fileSize", attachment.getFileSize());
+                    attachmentData.put("mimeType", attachment.getMimeType());
+                    attachmentsData.add(attachmentData);
+                }
+                responseData.put("attachments", attachmentsData);
+            }
+
+            response.getWriter().write(objectMapper.writeValueAsString(responseData));
         } catch (Exception e) {
             LOGGER.severe("Error broadcasting message: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"status\": \"error\", \"message\": \"Failed to broadcast message\"}");
         }
-        String broadcastMessage = objectMapper.writeValueAsString(message);
-        LOGGER.info("broadcasting json:" + broadcastMessage);
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        HttpSession session = request.getSession(false);
+        UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
+
+        if (user == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"User not logged in\"}");
+            return;
+        }
+
+        String conversationIdStr = request.getParameter("conversation_id");
+        if (conversationIdStr == null || conversationIdStr.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Conversation ID is required\"}");
+            return;
+        }
+
+        int conversationId;
+        try {
+            conversationId = Integer.parseInt(conversationIdStr);
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Invalid conversation ID\"}");
+            return;
+        }
+
+        String role;
+        try {
+            role = userService.whoisLoggedin(user.getId());
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Error checking user role\"}");
+            return;
+        }
+
+        boolean isCustomer = "customer".equals(role);
+        boolean success = chatService.softDeleteConversation(conversationId, user.getId(), isCustomer);
+
+        if (success) {
+            // Broadcast deletion notification via WebSocket
+            Message deletionMessage = new Message();
+            deletionMessage.setConversationID(conversationId);
+            deletionMessage.setSenderID(user.getId());
+            deletionMessage.setMessageContent("Conversation deleted by " + (isCustomer ? "customer" : "event owner"));
+            deletionMessage.setMessageType("system");
+            deletionMessage.setCreatedAt(new Date());
+            deletionMessage.setUpdatedAt(new Date());
+
+            int messageId = chatService.saveMessage(deletionMessage, conversationId);
+            if (messageId != -1) {
+                deletionMessage.setMessageID(messageId);
+                ChatWebSocket.broadcastMessage(deletionMessage, conversationId);
+            }
+
+            response.getWriter().write("{\"status\": \"success\", \"message\": \"Conversation deleted successfully\"}");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Failed to delete conversation\"}");
+        }
+    }
 }

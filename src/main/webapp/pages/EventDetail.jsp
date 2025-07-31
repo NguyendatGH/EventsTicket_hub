@@ -1,6 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -8,6 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
         <title>MasterTicket - Chi tiết sự kiện</title>
         <style>
             :root {
@@ -681,6 +683,80 @@
                 transform: scale(1.1);
             }
 
+            /*Modal update rate*/
+            .custom-modal-overlay {
+                display: none;
+                position: fixed;
+                z-index: 9999;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                justify-content: center;
+                align-items: center;
+            }
+
+            .custom-modal-box {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                width: 95%;
+                max-width: 500px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            }
+
+            .custom-modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+
+            .custom-modal-header h3 {
+                margin: 0;
+                font-size: 1.2rem;
+            }
+
+            .close-modal {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #888;
+            }
+
+            .custom-modal-group {
+                margin-bottom: 1rem;
+            }
+
+            .custom-label {
+                font-weight: 600;
+                display: block;
+                margin-bottom: 0.5rem;
+            }
+
+            .custom-stars label {
+                display: inline-block;
+                margin-right: 10px;
+                cursor: pointer;
+            }
+
+            .custom-stars input[type="radio"] {
+                display: none;
+            }
+
+            .custom-stars .star {
+                font-size: 1.2rem;
+                color: gold;
+            }
+
+            .custom-modal-footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+
             /* Responsive Design */
             @media (max-width: 1024px) {
                 .event-hero {
@@ -754,18 +830,17 @@
         <div class="header-container">
             <header class="header">
                 <div class="logo">
-                    <i class="fas fa-ticket-alt"></i>
-                    MasterTicket
+                    <a href="/OnlineSellingTicketEvents/home" class="logo">MasterTicket</a>                   
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm...">
                     <button><i class="fas fa-search"></i></button>
                 </div>
                 <div class="actions">
-                    <button class="primary-btn">
+                    <a class="primary-btn" href="${pageContext.request.contextPath}/TicketOrderHistoryServlet">
                         <i class="fas fa-plus"></i>
-                        Tạo sự kiện
-                    </button>
+                        Vé đã mua 
+                    </a>
 <!--                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
                         <i class="fas fa-history"></i>
                         Vé đã mua
@@ -941,54 +1016,121 @@
 
                     <div class="section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-comments"></i>
-                            Phản hồi từ người tham dự
+                            <i class="fas fa-comments"></i> Phản hồi từ người tham dự
                         </h2>
 
-                        <c:choose>
-                            <c:when test="${not empty feedbackList}">
-                                <c:forEach var="fb" items="${feedbackList}">
-                                    <div class="feedback-item" style="margin-bottom: 1.5rem;">
-                                        <!-- Nội dung feedback -->
-                                        <p class="feedback-text" style="margin: 0 0 0.5rem 0; font-weight: 500;">
-                                            ${fb.content}
-                                        </p>
+                        <c:if test="${param.updated == 'true'}">
+                            <div style="background: #d4edda; color: #155724; padding: 10px; margin-bottom: 1rem; border-radius: 4px;">
+                                 Phản hồi của bạn đã được cập nhật thành công!
+                            </div>
+                        </c:if>
 
-                                        <!-- Số sao + người gửi + ngày -->
-                                        <div class="feedback-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-                                            <!-- Số sao -->
-                                            <div class="feedback-stars">
-                                                <c:forEach begin="1" end="5" var="i">
-                                                    <i class="${i <= fb.rating ? 'fas' : 'far'} fa-star"
-                                                       style="color: ${i <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>
-                                                </c:forEach>
+                        <!-- THÔNG BÁO MỨC SAO ĐANG XEM -->
+                        <p style="margin-bottom: 1rem;">
+                            Đang xem phản hồi với mức 
+                            <span style="font-weight: bold;">${currentStar}</span> 
+                            <i class="fas fa-star" style="color: var(--warning);"></i>
+                        </p>
+
+                        <!-- DANH SÁCH FEEDBACK -->
+                        <div id="default-feedback-list">
+                            <c:choose>
+                                <c:when test="${not empty feedbackList}">
+                                    <c:forEach var="fb" items="${feedbackList}">
+                                        <div class="feedback-item" style="margin-bottom: 1.5rem;">
+                                            <p class="feedback-text" style="margin: 0 0 0.5rem 0; font-weight: 500;">
+                                                ${fb.content}
+                                            </p>
+                                            <div class="feedback-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                                                <div class="feedback-stars">
+                                                    <c:forEach begin="1" end="5" var="i">
+                                                        <i class="${i <= fb.rating ? 'fas' : 'far'} fa-star"
+                                                           style="color: ${i <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>
+                                                    </c:forEach>
+                                                </div>
+                                                <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
+                                                    ${fb.userName}
+                                                </span>
+                                                <span class="feedback-date" style="color: var(--text-muted); font-size: 0.95em;">
+                                                    (${fb.formattedDate})
+                                                </span>
+
+                                                <!-- NÚT CHỈNH SỬA -->
+                                                <c:if test="${not empty currentUser and currentUser.id == fb.userID}">
+                                                    <a href="${pageContext.request.contextPath}/pages/updateFeedback.jsp?feedbackId=${fb.feedbackID}" class="btn-edit-feedback">
+                                                        ✏️ Chỉnh sửa
+                                                    </a>
+
+
+                                                    <!-- MODAL -->
+                                                    <div id="edit-modal-${fb.feedbackID}" class="custom-modal-overlay">
+                                                        <div class="custom-modal-box">
+                                                            <div class="custom-modal-header">
+                                                                <h3>Chỉnh sửa phản hồi</h3>
+                                                                <button class="close-modal" onclick="closeModal('edit-modal-${fb.feedbackID}')">&times;</button>
+                                                            </div>
+                                                            <form method="post" action="${pageContext.request.contextPath}/UpdateFeedbackServlet">
+                                                                <input type="hidden" name="feedbackID" value="${fb.feedbackID}" />
+                                                                <div class="custom-modal-group">
+                                                                    <label class="custom-label">Mức đánh giá:</label>
+                                                                    <div class="custom-stars">
+                                                                        <c:forEach begin="1" end="5" var="i">
+                                                                            <label>
+                                                                                <input type="radio" name="rating" value="${i}" ${i == fb.rating ? "checked" : ""} />
+                                                                                <span class="star">&#9733;</span> ${i}
+                                                                            </label>
+                                                                        </c:forEach>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="custom-modal-group">
+                                                                    <label class="custom-label">Nội dung phản hồi:</label>
+                                                                    <textarea name="content" rows="4">${fb.content}</textarea>
+                                                                </div>
+
+                                                                <div class="custom-modal-footer">
+                                                                    <button type="button" onclick="closeModal('edit-modal-${fb.feedbackID}')">Hủy</button>
+                                                                    <button type="submit">Lưu</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </c:if>
                                             </div>
-
-                                            <!-- Người gửi -->
-                                            <span class="feedback-author" style="color: var(--primary); font-weight: 600;">
-                                                ${fb.userName}
-                                            </span>
-
-                                            <!-- Ngày gửi -->
-                                            <span class="feedback-date" style="color: var(--text-muted); font-size: 0.95em;">
-                                                (${fb.formattedDate})
-                                            </span>
                                         </div>
-                                    </div>
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise>
-                                <p style="color: var(--text-muted); margin-top: 1rem;">
-                                    Hiện tại chưa có phản hồi nào cho sự kiện này.
-                                </p>
-                            </c:otherwise>
-                        </c:choose>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <p style="color: var(--text-muted);">Hiện tại chưa có phản hồi nào cho mức đánh giá này.</p>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+
+                        <!-- PHÂN TRANG THEO SỐ SAO -->
+                        <div style="margin-top: 2rem; text-align: center;">
+                            <c:forEach begin="1" end="5" var="pageNum">
+                                <c:set var="starNum" value="${6 - pageNum}" />
+                                <c:choose>
+                                    <c:when test="${pageNum == currentPage}">
+                                        <span style="margin: 0 6px; font-weight: bold; color: var(--primary);">
+                                            ${starNum} <i class="fas fa-star" style="color: var(--warning);"></i>
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a href="${pageContext.request.contextPath}/EventServlet?id=${eventId}&page=${pageNum}"
+                                           style="margin: 0 6px; text-decoration: none; color: inherit;">
+                                            ${starNum} <i class="fas fa-star"></i>
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                        </div>
                     </div>
 
                 </div>
             </c:if>
         </div>
-
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-container">
@@ -1049,7 +1191,7 @@
 
         <script type="text/javascript">
             var contextPath = '${pageContext.request.contextPath}';
-
+//            const contextPath = document.body.dataset.contextPath;
             function handleBuyTickets(eventId, hasSeatingChartStr) {
                 console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
                 console.log("  - eventId nhận được:", eventId, "(kiểu:", typeof eventId, ")");
@@ -1057,7 +1199,7 @@
 
                 if (hasSeatingChartStr === 'true') {
                     console.log("  - KẾT LUẬN: CÓ sơ đồ ghế. Chuyển hướng tới BookChairServlet.");
-                    window.location.href = contextPath + '/BookChairServlet?eventId=' + eventId;
+                    window.location.href = contextPath + '/BookSeatServlet?eventId=' + eventId;
                 } else {
                     console.log("  - KẾT LUẬN: KHÔNG có sơ đồ ghế. Chuyển hướng tới TicketSelectionServlet.");
                     window.location.href = contextPath + '/TicketInfoServlet?eventId=' + eventId;
@@ -1070,10 +1212,33 @@
             }
 
 
+
+            function openModal(id) {
+                const modal = document.getElementById(id);
+                if (modal)
+                    modal.style.display = 'flex';
+            }
+
+            function closeModal(id) {
+                const modal = document.getElementById(id);
+                if (modal)
+                    modal.style.display = 'none';
+            }
+
+            window.onclick = function (event) {
+                document.querySelectorAll(".custom-modal-overlay").forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = "none";
+                    }
+                });
+            }
+
+
             document.addEventListener('DOMContentLoaded', function () {
                 const stars = document.querySelectorAll('.rating .fa-star');
                 stars.forEach((star, index) => {
                     star.addEventListener('click', function () {
+                        e.preventDefault();
                         stars.forEach((s, i) => {
                             if (i <= index) {
                                 s.classList.remove('far');
@@ -1104,6 +1269,70 @@
                     });
                 });
             });
+
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const starSelect = document.getElementById("star-filter");
+                const eventIdInput = document.getElementById("event-id-holder");
+                const defaultList = document.getElementById("default-feedback-list");
+                const container = document.getElementById("feedback-container");
+
+                const contextPath = document.body.dataset.contextPath;
+
+                if (!starSelect || !eventIdInput || !container || !defaultList || !contextPath) {
+                    console.error("Không tìm thấy phần tử DOM hoặc contextPath.");
+                    return;
+                }
+
+                starSelect.addEventListener("change", function () {
+                    const star = this.value;
+                    const eventId = eventIdInput.value;
+
+                    if (star === "") {
+                        defaultList.style.display = "block";
+                        container.innerHTML = "";
+                        return;
+                    }
+
+                    fetch(`${pageContext.request.contextPath}/FilterFeedbackServlet?eventId=${eventId}&star=${star}`)
+                                        .then(response => {
+                                            if (!response.ok)
+                                                throw new Error("Lỗi phản hồi từ server");
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            defaultList.style.display = "none";
+                                            container.innerHTML = "";
+
+                                            if (data.length === 0) {
+                                                container.innerHTML = "<p style='color: var(--text-muted);'>Hiện tại chưa có phản hồi nào cho mức đánh giá này.</p>";
+                                                return;
+                                            }
+
+                                            data.forEach(fb => {
+                                                const stars = Array.from({length: 5}, (_, i) =>
+                                                        `<i class="${i + 1 <= fb.rating ? 'fas' : 'far'} fa-star" style="color: ${i + 1 <= fb.rating ? 'var(--warning)' : 'var(--text-muted)'};"></i>`
+                                                ).join("");
+
+                                                const feedbackHtml = `
+                        <div class="feedback-item" style="margin-bottom: 1.5rem;">
+                            <p class="feedback-text" style="margin: 0 0 0.5rem 0; font-weight: 500;">${fb.content}</p>
+                            <div class="feedback-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                                <div class="feedback-stars">${stars}</div>
+                                <span class="feedback-author" style="color: var(--primary); font-weight: 600;">${fb.userName}</span>
+                                <span class="feedback-date" style="color: var(--text-muted); font-size: 0.95em;">(${fb.formattedDate})</span>
+                            </div>
+                        </div>`;
+                                                container.innerHTML += feedbackHtml;
+                                            });
+                                        })
+                                        .catch(error => {
+                                            console.error("Error fetching filtered feedback:", error);
+                                            container.innerHTML = "<p style='color: red;'>Không thể tải phản hồi từ máy chủ.</p>";
+                                        });
+                            });
+                        });
+
         </script>
     </body>
 </html>

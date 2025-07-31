@@ -726,7 +726,7 @@ public class EventDAO {
             }
 
             // Update event
-            String sql = "UPDATE Events SET Name = ?, Description = ?, PhysicalLocation = ?, StartTime = ?, EndTime = ?, TotalTicketCount = ?, Status = ?, ImageURL = ?, UpdatedAt = ? WHERE EventID = ? AND IsDeleted = 0";
+            String sql = "UPDATE Events SET Name = ?, Description = ?, PhysicalLocation = ?, StartTime = ?, EndTime = ?, TotalTicketCount = ?, IsApproved = ?, Status = ?, ImageURL = ?, UpdatedAt = ? WHERE EventID = ? AND IsDeleted = 0";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, event.getName());
                 ps.setString(2, event.getDescription());
@@ -734,10 +734,11 @@ public class EventDAO {
                 ps.setTimestamp(4, new Timestamp(event.getStartTime().getTime()));
                 ps.setTimestamp(5, new Timestamp(event.getEndTime().getTime()));
                 ps.setInt(6, event.getTotalTicketCount());
-                ps.setString(7, event.getStatus());
-                ps.setString(8, event.getImageURL());
-                ps.setTimestamp(9, new Timestamp(System.currentTimeMillis()));
-                ps.setInt(10, event.getEventID());
+                ps.setInt(7, 1);
+                ps.setString(8, event.getStatus());
+                ps.setString(9, event.getImageURL());
+                ps.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
+                ps.setInt(11, event.getEventID());
 
                 int affectedRows = ps.executeUpdate();
                 if (affectedRows == 0) {
