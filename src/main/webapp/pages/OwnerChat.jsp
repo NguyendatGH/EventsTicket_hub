@@ -6,8 +6,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat Room - Event Owner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
+          :root {
             --primary: #667aff;
             --primary-glow: rgba(102, 122, 255, 0.3);
             --secondary: #e06bce;
@@ -114,44 +115,6 @@
             padding: 10px 0;
         }
 
-        .customer-group {
-            margin-bottom: 10px;
-        }
-
-        .customer-header {
-            padding: 15px 20px;
-            cursor: pointer;
-            background: var(--card-bg);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .customer-header:hover {
-            background: var(--hover-bg);
-        }
-
-        .customer-name {
-            font-weight: 600;
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        .toggle-icon {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .threads-list {
-            display: none;
-            padding-left: 20px;
-        }
-
-        .threads-list.active {
-            display: block;
-        }
-
         .conversation {
             display: flex;
             align-items: center;
@@ -232,7 +195,6 @@
         }
 
         .conversation-badge {
-            display:none;
             background: var(--primary);
             color: white;
             border-radius: 50%;
@@ -243,6 +205,27 @@
             justify-content: center;
             font-size: 11px;
             font-weight: bold;
+        }
+
+        .conversation-badge.hidden {
+            display: none;
+        }
+
+        .delete-conversation-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .delete-conversation-btn:hover {
+            background: #ff3742;
+            transform: translateY(-1px);
+            filter: var(--neon-pulse);
         }
 
         /* Main Chat Area */
@@ -453,7 +436,7 @@
             border-radius: 10px;
             width: fit-content;
             margin-left: auto;
-            margin-right:jq auto;
+            margin-right: auto;
         }
 
         .message.sent .message-time {
@@ -708,7 +691,7 @@
 
         .search-results-count {
             display: none;
-            flex : 1;
+            flex: 1;
             text-align: center;
             font-weight: 500;
         }
@@ -782,28 +765,43 @@
             .sidebar {
                 width: 280px;
             }
-            
+
             .container {
                 flex-direction: column;
             }
-            
+
             .sidebar {
                 width: 100%;
                 height: 200px;
             }
-            
+
             .conversations-list {
                 display: flex;
                 overflow-x: auto;
                 overflow-y: hidden;
             }
-            
+
             .conversation {
                 min-width: 200px;
                 border-bottom: none;
                 border-right: 1px solid var(--border-color);
             }
         }
+    .delete-conversation-btn{
+    background: transparent;
+}
+        .fa-trash {
+  color: red; /* Màu xám bình thường */
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.fa-trash:hover {
+  color: red; /* Màu đỏ khi hover */
+  transform: scale(1.2);
+   box-shadow: 0 2px 6px rgba(255, 0, 0, 0.4); 
+}
     </style>
 </head>
 <body>
@@ -813,7 +811,7 @@
             <div class="sidebar-header">
                 <h1>Đoạn chat</h1>
                 <div class="search-container">
-                    <div class="search-icon">🔍</div>
+                   <div class="search-icon">🔍</div>
                     <input type="text" class="search-input" placeholder="Tìm kiếm khách hàng...">
                 </div>
             </div>
@@ -853,9 +851,11 @@
                                             </c:choose>
                                         </div>
                                     </div>
-                                    <div class="conversation-meta">
+                                   <div class="conversation-meta">
                                         <div class="conversation-time" data-last-message-at="${conv.lastMessageAt}"></div>
-                                        <div class="conversation-badge">2</div>
+                                        <div class="delete-conversation-btn" onclick="deleteConversation(${conv.conversationID}, event)">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </c:forEach>
@@ -1003,7 +1003,6 @@
                 <input type="text" id="messageSearchInput" class="message-search-input" placeholder="Tìm kiếm tin nhắn...">
                 <div class="search-navigation">
                     <button class="search-nav-btn" id="prevResultBtn" disabled><</button>
-                    <span class="search-results-count" id="searchResultsCount">0/0</span>
                     <button class="search-nav-btn" id="nextResultBtn" disabled>></button>
                 </div>
             </div>
@@ -1012,12 +1011,10 @@
             
             <div class="section-title">File phương tiện & file</div>
             <div class="menu-item">
-                <div class="menu-icon">📷</div>
+                <button class="file-button">
+  <i class="fa fa-file" aria-hidden="true"></i>
+</button>
                 <span>File phương tiện</span>
-            </div>
-            <div class="menu-item">
-                <div class="menu-icon">📄</div>
-                <span>File</span>
             </div>
             
             <div class="section-divider"></div>
@@ -1025,6 +1022,47 @@
     </div>
  
 <script>
+
+
+function deleteConversation(conversationId, event) {
+    event.stopPropagation(); // Prevent triggering the conversation click event
+    if (!confirm('Bạn có chắc chắn muốn xóa đoạn chat này? Nó sẽ vẫn hiển thị với người còn lại.')) {
+        return;
+    }
+
+    fetch('${pageContext.request.contextPath}/chat?conversation_id=' + conversationId, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Remove the conversation from the UI
+            const conversationElement = document.querySelector(`.conversation[data-conversation-id="${conversationId}"]`);
+            if (conversationElement) {
+                conversationElement.remove();
+            }
+            // If the deleted conversation is the current one, clear the chat area
+            if (conversationId.toString() === '${currentConversationId}') {
+                document.getElementById('messagesContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <p>Đoạn chat đã được xóa!</p>
+                        <small>Chọn một đoạn chat khác để tiếp tục.</small>
+                    </div>`;
+                document.getElementById('messageInput').disabled = true;
+                document.getElementById('sendButton').disabled = true;
+            }
+        } else {
+            alert('Xóa đoạn chat thất bại: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting conversation:', error);
+        alert('Đã xảy ra lỗi khi xóa đoạn chat.');
+    });
+}
+
+
 function initWebSocket(conversationId, userId, currentUserName, otherUserName, isOwner = true) {
     let socket = null;
     

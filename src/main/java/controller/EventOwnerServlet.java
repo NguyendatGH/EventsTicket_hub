@@ -52,7 +52,7 @@ public class EventOwnerServlet extends HttpServlet {
     private EventDAO eventDao;
     private GenreDAO genreDAO;
     private EventService eventService;
-    private static final String UPLOAD_DIR = "Uploads/event_banners";
+    private static final String UPLOAD_DIR = "uploads/event_banners";
     private static final Logger logger = Logger.getLogger(EventOwnerServlet.class.getName());
 
     @Override
@@ -679,7 +679,6 @@ public class EventOwnerServlet extends HttpServlet {
             return;
         }
 
-        // Use the imageURL from the Event object if it exists
         String imageFileName = event.getImageURL();
         if (imageFileName == null) {
             // Optionally allow a new upload in Step 4
