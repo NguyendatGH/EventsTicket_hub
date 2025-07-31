@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @WebServlet("/notification-servlet")
 public class NotificationServlet extends HttpServlet {
@@ -74,6 +75,51 @@ public class NotificationServlet extends HttpServlet {
         }
     }
     
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        
+        PrintWriter out = response.getWriter();
+        
+        try {
+            String action = request.getParameter("action");
+            
+            if ("getNotifications".equals(action)) {
+                int userId = Integer.parseInt(request.getParameter("userId"));
+                
+                List<models.Notification> notifications = notificationDAO.getNotificationsByUserId(userId);
+                int unreadCount = notificationDAO.getUnreadNotificationCount(userId);
+                
+                NotificationResponse notificationResponse = new NotificationResponse();
+                notificationResponse.setNotifications(notifications);
+                notificationResponse.setUnreadCount(unreadCount);
+                
+                out.print(gson.toJson(notificationResponse));
+                
+            } else if ("getUnreadCount".equals(action)) {
+                int userId = Integer.parseInt(request.getParameter("userId"));
+                
+                int unreadCount = notificationDAO.getUnreadNotificationCount(userId);
+                
+                UnreadCountResponse unreadResponse = new UnreadCountResponse();
+                unreadResponse.setUnreadCount(unreadCount);
+                
+                out.print(gson.toJson(unreadResponse));
+                
+            } else {
+                out.print(gson.toJson(new ErrorResponse("Invalid action")));
+            }
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error in NotificationServlet GET: " + e.getMessage());
+            e.printStackTrace();
+            out.print(gson.toJson(new ErrorResponse("Error: " + e.getMessage())));
+        }
+    }
+    
     private static class SuccessResponse {
         private String message;
         
@@ -92,5 +138,23 @@ public class NotificationServlet extends HttpServlet {
         }
         
         public String getError() { return error; }
+    }
+    
+    private static class NotificationResponse {
+        private List<models.Notification> notifications;
+        private int unreadCount;
+        
+        public List<models.Notification> getNotifications() { return notifications; }
+        public void setNotifications(List<models.Notification> notifications) { this.notifications = notifications; }
+        
+        public int getUnreadCount() { return unreadCount; }
+        public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
+    }
+    
+    private static class UnreadCountResponse {
+        private int unreadCount;
+        
+        public int getUnreadCount() { return unreadCount; }
+        public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
     }
 } 

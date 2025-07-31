@@ -1542,8 +1542,14 @@
 
             function markNotificationAsRead(notificationID) {
                 console.log('🔍 Marking notification as read:', notificationID);
-                fetch('${pageContext.request.contextPath}/notification-servlet?action=markRead&notificationID=' + notificationID, {
-                    method: 'POST'
+                const userId = <%= user != null ? user.getId() : 0 %>;
+                
+                fetch('${pageContext.request.contextPath}/notification-servlet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=markRead&notificationId=' + notificationID + '&userId=' + userId
                 })
                 .then(response => {
                     console.log('📡 Response status:', response.status);
@@ -1551,7 +1557,7 @@
                 })
                 .then(data => {
                     console.log('📋 Response data:', data);
-                    if (data.success) {
+                    if (data.message) {
                         // Tìm notification item bằng nhiều cách khác nhau
                         let notificationItem = document.querySelector(`.notification-item[onclick*='${notificationID}']`);
                         if (!notificationItem) {
@@ -1602,12 +1608,18 @@
             }
 
             function markAllNotificationsAsRead() {
-                fetch('${pageContext.request.contextPath}/notification-servlet?action=markAllRead', {
-                    method: 'POST'
+                const userId = <%= user != null ? user.getId() : 0 %>;
+                
+                fetch('${pageContext.request.contextPath}/notification-servlet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=markAllRead&userId=' + userId
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data.message) {
                         document.querySelectorAll('.notification-item.unread').forEach(item => {
                             item.classList.remove('unread');
                         });
