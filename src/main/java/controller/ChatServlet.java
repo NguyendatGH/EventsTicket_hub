@@ -18,11 +18,11 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
-import java.util.Date;
 import java.util.HashMap;
 
 @WebServlet({ "/chat/*", "/init-chat" })
@@ -33,7 +33,7 @@ import java.util.HashMap;
 public class ChatServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(ChatServlet.class.getName());
     private ObjectMapper objectMapper = new ObjectMapper();
-    private static final String UPLOAD_DIR = "Uploads";
+    private static final String UPLOAD_DIR = "uploads/message_assets";
     private static final UserService userService = new UserService();
     private static final ChatService chatService = new ChatService();
     private static final EventService eventService = new EventService();
@@ -190,7 +190,6 @@ public class ChatServlet extends HttpServlet {
                     }
 
                     conversationId = conversation.getConversationID();
-                    // LOGGER.info("Created new conversation with ID: " + conversationId); debug
                 }
 
                 List<Message> messages = new ArrayList<>();
@@ -217,7 +216,6 @@ public class ChatServlet extends HttpServlet {
                 request.setAttribute("eventOwner", owner);
                 request.setAttribute("currentUserId", user.getId());
 
-                // Forward to chat page instead of redirecting
                 LOGGER.info("Forwarding to chat page with conversationId: " + conversationId
                         + ", userId: " + user.getId());
                 request.getRequestDispatcher("/pages/CustomerChat.jsp").forward(request, response);
@@ -293,7 +291,7 @@ public class ChatServlet extends HttpServlet {
                 String originalFilename = part.getSubmittedFileName();
                 String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
                 String storedFilename = UUID.randomUUID().toString() + fileExtension;
-                String filePath = "/" + UPLOAD_DIR + "/" + storedFilename;
+                String filePath = "/" + UPLOAD_DIR.replace(File.separator, "/") + "/" + storedFilename;
 
                 // Validate file size
                 if (part.getSize() > 10 * 1024 * 1024) { // 10MB limit
@@ -370,4 +368,67 @@ public class ChatServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        HttpSession session = request.getSession(false);
+        UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
+
+        if (user == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"User not logged in\"}");
+            return;
+        }
+
+        String conversationIdStr = request.getParameter("conversation_id");
+        if (conversationIdStr == null || conversationIdStr.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Conversation ID is required\"}");
+            return;
+        }
+
+        int conversationId;
+        try {
+            conversationId = Integer.parseInt(conversationIdStr);
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Invalid conversation ID\"}");
+            return;
+        }
+
+        String role;
+        try {
+            role = userService.whoisLoggedin(user.getId());
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Error checking user role\"}");
+            return;
+        }
+
+        boolean isCustomer = "customer".equals(role);
+        boolean success = chatService.softDeleteConversation(conversationId, user.getId(), isCustomer);
+
+        if (success) {
+            // Broadcast deletion notification via WebSocket
+            Message deletionMessage = new Message();
+            deletionMessage.setConversationID(conversationId);
+            deletionMessage.setSenderID(user.getId());
+            deletionMessage.setMessageContent("Conversation deleted by " + (isCustomer ? "customer" : "event owner"));
+            deletionMessage.setMessageType("system");
+            deletionMessage.setCreatedAt(new Date());
+            deletionMessage.setUpdatedAt(new Date());
+
+            int messageId = chatService.saveMessage(deletionMessage, conversationId);
+            if (messageId != -1) {
+                deletionMessage.setMessageID(messageId);
+                ChatWebSocket.broadcastMessage(deletionMessage, conversationId);
+            }
+
+            response.getWriter().write("{\"status\": \"success\", \"message\": \"Conversation deleted successfully\"}");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Failed to delete conversation\"}");
+        }
+    }
 }
