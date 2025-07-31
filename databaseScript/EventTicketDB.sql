@@ -1,4 +1,6 @@
 create database EventTicketDB
+use EventTicketDB
+
 
 CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -218,6 +220,7 @@ CREATE TABLE Report (
     CONSTRAINT FK_Report_Admin FOREIGN KEY (AdminID) REFERENCES Users(Id)
 );
 
+
 -- Bảng ConversationTable 
 CREATE TABLE Conversations (
     ConversationID INT IDENTITY(1,1) PRIMARY KEY,
@@ -230,6 +233,9 @@ CREATE TABLE Conversations (
     CreatedBy INT NOT NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
+    IsDeletedByCustomer BIT DEFAULT 0,
+    IsDeletedByOwner BIT DEFAULT 0,
+    DeletedAt DATETIME NULL,
     CONSTRAINT FK_Conversations_Customer FOREIGN KEY (CustomerID) REFERENCES Users(Id),
     CONSTRAINT FK_Conversations_EventOwner FOREIGN KEY (EventOwnerID) REFERENCES Users(Id),
     CONSTRAINT FK_Conversations_Event FOREIGN KEY (EventID) REFERENCES Events(EventID),
@@ -300,41 +306,6 @@ CREATE TABLE Promotions(
         (PromotionType = 'buy_x_get_y')
     )
 );
-
-
-
-
-
--- 1. SUMMER25 áp dụng cho EventID = 15 (Indian Food Festival - diễn ra ngày 2025-12-04)
-UPDATE Promotions
-SET EndTime = '2025-12-03 23:59:59'
-WHERE PromotionCode = 'SUMMER25';
-
--- 2. EARLY10 áp dụng cho EventID = 19 (VBA Match - diễn ra ngày 2025-09-08)
-UPDATE Promotions
-SET EndTime = '2025-09-07 23:59:59'
-WHERE PromotionCode = 'EARLY10';
-
--- 3. CONCERT50K áp dụng cho EventID = 20 (Cải lương CÂU THƠ YÊN NGỰA - diễn ra ngày 2025-09-09)
-UPDATE Promotions
-SET EndTime = '2025-09-08 23:59:59'
-WHERE PromotionCode = 'CONCERT50K';
-
--- 4. THEATER20 áp dụng cho EventID = 7 (12 Bà Mụ - diễn ra ngày 2025-08-25)
-UPDATE Promotions
-SET EndTime = '2025-08-24 23:59:59'
-WHERE PromotionCode = 'THEATER20';
-
--- 5. ISLAND30K áp dụng cho EventID = 8 (The Island and The Bay - diễn ra ngày 2025-09-27)
-UPDATE Promotions
-SET EndTime = '2025-09-26 23:59:59'
-WHERE PromotionCode = 'ISLAND30K';
-
--- 6. CONCERT15 áp dụng cho EventID = 16 (Anh Trai concert - diễn ra ngày 2025-08-05)
-UPDATE Promotions
-SET EndTime = '2025-08-04 23:59:59'
-WHERE PromotionCode = 'CONCERT15';
-
 
 -- Bảng Notifications (mới)
 CREATE TABLE Notifications (
@@ -1054,9 +1025,21 @@ VALUES
 (9, 9, 9, 11, 80000, 1, 80000, '2025-06-20 14:00:00', '2025-06-20 14:00:00'),
 (10, 9, 9, 12, 80000, 1, 80000, '2025-06-20 14:00:00', '2025-06-20 14:00:00');
 
+
+select * from Promotions
+
+SELECT TOP 1 *
+FROM Events
+ORDER BY EventID DESC;
+
+update Events
+set StartTime = '2025-08-03 17:07:00.000', EndTime ='2025-08-09 17:07:00.000'
+where EventID = 29
 -- Insert into Promotions 
 INSERT INTO Promotions (PromotionName, PromotionCode, Description, PromotionType, StartTime, EndTime, EventID, DiscountPercentage, DiscountAmount, MinOrderAmount, MaxDiscountAmount, MaxUsageCount, CurrentUsageCount, IsActive, CreatedBy, CreatedAt, UpdatedAt)
 VALUES
+(N'Concert Flash Sale', N'CONCERT152', N'15% off for Anh Trai saygex', N'percentage', '2025-07-31 17:07:00.000', '2025-07-31 23:59:00.000', 29, 15.00, NULL, 400000, 75000, 200, 0, 1, 3, '2025-06-01 09:00:00', '2025-06-01 09:00:00');
+
 (N'Summer Sale', N'SUMMER25', N'25% off for summer events', N'percentage', '2025-07-01 00:00:00', '2025-07-03 11:00:00', 15, 25.00, NULL, 500000, 100000, 100, 0, 1, 1, '2025-06-28 09:00:00', '2025-06-29 09:00:00'),
 (N'Early Bird', N'EARLY10', N'10% off for early bookings', N'percentage', '2025-07-01 00:00:00', '2025-07-07 12:30:00', 19, 10.00, NULL, 200000, 50000, 50, 0, 1, 2, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
 (N'Concert Discount', N'CONCERT50K', N'50,000 VND off for concerts', N'fixed_amount', '2025-07-01 00:00:00', '2025-07-09 10:00:00', 20, NULL, 50000, 300000, 50000, 200, 0, 1, 3, '2025-06-01 09:00:00', '2025-06-01 09:00:00'),
@@ -1120,7 +1103,7 @@ SET CreatedAt = CASE
             WHEN 10 THEN '2025-06-10 09:30:00'
             WHEN 11 THEN '2025-06-12 14:00:00'
             WHEN 12 THEN '2025-06-14 11:45:00'
-            WHEN 13 THEN '2025-06-15 05:31:00'  -- Current time
+            WHEN 13 THEN '2025-07-15 05:31:00'  -- Current time
         END
     ELSE 
         CASE Id
@@ -1140,6 +1123,7 @@ SET CreatedAt = CASE
 END
 WHERE Id BETWEEN 1 AND 25;
 
+select * from Users
 UPDATE Users
 SET LastLoginAt = CASE Id
     -- New Users (CreatedAt >= 2025-03-15, IDs 1–13)
@@ -1172,4 +1156,8 @@ SET LastLoginAt = CASE Id
     WHEN 26 THEN '2024-09-01 10:15:00' -- Trough (1 login in September)
     ELSE LastLoginAt
 END
+
 WHERE Id BETWEEN 1 AND 25;
+
+update Events
+set [Status] = 'active'
