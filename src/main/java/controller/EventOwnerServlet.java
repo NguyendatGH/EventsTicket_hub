@@ -893,7 +893,8 @@ public class EventOwnerServlet extends HttpServlet {
             session.removeAttribute("seatMapData");
             session.removeAttribute("seatMapDataConfirmed");
             session.removeAttribute("ticketNames");
-            session.setAttribute("successMessage", "Event created successfully: " + result.getMessage());
+            session.setAttribute("successMessage", "" + result.getMessage());
+            
             response.sendRedirect(request.getContextPath() + "/organizer-servlet?action=dashboard");
         } else {
             request.setAttribute("errorMessage", result.getMessage());
