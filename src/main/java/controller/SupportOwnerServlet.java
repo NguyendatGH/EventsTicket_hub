@@ -14,9 +14,15 @@ import service.SupportService;
 import dto.UserDTO;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.io.File;
 
 @WebServlet("/support-owner")
 @MultipartConfig(
@@ -41,10 +47,19 @@ public class SupportOwnerServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        // Load all support requests by owner email
-        List<SupportItem> ownerRequests = supportService.getSupportRequestsByUserEmail(user.getEmail());
-        request.setAttribute("supportRequests", ownerRequests);
-        request.getRequestDispatcher("/supportCenter/supportCenter_owner.jsp").forward(request, response);
+        
+        String action = request.getParameter("action");
+        
+        if ("download".equals(action)) {
+            downloadAttachment(request, response, user);
+        } else if ("view".equals(action)) {
+            viewAttachment(request, response, user);
+        } else {
+            // Load all support requests by owner email
+            List<SupportItem> ownerRequests = supportService.getSupportRequestsByUserEmail(user.getEmail());
+            request.setAttribute("supportRequests", ownerRequests);
+            request.getRequestDispatcher("/supportCenter/supportCenter_owner.jsp").forward(request, response);
+        }
     }
 
     @Override
@@ -145,8 +160,17 @@ public class SupportOwnerServlet extends HttpServlet {
 
             // Set response headers for download
             response.setContentType(attachment.getFileType());
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + attachment.getOriginalFileName() + "\"");
+            
+            // Handle filename encoding for special characters
+            String fileName = attachment.getOriginalFileName();
+            String encodedFileName = java.net.URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + encodedFileName);
+            
             response.setContentLengthLong(attachment.getFileSize());
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            response.setHeader("X-Content-Type-Options", "nosniff");
 
             // Stream the file
             java.nio.file.Path filePath = java.nio.file.Paths.get(attachment.getFilePath());
@@ -166,6 +190,65 @@ public class SupportOwnerServlet extends HttpServlet {
             System.err.println("Error downloading attachment: " + e.getMessage());
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error downloading file");
+        }
+    }
+
+    private void viewAttachment(HttpServletRequest request, HttpServletResponse response, UserDTO user) 
+            throws ServletException, IOException {
+        
+        String fileIdStr = request.getParameter("fileId");
+        if (fileIdStr == null || fileIdStr.trim().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File ID is required");
+            return;
+        }
+
+        try {
+            int fileId = Integer.parseInt(fileIdStr);
+            SupportAttachment attachment = supportService.getAttachmentById(fileId);
+            
+            if (attachment == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found");
+                return;
+            }
+
+            // Check if file is viewable in browser
+            String contentType = attachment.getFileType();
+            boolean isViewable = contentType.startsWith("text/") || 
+                                contentType.startsWith("image/") || 
+                                contentType.equals("application/pdf") ||
+                                contentType.equals("application/json") ||
+                                contentType.equals("application/xml");
+
+            if (isViewable) {
+                // Display in browser
+                response.setContentType(contentType);
+                response.setHeader("Content-Disposition", "inline; filename=\"" + attachment.getOriginalFileName() + "\"");
+            } else {
+                // Force download for non-viewable files
+                response.setContentType(contentType);
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + attachment.getOriginalFileName() + "\"");
+            }
+            
+            response.setContentLengthLong(attachment.getFileSize());
+
+            // Stream the file
+            Path filePath = Paths.get(attachment.getFilePath());
+            try (InputStream in = Files.newInputStream(filePath);
+                 OutputStream out = response.getOutputStream()) {
+                
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid file ID");
+        } catch (Exception e) {
+            System.err.println("Error viewing attachment: " + e.getMessage());
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error viewing file");
         }
     }
 } 

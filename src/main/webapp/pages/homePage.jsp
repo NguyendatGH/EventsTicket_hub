@@ -3,8 +3,8 @@
 <%@page import="java.util.List"%>
 <%@page import="models.Event"%>
 <%@page import="dto.UserDTO"%>
-<%@page import="models.Notification"%>
-<%@page import="service.NotificationService"%>
+
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
@@ -297,121 +297,7 @@
                 color: var(--primary);
             }
 
-            /* Notification styles */
-            .notification-icon-container {
-                position: relative;
-                margin-right: 1.5rem;
-            }
 
-            .notification-icon {
-                cursor: pointer;
-                font-size: 1.5rem;
-                padding: 0.5rem;
-                color: var(--text-muted);
-                transition: color 0.3s;
-            }
-
-            .notification-icon:hover {
-                color: var(--text-light);
-            }
-
-            .notification-badge {
-                position: absolute;
-                top: 0;
-                right: 0;
-                background-color: var(--danger);
-                color: white;
-                border-radius: 50%;
-                padding: 0.2rem 0.5rem;
-                font-size: 0.7rem;
-                font-weight: bold;
-                line-height: 1;
-                min-width: 1.5rem;
-                text-align: center;
-                transform: translate(50%, -50%);
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-
-            .notification-badge.show {
-                opacity: 1;
-            }
-
-            .notification-dropdown {
-                position: absolute;
-                top: calc(100% + 10px);
-                right: 0;
-                background: var(--darker-bg);
-                backdrop-filter: blur(10px);
-                border-radius: 10px;
-                padding: 0.5rem;
-                min-width: 300px;
-                max-height: 400px;
-                overflow-y: auto;
-                border: 1px solid var(--border-color);
-                opacity: 0;
-                visibility: hidden;
-                transform: translateY(-10px);
-                transition: all 0.3s ease-in-out;
-                z-index: 102;
-            }
-
-            .notification-dropdown.show {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0);
-            }
-
-            .notification-item {
-                padding: 0.75rem;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-                display: flex;
-                flex-direction: column;
-                cursor: pointer;
-                transition: background-color 0.2s;
-            }
-
-            .notification-item:last-child {
-                border-bottom: none;
-            }
-
-            .notification-item:hover {
-                background-color: rgba(255, 255, 255, 0.05);
-            }
-
-            .notification-item.unread {
-                background-color: rgba(255, 51, 51, 0.1);
-                font-weight: bold;
-            }
-
-            .notification-item.unread:hover {
-                background-color: rgba(255, 51, 51, 0.2);
-            }
-
-            .notification-title {
-                font-size: 0.95rem;
-                color: var(--text-light);
-                margin-bottom: 0.2rem;
-            }
-
-            .notification-content {
-                font-size: 0.85rem;
-                color: var(--text-muted);
-                margin-bottom: 0.2rem;
-            }
-
-            .notification-time {
-                font-size: 0.75rem;
-                color: rgba(255, 255, 255, 0.5);
-                align-self: flex-end;
-            }
-
-            .no-notifications {
-                padding: 1rem;
-                text-align: center;
-                color: var(--text-muted);
-                font-style: italic;
-            }
 
             /* Main Content */
             .container {
@@ -586,11 +472,12 @@
 
             /* Event Grid */
             .event-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 120px));
-            gap: 2rem;
-            margin-bottom: 3rem;
-            justify-content: center;
+
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 280px));
+                gap: 1.5rem;
+                margin-bottom: 3rem;
+                justify-content: center;
             }
 
             .event-card {
@@ -832,25 +719,7 @@
                 transform: scale(1.1);
             }
 
-            /* Flash Messages */
-            .flash-message {
-                padding: 15px;
-                margin: 0 auto 20px auto;
-                border-radius: 8px;
-                max-width: 1200px;
-                font-weight: 500;
-                text-align: center;
-            }
 
-            .flash-success {
-                background-color: #28a745;
-                color: white;
-            }
-
-            .flash-error, .flash-fail {
-                background-color: #dc3545;
-                color: white;
-            }
 
             /* Pagination Controls */
             .pagination-controls {
@@ -1065,12 +934,6 @@
             // Retrieve UserDTO object from session
             UserDTO user = (UserDTO) session.getAttribute("user");
 
-            // --- Notification Logic ---
-            // Initialize notification service and lists
-            NotificationService notificationService = new NotificationService();
-            List<Notification> notifications = new ArrayList<>();
-            int unreadCount = 0;
-
             // Handle redirection for logged-in users with specific roles
             if (user != null) {
                 // If 'user' has a getRole() method and the role is 'event_owner', redirect them.
@@ -1078,9 +941,6 @@
                     response.sendRedirect(request.getContextPath() + "/eventOwnerPage/eventOwnerHomePage");
                     return; // VERY IMPORTANT: Stop further processing of THIS JSP
                 }
-                // Fetch notifications ONLY if a user is logged in (and not an owner, after redirection)
-                notifications = notificationService.getUserNotifications(user.getId());
-                unreadCount = notificationService.getUnreadNotificationsCount(user.getId());
             }
 
             // Retrieve events and pagination attributes from request
@@ -1132,33 +992,10 @@
                     </ul>
                 </div>
 
-                <%-- User Profile and Notifications Section --%>
+                <%-- User Profile Section --%>
                 <div class="auth-buttons">
                     <c:choose>
                         <c:when test="${sessionScope.user != null}">
-                            <%-- Notification Icon and Dropdown --%>
-                            <div class="notification-icon-container">
-                                <span class="notification-icon" onclick="toggleNotificationDropdown()">
-                                    🔔
-                                    <span class="notification-badge <%= unreadCount > 0 ? "show" : "" %>" id="notificationBadge">
-                                        <%= unreadCount > 0 ? unreadCount : "" %>
-                                    </span>
-                                </span>
-                                <div class="notification-dropdown" id="notificationDropdown">
-                                    <% if (notifications.isEmpty()) { %>
-                                        <div class="no-notifications">Bạn không có thông báo nào.</div>
-                                    <% } else { %>
-                                        <% for (Notification notification : notifications) { %>
-                                            <div class="notification-item <%= !notification.isIsRead() ? "unread" : "" %>"
-                                                 onclick="handleNotificationClick(<%= notification.getNotificationID() %>, '<%= notification.getNotificationType() %>', <%= notification.getRelatedID() != null ? notification.getRelatedID() : "null" %>)">
-                                                <span class="notification-title"><%= notification.getTitle() %></span>
-                                                <span class="notification-content"><%= notification.getContent() %></span>
-                                                <span class="notification-time"><%= new SimpleDateFormat("HH:mm dd/MM").format(java.sql.Timestamp.valueOf(notification.getCreatedAt())) %></span>
-                                            </div>
-                                        <% } %>
-                                    <% } %>
-                                </div>
-                            </div>
 
                             <div class="user-menu">
                                 <div class="user-info" onclick="toggleUserDropdown()">
@@ -1360,28 +1197,6 @@
                 const dropdown = document.getElementById("userDropdown");
                 if (dropdown) {
                     dropdown.classList.toggle("show");
-                    // Close notifications dropdown if open
-                    const notificationDropdown = document.getElementById("notificationDropdown");
-                    if (notificationDropdown && notificationDropdown.classList.contains('show')) {
-                        notificationDropdown.classList.remove('show');
-                    }
-                }
-            }
-
-            function toggleNotificationDropdown() {
-                const dropdown = document.getElementById("notificationDropdown");
-                if (dropdown) {
-                    dropdown.classList.toggle("show");
-                    // Close user dropdown if open
-                    const userDropdown = document.getElementById("userDropdown");
-                    if (userDropdown && userDropdown.classList.contains('show')) {
-                        userDropdown.classList.remove('show');
-                    }
-
-                    // Mark all notifications as read when the dropdown is opened
-                    if (dropdown.classList.contains('show')) {
-                        markAllNotificationsAsRead();
-                    }
                 }
             }
 
@@ -1389,16 +1204,10 @@
             window.addEventListener("click", function (e) {
                 const userInfo = document.querySelector(".user-info");
                 const userDropdown = document.getElementById("userDropdown");
-                const notificationIconContainer = document.querySelector(".notification-icon-container");
-                const notificationDropdown = document.getElementById("notificationDropdown");
 
                 // Check if click is outside user-info and user-dropdown
                 if (userDropdown && userInfo && !userInfo.contains(e.target) && !userDropdown.contains(e.target)) {
                     userDropdown.classList.remove("show");
-                }
-                // Check if click is outside notification-icon-container and notification-dropdown
-                if (notificationDropdown && notificationIconContainer && !notificationIconContainer.contains(e.target) && !notificationDropdown.contains(e.target)) {
-                    notificationDropdown.classList.remove("show");
                 }
             });
 
@@ -1502,121 +1311,10 @@
                 });
             });
 
-            // --- Notification JavaScript Functions ---
-            function handleNotificationClick(notificationID, notificationType, relatedID) {
-                // Mark notification as read
-                markNotificationAsRead(notificationID);
 
-                // Optionally, redirect based on notification type
-                let redirectUrl = null;
-                const contextPath = '<%= request.getContextPath() %>';
-
-                // Check for "null" string as well, because JSP might render null as string "null"
-                if (notificationType === 'order' && relatedID !== null && relatedID !== 'null') {
-                    redirectUrl = contextPath + '/order-details?orderId=' + relatedID;
-                } else if (notificationType === 'event' && relatedID !== null && relatedID !== 'null') {
-                    redirectUrl = contextPath + '/EventServlet?id=' + relatedID;
-                } else if (notificationType === 'promotion') {
-                    redirectUrl = contextPath + '/promotions';
-                }
-
-                if (redirectUrl) {
-                    // Short delay to allow UI update before redirecting
-                    setTimeout(() => {
-                        window.location.href = redirectUrl;
-                    }, 100);
-                } else {
-                    // If no specific redirect, just close the dropdown
-                    toggleNotificationDropdown();
-                }
-            }
-
-            function markNotificationAsRead(notificationID) {
-                fetch('${pageContext.request.contextPath}/notification-servlet?action=markRead&notificationID=' + notificationID, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const notificationItem = document.querySelector(`.notification-item[onclick*='${notificationID}']`);
-                        if (notificationItem) {
-                            notificationItem.classList.remove('unread');
-                        }
-                        const badge = document.getElementById('notificationBadge');
-                        let currentCount = parseInt(badge.textContent || '0');
-                        if (currentCount > 0) {
-                            currentCount--;
-                            badge.textContent = currentCount > 0 ? currentCount : '';
-                            if (currentCount === 0) {
-                                badge.classList.remove('show');
-                            }
-                        }
-                    } else {
-                        console.error('Failed to mark notification as read:', data.message);
-                    }
-                })
-                .catch(error => console.error('Error marking notification as read:', error));
-            }
-
-            function markAllNotificationsAsRead() {
-                fetch('${pageContext.request.contextPath}/notification-servlet?action=markAllRead', {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.querySelectorAll('.notification-item.unread').forEach(item => {
-                            item.classList.remove('unread');
-                        });
-                        const badge = document.getElementById('notificationBadge');
-                        badge.textContent = '';
-                        badge.classList.remove('show');
-                    } else {
-                        console.error('Failed to mark all notifications as read:', data.message);
-                    }
-                })
-                .catch(error => console.error('Error marking all notifications as read:', error));
-            }
         </script>
 
-        <%-- Flash messages --%>
-        <% String flashMessageSuccess = (String)session.getAttribute("flashMessage_success"); %>
-        <% if (flashMessageSuccess != null && !flashMessageSuccess.isEmpty()) { %>
-        <div class="flash-message flash-success" id="successPopup">
-            <%= flashMessageSuccess %>
-        </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const popup = document.getElementById("successPopup");
-                if (popup) {
-                    popup.style.display = "flex";
-                    setTimeout(() => {
-                        popup.style.display = "none";
-                    }, 5000);
-                }
-            });
-        </script>
-        <% session.removeAttribute("flashMessage_success"); %>
-        <% } %>
 
-        <% String flashMessageError = (String)session.getAttribute("flashMessage_error"); %>
-        <% if (flashMessageError != null && !flashMessageError.isEmpty()) { %>
-        <div class="flash-message flash-error" id="errorPopup">
-            <%= flashMessageError %>
-        </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const popup = document.getElementById("errorPopup");
-                if (popup) {
-                    popup.style.display = "flex";
-                    setTimeout(() => {
-                        popup.style.display = "none";
-                    }, 5000);
-                }
-            });
-        </script>
-        <% session.removeAttribute("flashMessage_error"); %>
-        <% } %>
 
     </body>
 </html>

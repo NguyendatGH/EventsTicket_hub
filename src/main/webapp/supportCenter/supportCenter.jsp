@@ -263,6 +263,35 @@
             box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.3);
         }
 
+        /* Back Button */
+        .back-button-container {
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--card-bg);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .back-button i {
+            font-size: 0.9rem;
+        }
+
         /* Main Content */
         .container {
             max-width: 1200px;
@@ -614,6 +643,22 @@
             text-decoration: underline;
         }
 
+        .attachment-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .attachment-view {
+            color: #28a745;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .attachment-view:hover {
+            text-decoration: underline;
+        }
+
         /* Footer */
         .footer {
             background: var(--darker-bg);
@@ -774,6 +819,13 @@
     </header>
 
     <div class="container">
+        <!-- Back Button -->
+        <div class="back-button-container">
+            <a href="${pageContext.request.contextPath}/home" class="back-button">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
         <div class="header">
             <h1><i class="fas fa-headset"></i> Trung tâm hỗ trợ</h1>
             <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7</p>
@@ -917,10 +969,21 @@
                                             <div class="attachment-item">
                                                 <i class="attachment-icon ${attachment.iconClass}"></i>
                                                 <span class="attachment-name">${attachment.originalFileName}</span>
-                                                <a href="${pageContext.request.contextPath}/support?action=download&fileId=${attachment.attachmentId}" 
-                                                   class="attachment-download">
-                                                    <i class="fas fa-download"></i> Tải xuống
-                                                </a>
+                                                <div class="attachment-actions">
+                                                    <a href="${pageContext.request.contextPath}/support?action=download&fileId=${attachment.attachmentId}" 
+                                                       class="attachment-download"
+                                                       target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       download="${attachment.originalFileName}">
+                                                        <i class="fas fa-download"></i> Tải xuống
+                                                    </a>
+                                                    <a href="${pageContext.request.contextPath}/support?action=view&fileId=${attachment.attachmentId}" 
+                                                       class="attachment-view"
+                                                       target="_blank"
+                                                       rel="noopener noreferrer">
+                                                        <i class="fas fa-eye"></i> Xem file
+                                                    </a>
+                                                </div>
                                             </div>
                                         </c:forEach>
                                     </div>
@@ -1022,7 +1085,7 @@
         }
 
         // Close dropdown when clicking outside
-        window.onclick = function(event) {
+        document.addEventListener('click', function(event) {
             if (!event.target.matches('.user-info') && !event.target.matches('.user-info *')) {
                 const dropdowns = document.getElementsByClassName('user-dropdown');
                 for (let dropdown of dropdowns) {
@@ -1031,7 +1094,7 @@
                     }
                 }
             }
-        };
+        });
 
         // File upload handling
         document.getElementById('attachments').addEventListener('change', function(e) {
@@ -1138,6 +1201,15 @@
             const fileList = document.getElementById('file-list');
             console.log('File input found:', fileInput);
             console.log('File list found:', fileList);
+            
+            // Ensure download links work properly
+            const downloadLinks = document.querySelectorAll('.attachment-download');
+            downloadLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Allow the download to proceed normally
+                    console.log('Download link clicked:', this.href);
+                });
+            });
         };
     </script>
 </body>
