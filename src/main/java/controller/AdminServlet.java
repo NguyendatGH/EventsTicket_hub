@@ -23,7 +23,6 @@ import models.SupportItem;
 import models.SupportAttachment;
 import service.SupportService;
 
-
 @WebServlet(name = "AdminServlet", urlPatterns = { "/admin-servlet/*" })
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1MB
         maxFileSize = 1024 * 1024 * 10, // 10MB
@@ -40,8 +39,9 @@ public class AdminServlet extends HttpServlet {
     private AdminSupportServlet adminSupportServlet;
     private DashboardServlet dashboardServlet;
     private TransactionServlet transactionServlet;
-    private UserService userService; // Instance của UserService
-    private SupportService supportService; // Instance của SupportService
+    private OwnerRevenueServletManagement ownerRevenueServlet;
+    private UserService userService;
+    private SupportService supportService;
 
     @Override
     public void init() throws ServletException {
@@ -55,6 +55,7 @@ public class AdminServlet extends HttpServlet {
             adminSupportServlet.init();
             dashboardServlet = new DashboardServlet();
             transactionServlet = new TransactionServlet();
+            ownerRevenueServlet = new OwnerRevenueServletManagement();
             userService = new UserService();
             supportService = new SupportService();
         } catch (Exception e) {
@@ -99,12 +100,12 @@ public class AdminServlet extends HttpServlet {
             } else if (pathInfo.startsWith("/event-management")) {
                 eventManagementServlet.handleRequest(request, response);
             } else if (pathInfo.startsWith("/support-center")) {
-                // Xử lý support center trực tiếp trong AdminServlet
                 handleSupportCenter(request, response);
             } else if (pathInfo.startsWith("/transaction-management")) {
                 transactionServlet.handleRequest(request, response);
+            } else if (pathInfo.startsWith("/owner-revenue")) {
+                ownerRevenueServlet.handleRequest(request, response);
             } else if (pathInfo.startsWith("/refund-management")) {
-                // Chuyển tiếp request đến AdminRefundServlet
                 request.getRequestDispatcher("/admin/refund").forward(request, response);
             } else {
                 logger.warning("Unknown path for admin: " + pathInfo);
@@ -156,9 +157,11 @@ public class AdminServlet extends HttpServlet {
                     eventManagementServlet.handleRequest(request, response);
                 } else if (pathInfo.startsWith("/support-center")) {
                     handleSupportCenterPost(request, response);
-                }
-
-                else {
+                } else if (pathInfo.startsWith("/transaction-management")) {
+                    transactionServlet.handleRequest(request, response);
+                } else if (pathInfo.startsWith("/owner-revenue")) {
+                    ownerRevenueServlet.handleRequest(request, response);
+                } else {
                     logger.warning("Unknown POST path for admin: " + pathInfo);
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "Đường dẫn quản trị POST không hợp lệ.");
                 }

@@ -165,7 +165,7 @@
 <body>
   <div class="container">
     <aside class="sidebar">
-      <div class="logo">MasterTicket</div>
+      <div class="logo">EventTicketHub</div>
       <div class="admin-section">
         <div class="admin-avatar">
           <svg fill="currentColor" viewBox="0 0 24 24">
@@ -173,16 +173,33 @@
           </svg>
         </div>
         <div class="admin-name">Admin</div>
-        <div class="admin-role">Quản lý website MasterTicket</div>
+        <div class="admin-role">Quản lý website EventTicketHub</div>
       </div>
       <nav>
-        <ul class="nav-menu">
-          <li class="nav-item"><a href="${pageContext.request.contextPath}/admin-servlet/dashboard" class="nav-link">Bảng điều khiển</a></li>
-          <li class="nav-item"><a href="${pageContext.request.contextPath}/admin-servlet/event-management" class="nav-link">Danh sách sự kiện</a></li>
-          <li class="nav-item"><a href="${pageContext.request.contextPath}/admin-servlet/user-management" class="nav-link">Danh sách tài khoản</a></li>
-          <li class="nav-item"><a href="${pageContext.request.contextPath}/admin-servlet/support-center" class="nav-link active">Hỗ trợ khách hàng</a></li>
-        </ul>
-      </nav>
+          <ul class="nav-menu">
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin-servlet/dashboard" class="nav-link ">Bảng điều khiển</a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin-servlet/event-management" class="nav-link ">Danh sách sự kiện</a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin-servlet/user-management" class="nav-link">Danh sách tài khoản</a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin-servlet/transaction-management" class="nav-link">Danh sách giao dịch</a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin-servlet/owner-revenue" class="nav-link ">Doanh thu chủ sự kiện</a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin/refund" class="nav-link ">Quản lý hoàn tiền</a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/admin-servlet/support-center" class="nav-link active">Hỗ trợ khách hàng</a>
+            </li>
+          </ul>
+        </nav>
       <a href="${pageContext.request.contextPath}/logout" class="logout">
         <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
           <path d="M16 13v-2H7V8l-5 4 5 4v-3z" />

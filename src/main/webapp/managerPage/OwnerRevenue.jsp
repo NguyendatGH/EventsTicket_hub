@@ -6,7 +6,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MasterTicket Admin - Danh Sách Giao Dịch</title>
+    <title>MasterTicket Admin - Doanh Thu Chủ Sự Kiện</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
       :root {
@@ -153,31 +153,32 @@
       }
       .content-grid {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 2fr;
         gap: 30px;
       }
+      .profile-section,
       .chart-section,
-      .table-section {
+      .table-section,
+      .stats-section {
         background: rgba(255, 255, 255, 0.18);
         border-radius: 12px;
         padding: 2rem;
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        height: 450px;
         display: flex;
         flex-direction: column;
       }
-      .chart-container {
-        flex: 1;
-        position: relative;
-        height: 350px;
-        max-height: 350px;
+      .profile-section {
+        height: 300px;
       }
-      #revenueChart {
-        background: rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        width: 100% !important;
-        height: 100% !important;
+      .chart-section {
+        height: 400px;
+      }
+      .table-section {
+        height: 450px;
+      }
+      .stats-section {
+        height: 300px;
       }
       .section-title {
         color: white;
@@ -185,11 +186,81 @@
         font-weight: 600;
         margin-bottom: 1rem;
       }
+      .profile-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow);
+      }
+      .profile-avatar svg {
+        width: 50px;
+        height: 50px;
+        color: var(--text-secondary);
+      }
+      .profile-name {
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      .profile-email,
+      .profile-role {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+      .chart-container {
+        flex: 1;
+        position: relative;
+        height: 300px;
+        max-height: 300px;
+      }
+      #revenueChart {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        width: 100% !important;
+        height: 100% !important;
+      }
       .table-container {
         height: 350px;
         max-height: 350px;
         overflow-x: auto;
         overflow-y: auto;
+      }
+      .stats-container {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+      .stat-item {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+      }
+      .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+      .stat-value {
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        font-weight: 600;
       }
       table {
         width: 100%;
@@ -212,29 +283,39 @@
       tbody tr:hover {
         background: rgba(255, 255, 255, 0.05);
       }
-      .status-tag {
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        text-wrap: nowrap;
-      }
-      .status-completed {
-        background: rgba(40, 167, 69, 0.2);
-        color: #28a745;
-      }
-      .status-pending {
-        background: rgba(255, 193, 7, 0.2);
-        color: #ffc107;
-      }
-      .status-failed {
-        background: rgba(220, 53, 69, 0.2);
-        color: #dc3545;
-      }
       .no-data {
         color: #94a3b8;
         text-align: center;
         padding: 2rem;
+        font-size: 1.1rem;
+      }
+      .owner-filter {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .owner-filter input,
+      .owner-filter select {
+        padding: 0.5rem;
+        border: 1px solid var(--border-light);
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+      }
+      .owner-filter button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        background: #0f67ff;
+        color: var(--text-primary);
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      .owner-filter button:hover {
+        background: #0a4cb2;
       }
       .hamburger {
         display: none;
@@ -338,14 +419,16 @@
         .main-content {
           padding: 0 30px;
         }
+        .profile-section,
         .chart-section,
-        .table-section {
-          height: 400px;
+        .table-section,
+        .stats-section {
+          height: 350px;
         }
         .chart-container,
         .table-container {
-          height: 300px;
-          max-height: 300px;
+          height: 250px;
+          max-height: 250px;
         }
         .bg_elips {
           width: 600px;
@@ -419,14 +502,16 @@
           padding: 8px 16px;
           font-size: 0.875rem;
         }
+        .profile-section,
         .chart-section,
-        .table-section {
-          height: 350px;
+        .table-section,
+        .stats-section {
+          height: 300px;
         }
         .chart-container,
         .table-container {
-          height: 250px;
-          max-height: 250px;
+          height: 200px;
+          max-height: 200px;
         }
         .bg_elips {
           width: 400px;
@@ -470,16 +555,24 @@
           bottom: -150px;
           right: -50px;
         }
-        .content-grid {
-          display: flex;
+        .owner-filter {
           flex-direction: column;
-          align-items: stretch;
+          align-items: flex-start;
         }
       }
       @keyframes float {
         0% { transform: translateY(0); }
         50% { transform: translateY(-20px); }
         100% { transform: translateY(0); }
+      }
+      .sm{
+        width: 120px;
+        height:120px;
+        border-radius: 50%;
+      }
+      .otp{
+        background-color: transparent;
+        color: white;
       }
     </style>
   </head>
@@ -516,10 +609,10 @@
               <a href="${pageContext.request.contextPath}/admin-servlet/user-management" class="nav-link">Danh sách tài khoản</a>
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet/transaction-management/" class="nav-link active">Danh sách giao dịch</a>
+              <a href="${pageContext.request.contextPath}/admin-servlet/transaction-management" class="nav-link">Danh sách giao dịch</a>
             </li>
             <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/admin-servlet/owner-revenue" class="nav-link">Doanh thu chủ sự kiện</a>
+              <a href="${pageContext.request.contextPath}/admin-servlet/owner-revenue" class="nav-link active">Doanh thu chủ sự kiện</a>
             </li>
             <li class="nav-item">
               <a href="${pageContext.request.contextPath}/admin/refund" class="nav-link">Quản lý hoàn tiền</a>
@@ -539,86 +632,148 @@
       </aside>
       <main class="main-content">
         <header class="header">
-          <h1 class="page-title">Danh Sách Giao Dịch</h1>
-          <div class="control-panel">Tổng quan giao dịch</div>
+          <h1 class="page-title">Doanh Thu Chủ Sự Kiện</h1>
+          <div class="control-panel">Tổng quan doanh thu</div>
         </header>
-        <section class="content-grid">
-          <div class="chart-section">
-            <h2 class="section-title">Doanh thu theo ngày</h2>
-            <div class="chart-container">
-              <c:choose>
-                <c:when test="${not empty dailyRevenue}">
-                  <canvas id="revenueChart"></canvas>
-                </c:when>
-                <c:otherwise>
-                  <div class="no-data">Không có dữ liệu doanh thu</div>
-                </c:otherwise>
-              </c:choose>
-            </div>
+        <section>
+          <div class="owner-filter">
+            <input type="email" id="ownerEmail" name="ownerEmail" placeholder="Nhập email chủ sự kiện" value="${ownerEmail != null ? ownerEmail : ''}" />
+            <select id="timePeriod" name="timePeriod">
+              <option class="opt" value="all" ${timePeriod == 'all' ? 'selected' : ''}>Toàn thời gian</option>
+              <option  class="opt" value="monthly" ${timePeriod == 'monthly' ? 'selected' : ''}>Theo tháng</option>
+              <option   class="opt" value="yearly" ${timePeriod == 'yearly' ? 'selected' : ''}>Theo năm</option>
+            </select>
+            <button onclick="filterOwnerRevenue()">Lọc</button>
           </div>
-          <div class="table-section">
-            <h2 class="section-title">Danh sách giao dịch</h2>
-            <div class="table-container">
-              <c:choose>
-                <c:when test="${not empty transactions}">
-                  <table>
-                    <thead class="table-header">
-                      <tr>
-                        <th>Mã đơn hàng</th>
-                        <th>Khách hàng</th>
-                        <th>Sự kiện</th>
-                        <th>Vé</th>
-                        <th>Số lượng</th>
-                        <th>Tổng tiền</th>
-                        <th>Thanh toán</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày tạo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <c:forEach var="transaction" items="${transactions}">
-                        <tr>
-                          <td>${transaction.orderNumber}</td>
-                          <td>${transaction.customerName}</td>
-                          <td>${transaction.eventName}</td>
-                          <td>${transaction.ticketName}</td>
-                          <td>${transaction.totalQuantity}</td>
-                          <td>
-                            <fmt:formatNumber value="${transaction.totalAmount}" type="currency" currencyCode="VND" />
-                          </td>
-                          <td>
-                            <span class="status-tag status-${transaction.paymentStatus}">
-                              ${transaction.paymentStatus == 'paid' ? 'Đã thanh toán' :
-                                transaction.paymentStatus == 'pending' ? 'Đang chờ' : 'Thất bại'}
-                            </span>
-                          </td>
-                          <td>
-                            <span class="status-tag status-${transaction.orderStatus}">
-                              ${transaction.orderStatus == 'completed' ? 'Hoàn thành' :
-                                transaction.orderStatus == 'pending' ? 'Đang xử lý' : 'Hủy'}
-                            </span>
-                          </td>
-                          <td>
-                            <c:choose>
-                              <c:when test="${not empty transaction.createdAt}">
-                                <fmt:formatDate value="${transaction.createdAt}" pattern="dd/MM/yyyy HH:mm" />
-                              </c:when>
-                              <c:otherwise>
-                                N/A
-                              </c:otherwise>
-                            </c:choose>
-                          </td>
-                        </tr>
-                      </c:forEach>
-                    </tbody>
-                  </table>
-                </c:when>
-                <c:otherwise>
-                  <div class="no-data">Không có giao dịch nào</div>
-                </c:otherwise>
-              </c:choose>
-            </div>
-          </div>
+          <c:choose>
+            <c:when test="${ownerNotFound}">
+              <div class="no-data">Không tìm thấy chủ sự kiện với email này</div>
+            </c:when>
+            <c:otherwise>
+              <div class="content-grid">
+                <div class="profile-section">
+                  <h2 class="section-title">Hồ sơ chủ sự kiện</h2>
+                  <div class="profile-container">
+                    <c:choose>
+                      <c:when test="${not empty ownerProfile}">
+                        <div class="profile-avatar">
+                          <img  class="profile-avatar sm" src="${pageContext.request.contextPath}/uploads/user_avatar/${ownerProfile.avatar}"/>
+                        </div>
+                        <div class="profile-name">${ownerProfile.name}</div>
+                        <div class="profile-email">${ownerProfile.email}</div>
+                        <div class="profile-role">Chủ sự kiện</div>
+                      </c:when>
+                      <c:otherwise>
+                        <div class="no-data">Không có thông tin hồ sơ</div>
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+                </div>
+                <div class="stats-section">
+                  <h2 class="section-title">Thống kê</h2>
+                  <div class="stats-container">
+                    <div class="stat-item">
+                      <div class="stat-label">Tổng doanh thu</div>
+                      <div class="stat-value"><fmt:formatNumber value="${totalRevenue}" type="currency" currencyCode="VND" /></div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">Số sự kiện</div>
+                      <div class="stat-value">${eventCount}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">Tổng vé bán</div>
+                      <div class="stat-value">${totalTicketsSold}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">Số đơn hàng</div>
+                      <div class="stat-value">${orderCount}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="chart-section">
+                  <h2 class="section-title">Doanh thu theo thời gian</h2>
+                  <div class="chart-container">
+                    <c:choose>
+                      <c:when test="${not empty revenueData}">
+                        <canvas id="revenueChart"></canvas>
+                      </c:when>
+                      <c:otherwise>
+                        <div class="no-data">Không có dữ liệu doanh thu</div>
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+                </div>
+                <div class="table-section">
+                  <h2 class="section-title">Chi tiết doanh thu</h2>
+                  <div class="table-container">
+                    <c:choose>
+                      <c:when test="${not empty ownerRevenues}">
+                        <table>
+                          <thead class="table-header">
+                            <tr>
+                              <th>Chủ sự kiện</th>
+                              <c:choose>
+                                <c:when test="${timePeriod == 'monthly' || timePeriod == 'yearly'}">
+                                  <th>Thời kỳ</th>
+                                </c:when>
+                                <c:otherwise>
+                                  <th>Sự kiện</th>
+                                  <th>Thời gian bắt đầu</th>
+                                  <th>Thời gian kết thúc</th>
+                                </c:otherwise>
+                              </c:choose>
+                              <th>Số đơn hàng</th>
+                              <th>Tổng vé bán</th>
+                              <th>Doanh thu</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <c:forEach var="revenue" items="${ownerRevenues}">
+                              <tr>
+                                <td>${revenue.ownerName}</td>
+                                <c:choose>
+                                  <c:when test="${timePeriod == 'monthly' || timePeriod == 'yearly'}">
+                                    <td>${revenue.revenuePeriod}</td>
+                                  </c:when>
+                                  <c:otherwise>
+                                    <td>${revenue.eventName}</td>
+                                    <td>
+                                      <c:choose>
+                                        <c:when test="${not empty revenue.startTime}">
+                                          <fmt:formatDate value="${revenue.startTime}" pattern="dd/MM/yyyy HH:mm" />
+                                        </c:when>
+                                        <c:otherwise>N/A</c:otherwise>
+                                      </c:choose>
+                                    </td>
+                                    <td>
+                                      <c:choose>
+                                        <c:when test="${not empty revenue.endTime}">
+                                          <fmt:formatDate value="${revenue.endTime}" pattern="dd/MM/yyyy HH:mm" />
+                                        </c:when>
+                                        <c:otherwise>N/A</c:otherwise>
+                                      </c:choose>
+                                    </td>
+                                  </c:otherwise>
+                                </c:choose>
+                                <td>${revenue.orderCount}</td>
+                                <td>${revenue.totalTicketsSold}</td>
+                                <td>
+                                  <fmt:formatNumber value="${revenue.eventRevenue}" type="currency" currencyCode="VND" />
+                                </td>
+                              </tr>
+                            </c:forEach>
+                          </tbody>
+                        </table>
+                      </c:when>
+                      <c:otherwise>
+                        <div class="no-data">Không có dữ liệu doanh thu</div>
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+                </div>
+              </div>
+            </c:otherwise>
+          </c:choose>
         </section>
       </main>
     </div>
@@ -664,11 +819,19 @@
       }
       animateEllipses();
 
-      // Data for daily revenue chart
-      <c:if test="${not empty dailyRevenue}">
+      function filterOwnerRevenue() {
+        const ownerEmail = document.getElementById("ownerEmail").value;
+        const timePeriod = document.getElementById("timePeriod").value;
+        if (ownerEmail) {
+          window.location.href = "${pageContext.request.contextPath}/admin-servlet/owner-revenue?ownerEmail=" + 
+            encodeURIComponent(ownerEmail) + "&timePeriod=" + timePeriod;
+        }
+      }
+
+      <c:if test="${not empty revenueData}">
         const revenueData = {
           labels: [
-            <c:forEach var="entry" items="${dailyRevenue}" varStatus="loop">
+            <c:forEach var="entry" items="${revenueData}" varStatus="loop">
               "${entry.key}"${loop.last ? '' : ','}
             </c:forEach>
           ],
@@ -676,7 +839,7 @@
             {
               label: "Doanh thu (VNĐ)",
               data: [
-                <c:forEach var="entry" items="${dailyRevenue}" varStatus="loop">
+                <c:forEach var="entry" items="${revenueData}" varStatus="loop">
                   ${entry.value}${loop.last ? '' : ','}
                 </c:forEach>
               ],

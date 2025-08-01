@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hỗ trợ chủ sự kiện - MasterTicket</title>
+    <title>Hỗ trợ chủ sự kiện - EventTicketHub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -233,7 +233,7 @@
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="brand">🎟️ MasterTicket</div>
+        <div class="brand">🎟️ EventTicketHub</div>
         <ul class="menu">
             <li><a href="#">📅 My Events</a></li>
             <li><a href="#">📊 Manage Reports</a></li>
