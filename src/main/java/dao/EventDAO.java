@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
 public class EventDAO {
 
     private static final Logger logger = Logger.getLogger(EventDAO.class.getName());
@@ -639,54 +638,160 @@ public class EventDAO {
         }
     }
 
-    public ToggleEvent deleteEvent(int event_id) {
+    public ToggleEvent deleteEvent(int eventId) {
         Connection conn = null;
-        boolean success = false;
-        System.out.println("event id to delete: " + event_id);
         try {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false);
+            logger.info("Attempting to delete EventID: " + eventId);
 
-            // Check for sold tickets (for hard delete)
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT COUNT(*) FROM Ticket t JOIN TicketInfo ti ON t.TicketInfoID = ti.TicketInfoID WHERE ti.EventID = ? AND t.Status = 'sold'")) {
-                ps.setInt(1, event_id);
-                ResultSet rs = ps.executeQuery();
-                if (rs.next() && rs.getInt(1) > 0) {
-                    logger.warning("Cannot hard delete EventID: " + event_id + " due to sold tickets");
-                    conn.rollback();
-                    return new ToggleEvent(false, "Không thể xóa sự kiện vì đã có vé được bán");
+            // Step 1: Check if event exists
+            String checkEventSql = "SELECT Status, IsDeleted FROM Events WHERE EventID = ?";
+            String eventStatus = null;
+            boolean isDeleted = false;
+            try (PreparedStatement ps = conn.prepareStatement(checkEventSql)) {
+                ps.setInt(1, eventId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        conn.rollback();
+                        return new ToggleEvent(false, "Sự kiện không tồn tại");
+                    }
+                    eventStatus = rs.getString("Status");
+                    isDeleted = rs.getBoolean("IsDeleted");
                 }
             }
 
-            String eventQuery = "DELETE FROM Events WHERE EventID = ?";
-            try (PreparedStatement ps = conn.prepareStatement(eventQuery)) {
-                ps.setInt(1, event_id);
-                int rows = ps.executeUpdate();
-                System.out.println("");
-                if (rows == 0) {
-                    conn.rollback();
-                    return new ToggleEvent(false, "Sự kiện không tồn tại");
+            // Step 2: Check if event is already deleted
+            if (isDeleted) {
+                conn.rollback();
+                return new ToggleEvent(false, "Sự kiện đã bị xóa trước đó");
+            }
+
+            // Step 3: Check for sold tickets
+            int soldTicketsCount = 0;
+            String checkTicketsSql = "SELECT COUNT(*) FROM Ticket t " +
+                    "JOIN TicketInfo ti ON t.TicketInfoID = ti.TicketInfoID " +
+                    "WHERE ti.EventID = ? AND t.Status = 'sold'";
+            try (PreparedStatement ps = conn.prepareStatement(checkTicketsSql)) {
+                ps.setInt(1, eventId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        soldTicketsCount = rs.getInt(1);
+                    }
                 }
             }
-            // Log to AuditLog
+
+            // Step 4: Check for related TicketInfo records
+            int ticketInfoCount = 0;
+            String checkTicketInfoSql = "SELECT COUNT(*) FROM TicketInfo WHERE EventID = ?";
+            try (PreparedStatement ps = conn.prepareStatement(checkTicketInfoSql)) {
+                ps.setInt(1, eventId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        ticketInfoCount = rs.getInt(1);
+                    }
+                }
+            }
+
+            // Step 5: Determine deletion strategy
+            if (soldTicketsCount > 0 || ticketInfoCount > 0) {
+                // Events with sold tickets or TicketInfo records can only be soft deleted
+                if ("active".equals(eventStatus)) {
+                    conn.rollback();
+                    return new ToggleEvent(false,
+                            "Không thể xóa sự kiện đang hoạt động đã bán vé hoặc có thông tin vé");
+                } else if ("completed".equals(eventStatus) || "cancelled".equals(eventStatus)
+                        || "pending".equals(eventStatus)) {
+                    // Soft delete for completed, cancelled, or pending events with sold tickets or
+                    // TicketInfo
+                    String softDeleteSql = "UPDATE Events SET IsDeleted = 1, UpdatedAt = ? WHERE EventID = ?";
+                    try (PreparedStatement ps = conn.prepareStatement(softDeleteSql)) {
+                        ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+                        ps.setInt(2, eventId);
+                        int rows = ps.executeUpdate();
+                        if (rows == 0) {
+                            conn.rollback();
+                            return new ToggleEvent(false, "Không thể xóa mềm sự kiện");
+                        }
+                    }
+                    logger.info("Soft deleted EventID: " + eventId + " with sold tickets or TicketInfo records");
+                } else {
+                    conn.rollback();
+                    return new ToggleEvent(false, "Không thể xóa sự kiện ở trạng thái: " + eventStatus);
+                }
+            } else {
+                // No sold tickets and no TicketInfo: perform hard delete with cascading
+                // Delete related records in dependent tables
+                // Delete from Ticket (no sold tickets, so safe to delete)
+                String deleteTicketsSql = "DELETE t FROM Ticket t " +
+                        "JOIN TicketInfo ti ON t.TicketInfoID = ti.TicketInfoID " +
+                        "WHERE ti.EventID = ?";
+                try (PreparedStatement ps = conn.prepareStatement(deleteTicketsSql)) {
+                    ps.setInt(1, eventId);
+                    ps.executeUpdate();
+                }
+
+                // Delete from TicketInventory
+                String deleteInventorySql = "DELETE ti FROM TicketInventory ti " +
+                        "JOIN TicketInfo t ON ti.TicketInfoID = t.TicketInfoID " +
+                        "WHERE t.EventID = ?";
+                try (PreparedStatement ps = conn.prepareStatement(deleteInventorySql)) {
+                    ps.setInt(1, eventId);
+                    ps.executeUpdate();
+                }
+
+                // Delete from Seat (via Zones)
+                String deleteSeatsSql = "DELETE s FROM Seat s " +
+                        "JOIN Zones z ON s.ZoneID = z.id " +
+                        "WHERE z.event_id = ?";
+                try (PreparedStatement ps = conn.prepareStatement(deleteSeatsSql)) {
+                    ps.setInt(1, eventId);
+                    ps.executeUpdate();
+                }
+
+                // Delete from Zones
+                String deleteZonesSql = "DELETE FROM Zones WHERE event_id = ?";
+                try (PreparedStatement ps = conn.prepareStatement(deleteZonesSql)) {
+                    ps.setInt(1, eventId);
+                    ps.executeUpdate();
+                }
+
+                // Delete from TicketInfo
+                String deleteTicketInfoSql = "DELETE FROM TicketInfo WHERE EventID = ?";
+                try (PreparedStatement ps = conn.prepareStatement(deleteTicketInfoSql)) {
+                    ps.setInt(1, eventId);
+                    ps.executeUpdate();
+                }
+
+                // Delete from Events
+                String hardDeleteSql = "DELETE FROM Events WHERE EventID = ?";
+                try (PreparedStatement ps = conn.prepareStatement(hardDeleteSql)) {
+                    ps.setInt(1, eventId);
+                    int rows = ps.executeUpdate();
+                    if (rows == 0) {
+                        conn.rollback();
+                        return new ToggleEvent(false, "Không thể xóa sự kiện");
+                    }
+                }
+                logger.info("Hard deleted EventID: " + eventId + " with no sold tickets or TicketInfo");
+            }
+
+            // Step 6: Log to AuditLog
             try (PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO AuditLog (TableName, RecordID, Action, UserID, CreatedAt) VALUES (?, ?, ?, ?, ?)")) {
                 ps.setString(1, "Events");
-                ps.setInt(2, event_id);
+                ps.setInt(2, eventId);
                 ps.setString(3, "DELETE");
-                ps.setInt(4, 1);
+                ps.setInt(4, 1); // Assuming admin user ID is 1
                 ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
                 ps.executeUpdate();
             }
 
             conn.commit();
-            success = true;
             return new ToggleEvent(true, "Xóa sự kiện thành công");
         } catch (SQLException e) {
-            logger.severe("Error during " + "hard" + " delete of EventID: " + event_id + " - "
-                    + e.getMessage());
-            e.printStackTrace();
+            logger.severe("Error deleting EventID: " + eventId + " - " + e.getMessage() +
+                    ", SQLState: " + e.getSQLState() + ", ErrorCode: " + e.getErrorCode());
             if (conn != null) {
                 try {
                     conn.rollback();
@@ -694,7 +799,7 @@ public class EventDAO {
                     logger.severe("Rollback failed: " + re.getMessage());
                 }
             }
-            return new ToggleEvent(false, "Lỗi hệ thống khi xóa sự kiện");
+            return new ToggleEvent(false, "Lỗi hệ thống khi xóa sự kiện: " + e.getMessage());
         } finally {
             if (conn != null) {
                 try {
@@ -705,7 +810,6 @@ public class EventDAO {
                 }
             }
         }
-
     }
 
     // Existing updateEvent method remains unchanged
@@ -977,7 +1081,8 @@ public class EventDAO {
                 "TotalTicketCount, IsApproved, Status, GenreID, OwnerID, ImageURL, " +
                 "HasSeatingChart, IsDeleted, CreatedAt, UpdatedAt";
 
-        String sql = "SELECT " + allColumns + " FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE() " +
+        String sql = "SELECT " + allColumns
+                + " FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE() " +
                 "ORDER BY StartTime DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (Connection conn = DBConnection.getConnection();
@@ -1057,7 +1162,8 @@ public class EventDAO {
 
     public List<Event> searchEvents(String keyword, String location, Integer genreId) {
         List<Event> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE()");
+        StringBuilder sql = new StringBuilder(
+                "SELECT * FROM Events WHERE IsApproved = 1 AND IsDeleted = 0 AND EndTime > GETDATE()");
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -1076,7 +1182,8 @@ public class EventDAO {
         }
         sql.append(" ORDER BY StartTime DESC");
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -1131,7 +1238,8 @@ public class EventDAO {
         }
         sql.append(" ORDER BY StartTime DESC");
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
