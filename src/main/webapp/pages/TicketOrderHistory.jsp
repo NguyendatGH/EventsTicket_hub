@@ -1066,8 +1066,10 @@
         <header class="header">
             <div class="header-container">
                 <div class="logo">
-                    <i class="fas fa-ticket-alt"></i>
-                    MasterTicket
+                    <a href="${pageContext.request.contextPath}/home" style="text-decoration: none; color: inherit;">
+                        <i class="fas fa-ticket-alt"></i>
+                        MasterTicket
+                    </a>
                 </div>
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
