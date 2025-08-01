@@ -148,6 +148,35 @@
             background: #c82333;
         }
 
+        /* Back Button */
+        .back-button-container {
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #21262d;
+            color: #e6edf3;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: #667aff;
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .back-button i {
+            font-size: 0.9rem;
+        }
+
         .attachment-list {
             margin-top: 1rem;
         }
@@ -179,6 +208,22 @@
         }
 
         .attachment-download:hover {
+            text-decoration: underline;
+        }
+
+        .attachment-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .attachment-view {
+            color: #28a745;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .attachment-view:hover {
             text-decoration: underline;
         }
         
@@ -218,6 +263,13 @@
         </nav>
         <!-- Support Center Content -->
         <div class="container">
+            <!-- Back Button -->
+            <div class="back-button-container">
+                <a href="${pageContext.request.contextPath}/eventOwner/dashBoard" class="back-button">
+                    <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+                </a>
+            </div>
+
             <div class="header">
                 <h1><i class="fas fa-headset"></i> Hỗ trợ dành cho chủ sự kiện</h1>
                 <p>Gửi yêu cầu hỗ trợ tới admin nếu bạn gặp khó khăn khi quản lý sự kiện.</p>
@@ -317,10 +369,21 @@
                                                 <div class="attachment-item">
                                                     <i class="attachment-icon ${attachment.iconClass}"></i>
                                                     <span class="attachment-name">${attachment.originalFileName}</span>
-                                                    <a href="${pageContext.request.contextPath}/support-owner?action=download&fileId=${attachment.attachmentId}" 
-                                                       class="attachment-download">
-                                                        <i class="fas fa-download"></i> Tải xuống
-                                                    </a>
+                                                    <div class="attachment-actions">
+                                                        <a href="${pageContext.request.contextPath}/support-owner?action=download&fileId=${attachment.attachmentId}"
+                                                           class="attachment-download"
+                                                           target="_blank"
+                                                           rel="noopener noreferrer"
+                                                           download="${attachment.originalFileName}">
+                                                            <i class="fas fa-download"></i> Tải xuống
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/support-owner?action=view&fileId=${attachment.attachmentId}" 
+                                                           class="attachment-view"
+                                                           target="_blank"
+                                                           rel="noopener noreferrer">
+                                                            <i class="fas fa-eye"></i> Xem file
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </c:forEach>
                                         </div>
@@ -463,6 +526,15 @@
             const fileList = document.getElementById('file-list');
             console.log('File input found:', fileInput);
             console.log('File list found:', fileList);
+            
+            // Ensure download links work properly
+            const downloadLinks = document.querySelectorAll('.attachment-download');
+            downloadLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Allow the download to proceed normally
+                    console.log('Download link clicked:', this.href);
+                });
+            });
         };
     </script>
 </body>

@@ -137,8 +137,17 @@ public class AdminSupportServlet extends HttpServlet {
 
             // Set response headers for download
             response.setContentType(attachment.getFileType());
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + attachment.getOriginalFileName() + "\"");
+            
+            // Handle filename encoding for special characters
+            String fileName = attachment.getOriginalFileName();
+            String encodedFileName = java.net.URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + encodedFileName);
+            
             response.setContentLengthLong(attachment.getFileSize());
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            response.setHeader("X-Content-Type-Options", "nosniff");
 
             // Stream the file
             Path filePath = Paths.get(attachment.getFilePath());
