@@ -155,7 +155,7 @@ public class EventDAO {
 
     public List<Event> getPendingEvents() {
         List<Event> list = new ArrayList<>();
-        String sql = "SELECT * FROM Events WHERE Status = 'pending'";
+        String sql = "SELECT * FROM Events WHERE Status = 'pending' And isDeleted = 0";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
