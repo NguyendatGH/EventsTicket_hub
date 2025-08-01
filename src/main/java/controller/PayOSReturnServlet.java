@@ -5,6 +5,9 @@ import dto.UserDTO;
 import models.Order;
 import models.OrderItem;
 import service.EmailService;
+import service.NotificationService;
+import models.Notification;
+import controller.NotificationWebSocket;
 
 
 import jakarta.servlet.ServletException;
@@ -67,6 +70,27 @@ public class PayOSReturnServlet extends HttpServlet {
                                 ex.printStackTrace();
                                 request.setAttribute("status", "success");
                                 request.setAttribute("message", "Đặt hàng thành công nhưng gửi email thất bại.");
+                            }
+
+                            // Tạo thông báo real-time cho order thành công
+                            try {
+                                NotificationService notificationService = new NotificationService();
+                                Notification notification = new Notification();
+                                notification.setUserID(currentUser.getId());
+                                notification.setNotificationType("order");
+                                notification.setTitle("Đặt vé thành công!");
+                                notification.setContent("Bạn đã đặt vé thành công cho sự kiện: " + currentOrder.getEvent().getName());
+                                notification.setRelatedID(newOrderId);
+                                notification.setIsRead(false);
+                                notification.setCreatedAt(java.time.LocalDateTime.now());
+                                
+                                boolean notificationSaved = notificationService.insertNotification(notification);
+                                if (notificationSaved) {
+                                    // Gửi thông báo real-time qua WebSocket
+                                    NotificationWebSocket.sendNotificationToUser(currentUser.getId(), notification);
+                                }
+                            } catch (Exception ex) {
+                                System.err.println("Lỗi khi tạo thông báo: " + ex.getMessage());
                             }
 
                             request.setAttribute("status", "success");

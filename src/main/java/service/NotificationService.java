@@ -45,4 +45,13 @@ public class NotificationService {
         return notificationDAO.markAllAsRead(userId);
     }
 
+    // Insert a new notification
+    public boolean insertNotification(Notification notification) {
+        if (notification == null || notification.getUserID() <= 0) {
+            System.err.println("Invalid notification or user ID for inserting notification.");
+            return false;
+        }
+        return notificationDAO.insertNotification(notification);
+    }
+
 }

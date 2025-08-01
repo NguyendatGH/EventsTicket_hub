@@ -1027,22 +1027,22 @@
                                     
                                     <c:if test="${refund.refundStatus == 'pending'}">
                                         <form method="post" action="${pageContext.request.contextPath}/admin/refund" 
-                                              style="display: inline;">
+                                              style="display: inline;" class="refund-action-form">
                                             <input type="hidden" name="action" value="approve">
                                             <input type="hidden" name="refundId" value="${refund.refundId}">
                                             <button type="submit" class="btn btn-success" 
-                                                    onclick="return confirm('Bạn có chắc chắn muốn phê duyệt yêu cầu hoàn tiền này?')">
+                                                    onclick="return handleRefundAction(this, 'Bạn có chắc chắn muốn phê duyệt yêu cầu hoàn tiền này?')">
                                                 <i class="fas fa-check"></i>
                                                 Phê duyệt
                                             </button>
                                         </form>
                                         
                                         <form method="post" action="${pageContext.request.contextPath}/admin/refund" 
-                                              style="display: inline;">
+                                              style="display: inline;" class="refund-action-form">
                                             <input type="hidden" name="action" value="reject">
                                             <input type="hidden" name="refundId" value="${refund.refundId}">
                                             <button type="submit" class="btn btn-danger" 
-                                                    onclick="return confirm('Bạn có chắc chắn muốn từ chối yêu cầu hoàn tiền này?')">
+                                                    onclick="return handleRefundAction(this, 'Bạn có chắc chắn muốn từ chối yêu cầu hoàn tiền này?')">
                                                 <i class="fas fa-times"></i>
                                                 Từ chối
                                             </button>
@@ -1051,11 +1051,11 @@
                                     
                                     <c:if test="${refund.refundStatus == 'approved'}">
                                         <form method="post" action="${pageContext.request.contextPath}/admin/refund" 
-                                              style="display: inline;">
+                                              style="display: inline;" class="refund-action-form">
                                             <input type="hidden" name="action" value="complete">
                                             <input type="hidden" name="refundId" value="${refund.refundId}">
                                             <button type="submit" class="btn btn-warning" 
-                                                    onclick="return confirm('Bạn có chắc chắn muốn hoàn thành xử lý yêu cầu hoàn tiền này?')">
+                                                    onclick="return handleRefundAction(this, 'Bạn có chắc chắn muốn hoàn thành xử lý yêu cầu hoàn tiền này?')">
                                                 <i class="fas fa-check-double"></i>
                                                 Hoàn thành
                                             </button>
@@ -1136,6 +1136,60 @@
     </div>
 
     <script>
+        // Global variable to track form submission
+        let isSubmitting = false;
+        
+        // Function to handle refund actions and prevent double submission
+        function handleRefundAction(button, confirmMessage) {
+            // Prevent double submission
+            if (isSubmitting) {
+                return false;
+            }
+            
+            // Show confirmation dialog
+            if (!confirm(confirmMessage)) {
+                return false;
+            }
+            
+            // Set submitting flag
+            isSubmitting = true;
+            
+            // Disable the button and show loading state
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            button.style.opacity = '0.7';
+            button.style.cursor = 'not-allowed';
+            
+            // Disable all other refund action buttons
+            const allRefundButtons = document.querySelectorAll('.refund-action-form button[type="submit"]');
+            allRefundButtons.forEach(btn => {
+                if (btn !== button) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                }
+            });
+            
+            // Submit the form
+            const form = button.closest('form');
+            if (form) {
+                form.submit();
+            }
+            
+            // Reset flag after a timeout (in case of errors)
+            setTimeout(() => {
+                isSubmitting = false;
+            }, 5000);
+            
+            return false; // Prevent default form submission
+        }
+        
+        // Prevent form resubmission on page refresh
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+        
         // Page initialization
         document.addEventListener('DOMContentLoaded', function() {
             

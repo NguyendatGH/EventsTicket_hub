@@ -155,9 +155,60 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
       .header {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        gap: 1rem;
         margin-bottom: 2rem;
+      }
+      
+      .header-top {
+        display: flex;
+        justify-content: flex-start;
+      }
+      
+      .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: rgba(255, 255, 255, 0.18);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        border: none;
+      }
+      
+      .btn-back:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+      
+      .btn-refresh {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: rgba(255, 255, 255, 0.18);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        border: none;
+      }
+      
+      .btn-refresh:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       }
 
       .page-title {
@@ -621,7 +672,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         }
       }
 
-      /* Notification Styles */
+      /* Simple Notification Styles */
       .notification-container {
         position: relative;
       }
@@ -659,7 +710,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         border-radius: 50%;
         width: 20px;
         height: 20px;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
         font-size: 12px;
@@ -667,12 +718,16 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         min-width: 20px;
       }
 
+      .notification-badge.show {
+        display: flex;
+      }
+
       .notification-dropdown {
         position: absolute;
         top: 100%;
         right: 0;
-        width: 400px;
-        max-height: 500px;
+        width: 350px;
+        max-height: 400px;
         background: rgba(15, 23, 42, 0.95);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -718,7 +773,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
 
       .notification-list {
-        max-height: 400px;
+        max-height: 300px;
         overflow-y: auto;
       }
 
@@ -743,27 +798,50 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
       .notification-title {
         color: white;
-        font-size: 14px;
         font-weight: 600;
+        font-size: 14px;
         margin-bottom: 4px;
+        display: block;
       }
 
       .notification-content {
-        color: #94a3b8;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 12px;
         line-height: 1.4;
         margin-bottom: 8px;
+        display: block;
+        word-wrap: break-word;
+        max-width: 100%;
       }
 
+      .notification-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+      
+      .notification-type {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      
       .notification-time {
-        color: #64748b;
+        color: rgba(255, 255, 255, 0.6);
         font-size: 11px;
+        display: block;
       }
 
       .notification-empty {
-        padding: 40px 20px;
+        padding: 20px;
         text-align: center;
-        color: #94a3b8;
+        color: rgba(255, 255, 255, 0.6);
         font-size: 14px;
       }
 
@@ -778,6 +856,44 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           transform: translateY(0);
         }
       }
+
+      .popup-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 8px;
+       }
+
+       .popup-header strong {
+         font-size: 14px;
+         font-weight: 600;
+       }
+
+       .popup-close {
+         background: none;
+         border: none;
+         color: white;
+         font-size: 18px;
+         cursor: pointer;
+         padding: 0;
+         width: 20px;
+         height: 20px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 50%;
+         transition: background-color 0.2s;
+       }
+
+       .popup-close:hover {
+         background-color: rgba(255, 255, 255, 0.2);
+       }
+
+       .popup-body {
+         font-size: 13px;
+         line-height: 1.4;
+         opacity: 0.9;
+       }
     </style>
   </head>
   <body>
@@ -846,25 +962,18 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       </aside>
       <main class="main-content">
         <header class="header">
+          <div class="header-top">
+            <button onclick="history.back()" class="btn-back">
+              <i class="fas fa-arrow-left"></i>
+              Quay lại
+            </button>
+          </div>
           <h1 class="page-title">Bảng điều khiển</h1>
-          <div style="display: flex; align-items: center; gap: 24px;">
-            <!-- Notification Bell -->
-            <div class="notification-container">
-              <div class="notification-bell" id="notificationBell">
-                <i class="fas fa-bell"></i>
-                <span class="notification-badge" id="notificationBadge">0</span>
-              </div>
-              <div class="notification-dropdown" id="notificationDropdown">
-                <div class="notification-header">
-                  <h3>Thông báo</h3>
-                  <button class="mark-all-read" id="markAllRead">Đánh dấu tất cả</button>
-                </div>
-                <div class="notification-list" id="notificationList">
-                  <!-- Notifications will be loaded here -->
-                </div>
-              </div>
-            </div>
-            <div class="control-panel">Tổng quan</div>
+          <div class="control-panel">
+            <button onclick="refreshDashboard()" class="btn-refresh">
+              <i class="fas fa-sync-alt"></i>
+              Làm mới
+            </button>
           </div>
         </header>
         <section class="stats-grid">
@@ -984,162 +1093,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         });
       });
 
-      // Notification System
-      const notificationBell = document.getElementById('notificationBell');
-      const notificationDropdown = document.getElementById('notificationDropdown');
-      const notificationList = document.getElementById('notificationList');
-      const notificationBadge = document.getElementById('notificationBadge');
-      const markAllRead = document.getElementById('markAllRead');
-
-      // Toggle notification dropdown
-      notificationBell.addEventListener('click', function(e) {
-        e.stopPropagation();
-        notificationDropdown.classList.toggle('show');
-        if (notificationDropdown.classList.contains('show')) {
-          loadNotifications();
-        }
-      });
-
-      // Close dropdown when clicking outside
-      document.addEventListener('click', function(e) {
-        if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
-          notificationDropdown.classList.remove('show');
-        }
-      });
-
-      // Load notifications
-      function loadNotifications() {
-        fetch('${pageContext.request.contextPath}/admin-notifications')
-          .then(response => {
-            console.log('Response status:', response.status);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Loaded notifications:', data);
-            
-            // Check if data is an array
-            if (Array.isArray(data)) {
-              displayNotifications(data);
-              updateNotificationBadge(data);
-            } else if (data.error) {
-              console.error('Server error:', data.error);
-              notificationList.innerHTML = '<div class="notification-empty">Lỗi: ' + data.error + '</div>';
-            } else {
-              console.error('Unexpected data format:', data);
-              notificationList.innerHTML = '<div class="notification-empty">Dữ liệu không đúng định dạng</div>';
-            }
-          })
-          .catch(error => {
-            console.error('Error loading notifications:', error);
-            notificationList.innerHTML = '<div class="notification-empty">Không thể tải thông báo: ' + error.message + '</div>';
-          });
-      }
-
-      // Display notifications
-      function displayNotifications(notifications) {
-        if (!notifications || notifications.length === 0) {
-          notificationList.innerHTML = '<div class="notification-empty">Không có thông báo nào</div>';
-          return;
-        }
-
-        notificationList.innerHTML = '';
-        notifications.forEach(notification => {
-          const notificationItem = document.createElement('div');
-          notificationItem.className = `notification-item ${!notification.isRead ? 'unread' : ''}`;
-          
-          const timeAgo = formatTimeAgo(notification.createdAt);
-          
-          notificationItem.innerHTML = `
-            <div class="notification-title">${notification.title}</div>
-            <div class="notification-content">${notification.content}</div>
-            <div class="notification-time">${timeAgo}</div>
-          `;
-          
-          notificationItem.addEventListener('click', () => {
-            markNotificationAsRead(notification.notificationID);
-            notificationItem.classList.remove('unread');
-          });
-          
-          notificationList.appendChild(notificationItem);
-        });
-      }
-
-      // Update notification badge
-      function updateNotificationBadge(notifications) {
-        const unreadCount = notifications.filter(n => !n.isRead).length;
-        notificationBadge.textContent = unreadCount;
-        notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
-      }
-
-      // Mark notification as read
-      function markNotificationAsRead(notificationId) {
-        fetch('${pageContext.request.contextPath}/admin-notifications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: `action=markAsRead&notificationId=${notificationId}`
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            console.log('Notification marked as read');
-          }
-        })
-        .catch(error => {
-          console.error('Error marking notification as read:', error);
-        });
-      }
-
-      // Mark all notifications as read
-      markAllRead.addEventListener('click', function() {
-        fetch('${pageContext.request.contextPath}/admin-notifications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: 'action=markAllAsRead'
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            console.log('All notifications marked as read');
-            loadNotifications();
-          }
-        })
-        .catch(error => {
-          console.error('Error marking all notifications as read:', error);
-        });
-      });
-
-      // Format time ago
-      function formatTimeAgo(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - date) / 1000);
-        
-        if (diffInSeconds < 60) {
-          return 'Vừa xong';
-        } else if (diffInSeconds < 3600) {
-          const minutes = Math.floor(diffInSeconds / 60);
-          return `${minutes} phút trước`;
-        } else if (diffInSeconds < 86400) {
-          const hours = Math.floor(diffInSeconds / 3600);
-          return `${hours} giờ trước`;
-        } else {
-          const days = Math.floor(diffInSeconds / 86400);
-          return `${days} ngày trước`;
-        }
-      }
-
-      // Load notifications on page load
-      document.addEventListener('DOMContentLoaded', function() {
-        loadNotifications();
-      });
-
       document.addEventListener("click", (e) => {
         if (
           window.innerWidth <= 992 &&
@@ -1161,7 +1114,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       }
       animateEllipses();
 
-            const organizerNames = [
+      const organizerNames = [
         <c:forEach var="organizer" items="${topEventOrganizers}" varStatus="loop">
           "${organizer.name}"${loop.last ? '' : ','}
         </c:forEach>
@@ -1257,10 +1210,683 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       const ctx = document.getElementById("revenueChart").getContext("2d");
       const revenueChart = new Chart(ctx, config);
 
-      // Simple page initialization
+            // ===== SIMPLE NOTIFICATION SYSTEM =====
+      
+      // Notification elements
+      const notificationBell = document.getElementById('notificationBell');
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      const notificationList = document.getElementById('notificationList');
+      const notificationBadge = document.getElementById('notificationBadge');
+      const markAllRead = document.getElementById('markAllRead');
+      const testNotificationBtn = document.getElementById('testNotificationBtn');
+      const testParsingBtn = document.getElementById('testParsingBtn');
+
+      // WebSocket connection
+      let adminNotificationSocket = null;
+
+      // Initialize WebSocket
+      function initAdminNotificationWebSocket() {
+        const adminId = 1; // Admin ID
+        console.log('🔌 Initializing Admin WebSocket for Admin ID:', adminId);
+        
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = wsProtocol + "//" + window.location.host + '${pageContext.request.contextPath}/websocket/notifications?userId=' + adminId;
+        console.log('🔗 Connecting to Admin Notification WebSocket:', wsUrl);
+
+        adminNotificationSocket = new WebSocket(wsUrl);
+
+        adminNotificationSocket.onopen = function(event) {
+          console.log('✅ Admin WebSocket connection opened');
+        };
+
+        adminNotificationSocket.onmessage = function(event) {
+          console.log('📨 Admin received notification:', event.data);
+          try {
+            const notification = JSON.parse(event.data);
+            console.log('📋 Parsed notification:', notification);
+            
+            // Add to dropdown if open
+            if (notificationDropdown.classList.contains('show')) {
+              addNotificationToDropdown(notification);
+            }
+            
+            // Update badge
+            updateNotificationBadgeFromWebSocket();
+            
+          } catch (e) {
+            console.error('❌ Error parsing notification:', e);
+          }
+        };
+
+        adminNotificationSocket.onerror = function(error) {
+          console.error('❌ Admin WebSocket Error:', error);
+        };
+
+        adminNotificationSocket.onclose = function(event) {
+          console.log('🔌 Admin WebSocket connection closed');
+          // Reconnect after 5 seconds
+          setTimeout(() => {
+            console.log('🔄 Attempting to reconnect...');
+            initAdminNotificationWebSocket();
+          }, 5000);
+        };
+      }
+
+      // Toggle notification dropdown
+      notificationBell.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationDropdown.classList.toggle('show');
+        if (notificationDropdown.classList.contains('show')) {
+          loadNotifications();
+        }
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
+          notificationDropdown.classList.remove('show');
+        }
+      });
+
+      // Test parsing function
+      function testParsing() {
+        console.log('🧪 Testing parsing logic...');
+        
+        // Test refund notification content
+        const refundContent = "Người gửi: Nguyễn Văn A (ID: 15) | Lý do: Vé bị hủy do sự kiện bị hoãn | Số tiền: 500,000 VNĐ | Đơn hàng: #123";
+        console.log('🧪 Testing refund content:', refundContent);
+        
+        const senderMatch1 = refundContent.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+        if (senderMatch1) {
+          console.log('✅ Refund sender parsed:', senderMatch1[1].trim());
+        } else {
+          console.log('❌ Failed to parse refund sender');
+        }
+        
+        const reasonMatch1 = refundContent.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+        if (reasonMatch1) {
+          console.log('✅ Refund reason parsed:', reasonMatch1[1].trim());
+        } else {
+          console.log('❌ Failed to parse refund reason');
+        }
+        
+        const amountMatch1 = refundContent.match(/Số tiền: ([^|]+?)(?=\s*\|\s*Đơn hàng:)/);
+        if (amountMatch1) {
+          console.log('✅ Refund amount parsed:', amountMatch1[1].trim());
+        } else {
+          console.log('❌ Failed to parse refund amount');
+        }
+        
+        const orderMatch1 = refundContent.match(/Đơn hàng: #(\d+)/);
+        if (orderMatch1) {
+          console.log('✅ Refund order ID parsed:', orderMatch1[1]);
+        } else {
+          console.log('❌ Failed to parse refund order ID');
+        }
+        
+        // Test support notification content
+        const supportContent = "Người gửi: Trần Thị B (ID: 23) | Lý do: Không thể thanh toán qua PayOS | Loại hỗ trợ: Thanh toán | Mô tả: Lỗi khi nhập thông tin thẻ";
+        console.log('🧪 Testing support content:', supportContent);
+        
+        const senderMatch2 = supportContent.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+        if (senderMatch2) {
+          console.log('✅ Support sender parsed:', senderMatch2[1].trim());
+        } else {
+          console.log('❌ Failed to parse support sender');
+        }
+        
+        const reasonMatch2 = supportContent.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+        if (reasonMatch2) {
+          console.log('✅ Support reason parsed:', reasonMatch2[1].trim());
+        } else {
+          console.log('❌ Failed to parse support reason');
+        }
+        
+        const supportTypeMatch2 = supportContent.match(/Loại hỗ trợ: ([^|]+?)(?=\s*\|\s*Mô tả:)/);
+        if (supportTypeMatch2) {
+          console.log('✅ Support type parsed:', supportTypeMatch2[1].trim());
+        } else {
+          console.log('❌ Failed to parse support type');
+        }
+      }
+
+      // Load notifications from server
+      function loadNotifications() {
+        fetch('${pageContext.request.contextPath}/admin-notifications')
+          .then(response => {
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response headers:', response.headers);
+            return response.text();
+          })
+          .then(text => {
+            console.log('📡 Raw response text:', text);
+            try {
+              const data = JSON.parse(text);
+              console.log('📋 Parsed notifications:', data);
+              console.log('📋 Data type:', typeof data);
+              console.log('📋 Is array:', Array.isArray(data));
+              if (Array.isArray(data)) {
+                console.log('📋 Number of notifications:', data.length);
+                if (data.length > 0) {
+                  console.log('📋 First notification:', data[0]);
+                  console.log('📋 First notification keys:', Object.keys(data[0]));
+                  console.log('📋 First notification title:', data[0].title);
+                  console.log('📋 First notification content:', data[0].content);
+                  console.log('📋 First notification isIsRead:', data[0].isIsRead);
+                }
+                displayNotifications(data);
+                updateNotificationBadge(data);
+              } else {
+                console.log('📋 Data is not an array:', data);
+              }
+            } catch (e) {
+              console.error('❌ Error parsing JSON:', e);
+              console.error('❌ Raw text was:', text);
+            }
+          })
+          .catch(error => {
+            console.error('❌ Error loading notifications:', error);
+          });
+      }
+
+      // Display notifications in dropdown
+      function displayNotifications(notifications) {
+        console.log('🔍 Displaying notifications:', notifications);
+        
+        if (!notifications || notifications.length === 0) {
+          notificationList.innerHTML = '<div class="notification-empty">Không có thông báo nào</div>';
+          return;
+        }
+
+        notificationList.innerHTML = '';
+        notifications.forEach((notification, index) => {
+          console.log(`📋 Notification ${index + 1}:`, notification);
+          console.log(`📋 All keys:`, Object.keys(notification));
+          console.log(`📋 isIsRead:`, notification.isIsRead);
+          console.log(`📋 isRead:`, notification.isRead);
+          console.log(`📋 title:`, notification.title);
+          console.log(`📋 content:`, notification.content);
+          console.log(`📋 notificationID:`, notification.notificationID);
+          console.log(`📋 userID:`, notification.userID);
+          console.log(`📋 notificationType:`, notification.notificationType);
+          
+          const notificationItem = document.createElement('div');
+          notificationItem.className = `notification-item ${!notification.isIsRead ? 'unread' : ''}`;
+          
+          const timeAgo = formatTimeAgo(notification.createdAt);
+          
+          // Ensure we have proper content
+          const title = notification.title || 'Không có tiêu đề';
+          const content = notification.content || 'Không có nội dung';
+          const type = notification.notificationType || 'system';
+          const notificationId = notification.notificationID || 'N/A';
+          const priority = notification.priority || 'normal';
+          const relatedId = notification.relatedID || null;
+          
+          console.log(`📋 Final display values - Title: "${title}", Content: "${content}", Type: "${type}", ID: "${notificationId}", Priority: "${priority}", RelatedID: "${relatedId}"`);
+          
+          // Add more detailed logging
+          if (!title || title === 'null' || title === 'undefined') {
+            console.warn(`⚠️ Notification ${index + 1} has invalid title:`, title);
+          }
+          if (!content || content === 'null' || content === 'undefined') {
+            console.warn(`⚠️ Notification ${index + 1} has invalid content:`, content);
+          }
+          
+          // Parse content to extract sender and reason
+          let sender = 'Không xác định';
+          let reason = 'Không có lý do';
+          let amount = '';
+          let orderId = '';
+          
+          if (content && content !== 'null' && content !== 'undefined') {
+            console.log('🔍 Parsing content:', content);
+            
+            // Parse content for sender and reason
+            const senderMatch = content.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+            if (senderMatch) {
+              sender = senderMatch[1].trim();
+              console.log('✅ Parsed sender:', sender);
+            } else {
+              console.log('❌ Failed to parse sender from:', content);
+            }
+            
+            const reasonMatch = content.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+            if (reasonMatch) {
+              reason = reasonMatch[1].trim();
+              console.log('✅ Parsed reason:', reason);
+            } else {
+              console.log('❌ Failed to parse reason from:', content);
+            }
+            
+            // Try to parse amount (for refund notifications)
+            const amountMatch = content.match(/Số tiền: ([^|]+?)(?=\s*\|\s*Đơn hàng:)/);
+            if (amountMatch) {
+              amount = amountMatch[1].trim();
+              console.log('✅ Parsed amount:', amount);
+            } else {
+              console.log('❌ Failed to parse amount from:', content);
+            }
+            
+            // Try to parse order ID (for refund notifications)
+            const orderMatch = content.match(/Đơn hàng: #(\d+)/);
+            if (orderMatch) {
+              orderId = orderMatch[1];
+              console.log('✅ Parsed orderId:', orderId);
+            } else {
+              console.log('❌ Failed to parse orderId from:', content);
+            }
+            
+            // Try to parse support type (for support notifications)
+            const supportTypeMatch = content.match(/Loại hỗ trợ: ([^|]+?)(?=\s*\|\s*Mô tả:)/);
+            if (supportTypeMatch) {
+              const supportType = supportTypeMatch[1].trim();
+              console.log('✅ Parsed support type:', supportType);
+              // Add support type to the display if it's a support notification
+              if (content.includes('Loại hỗ trợ:')) {
+                reason += ' (' + supportType + ')';
+              }
+            }
+          }
+          
+          notificationItem.innerHTML = `
+            <div class="notification-title">${title}</div>
+            <div class="notification-content">
+              <div style="margin-bottom: 8px;">
+                <strong>Người gửi:</strong> ${sender}
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong>Lý do:</strong> ${reason}
+              </div>
+                          ${amount ? '<div style="margin-bottom: 8px;"><strong>Số tiền:</strong> ' + amount + '</div>' : ''}
+            ${orderId ? '<div style="margin-bottom: 8px;"><strong>Đơn hàng:</strong> #' + orderId + '</div>' : ''}
+            </div>
+            <div class="notification-meta">
+              <span class="notification-type">${type}</span>
+              <span class="notification-time">${timeAgo}</span>
+            </div>
+            <div class="notification-details" style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px;">
+              ID: ${notificationId} | Priority: ${priority} ${relatedId ? '| Related ID: ' + relatedId : ''}
+            </div>
+          `;
+          
+          notificationItem.addEventListener('click', () => {
+            markNotificationAsRead(notification.notificationID);
+            notificationItem.classList.remove('unread');
+            
+            // Handle redirect based on notification type
+            if (notification.notificationType === 'order') {
+              if (notification.content && notification.content.includes('hoàn tiền')) {
+                window.location.href = '${pageContext.request.contextPath}/admin/refund';
+              } else {
+                window.location.href = '${pageContext.request.contextPath}/AdminEventManagement.jsp';
+              }
+            }
+          });
+          
+          notificationList.appendChild(notificationItem);
+        });
+      }
+
+      // Add new notification to dropdown
+      function addNotificationToDropdown(notification) {
+        const notificationItem = document.createElement('div');
+        notificationItem.className = 'notification-item unread';
+        
+        const timeAgo = formatTimeAgo(notification.createdAt);
+        
+        // Ensure we have proper content
+        const title = notification.title || 'Không có tiêu đề';
+        const content = notification.content || 'Không có nội dung';
+        const type = notification.notificationType || 'system';
+        const notificationId = notification.notificationID || 'N/A';
+        const priority = notification.priority || 'normal';
+        const relatedId = notification.relatedID || null;
+        
+        console.log(`📋 Adding new notification - Title: "${title}", Content: "${content}", Type: "${type}", ID: "${notificationId}", Priority: "${priority}", RelatedID: "${relatedId}"`);
+        
+        // Add more detailed logging
+        if (!title || title === 'null' || title === 'undefined') {
+          console.warn(`⚠️ New notification has invalid title:`, title);
+        }
+        if (!content || content === 'null' || content === 'undefined') {
+          console.warn(`⚠️ New notification has invalid content:`, content);
+        }
+        
+        // Parse content to extract sender and reason
+        let sender = 'Không xác định';
+        let reason = 'Không có lý do';
+        let amount = '';
+        let orderId = '';
+        
+        if (content && content !== 'null' && content !== 'undefined') {
+          console.log('🔍 Parsing content for new notification:', content);
+          
+          // Parse content for sender and reason
+          const senderMatch = content.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+          if (senderMatch) {
+            sender = senderMatch[1].trim();
+            console.log('✅ Parsed sender for new notification:', sender);
+          } else {
+            console.log('❌ Failed to parse sender from new notification:', content);
+          }
+          
+          const reasonMatch = content.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+          if (reasonMatch) {
+            reason = reasonMatch[1].trim();
+            console.log('✅ Parsed reason for new notification:', reason);
+          } else {
+            console.log('❌ Failed to parse reason from new notification:', content);
+          }
+          
+          // Try to parse amount (for refund notifications)
+          const amountMatch = content.match(/Số tiền: ([^|]+?)(?=\s*\|\s*Đơn hàng:)/);
+          if (amountMatch) {
+            amount = amountMatch[1].trim();
+            console.log('✅ Parsed amount for new notification:', amount);
+          } else {
+            console.log('❌ Failed to parse amount from new notification:', content);
+          }
+          
+          // Try to parse order ID (for refund notifications)
+          const orderMatch = content.match(/Đơn hàng: #(\d+)/);
+          if (orderMatch) {
+            orderId = orderMatch[1];
+            console.log('✅ Parsed orderId for new notification:', orderId);
+          } else {
+            console.log('❌ Failed to parse orderId from new notification:', content);
+          }
+          
+          // Try to parse support type (for support notifications)
+          const supportTypeMatch = content.match(/Loại hỗ trợ: ([^|]+?)(?=\s*\|\s*Mô tả:)/);
+          if (supportTypeMatch) {
+            const supportType = supportTypeMatch[1].trim();
+            console.log('✅ Parsed support type for new notification:', supportType);
+            // Add support type to the display if it's a support notification
+            if (content.includes('Loại hỗ trợ:')) {
+              reason += ' (' + supportType + ')';
+            }
+          }
+        }
+        
+        notificationItem.innerHTML = `
+          <div class="notification-title">${title}</div>
+          <div class="notification-content">
+            <div style="margin-bottom: 8px;">
+              <strong>Người gửi:</strong> ${sender}
+            </div>
+            <div style="margin-bottom: 8px;">
+              <strong>Lý do:</strong> ${reason}
+            </div>
+            ${amount ? '<div style="margin-bottom: 8px;"><strong>Số tiền:</strong> ' + amount + '</div>' : ''}
+            ${orderId ? '<div style="margin-bottom: 8px;"><strong>Đơn hàng:</strong> #' + orderId + '</div>' : ''}
+          </div>
+          <div class="notification-meta">
+            <span class="notification-type">${type}</span>
+            <span class="notification-time">${timeAgo}</span>
+          </div>
+          <div class="notification-details" style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px;">
+            ID: ${notificationId} | Priority: ${priority} ${relatedId ? '| Related ID: ' + relatedId : ''}
+          </div>
+        `;
+        
+        notificationItem.addEventListener('click', () => {
+          markNotificationAsRead(notification.notificationID);
+          notificationItem.classList.remove('unread');
+          
+          if (notification.notificationType === 'order') {
+            if (notification.content && notification.content.includes('hoàn tiền')) {
+              window.location.href = '${pageContext.request.contextPath}/admin/refund';
+            } else {
+              window.location.href = '${pageContext.request.contextPath}/AdminEventManagement.jsp';
+            }
+          }
+        });
+        
+        // Add to beginning of list
+        const firstItem = notificationList.querySelector('.notification-item');
+        if (firstItem) {
+          notificationList.insertBefore(notificationItem, firstItem);
+        } else {
+          notificationList.appendChild(notificationItem);
+        }
+      }
+
+      // Update notification badge
+      function updateNotificationBadge(notifications) {
+        const unreadCount = notifications.filter(n => !n.isIsRead).length;
+        console.log('🔢 Updating badge count:', unreadCount, 'from', notifications.length, 'notifications');
+        notificationBadge.textContent = unreadCount;
+        if (unreadCount > 0) {
+          notificationBadge.classList.add('show');
+        } else {
+          notificationBadge.classList.remove('show');
+        }
+      }
+
+      // Update badge from WebSocket
+      function updateNotificationBadgeFromWebSocket() {
+        const currentCount = parseInt(notificationBadge.textContent || '0');
+        const newCount = currentCount + 1;
+        console.log('🔢 WebSocket badge update:', currentCount, '->', newCount);
+        notificationBadge.textContent = newCount;
+        notificationBadge.classList.add('show');
+      }
+
+      // Mark notification as read
+      function markNotificationAsRead(notificationId) {
+        console.log('📝 Marking notification as read:', notificationId);
+        fetch('${pageContext.request.contextPath}/notification-servlet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `action=markRead&notificationId=${notificationId}&userId=1`
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            console.log('✅ Notification marked as read');
+            // Reload notifications to update the badge count
+            loadNotifications();
+          } else {
+            console.error('❌ Failed to mark notification as read:', data.error);
+          }
+        })
+        .catch(error => {
+          console.error('❌ Error marking notification as read:', error);
+        });
+      }
+
+      // Mark all notifications as read
+      markAllRead.addEventListener('click', function() {
+        console.log('📝 Marking all notifications as read');
+        fetch('${pageContext.request.contextPath}/notification-servlet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'action=markAllRead&userId=1'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            console.log('✅ All notifications marked as read');
+            // Reload notifications to update the badge count
+            loadNotifications();
+          } else {
+            console.error('❌ Failed to mark all notifications as read:', data.error);
+          }
+        })
+        .catch(error => {
+          console.error('❌ Error marking all notifications as read:', error);
+        });
+      });
+
+      // Format time ago
+      function formatTimeAgo(dateString) {
+        if (!dateString) return 'Không xác định';
+        
+        try {
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) return 'Không xác định';
+          
+          const now = new Date();
+          const diffInSeconds = Math.floor((now - date) / 1000);
+          
+          if (diffInSeconds < 60) {
+            return 'Vừa xong';
+          } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes} phút trước`;
+          } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours} giờ trước`;
+          } else {
+            const days = Math.floor(diffInSeconds / 86400);
+            return `${days} ngày trước`;
+          }
+        } catch (e) {
+          return 'Không xác định';
+        }
+      }
+
+      // Initialize everything
       document.addEventListener('DOMContentLoaded', function() {
         console.log('Admin Dashboard page loaded successfully');
+        
+        // Initialize WebSocket
+        initAdminNotificationWebSocket();
+        
+        // Load initial notifications
+        loadNotifications();
+        
+        // Test notification object
+        console.log('🧪 Testing notification object structure...');
+        const testNotification = {
+          notificationID: 1,
+          userID: 1,
+          title: "Test Title",
+          content: "Test Content",
+          notificationType: "order",
+          isIsRead: false,
+          isRead: false,
+          createdAt: "2024-01-01T00:00:00"
+        };
+        console.log('🧪 Test notification:', testNotification);
+        console.log('🧪 Test notification keys:', Object.keys(testNotification));
+        
+        // Function to refresh dashboard
+        function refreshDashboard() {
+          console.log('🔄 Refreshing dashboard...');
+          window.location.reload();
+        }
+        
+        // Auto-refresh dashboard every 30 seconds
+        setInterval(refreshDashboard, 30000);
+        
+        // Test parsing function
+        testParsing();
+
+        // Test notification button
+        testNotificationBtn.addEventListener('click', function() {
+          console.log('🧪 Simulating WebSocket notification...');
+          
+          // First, let's load the actual notifications and see what we get
+          fetch('${pageContext.request.contextPath}/admin-notifications')
+            .then(response => response.json())
+            .then(data => {
+              console.log('📋 Actual notifications loaded:', data);
+              
+              if (Array.isArray(data) && data.length > 0) {
+                console.log('📋 First notification content:', data[0].content);
+                console.log('📋 First notification title:', data[0].title);
+                console.log('📋 First notification type:', data[0].notificationType);
+                console.log('📋 First notification isRead:', data[0].isIsRead);
+                
+                // Test parsing the first notification
+                const firstNotification = data[0];
+                if (firstNotification.content) {
+                  console.log('🧪 Testing parsing for first notification...');
+                  const content = firstNotification.content;
+                  console.log('🧪 Raw content:', content);
+                  
+                  const senderMatch = content.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+                  if (senderMatch) {
+                    console.log('✅ Sender parsed:', senderMatch[1].trim());
+                  } else {
+                    console.log('❌ Failed to parse sender from:', content);
+                  }
+                  
+                  const reasonMatch = content.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+                  if (reasonMatch) {
+                    console.log('✅ Reason parsed:', reasonMatch[1].trim());
+                  } else {
+                    console.log('❌ Failed to parse reason from:', content);
+                  }
+                }
+              }
+            })
+            .catch(error => {
+              console.error('❌ Error loading notifications:', error);
+            });
+          
+          const newNotification = {
+            notificationID: Date.now(), // Unique ID
+            userID: 1, // Admin ID
+            title: "Test Notification",
+            content: "This is a test notification content. It can be a refund request, support request, or any other type. It should be parsed correctly.",
+            notificationType: "test", // Custom type for testing
+            isIsRead: false,
+            isRead: false,
+            createdAt: new Date().toISOString()
+          };
+          console.log('🧪 New notification to add:', newNotification);
+          addNotificationToDropdown(newNotification);
+          updateNotificationBadgeFromWebSocket(); // Update badge from WebSocket
+        });
+
+        // Test parsing button
+        testParsingBtn.addEventListener('click', function() {
+          console.log('🧪 Simulating parsing test...');
+          testParsing();
+          
+          // Also test with the exact content that should be generated
+          console.log('🧪 Testing with exact content format...');
+          const testContent = "Người gửi: DEBUG User (ID: 999) | Lý do: This is a debug test | Số tiền: 999,999 VNĐ | Đơn hàng: #999";
+          console.log('🧪 Test content:', testContent);
+          
+          const senderMatch = testContent.match(/Người gửi: ([^|]+?)(?=\s*\|\s*Lý do:)/);
+          if (senderMatch) {
+            console.log('✅ Test sender parsed:', senderMatch[1].trim());
+          } else {
+            console.log('❌ Test failed to parse sender');
+          }
+          
+          const reasonMatch = testContent.match(/Lý do: ([^|]+?)(?=\s*\|\s*(?:Số tiền:|Loại hỗ trợ:|Đơn hàng:|Mô tả:))/);
+          if (reasonMatch) {
+            console.log('✅ Test reason parsed:', reasonMatch[1].trim());
+          } else {
+            console.log('❌ Test failed to parse reason');
+          }
+          
+          const amountMatch = testContent.match(/Số tiền: ([^|]+?)(?=\s*\|\s*Đơn hàng:)/);
+          if (amountMatch) {
+            console.log('✅ Test amount parsed:', amountMatch[1].trim());
+          } else {
+            console.log('❌ Test failed to parse amount');
+          }
+          
+          const orderMatch = testContent.match(/Đơn hàng: #(\d+)/);
+          if (orderMatch) {
+            console.log('✅ Test order ID parsed:', orderMatch[1]);
+          } else {
+            console.log('❌ Test failed to parse order ID');
+          }
+          
+          alert('Parsing test completed. Check console for results.');
+        });
       });
-    </script>
-  </body>
-</html>
+     </script>
+   </body>
+ </html>

@@ -14,7 +14,8 @@ public class RefundDAO {
         String sql = "INSERT INTO Refunds (OrderID, OrderItemID, UserID, RefundAmount, RefundReason, RefundStatus, PaymentMethodID, RefundRequestDate, CreatedAt, UpdatedAt) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, refund.getOrderId());
             if (refund.getOrderItemId() != null) {
                 ps.setInt(2, refund.getOrderItemId());
@@ -30,15 +31,21 @@ public class RefundDAO {
             ps.setTimestamp(9, Timestamp.valueOf(refund.getCreatedAt()));
             ps.setTimestamp(10, Timestamp.valueOf(refund.getUpdatedAt()));
             
-            boolean success = ps.executeUpdate() > 0;
+            int affectedRows = ps.executeUpdate();
             
-            if (success) {
-                System.out.println("Refund created successfully");
+            if (affectedRows > 0) {
+                // Lấy refundId được tạo
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        refund.setRefundId(rs.getInt(1));
+                        System.out.println("Refund created successfully with ID: " + refund.getRefundId());
+                    }
+                }
+                return true;
             } else {
                 System.out.println("Failed to create refund");
+                return false;
             }
-            
-            return success;
         } catch (Exception e) {
             e.printStackTrace();
         }

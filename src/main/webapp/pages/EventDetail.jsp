@@ -823,6 +823,127 @@
                 background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
                 animation: shimmer 2s infinite;
             }
+            
+            /* Notification styles */
+            .notification-icon-container {
+                position: relative;
+                display: inline-block;
+                margin-right: 1rem;
+            }
+            
+            .notification-icon {
+                position: relative;
+                cursor: pointer;
+                padding: 0.5rem;
+                color: var(--text-light);
+                font-size: 1.2rem;
+                transition: color 0.3s ease;
+            }
+            
+            .notification-icon:hover {
+                color: var(--primary);
+            }
+            
+            .notification-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: var(--danger);
+                color: white;
+                border-radius: 50%;
+                width: 18px;
+                height: 18px;
+                font-size: 0.7rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transform: scale(0);
+                transition: all 0.3s ease;
+            }
+            
+            .notification-badge.show {
+                opacity: 1;
+                transform: scale(1);
+            }
+            
+            .notification-dropdown {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                width: 350px;
+                max-height: 400px;
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                transition: all 0.3s ease;
+                overflow-y: auto;
+            }
+            
+            .notification-dropdown.show {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+            
+            .notification-item {
+                padding: 1rem;
+                border-bottom: 1px solid var(--border-color);
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+            
+            .notification-item:last-child {
+                border-bottom: none;
+            }
+            
+            .notification-item:hover {
+                background: rgba(255, 255, 255, 0.05);
+            }
+            
+            .notification-item.unread {
+                background: rgba(99, 102, 241, 0.1);
+                border-left: 3px solid var(--primary);
+            }
+            
+            .notification-item.unread:hover {
+                background: rgba(99, 102, 241, 0.15);
+            }
+            
+            .notification-title {
+                font-weight: 600;
+                color: var(--text-light);
+                margin-bottom: 0.25rem;
+                font-size: 0.9rem;
+            }
+            
+            .notification-content {
+                color: var(--text-muted);
+                font-size: 0.8rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .notification-time {
+                color: var(--text-muted);
+                font-size: 0.7rem;
+            }
+            
+            .no-notifications {
+                padding: 2rem;
+                text-align: center;
+                color: var(--text-muted);
+            }
+            
+            .notification-loading {
+                padding: 1rem;
+                text-align: center;
+                color: var(--text-muted);
+            }
         </style>
     </head>
 
@@ -841,10 +962,18 @@
                         <i class="fas fa-plus"></i>
                         Vé đã mua 
                     </a>
-<!--                    <a href="${pageContext.request.contextPath}/TicketOrderHistoryServlet" class="link">
-                        <i class="fas fa-history"></i>
-                        Vé đã mua
-                    </a>-->
+                    
+                    <!-- Notification Icon and Dropdown -->
+                    <div class="notification-icon-container">
+                        <span class="notification-icon" onclick="toggleNotificationDropdown()">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationBadge"></span>
+                        </span>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-loading">Đang tải...</div>
+                        </div>
+                    </div>
+                    
                     <div class="account">
                         <a href="${pageContext.request.contextPath}/updateProfile" class="link">
                             <i class="fas fa-user"></i>
@@ -1192,6 +1321,168 @@
         <script type="text/javascript">
             var contextPath = '${pageContext.request.contextPath}';
 //            const contextPath = document.body.dataset.contextPath;
+            
+            // --- Notification JavaScript Functions ---
+            function toggleNotificationDropdown() {
+                const dropdown = document.getElementById("notificationDropdown");
+                if (dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                } else {
+                    dropdown.classList.add('show');
+                    loadNotifications();
+                }
+            }
+
+            function loadNotifications() {
+                const dropdown = document.getElementById("notificationDropdown");
+                const userId = <%= session.getAttribute("user") != null ? ((dto.UserDTO)session.getAttribute("user")).getId() : 0 %>;
+                
+                if (userId <= 0) {
+                    dropdown.innerHTML = '<div class="no-notifications">Vui lòng đăng nhập để xem thông báo</div>';
+                    return;
+                }
+
+                fetch(contextPath + '/notification-servlet?action=getNotifications&userId=' + userId)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.notifications && data.notifications.length > 0) {
+                            displayNotifications(data.notifications);
+                            updateNotificationBadge(data.unreadCount);
+                        } else {
+                            dropdown.innerHTML = '<div class="no-notifications">Bạn không có thông báo nào</div>';
+                            updateNotificationBadge(0);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading notifications:', error);
+                        dropdown.innerHTML = '<div class="no-notifications">Lỗi tải thông báo</div>';
+                    });
+            }
+
+            function displayNotifications(notifications) {
+                const dropdown = document.getElementById("notificationDropdown");
+                dropdown.innerHTML = '';
+                
+                notifications.forEach(notification => {
+                    const item = document.createElement('div');
+                    item.className = `notification-item ${notification.isRead ? '' : 'unread'}`;
+                    item.onclick = () => handleNotificationClick(notification.notificationID, notification.notificationType, notification.relatedID);
+                    
+                    const timeAgo = getTimeAgo(new Date(notification.createdAt));
+                    
+                    item.innerHTML = `
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-content">${notification.content}</div>
+                        <div class="notification-time">${timeAgo}</div>
+                    `;
+                    
+                    dropdown.appendChild(item);
+                });
+            }
+
+            function handleNotificationClick(notificationID, notificationType, relatedID) {
+                // Mark notification as read
+                markNotificationAsRead(notificationID);
+                
+                // Close dropdown
+                toggleNotificationDropdown();
+                
+                // Redirect based on notification type
+                let redirectUrl = null;
+                
+                if (notificationType === 'order' && relatedID) {
+                    redirectUrl = contextPath + '/TicketOrderHistoryServlet';
+                } else if (notificationType === 'event' && relatedID) {
+                    redirectUrl = contextPath + '/EventServlet?id=' + relatedID;
+                } else if (notificationType === 'refund') {
+                    redirectUrl = contextPath + '/customer/refund-history';
+                }
+                
+                if (redirectUrl) {
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 100);
+                }
+            }
+
+            function markNotificationAsRead(notificationID) {
+                const userId = <%= session.getAttribute("user") != null ? ((dto.UserDTO)session.getAttribute("user")).getId() : 0 %>;
+                
+                fetch(contextPath + '/notification-servlet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=markRead&notificationId=' + notificationID + '&userId=' + userId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Remove unread class from notification item
+                        const notificationItem = document.querySelector(`.notification-item[onclick*='${notificationID}']`);
+                        if (notificationItem) {
+                            notificationItem.classList.remove('unread');
+                        }
+                        
+                        // Update badge
+                        updateNotificationBadge();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error marking notification as read:', error);
+                });
+            }
+
+            function updateNotificationBadge(count) {
+                const badge = document.getElementById('notificationBadge');
+                if (badge) {
+                    if (count > 0) {
+                        badge.textContent = count;
+                        badge.classList.add('show');
+                    } else {
+                        badge.textContent = '';
+                        badge.classList.remove('show');
+                    }
+                }
+            }
+
+            function getTimeAgo(date) {
+                const now = new Date();
+                const diffInSeconds = Math.floor((now - date) / 1000);
+                
+                if (diffInSeconds < 60) return 'Vừa xong';
+                if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' phút trước';
+                if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' giờ trước';
+                return Math.floor(diffInSeconds / 86400) + ' ngày trước';
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                const notificationIconContainer = document.querySelector(".notification-icon-container");
+                const notificationDropdown = document.getElementById("notificationDropdown");
+                
+                if (notificationDropdown && notificationIconContainer && 
+                    !notificationIconContainer.contains(e.target) && 
+                    !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.remove("show");
+                }
+            });
+
+            // Initialize notifications on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                const userId = <%= session.getAttribute("user") != null ? ((dto.UserDTO)session.getAttribute("user")).getId() : 0 %>;
+                if (userId > 0) {
+                    // Load initial notification count
+                    fetch(contextPath + '/notification-servlet?action=getUnreadCount&userId=' + userId)
+                        .then(response => response.json())
+                        .then(data => {
+                            updateNotificationBadge(data.unreadCount || 0);
+                        })
+                        .catch(error => {
+                            console.error('Error loading notification count:', error);
+                        });
+                }
+            });
             function handleBuyTickets(eventId, hasSeatingChartStr) {
                 console.log("DEBUG: Bắt đầu hàm handleBuyTickets.");
                 console.log("  - eventId nhận được:", eventId, "(kiểu:", typeof eventId, ")");

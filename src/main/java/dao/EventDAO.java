@@ -886,7 +886,10 @@ public class EventDAO {
     }
 
     public BigDecimal getTotalRevenueOfAllEvent() {
-        String sql = "SELECT SUM(TotalAmount) AS TotalRevenue FROM Orders WHERE PaymentStatus = 'paid'";
+        String sql = "SELECT SUM(o.TotalAmount) - COALESCE(SUM(CASE WHEN r.RefundStatus IN ('approved', 'completed') AND r.IsDeleted = 0 THEN r.RefundAmount ELSE 0 END), 0) AS TotalRevenue " +
+                     "FROM Orders o " +
+                     "LEFT JOIN Refunds r ON o.OrderID = r.OrderID " +
+                     "WHERE o.PaymentStatus = 'paid'";
         BigDecimal totalRevenue = BigDecimal.ZERO;
 
         try (Connection conn = DBConnection.getConnection();
@@ -924,9 +927,11 @@ public class EventDAO {
     }
 
     public BigDecimal getTotalRevenueByOwner(int ownerId) {
-        String sql = "SELECT SUM(t.Amount) FROM Transactions t " +
-                "JOIN Events e ON t.EventID = e.EventID " +
-                "WHERE e.OwnerID = ? AND t.Status = 'completed'";
+        String sql = "SELECT SUM(o.TotalAmount) - COALESCE(SUM(CASE WHEN r.RefundStatus IN ('approved', 'completed') AND r.IsDeleted = 0 THEN r.RefundAmount ELSE 0 END), 0) AS TotalRevenue " +
+                     "FROM Orders o " +
+                     "JOIN Events e ON o.EventID = e.EventID " +
+                     "LEFT JOIN Refunds r ON o.OrderID = r.OrderID " +
+                     "WHERE e.OwnerID = ? AND o.PaymentStatus = 'paid'";
         BigDecimal total = BigDecimal.ZERO;
 
         try (Connection conn = DBConnection.getConnection();
@@ -935,7 +940,7 @@ public class EventDAO {
             ps.setInt(1, ownerId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    total = rs.getBigDecimal(1);
+                    total = rs.getBigDecimal("TotalRevenue");
                     if (rs.wasNull()) {
                         total = BigDecimal.ZERO;
                     }

@@ -74,7 +74,7 @@ public class TicketOrderHistoryServlet extends HttpServlet {
         
         if (currentUser == null) {
             System.out.println("User not authenticated, redirecting to login");
-            response.sendRedirect("login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 

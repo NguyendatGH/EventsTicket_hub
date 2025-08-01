@@ -163,6 +163,13 @@
             flex: 1;
             padding: 2rem;
             overflow-y: auto;
+            margin-left: 280px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
         }
 
         .header {

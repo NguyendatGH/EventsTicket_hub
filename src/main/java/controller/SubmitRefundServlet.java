@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Refund;
 import models.Notification;
+import service.NotificationService;
+import controller.NotificationWebSocket;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -71,20 +73,20 @@ public class SubmitRefundServlet extends HttpServlet {
             }
 
             // Lấy thông tin đơn hàng để tính số tiền hoàn
-//            BigDecimal orderAmount = orderDAO.getOrderAmount(orderId);
-//            if (orderAmount == null) {
-//                request.setAttribute("errorMessage", "Không tìm thấy thông tin đơn hàng.");
-//                request.setAttribute("orderId", orderId);
-//                request.setAttribute("refundReason", refundReason);
-//                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
-//                return;
-//            }
+            BigDecimal orderAmount = orderDAO.getOrderAmount(orderId);
+            if (orderAmount == null) {
+                request.setAttribute("errorMessage", "Không tìm thấy thông tin đơn hàng.");
+                request.setAttribute("orderId", orderId);
+                request.setAttribute("refundReason", refundReason);
+                request.getRequestDispatcher("/pages/RequestRefund.jsp").forward(request, response);
+                return;
+            }
 
             // Tạo yêu cầu hoàn tiền
             Refund refund = new Refund();
             refund.setOrderId(orderId);
             refund.setUserId(currentUser.getId());
-//            refund.setRefundAmount(orderAmount);
+            refund.setRefundAmount(orderAmount);
             refund.setRefundReason(refundReason.trim());
             refund.setRefundStatus("pending");
             refund.setRefundRequestDate(LocalDateTime.now());
@@ -94,7 +96,25 @@ public class SubmitRefundServlet extends HttpServlet {
             boolean success = refundDAO.insertRefund(refund);
 
             if (success) {
-                // Thông báo đã được tạo tự động trong RefundDAO.insertRefund()
+                // Gửi thông báo real-time cho admin về refund request mới
+                try {
+                    System.out.println("🔔 Creating admin notification for refund request...");
+                    System.out.println("📝 Refund ID: " + refund.getRefundId());
+                    System.out.println("📝 Order ID: " + refund.getOrderId());
+                    System.out.println("📝 Refund Amount: " + refund.getRefundAmount());
+                    System.out.println("📝 Refund Reason: " + refund.getRefundReason());
+                    
+                    NotificationWebSocket.sendRefundNotification(
+                        refund.getRefundId(), 
+                        refund.getRefundAmount().toString(), 
+                        refund.getRefundReason()
+                    );
+                    System.out.println("✅ Refund notification sent to admin");
+                } catch (Exception ex) {
+                    System.err.println("❌ Error creating admin notification: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+                
                 session.setAttribute("flashMessage_success", "Yêu cầu hoàn tiền đã được gửi thành công! Chúng tôi sẽ xử lý trong thời gian sớm nhất.");
                 response.sendRedirect(request.getContextPath() + "/TicketOrderHistoryServlet");
             } else {
