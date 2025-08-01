@@ -436,12 +436,7 @@
                     <button class="alert-dismiss">✕</button>
                 </div>
             </c:if>
-            <c:if test="${not empty successMessage}">
-                <script>
-                    alert('Đã tạo sự kiện thành công');
-                    window.location.href = '${pageContext.request.contextPath}/events';
-                </script>
-            </c:if>
+           
             <form action="${pageContext.request.contextPath}/organizer-servlet" method="post" id="ticketForm">
                 <input type="hidden" name="action" value="create"/>
                 <div class="form-section">
@@ -522,15 +517,15 @@
             newTicketType.innerHTML = `
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Ticket Name *</label>
+                        <label class="form-label">Tên vé *</label>
                         <input type="text" class="form-input" name="ticketName[]" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Price (VND) *</label>
+                        <label class="form-label">Giá tiền (VND) *<label>
                         <input type="number" step="0.01" class="form-input" name="ticketPrice[]" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Quantity *</label>
+                        <label class="form-label">Số lượng *</label>
                         <input type="number" class="form-input" name="ticketQuantity[]" required>
                     </div>
                     <button type="button" class="btn-secondary remove-ticket">Remove</button>
@@ -556,7 +551,7 @@
                     const mainContent = document.querySelector('.main-content');
                     const errorAlert = document.createElement('div');
                     errorAlert.className = 'alert';
-                    errorAlert.innerHTML = '<span>Sum of ticket quantities must equal total ticket count</span><button class="alert-dismiss">✕</button>';
+                    errorAlert.innerHTML = '<span>Tổng số lượng các vé bên dưới phải trùng khớp với tổng số vé!</span><button class="alert-dismiss">✕</button>';
                     mainContent.insertBefore(errorAlert, mainContent.firstChild);
                 }
             }
