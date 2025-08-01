@@ -1770,27 +1770,6 @@
                 window.testWebSocket();
             }, 3000);
             
-            // Thêm test button vào trang (chỉ hiển thị khi debug)
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                const testButton = document.createElement('button');
-                testButton.textContent = 'Test Notification';
-                testButton.style.cssText = 'position:fixed;top:10px;left:10px;z-index:9999;background:#667aff;color:white;border:none;padding:10px;border-radius:5px;cursor:pointer;';
-                testButton.onclick = function() {
-                    console.log('🧪 Manual test button clicked');
-                    fetch('${pageContext.request.contextPath}/test-notification')
-                        .then(response => response.text())
-                        .then(result => {
-                            console.log('✅ Test result:', result);
-                            alert('Test notification sent! Check console for details.');
-                        })
-                        .catch(error => {
-                            console.error('❌ Test error:', error);
-                            alert('Test failed! Check console for details.');
-                        });
-                };
-                document.body.appendChild(testButton);
-                console.log('🔧 Test button added to page');
-            }
         });
         </script>
 
