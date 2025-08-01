@@ -173,8 +173,7 @@ public class EventDAO {
         List<Event> suggestedList = new ArrayList<>();
         Event currentEvent = getEventById(currentEventId);
 
-        String sql;
-
+        String sql ="";
         if (currentEvent != null && currentEvent.getGenreID() != null) {
             sql = "SELECT TOP 3 * FROM Events WHERE GenreID = ? AND EventID != ? AND isDeleted = 0 AND isApproved = 1 ORDER BY StartTime DESC";
             try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
